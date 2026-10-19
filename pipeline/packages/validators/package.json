@@ -1,0 +1,14 @@
+{
+  "name": "@prd-ui/validators",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@prd-ui/contracts": "workspace:*",
+    "@prd-ui/design-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@prd-ui/compiler": "workspace:*"
+  }
+}
