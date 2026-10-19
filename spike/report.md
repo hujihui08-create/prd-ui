@@ -27,8 +27,8 @@
 | plan 编译 | **pass** | `spike/spec/figma-plan.{b,c}-end.json` | `pnpm plan` 生成两份 plan；B 有 12 个 `STRETCH` + Content `layoutGrow: 1`，C 有 4 个 `STRETCH` |
 | HTML 构建 | **pass** | `spike/dist-html/` | Vite 构建成功，21 个模块 |
 | HTML 布局 / 无溢出 | **pass** | `spike/artifacts/b-end.png`、`spike/artifacts/c-end.png` | `pnpm test:e2e` 2 passed；console / pageerror 断言为空（自动化）；两张截图已人工查看 |
-| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,597 bytes，含两份 plan，无未解析 import |
-| 类型检查 | **not clean（非门禁）** | `tsc --noEmit` | 插件 JSON import 推断导致 8 个 type-only 错误；`build-plans.ts` 缺 `@types/node`；CSS side-effect import 缺 `vite/client`。esbuild / vitest / Vite 构建均不受影响；计划没有把 `tsc` 设为 Phase 0 门禁 |
+| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,663 bytes，含两份 plan，无未解析 import |
+| 类型检查 | **not clean（非门禁）** | `tsc --noEmit` | 插件包 `tsc --noEmit` 报告 19 个 type-only 错误（JSON 推断 + 新增字段读取）；`build-plans.ts` 缺 `@types/node`；CSS side-effect import 缺 `vite/client`。esbuild / vitest / Vite 构建均不受影响；计划没有把 `tsc` 设为 Phase 0 门禁 |
 
 ## Figma 人工结果（待执行）
 
@@ -49,7 +49,8 @@
 ### 实现过程中对计划代码的修正
 
 - **Auto Layout 尺寸**：计划的插件代码设置 `layoutMode` 后没有设置 sizing mode，frame 会停留在 100×100；fill 轴保持 `AUTO` 也与 Figma 类型约束冲突。已新增 `layoutGrow` / `layoutAlign` 字段与纯函数 `resolveSizingModes`，保证 fill 轴为 `FIXED`、hug 轴为 `AUTO`，并新增 14 个单元测试。
-- **最终验收前对齐修复**：C 端新增 `FeedContent` 包裹层（padding 16 / gap 16），FeedCard 宽 358、封面满宽、`FeedText` 内缩 16，与 HTML 一致；文本填充绑定 `color.text.primary`；Header / TopBar / Search 改为水平 padding 并垂直居中，FilterBar / HeaderRow / Row 垂直居中，BottomNav 两端对齐；图标按 plan `size` 缩放；表格示例文案改用列名。以上均在最终修复波次完成。
+- **最终验收前对齐修复**：C 端新增 `FeedContent` 包裹层（padding 16 / gap 16），FeedCard 宽 358、封面满宽、`FeedText` 水平内缩 16px / 垂直 12px，与 HTML 一致；文本填充绑定 `color.text.primary`；Header / TopBar / Search 改为水平 padding 并垂直居中，FilterBar / HeaderRow / Row 垂直居中，BottomNav 两端对齐；图标按 plan `size` 缩放；表格示例文案改用列名。以上均在最终修复波次完成。
+- **HTML 字体层级**：HTML renderer 现在通过 CSS 变量消费 profile typography（`heading.1/2/3`、`body.md`、`label.sm`），字号 / 行高 / 字重与 Figma 对应文本样式一致（仅受字体回退影响）。
 - **Zod v4**：计划测试使用 Zod 3 的单参数 `z.record()`；安装的是 Zod 4，改为双参数形式，语义等价。
 - **`findNode` 测试 helper**：计划中的 guard 顺序会让 ICON 节点永远找不到；调整为先比较 name，再判断 type，断言未变。
 - **Vite 预览地址**：`vite preview` 默认只绑定 `::1`，已给 `preview:html` / `dev:html` 加 `--host 127.0.0.1`，与计划中的 URL 和 Playwright `baseURL` 一致。

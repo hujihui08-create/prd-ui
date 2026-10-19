@@ -162,3 +162,15 @@ body {
   background: #fff;
   border-top: 1px solid var(--border);
 }
+
+[data-profile] {
+  font-size: var(--body-md-size, 14px);
+  line-height: var(--body-md-line-height, 20px);
+  font-weight: var(--body-md-weight, 400);
+  font-family: var(--body-md-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif);
+}
+.text-heading-1 { font-family: var(--heading-1-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif); font-size: var(--heading-1-size, 28px); line-height: var(--heading-1-line-height, 36px); font-weight: var(--heading-1-weight, 700); }
+.text-heading-2 { font-family: var(--heading-2-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif); font-size: var(--heading-2-size, 24px); line-height: var(--heading-2-line-height, 32px); font-weight: var(--heading-2-weight, 600); }
+.text-heading-3 { font-family: var(--heading-3-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif); font-size: var(--heading-3-size, 18px); line-height: var(--heading-3-line-height, 26px); font-weight: var(--heading-3-weight, 600); }
+.text-body-md { font-family: var(--body-md-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif); font-size: var(--body-md-size, 14px); line-height: var(--body-md-line-height, 20px); font-weight: var(--body-md-weight, 400); }
+.text-label-sm { font-family: var(--label-sm-family, "Noto Sans SC", "PingFang SC", system-ui, sans-serif); font-size: var(--label-sm-size, 12px); line-height: var(--label-sm-line-height, 16px); font-weight: var(--label-sm-weight, 500); }

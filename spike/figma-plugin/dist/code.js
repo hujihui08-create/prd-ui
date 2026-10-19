@@ -630,7 +630,8 @@
                       textStyle: "body.md"
                     }
                   ],
-                  padding: 16,
+                  paddingX: 16,
+                  paddingY: 12,
                   gap: 12,
                   fill: "color.surface.default",
                   layoutAlign: "STRETCH"
@@ -671,7 +672,8 @@
                       textStyle: "body.md"
                     }
                   ],
-                  padding: 16,
+                  paddingX: 16,
+                  paddingY: 12,
                   gap: 12,
                   fill: "color.surface.default",
                   layoutAlign: "STRETCH"

@@ -78,7 +78,11 @@ describe("compilePlan", () => {
     const feedTexts = findAllNodes(plan.root, "FeedText");
     expect(feedTexts).toHaveLength(2);
     for (const feedText of feedTexts) {
-      expect(feedText).toMatchObject({ type: "FRAME", padding: 16 });
+      expect(feedText).toMatchObject({
+        type: "FRAME",
+        paddingX: 16,
+        paddingY: 12,
+      });
     }
 
     expect(findNode(plan.root, "BottomNav")).toMatchObject({

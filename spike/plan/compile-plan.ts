@@ -355,7 +355,8 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
               ),
             ],
             {
-              padding: ctx.space("space.4", "4"),
+              paddingX: ctx.space("space.4", "4"),
+              paddingY: ctx.space("space.3", "3"),
               gap: ctx.space("space.3", "3"),
               fill: "color.surface.default",
               layoutAlign: "STRETCH",

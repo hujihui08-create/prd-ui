@@ -5,16 +5,16 @@ function PageShell({ title, nav = [], children }: any) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="brand">ACME</div>
+        <div className="brand text-heading-2">ACME</div>
         {nav.map((item: string) => (
-          <div className="nav-item" key={item}>
+          <div className="nav-item text-body-md" key={item}>
             {item}
           </div>
         ))}
       </aside>
       <main className="content">
         <header className="header">
-          <h1>{title}</h1>
+          <h1 className="text-heading-2">{title}</h1>
         </header>
         {children}
       </main>
@@ -29,8 +29,8 @@ function Section({ children }: any) {
 function FilterBar({ placeholder, action }: any) {
   return (
     <div className="filter-bar">
-      <div className="search">{placeholder}</div>
-      <button className="primary-button">{action}</button>
+      <div className="search text-body-md">{placeholder}</div>
+      <button className="primary-button text-body-md">{action}</button>
     </div>
   );
 }
@@ -41,7 +41,7 @@ function DataTable({ columns, rows = 3 }: any) {
       <thead>
         <tr>
           {columns.map((column: string) => (
-            <th key={column}>{column}</th>
+            <th className="text-label-sm" key={column}>{column}</th>
           ))}
         </tr>
       </thead>
@@ -49,7 +49,7 @@ function DataTable({ columns, rows = 3 }: any) {
         {Array.from({ length: rows }, (_, rowIndex) => (
           <tr key={rowIndex}>
             {columns.map((column: string) => (
-              <td key={column}>
+              <td className="text-body-md" key={column}>
                 示例 {rowIndex + 1}-{column}
               </td>
             ))}
@@ -64,12 +64,14 @@ function MobileShell({ title, tabs = [], children }: any) {
   return (
     <div className="mobile-shell">
       <header className="mobile-header">
-        <h1>{title}</h1>
+        <h1 className="text-heading-1">{title}</h1>
       </header>
       <main className="mobile-content">{children}</main>
       <nav className="bottom-nav">
         {tabs.map((tab: string) => (
-          <div key={tab}>{tab}</div>
+          <div className="text-label-sm" key={tab}>
+            {tab}
+          </div>
         ))}
       </nav>
     </div>
@@ -80,8 +82,8 @@ function FeedCard({ title, body }: any) {
   return (
     <article className="feed-card">
       <div className="cover" />
-      <h2>{title}</h2>
-      <p>{body}</p>
+      <h2 className="text-heading-3">{title}</h2>
+      <p className="text-body-md">{body}</p>
     </article>
   );
 }
