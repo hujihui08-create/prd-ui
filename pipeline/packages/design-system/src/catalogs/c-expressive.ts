@@ -36,7 +36,7 @@ export const cExpressiveCatalog: Catalog = {
         },
         "bottom-nav": { allowed: ["BottomNav"] },
         title: { allowed: ["Text"] },
-        fields: { allowed: ["FormField", "Input", "Select", "Stack", "Row", "Text"] },
+        fields: { allowed: ["FormField", "Input", "Stack", "Row", "Text"] },
         actions: { allowed: ["Button", "IconButton", "Row", "Stack", "Text"] },
         illustration: { allowed: ["Image"] },
         body: { allowed: ["Text", "Stack", "Row"] },

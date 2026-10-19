@@ -12,7 +12,10 @@ export interface ArchetypeDef {
  * Archetype baselines for the compiler templates.
  *
  * `allowedComponents` lists catalog components that may appear inside the page
- * body. Layout primitives (Text/Grid/Row/Stack/Icon) are not catalog
+ * body. It is template-scoped: components not emitted by an archetype's
+ * compiler template (for example Sidebar/Header, which PageShell subsumes via
+ * its `nav` prop) are deliberately omitted even though they exist in the
+ * catalog. Layout primitives (Text/Grid/Row/Stack/Icon) are not catalog
  * components and are intentionally excluded; the root shell (PageShell for
  * web, MobileShell for mobile) is validated separately by the layout
  * validator because the compiler emits it as the page root.

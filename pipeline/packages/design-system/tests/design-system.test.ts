@@ -111,6 +111,17 @@ const expectedSlots: Record<string, string[]> = {
   onboarding: ["illustration", "title", "body", "actions"],
 };
 
+const expectedStates: Record<string, string[]> = {
+  overview: ["default", "loading", "error"],
+  list: ["default", "empty", "loading", "error"],
+  detail: ["default", "loading", "error"],
+  form: ["default", "loading", "error", "disabled"],
+  settings: ["default", "loading", "error"],
+  feed: ["default", "empty", "loading", "error"],
+  auth: ["default", "loading", "error", "disabled"],
+  onboarding: ["default", "loading", "error"],
+};
+
 const layoutPrimitives = ["Text", "Grid", "Row", "Stack", "Icon"];
 
 function component(catalog: Catalog, id: string) {
@@ -145,6 +156,7 @@ describe("design-system baselines", () => {
       expect(CatalogSchema.safeParse(catalog).success, catalog.meta.library).toBe(true);
       for (const contract of catalog.components) {
         expect(contract.library).toBe(catalog.meta.library);
+        expect(contract.source).toBe("baseline");
         expect(contract.version).toBe(catalog.meta.version);
       }
     }
@@ -180,14 +192,29 @@ describe("design-system baselines", () => {
     expect(component(cExpressiveCatalog, "Input").props.inputType?.enum).toEqual(["text", "email", "password"]);
 
     const pageShell = component(bDenseCatalog, "PageShell");
-    for (const slot of ["content", "summary", "fields", "actions"]) {
+    expect(Object.keys(pageShell.slots ?? {}).sort()).toEqual(["actions", "content", "fields", "groups", "summary"]);
+    for (const slot of ["content", "summary", "fields", "actions", "groups"]) {
       expect(pageShell.slots?.[slot], `PageShell.${slot}`).toBeDefined();
     }
+    expect(pageShell.slots?.actions?.allowed).toContain("Section");
+    expect(pageShell.slots?.groups?.allowed).toEqual(
+      expect.arrayContaining(["Section", "Card", "FormField", "Input", "Select", "Button", "List", "ListItem", "Text"])
+    );
 
     const mobileShell = component(cExpressiveCatalog, "MobileShell");
+    expect(Object.keys(mobileShell.slots ?? {}).sort()).toEqual([
+      "actions",
+      "body",
+      "bottom-nav",
+      "feed",
+      "fields",
+      "illustration",
+      "title",
+    ]);
     for (const slot of ["feed", "bottom-nav", "title", "fields", "actions", "illustration", "body"]) {
       expect(mobileShell.slots?.[slot], `MobileShell.${slot}`).toBeDefined();
     }
+    expect(mobileShell.slots?.fields?.allowed).not.toContain("Select");
   });
 
   it("has eight archetypes", () => {
@@ -218,7 +245,7 @@ describe("design-system baselines", () => {
     for (const archetype of archetypes) {
       expect(archetype.target, archetype.id).toBe(expectedTargets[archetype.id]);
       expect(archetype.requiredSlots, archetype.id).toEqual(expectedSlots[archetype.id]);
-      expect(archetype.requiredStates, archetype.id).toContain("default");
+      expect(archetype.requiredStates, archetype.id).toEqual(expectedStates[archetype.id]);
     }
   });
 
