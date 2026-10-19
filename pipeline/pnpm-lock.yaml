@@ -31,6 +31,12 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
+  packages/design-system:
+    dependencies:
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
 packages:
 
   '@esbuild/aix-ppc64@0.28.2':
