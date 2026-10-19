@@ -1,7 +1,7 @@
 # Phase 0 · Figma 人工验收清单
 
 > 日期：2026-10-19
-> 插件构建 commit：`48f0449`（`fix: improve figma/html parity and acceptance notes`）
+> 插件构建 commit：`b35907d`（`fix: align html typography to profile tokens`）
 > 参考 HTML 截图：`spike/artifacts/b-end.png`、`spike/artifacts/c-end.png`
 
 ## 前置条件
