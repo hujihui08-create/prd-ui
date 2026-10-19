@@ -458,7 +458,7 @@ git commit -m "feat: add svg normalization and asset hard gates"
 - `AssetReviewPorts` includes `producer`, `reviewer`, `store`, `clock`, `log`.
 - `AssetReviewRunResult = { runId; assets: AssetReviewRecord[]; summary; passed: boolean }`.
 
-- [ ] **Step 1: Write failing state-machine tests**
+- [x] **Step 1: Write failing state-machine tests**
 
 Use fake ports with scripted verdict arrays. Cover:
 1. first pass → one frozen record, `passed: true`.
@@ -468,12 +468,12 @@ Use fake ports with scripted verdict arrays. Cover:
 5. budget exceeded → `unresolved` with `BUDGET_EXCEEDED`.
 6. reviewer throws → `reviewer_error`, no source switch.
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests/state-machine.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement ports and state machine**
+- [x] **Step 3: Implement ports and state machine**
 
 The state machine is pure orchestration: it calls ports, validates verdicts with `validateVerdict`, records each attempt, enforces 3 attempts/source and 9/asset, and calls `store.writeJson` for `asset-review.json` and `manifest.json`. It does not import `node:fs`; all IO goes through `store`.
 
@@ -494,7 +494,7 @@ interface AssetReviewRunResult {
 }
 ```
 
-- [ ] **Step 4: Implement prompt builder and schema**
+- [x] **Step 4: Implement prompt builder and schema**
 
 Use `z.toJSONSchema(AssetReviewVerdictSchema)` (Zod 4) to embed the schema. The prompt must include:
 - role: independent asset reviewer
@@ -504,12 +504,12 @@ Use `z.toJSONSchema(AssetReviewVerdictSchema)` (Zod 4) to embed the schema. The 
 - output: JSON only, no markdown fences
 - `verdict` must be `pass|retry|fallback`
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests && pnpm typecheck`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pipeline/core/asset-review

@@ -181,6 +181,33 @@ export const AssetReviewRecordSchema = z
   .strict();
 export type AssetReviewRecord = z.infer<typeof AssetReviewRecordSchema>;
 
+export const AssetReviewSummarySchema = z
+  .object({
+    total: z.number().int().min(0),
+    passed: z.number().int().min(0),
+    retried: z.number().int().min(0),
+    unresolved: z.number().int().min(0),
+    degraded: z.number().int().min(0),
+  })
+  .strict();
+export type AssetReviewSummary = z.infer<typeof AssetReviewSummarySchema>;
+
+export const AssetReviewRunSchema = z
+  .object({
+    runId: z.string().min(1),
+    runDir: z.string().min(1),
+    project: z.string().min(1),
+    profile: z.string().min(1),
+    startedAt: z.string().min(1),
+    finishedAt: z.string().min(1),
+    assets: z.array(AssetReviewRecordSchema),
+    summary: AssetReviewSummarySchema,
+    passed: z.boolean(),
+    error: z.string().optional(),
+  })
+  .strict();
+export type AssetReviewRun = z.infer<typeof AssetReviewRunSchema>;
+
 export const SourcePolicySchema = z
   .object({
     chains: z
