@@ -1,0 +1,7 @@
+{
+  "name": "PRD UI Spike",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page"
+}

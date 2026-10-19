@@ -1,2 +1,5 @@
+packages:
+  - figma-plugin
+
 allowBuilds:
   esbuild: true

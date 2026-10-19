@@ -1,0 +1,13 @@
+{
+  "name": "prd-ui-spike-figma",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.100.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.7.0"
+  }
+}

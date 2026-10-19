@@ -43,6 +43,18 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
+  figma-plugin:
+    devDependencies:
+      '@figma/plugin-typings':
+        specifier: ^1.100.0
+        version: 1.142.0
+      esbuild:
+        specifier: ^0.28.0
+        version: 0.28.2
+      typescript:
+        specifier: ^5.7.0
+        version: 5.7.2
+
 packages:
 
   '@esbuild/aix-ppc64@0.28.2':
@@ -200,6 +212,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@figma/plugin-typings@1.142.0':
+    resolution: {integrity: sha512-Loa9P4bUZi/pQejic8OYQSU4Zz9izJdIiDUkkKddq5Bfc5JPRV6pCeg3C8owovbX9lKshaFym86PlMhKZgLeBw==}
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -677,6 +692,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  typescript@5.7.2:
+    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   typescript@7.0.2:
     resolution: {integrity: sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==}
     engines: {node: '>=16.20.0'}
@@ -853,6 +873,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@figma/plugin-typings@1.142.0': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
@@ -1182,6 +1204,8 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
+
+  typescript@5.7.2: {}
 
   typescript@7.0.2:
     optionalDependencies:
