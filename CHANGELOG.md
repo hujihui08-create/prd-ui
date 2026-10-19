@@ -54,12 +54,17 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   frozen deterministic assets are byte-identical.
 - dsh profile spike: profile loads, plugin activates, and the headless CLI fails
   only with `MISSING_CREDENTIAL` for `PRD_UI_VISION_API_KEY` when no key is set.
+- dsh end-to-end against a **local mock OpenAI-compatible endpoint**:
+  `--only icon-home` passed, then all 13 assets passed (`13 assets, 13 passed`);
+  one chat-completions request per asset, model `mock-vision`, dsh evidence under
+  `runs/<id>/dsh/`.
 
 ### Known blockers / deferred
 
-- A real dsh review was **not** executed because no vision key is configured in
-  this environment. This is intentional: the pipeline fails with
-  `MISSING_CREDENTIAL` instead of faking a pass.
+- A real vision provider key was **not** configured in this environment. The dsh
+  runtime itself was verified end-to-end with a local mock OpenAI-compatible
+  endpoint (13/13 passed); real model quality/cost is not measured. Without a
+  key the pipeline fails with `MISSING_CREDENTIAL` instead of faking a pass.
 - M0 only connects the A library; B/C adapter interfaces and state-machine
   branches exist, but real suppliers/accounts/licensing are M2.
 - IA/Interaction/Visual Style agents are M1; Figma, screenshot diff, recording,

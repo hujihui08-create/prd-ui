@@ -101,6 +101,31 @@ The renderer uses the Page Spec + `b-mobile` tokens; `?state=empty|loading|error
 switches states. A checked-in copy of the rendered slice and screenshots is under
 `artifacts/employee-app/`.
 
+### Asset review (M0)
+
+M0 adds a runtime-neutral asset review core and two execution adapters. It reads
+A-library candidates, runs deterministic hard gates, gets an independent verdict,
+and freezes the assets into `manifest.json`:
+
+```bash
+# 13 assets, scripted reviewer, no model key
+pnpm asset:review \
+  --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0 \
+  --runtime standalone \
+  --runs /tmp/m0-runs
+
+# retry / unresolved scenarios
+pnpm asset:review \
+  --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0-scenarios \
+  --runtime standalone \
+  --runs /tmp/m0-scenarios
+```
+
+For a real dsh review, configure `pipeline/.env` and see
+[`dsh/README.md`](dsh/README.md); the full usage guide is
+[`docs/asset-review-m0.md`](docs/asset-review-m0.md).
 
 ### CLI options
 

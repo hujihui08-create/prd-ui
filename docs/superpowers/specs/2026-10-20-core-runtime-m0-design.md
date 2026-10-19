@@ -937,10 +937,11 @@ M0 已实现并完成本地验证；真实 dsh 视觉评审仍阻塞在 vision k
 | `pnpm asset:review --assets samples/assets/m0-scenarios --runtime standalone` | `1 passed, 1 unresolved`，exit 1 |
 | standalone vs dsh-like conformance | 相同 decision trace；确定性资产 byte-identical |
 | dsh profile spike | profile 加载、插件激活；无 key 时报 `MISSING_CREDENTIAL: PRD_UI_VISION_API_KEY` |
+| dsh end-to-end（本地 mock OpenAI-compatible endpoint） | `--only icon-home` 通过；13 个资产 `13 passed`；每个资产一次 chat-completions 请求；证据在 `runs/<id>/dsh/` |
 
 ### 15.3 当前阻塞 / 后续
 
-- 真实 dsh 评审需要用户配置 `PRD_UI_VISION_API_KEY`（及 base URL/model）；未配置时不会伪造 pass。
+- 真实 dsh 评审需要用户配置 `PRD_UI_VISION_API_KEY`（及 base URL/model）；未配置时不会伪造 pass。dsh 运行时已用本地 mock OpenAI-compatible endpoint 跑通 13 资产，但真实模型质量/成本尚未测量。
 - B/C 真实供应商、IA/Interaction/Visual Style Agent、Figma、截图 diff、录屏/trace 仍按 §1.4 的 M1–M3 顺序。
 - dsh 仍是 rc；CLI 与 bundle 版本锁定，`@next` 不作为默认依赖。
 

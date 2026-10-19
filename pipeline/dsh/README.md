@@ -66,6 +66,10 @@ Without a key the profile loads and the plugin activates, then fails with
 "wired but unconfigured" state. With a key, the command prints the model's final
 message and exits 0.
 
+The full `asset:review --runtime dsh` path was also verified against a local
+mock OpenAI-compatible endpoint: one icon smoke passed, then all 13 M0 assets
+passed. A real provider key is still required to measure visual quality/cost.
+
 ## Run asset review
 
 ```bash

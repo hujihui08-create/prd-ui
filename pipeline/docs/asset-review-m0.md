@@ -55,6 +55,8 @@ DSH_HOME="$PWD/dsh/home" \
 
 先用 `--only icon-home` 验证 key 和 profile，再跑全部资产。
 
+本地已用 mock OpenAI-compatible endpoint 跑通 dsh 端到端（1 个图标 smoke + 13 个资产全通过）；真实 provider 的视觉质量/成本仍需配置 key 后测量。
+
 ## 结果
 
 | 路径 | 内容 |

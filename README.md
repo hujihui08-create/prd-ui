@@ -99,6 +99,8 @@ DSH_HOME="$PWD/dsh/home" \
 
 profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipeline/dsh/README.md)。
 
+> 本地已用 mock OpenAI-compatible endpoint 跑通 dsh 端到端（13/13 passed）；真实 provider 的视觉质量/成本仍需配置 key 后测量。
+
 ## 测试与验收
 
 - `pnpm test`：231 tests（core + standalone + dsh adapter conformance）。
