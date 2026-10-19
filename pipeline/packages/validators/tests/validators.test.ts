@@ -5,6 +5,8 @@ import {
   type PageSpec,
   type ReqId,
   type SpecNode,
+  type UiBrief,
+  type UiBriefPage,
 } from "@prd-ui/contracts";
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
@@ -19,7 +21,8 @@ import {
 } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
-const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
+const deps = { getProfile, getCatalog, getArchetype };
+const specs = compileProject(brief, deps);
 const specByPageId = new Map(specs.map((spec) => [spec.meta.pageId, spec]));
 
 const manifestsByProfile: Record<string, AssetManifest> = {
@@ -79,18 +82,94 @@ function requiredSpec(pageId: string): PageSpec {
   return spec;
 }
 
-function contextFor(spec: PageSpec): ValidationContext {
-  const manifest = manifestsByProfile[spec.meta.profile];
+function contextForSpec(
+  spec: PageSpec,
+  page: UiBriefPage | undefined,
+  navigation: ValidationContext["navigation"],
+  manifests: Record<string, AssetManifest> = manifestsByProfile
+): ValidationContext {
+  const manifest = manifests[spec.meta.profile];
   if (!manifest) throw new Error(`Unknown manifest profile: ${spec.meta.profile}`);
-  const page = brief.ia.pages.find((candidate) => candidate.id === spec.meta.pageId);
   return {
     profile: getProfile(spec.meta.profile),
     catalog: getCatalog(spec.meta.profile),
     archetype: getArchetype(spec.meta.archetype),
     manifest,
     requiredStates: page?.requiredStates,
+    briefPage: page,
+    navigation,
   };
 }
+
+function contextFor(spec: PageSpec): ValidationContext {
+  const page = brief.ia.pages.find((candidate) => candidate.id === spec.meta.pageId);
+  return contextForSpec(spec, page, brief.ia.navigation);
+}
+
+/** Context without brief data; semantic checks must be skipped. */
+function brieflessContextFor(spec: PageSpec): ValidationContext {
+  return contextForSpec(spec, undefined, undefined);
+}
+
+function findingDetail(report: ValidationReport): string {
+  return report.findings
+    .map((finding) => `${finding.ruleId}@${finding.location}: ${finding.issue}`)
+    .join("\n");
+}
+
+const customersPage: UiBriefPage = {
+  id: "customers-list",
+  name: "客户列表",
+  purpose: "查看和管理客户",
+  archetype: "list",
+  target: "web",
+  profile: "b-dense",
+  route: "/customers",
+  roles: ["admin", "operator"],
+  requiredStates: ["default", "empty", "loading", "error"],
+  reqRefs: ["REQ-ORDER-009"],
+  fields: ["customerName", "phone", "email"],
+  filterFields: ["name", "phone"],
+  actions: ["新建客户"],
+  emptyTitle: "暂无客户",
+};
+
+const customersBrief = structuredClone(brief) as UiBrief;
+customersBrief.ia.pages.push(customersPage);
+customersBrief.traceability.reqMap["REQ-ORDER-009"] = ["customers-list"];
+const customersSpec = compileProject(customersBrief, deps).find(
+  (spec) => spec.meta.pageId === "customers-list"
+)!;
+
+const contactsPage: UiBriefPage = {
+  id: "contacts-list",
+  name: "联系人列表",
+  purpose: "查看和管理联系人",
+  archetype: "list",
+  target: "web",
+  profile: "b-dense",
+  route: "/contacts",
+  roles: ["admin", "operator"],
+  requiredStates: ["default", "empty", "loading", "error"],
+  reqRefs: ["REQ-CRM-001"],
+  fields: ["name", "email", "phone"],
+  filterFields: ["name", "email"],
+  actions: ["新建联系人"],
+  emptyTitle: "暂无联系人",
+};
+
+const crmBrief = structuredClone(brief) as UiBrief;
+crmBrief.meta.project = "demo-crm";
+crmBrief.ia.pages = [contactsPage];
+crmBrief.ia.navigation = { primary: ["联系人", "设置"] };
+crmBrief.ia.flows = [];
+crmBrief.traceability.reqMap = { "REQ-CRM-001": ["contacts-list"] };
+crmBrief.traceability.unmapped = [];
+const contactsSpec = compileProject(crmBrief, deps)[0]!;
+const crmManifestsByProfile: Record<string, AssetManifest> = {
+  ...manifestsByProfile,
+  "b-dense": { ...structuredClone(manifestsByProfile["b-dense"]!), project: "demo-crm" },
+};
 
 function cloneSpec(pageId: string): PageSpec {
   return structuredClone(requiredSpec(pageId));
@@ -104,6 +183,16 @@ function findNode(spec: PageSpec, type: string): SpecNode {
 
 function ruleIds(report: ValidationReport): string[] {
   return [...new Set(report.findings.map((finding) => finding.ruleId))];
+}
+
+function semanticRuleIds(report: ValidationReport): string[] {
+  return [
+    ...new Set(
+      report.findings
+        .filter((finding) => finding.ruleId.startsWith("SEMANTIC-"))
+        .map((finding) => finding.ruleId)
+    ),
+  ];
 }
 
 describe("compiled sample specs", () => {
@@ -156,6 +245,171 @@ describe("compiled sample specs", () => {
     );
     expect(report.blockers).toBe(report.findings.length);
     expect(report.passed).toBe(false);
+  });
+});
+
+describe("brief semantic validation", () => {
+  it("reports zero semantic findings for all eight sample pages", () => {
+    for (const spec of specs) {
+      const report = validatePageSpec(spec, contextFor(spec));
+      expect(semanticRuleIds(report), `${spec.meta.pageId}\n${findingDetail(report)}`).toEqual(
+        []
+      );
+      expect(report.passed, findingDetail(report)).toBe(true);
+    }
+  });
+
+  it("reports zero semantic findings for a custom customers-list page", () => {
+    const report = validatePageSpec(
+      customersSpec,
+      contextForSpec(customersSpec, customersPage, customersBrief.ia.navigation)
+    );
+    expect(report.findings, findingDetail(report)).toEqual([]);
+    expect(report.passed).toBe(true);
+  });
+
+  it("reports zero semantic findings for a custom contacts-list page", () => {
+    const report = validatePageSpec(
+      contactsSpec,
+      contextForSpec(
+        contactsSpec,
+        contactsPage,
+        crmBrief.ia.navigation,
+        crmManifestsByProfile
+      )
+    );
+    expect(report.findings, findingDetail(report)).toEqual([]);
+    expect(report.passed).toBe(true);
+  });
+
+  it("rejects a customer page that renders order fields, actions, and empty copy", () => {
+    const spec = structuredClone(customersSpec);
+    const table = findNode(spec, "DataTable");
+    table.props = {
+      ...(table.props ?? {}),
+      columns: ["orderNo", "customer", "amount", "status", "createdAt"],
+    };
+    const filter = findNode(spec, "FilterBar");
+    filter.props = { ...(filter.props ?? {}), action: "新建订单" };
+    const empty = findNode(spec, "EmptyState");
+    empty.props = { ...(empty.props ?? {}), title: "暂无订单" };
+    spec.interactions = [{ trigger: "新建订单", action: "navigate" }];
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, customersPage, customersBrief.ia.navigation)
+    );
+    const ids = semanticRuleIds(report);
+    expect(ids, findingDetail(report)).toContain("SEMANTIC-FIELD");
+    expect(ids, findingDetail(report)).toContain("SEMANTIC-ACTION");
+    expect(ids, findingDetail(report)).toContain("SEMANTIC-EMPTY");
+    expect(
+      report.findings
+        .filter((finding) => finding.ruleId.startsWith("SEMANTIC-"))
+        .every((finding) => finding.severity === "blocker")
+    ).toBe(true);
+    expect(report.passed).toBe(false);
+  });
+
+  it("reports SEMANTIC-META for name, purpose, route, and role drift", () => {
+    const spec = structuredClone(customersSpec);
+    spec.meta.name = "订单列表";
+    spec.meta.purpose = "查看和管理订单";
+    spec.meta.route = "/orders";
+    spec.meta.roles = ["admin"];
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, customersPage, customersBrief.ia.navigation)
+    );
+    const metaFindings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-META"
+    );
+    expect(metaFindings.map((finding) => finding.location).sort()).toEqual([
+      "meta.name",
+      "meta.purpose",
+      "meta.roles",
+      "meta.route",
+    ]);
+    expect(metaFindings.every((finding) => finding.severity === "blocker")).toBe(true);
+  });
+
+  it("compares roles order-insensitively", () => {
+    const spec = structuredClone(customersSpec);
+    spec.meta.roles = ["operator", "admin"];
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, customersPage, customersBrief.ia.navigation)
+    );
+    expect(semanticRuleIds(report), findingDetail(report)).toEqual([]);
+    expect(report.passed).toBe(true);
+  });
+
+  it("reports SEMANTIC-NAV when a web nav item is missing", () => {
+    const spec = cloneSpec("orders-list");
+    const nav = (spec.layout.props?.nav as string[] | undefined) ?? [];
+    spec.layout.props = {
+      ...(spec.layout.props ?? {}),
+      nav: nav.filter((item) => item !== "客户"),
+    };
+
+    const report = validatePageSpec(spec, contextFor(spec));
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-NAV"
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.evidence).toBe("客户");
+    expect(findings[0]?.location).toBe("layout.props.nav");
+    expect(report.passed).toBe(false);
+  });
+
+  it("reports SEMANTIC-NAV when a mobile tab is missing", () => {
+    const spec = cloneSpec("home-feed");
+    const tabs = (spec.layout.props?.tabs as string[] | undefined) ?? [];
+    spec.layout.props = {
+      ...(spec.layout.props ?? {}),
+      tabs: tabs.filter((item) => item !== "关注"),
+    };
+
+    const report = validatePageSpec(spec, contextFor(spec));
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-NAV"
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.evidence).toBe("关注");
+    expect(findings[0]?.location).toBe("layout.props.tabs");
+  });
+
+  it("reports SEMANTIC-EMPTY when the brief empty title is absent", () => {
+    const spec = cloneSpec("orders-list");
+    const empty = findNode(spec, "EmptyState");
+    empty.props = { ...(empty.props ?? {}), title: "暂无数据" };
+
+    const report = validatePageSpec(spec, contextFor(spec));
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-EMPTY"
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.evidence).toBe("暂无订单");
+    expect(report.passed).toBe(false);
+  });
+
+  it("skips every semantic check when brief context is absent", () => {
+    const spec = cloneSpec("orders-list");
+    spec.meta.name = "客户列表";
+    const nav = (spec.layout.props?.nav as string[] | undefined) ?? [];
+    spec.layout.props = {
+      ...(spec.layout.props ?? {}),
+      nav: nav.filter((item) => item !== "客户"),
+    };
+    const empty = findNode(spec, "EmptyState");
+    empty.props = { ...(empty.props ?? {}), title: "暂无数据" };
+
+    const report = validatePageSpec(spec, brieflessContextFor(spec));
+    expect(semanticRuleIds(report)).toEqual([]);
+    expect(report.findings, findingDetail(report)).toEqual([]);
+    expect(report.passed).toBe(true);
   });
 });
 
@@ -391,7 +645,7 @@ describe("layout validation", () => {
     const spec = cloneSpec("orders-list");
     delete spec.layout.slots!.content;
 
-    const report = validatePageSpec(spec, contextFor(spec));
+    const report = validatePageSpec(spec, brieflessContextFor(spec));
     expect(ruleIds(report)).toEqual(["LAYOUT-SLOT"]);
   });
 
@@ -399,7 +653,7 @@ describe("layout validation", () => {
     const spec = cloneSpec("orders-list");
     spec.layout.slots!.content = [];
 
-    const report = validatePageSpec(spec, contextFor(spec));
+    const report = validatePageSpec(spec, brieflessContextFor(spec));
     expect(ruleIds(report)).toEqual(["LAYOUT-SLOT"]);
   });
 });

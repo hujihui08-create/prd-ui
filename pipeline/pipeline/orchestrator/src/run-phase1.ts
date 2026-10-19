@@ -297,6 +297,7 @@ function buildContexts(
           `No asset manifest for profile "${spec.meta.profile}" (page "${spec.meta.pageId}").`
         );
       }
+      const page = pagesById.get(spec.meta.pageId);
       return [
         spec.meta.pageId,
         {
@@ -304,7 +305,9 @@ function buildContexts(
           catalog: getCatalog(spec.meta.profile),
           archetype: getArchetype(spec.meta.archetype),
           manifest,
-          requiredStates: pagesById.get(spec.meta.pageId)?.requiredStates,
+          requiredStates: page?.requiredStates,
+          briefPage: page,
+          navigation: brief.ia.navigation,
         },
       ];
     })

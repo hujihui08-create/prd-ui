@@ -4,6 +4,7 @@ import type {
   Finding,
   Profile,
   SpecNode,
+  UiBriefPage,
 } from "@prd-ui/contracts";
 import type { ArchetypeDef } from "@prd-ui/design-system";
 
@@ -15,6 +16,17 @@ export interface ValidationContext {
   manifest: AssetManifest;
   /** States required by the page's own brief entry, beyond the archetype set. */
   requiredStates?: string[];
+  /**
+   * The page's entry in the UI brief. Semantic checks are skipped when this is
+   * absent so unit contexts that predate brief-driven compilation still work;
+   * the orchestrator always provides it.
+   */
+  briefPage?: UiBriefPage;
+  /**
+   * The brief's information architecture navigation. Semantic nav checks are
+   * skipped when this is absent; the orchestrator always provides it.
+   */
+  navigation?: { primary: string[]; tabs?: string[] };
 }
 
 export interface ValidationReport {

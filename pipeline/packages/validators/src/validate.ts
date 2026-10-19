@@ -3,6 +3,7 @@ import { validateAsset } from "./asset.js";
 import { validateCatalog } from "./catalog.js";
 import { validateLayout } from "./layout.js";
 import { validateSchema } from "./schema.js";
+import { validateSemantic } from "./semantic.js";
 import { validateState } from "./state.js";
 import { validateToken } from "./token.js";
 import { validateTraceability } from "./traceability.js";
@@ -18,6 +19,7 @@ const validators: PageValidator[] = [
   validateState,
   validateAsset,
   validateTraceability,
+  validateSemantic,
 ];
 
 /**

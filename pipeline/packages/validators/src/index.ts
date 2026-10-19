@@ -6,4 +6,5 @@ export * from "./layout.js";
 export * from "./state.js";
 export * from "./asset.js";
 export * from "./traceability.js";
+export * from "./semantic.js";
 export * from "./validate.js";
