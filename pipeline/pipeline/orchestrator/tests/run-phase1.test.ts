@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import type { PageSpec, RunState, UiBrief } from "@prd-ui/contracts";
+import type { AssetManifest, PageSpec, RunState, UiBrief } from "@prd-ui/contracts";
 import type { ValidationReport } from "@prd-ui/validators";
 import sampleBrief from "../../../samples/ui-brief.sample.json";
 import { runPhase1 } from "../src/run-phase1.js";
@@ -38,6 +38,18 @@ async function writeBriefFile(
   mutate(brief);
   const filePath = path.join(dir, "brief.json");
   await writeFile(filePath, JSON.stringify(brief), "utf8");
+  return filePath;
+}
+
+async function writeIconsOnlyManifest(
+  filePath: string,
+  manifest: AssetManifest
+): Promise<string> {
+  const iconsOnly: AssetManifest = {
+    ...manifest,
+    assets: manifest.assets.filter((asset) => asset.kind === "icon"),
+  };
+  await writeFile(filePath, JSON.stringify(iconsOnly), "utf8");
   return filePath;
 }
 
@@ -176,6 +188,9 @@ describe("runPhase1", () => {
     expect(result.passed).toBe(false);
     expect(result.pages).toBe(0);
     expect(result.blockers).toBe(1);
+    expect(result.findings.map((finding) => finding.ruleId)).toEqual([
+      "BRIEF-BLOCKING-QUESTION",
+    ]);
 
     const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
     expect(state.status).toBe("failed");
@@ -280,6 +295,9 @@ describe("runPhase1", () => {
 
     expect(result.passed).toBe(false);
     expect(result.blockers).toBe(1);
+    expect(result.findings).toHaveLength(1);
+    expect(result.findings[0]?.ruleId).toBe("PROJECT-MISMATCH");
+    expect(result.findings[0]?.severity).toBe("blocker");
     const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
     expect(state.status).toBe("failed");
     const log = await readFile(path.join(result.runDir, "logs", "run.log"), "utf8");
@@ -297,11 +315,88 @@ describe("runPhase1", () => {
 
     expect(result.passed).toBe(false);
     expect(result.blockers).toBe(1);
+    expect(result.findings).toHaveLength(1);
+    expect(result.findings[0]?.ruleId).toBe("PROJECT-MANIFEST-MISSING");
+    expect(result.findings[0]?.issue).toContain("c-expressive");
     const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
     expect(state.status).toBe("failed");
     const log = await readFile(path.join(result.runDir, "logs", "run.log"), "utf8");
     expect(log).toContain("PROJECT-MANIFEST-MISSING");
     expect(log).toContain("c-expressive");
+  });
+
+  it("runs a 9-page brief with a custom customers-list and no empty illustration", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+    const briefPath = await writeBriefFile(tmpDir, (brief) => {
+      // Every page in this brief opts out of empty illustrations, so the
+      // icons-only manifests below have nothing to resolve.
+      for (const page of brief.ia.pages) delete page.emptyAssetRef;
+      brief.ia.pages.push({
+        id: "customers-list",
+        name: "客户列表",
+        purpose: "查看和管理客户",
+        archetype: "list",
+        target: "web",
+        profile: "b-dense",
+        route: "/customers",
+        roles: ["admin", "operator"],
+        requiredStates: ["default", "empty", "loading", "error"],
+        reqRefs: ["REQ-ORDER-009"],
+        fields: ["customerName", "phone", "email"],
+        filterFields: ["name", "phone"],
+        actions: ["新建客户", "导出客户"],
+        emptyTitle: "暂无客户",
+      });
+      brief.traceability.reqMap["REQ-ORDER-009"] = ["customers-list"];
+    });
+
+    const sampleBDense = await readJson<AssetManifest>(
+      path.join(samplesDir, "asset-manifest.b-dense.json")
+    );
+    const sampleCExpressive = await readJson<AssetManifest>(
+      path.join(samplesDir, "asset-manifest.c-expressive.json")
+    );
+    const bDenseManifest = await writeIconsOnlyManifest(
+      path.join(tmpDir, "asset-manifest.b-dense.json"),
+      sampleBDense
+    );
+    const cExpressiveManifest = await writeIconsOnlyManifest(
+      path.join(tmpDir, "asset-manifest.c-expressive.json"),
+      sampleCExpressive
+    );
+
+    const result = await runPhase1({
+      runsDir: path.join(tmpDir, "runs"),
+      briefPath,
+      manifests: { "b-dense": bDenseManifest, "c-expressive": cExpressiveManifest },
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.pages).toBe(9);
+    expect(result.blockers).toBe(0);
+    expect(result.findings).toEqual([]);
+
+    const spec = await readJson<PageSpec>(
+      path.join(result.runDir, "artifacts", "page-spec", "customers-list.json")
+    );
+    const section = spec.layout.slots?.content?.[0]!;
+    const children = section.children ?? [];
+    const filterBar = children.find((node) => node.type === "FilterBar");
+    const actionRow = children.find((node) => node.type === "Row");
+    const emptyState = children.find((node) => node.type === "EmptyState");
+
+    expect(filterBar?.props?.action).toBe("新建客户");
+    expect(actionRow?.children?.map((node) => node.props?.label)).toEqual(["导出客户"]);
+    expect(emptyState?.assetRef).toBeUndefined();
+    expect(JSON.stringify(spec)).toContain("新建客户");
+    expect(JSON.stringify(spec)).toContain("导出客户");
+    expect(JSON.stringify(spec)).not.toContain("empty-orders");
+
+    const reports = await readJson<ValidationReport[]>(
+      path.join(result.runDir, "reports", "validation.json")
+    );
+    expect(reports).toHaveLength(9);
+    expect(reports.every((report) => report.passed)).toBe(true);
   });
 
   it("compiles the demo-crm project from its own brief and manifest", async () => {

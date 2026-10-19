@@ -76,7 +76,8 @@
         "fields": ["orderNo", "customer", "amount", "status", "createdAt"],
         "actions": ["新建订单"],
         "filterFields": ["status", "date", "keyword"],
-        "emptyTitle": "暂无订单"
+        "emptyTitle": "暂无订单",
+        "emptyAssetRef": "empty-orders"
       },
       {
         "id": "order-detail",
@@ -137,7 +138,8 @@
         "feedItems": [
           { "title": "周末去哪儿", "body": "城市周边 5 个小众目的地" },
           { "title": "新店开业", "body": "手冲咖啡买一送一" }
-        ]
+        ],
+        "emptyAssetRef": "empty-feed"
       },
       {
         "id": "item-detail",

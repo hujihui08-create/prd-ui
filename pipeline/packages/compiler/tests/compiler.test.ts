@@ -280,6 +280,97 @@ describe("brief-driven page content", () => {
     );
   });
 
+  it("renders every action for detail, form, settings, auth, and onboarding", () => {
+    const actionPages: UiBriefPage[] = [
+      {
+        id: "action-detail",
+        name: "客户详情",
+        purpose: "查看客户",
+        archetype: "detail",
+        target: "web",
+        profile: "b-dense",
+        route: "/action-detail",
+        roles: ["admin"],
+        requiredStates: ["default", "loading", "error"],
+        reqRefs: ["REQ-ORDER-001"],
+        fields: ["name"],
+        actions: ["编辑客户", "导出客户"],
+      },
+      {
+        id: "action-form",
+        name: "客户表单",
+        purpose: "创建客户",
+        archetype: "form",
+        target: "web",
+        profile: "b-dense",
+        route: "/action-form",
+        roles: ["admin"],
+        requiredStates: ["default", "loading", "error", "disabled"],
+        reqRefs: ["REQ-ORDER-001"],
+        fields: ["name"],
+        actions: ["保存草稿", "提交"],
+      },
+      {
+        id: "action-settings",
+        name: "客户设置",
+        purpose: "维护偏好",
+        archetype: "settings",
+        target: "web",
+        profile: "b-dense",
+        route: "/action-settings",
+        roles: ["admin"],
+        requiredStates: ["default", "loading", "error"],
+        reqRefs: ["REQ-ORDER-001"],
+        fields: ["notifications"],
+        actions: ["保存", "重置"],
+      },
+      {
+        id: "action-auth",
+        name: "账号登录",
+        purpose: "登录账号",
+        archetype: "auth",
+        target: "mobile",
+        profile: "c-expressive",
+        route: "/action-auth",
+        roles: ["viewer"],
+        requiredStates: ["default", "loading", "error", "disabled"],
+        reqRefs: ["REQ-ORDER-001"],
+        fields: ["email", "password"],
+        actions: ["登录", "注册"],
+      },
+      {
+        id: "action-onboarding",
+        name: "引导页",
+        purpose: "了解产品",
+        archetype: "onboarding",
+        target: "mobile",
+        profile: "c-expressive",
+        route: "/action-onboarding",
+        roles: ["viewer"],
+        requiredStates: ["default", "loading", "error"],
+        reqRefs: ["REQ-ORDER-001"],
+        actions: ["开始", "稍后"],
+      },
+    ];
+
+    const actionBrief: UiBrief = structuredClone(brief);
+    actionBrief.ia.pages.push(...actionPages);
+    const compiled = compileProject(actionBrief, deps);
+    const compiledById = new Map(compiled.map((spec) => [spec.meta.pageId, spec]));
+
+    for (const page of actionPages) {
+      const spec = compiledById.get(page.id)!;
+      const serialized = JSON.stringify(spec.layout);
+      for (const action of page.actions ?? []) {
+        expect(serialized, `${page.id} layout`).toContain(action);
+      }
+      expect(
+        nodesOf(spec, "Button").map((node) => node.props?.label),
+        page.id
+      ).toEqual(page.actions);
+    }
+  });
+
   it("compiles a custom customers-list page with its own content", () => {
     const customersPage: UiBriefPage = {
       id: "customers-list",
@@ -294,7 +385,7 @@ describe("brief-driven page content", () => {
       reqRefs: ["REQ-ORDER-009"],
       fields: ["customerName", "phone", "email"],
       filterFields: ["name", "phone"],
-      actions: ["新建客户"],
+      actions: ["新建客户", "导出客户"],
       emptyTitle: "暂无客户",
     };
 
@@ -317,8 +408,15 @@ describe("brief-driven page content", () => {
       action: "新建客户",
     });
     expect(nodesOf(customersSpec, "EmptyState")[0]?.props?.title).toBe("暂无客户");
-    expect(nodesOf(customersSpec, "EmptyState")[0]?.assetRef).toBe("empty-orders");
+    expect(nodesOf(customersSpec, "EmptyState")[0]?.assetRef).toBeUndefined();
     expect(customersSpec.layout.props?.nav).toEqual(brief.ia.navigation.primary);
+
+    const serializedLayout = JSON.stringify(customersSpec.layout);
+    expect(serializedLayout).toContain("新建客户");
+    expect(serializedLayout).toContain("导出客户");
+    expect(nodesOf(customersSpec, "Button").map((node) => node.props?.label)).toEqual([
+      "导出客户",
+    ]);
 
     expect(customersSpec.meta).toMatchObject({
       purpose: customersPage.purpose,
@@ -326,6 +424,36 @@ describe("brief-driven page content", () => {
       roles: customersPage.roles,
     });
     expectNoOrderCopy(customersSpec);
+  });
+
+  it("does not invent an empty illustration for a list page without emptyAssetRef", () => {
+    const barePage: UiBriefPage = {
+      id: "vendors-list",
+      name: "供应商列表",
+      purpose: "查看供应商",
+      archetype: "list",
+      target: "web",
+      profile: "b-dense",
+      route: "/vendors",
+      roles: ["admin"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-ORDER-009"],
+      fields: ["vendorName"],
+    };
+
+    const bareBrief: UiBrief = structuredClone(brief);
+    bareBrief.ia.pages.push(barePage);
+    bareBrief.traceability.reqMap["REQ-ORDER-009"] = ["vendors-list"];
+
+    const bareSpec = compileProject(bareBrief, deps).find(
+      (spec) => spec.meta.pageId === "vendors-list"
+    )!;
+    const empty = nodesOf(bareSpec, "EmptyState")[0]!;
+
+    expect(empty.assetRef).toBeUndefined();
+    expect(JSON.stringify(bareSpec)).not.toContain("empty-orders");
+    expect(JSON.stringify(bareSpec)).not.toContain("empty-feed");
+    expect(nodesOf(bareSpec, "FilterBar")[0]?.props?.action).toBe("新建");
   });
 
   it("compiles a demo-crm contacts-list page without order copy", () => {
@@ -344,6 +472,7 @@ describe("brief-driven page content", () => {
       filterFields: ["name", "email"],
       actions: ["新建联系人"],
       emptyTitle: "暂无联系人",
+      emptyAssetRef: "empty-contacts",
     };
 
     const crmBrief: UiBrief = structuredClone(brief);
@@ -369,7 +498,7 @@ describe("brief-driven page content", () => {
       action: "新建联系人",
     });
     expect(nodesOf(contactsSpec, "EmptyState")[0]?.props?.title).toBe("暂无联系人");
-    expect(nodesOf(contactsSpec, "EmptyState")[0]?.assetRef).toBe("empty-orders");
+    expect(nodesOf(contactsSpec, "EmptyState")[0]?.assetRef).toBe("empty-contacts");
     expect(contactsSpec.layout.props?.nav).toEqual(["联系人", "设置"]);
     expect(contactsSpec.meta).toMatchObject({
       project: "demo-crm",

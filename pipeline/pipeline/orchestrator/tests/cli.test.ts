@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
+import type { AssetManifest, PageSpec, UiBrief } from "@prd-ui/contracts";
 
 const execFileAsync = promisify(execFile);
 const pipelineRoot = path.resolve(
@@ -171,8 +172,10 @@ describe("phase1 CLI", () => {
     );
 
     expect(result.code).toBe(1);
-    expect(result.stdout).toContain("Phase 1A FAILED: 0 pages, 1 blockers");
+    expect(result.stdout).toContain("Phase 1A FAILED: 0 pages, 1 blocker");
     expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
+    expect(result.stdout).toContain("- PROJECT-MANIFEST-MISSING:");
+    expect(result.stdout).toContain("c-expressive");
     const log = await readLog(await findRunDir(runsDir));
     expect(log).toContain("PROJECT-MANIFEST-MISSING");
     expect(log).toContain("c-expressive");
@@ -201,10 +204,118 @@ describe("phase1 CLI", () => {
     );
 
     expect(result.code).toBe(1);
-    expect(result.stdout).toContain("Phase 1A FAILED: 0 pages, 1 blockers");
+    expect(result.stdout).toContain("Phase 1A FAILED: 0 pages, 1 blocker");
     expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
+    expect(result.stdout).toContain("- PROJECT-MISMATCH:");
+    expect(result.stdout).toContain('"another-project"');
     const log = await readLog(await findRunDir(runsDir));
     expect(log).toContain("PROJECT-MISMATCH");
+  });
+
+  it("prints page validation blockers on stdout", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const runsDir = path.join(tmpDir, "runs");
+    const brief = JSON.parse(
+      await readFile(path.join(samplesDir, "ui-brief.sample.json"), "utf8")
+    ) as UiBrief;
+    const ordersList = brief.ia.pages.find((page) => page.id === "orders-list")!;
+    ordersList.emptyAssetRef = "missing-illustration";
+    const briefPath = path.join(tmpDir, "brief.json");
+    await writeFile(briefPath, JSON.stringify(brief), "utf8");
+
+    const result = await runCli(
+      [
+        "--brief",
+        briefPath,
+        "--manifest",
+        "b-dense=samples/asset-manifest.b-dense.json",
+        "--manifest",
+        "c-expressive=samples/asset-manifest.c-expressive.json",
+        "--runs",
+        runsDir,
+      ],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain("Phase 1A FAILED: 8 pages, 1 blocker");
+    expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
+    expect(result.stdout).toContain("- ASSET-MISSING:");
+    expect(result.stdout).toContain("missing-illustration");
+  });
+
+  it("runs a 9-page customers-list brief with --brief and --manifest", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const workDir = tmpDir;
+    const runsDir = path.join(workDir, "runs");
+    const brief = JSON.parse(
+      await readFile(path.join(samplesDir, "ui-brief.sample.json"), "utf8")
+    ) as UiBrief;
+    for (const page of brief.ia.pages) delete page.emptyAssetRef;
+    brief.ia.pages.push({
+      id: "customers-list",
+      name: "客户列表",
+      purpose: "查看和管理客户",
+      archetype: "list",
+      target: "web",
+      profile: "b-dense",
+      route: "/customers",
+      roles: ["admin", "operator"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-ORDER-009"],
+      fields: ["customerName", "phone", "email"],
+      filterFields: ["name", "phone"],
+      actions: ["新建客户", "导出客户"],
+      emptyTitle: "暂无客户",
+    });
+    brief.traceability.reqMap["REQ-ORDER-009"] = ["customers-list"];
+    const briefPath = path.join(workDir, "brief.json");
+    await writeFile(briefPath, JSON.stringify(brief), "utf8");
+
+    const writeIconsOnly = async (profile: string): Promise<string> => {
+      const manifest = JSON.parse(
+        await readFile(
+          path.join(samplesDir, `asset-manifest.${profile}.json`),
+          "utf8"
+        )
+      ) as AssetManifest;
+      manifest.assets = manifest.assets.filter((asset) => asset.kind === "icon");
+      const manifestPath = path.join(workDir, `asset-manifest.${profile}.json`);
+      await writeFile(manifestPath, JSON.stringify(manifest), "utf8");
+      return manifestPath;
+    };
+    const bDenseManifest = await writeIconsOnly("b-dense");
+    const cExpressiveManifest = await writeIconsOnly("c-expressive");
+
+    const result = await runCli(
+      [
+        "--brief",
+        briefPath,
+        "--manifest",
+        `b-dense=${bDenseManifest}`,
+        "--manifest",
+        `c-expressive=${cExpressiveManifest}`,
+        "--runs",
+        runsDir,
+      ],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Phase 1A OK: 9 pages, 0 blockers");
+    expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
+
+    const runDir = await findRunDir(runsDir);
+    const spec = JSON.parse(
+      await readFile(
+        path.join(runDir, "artifacts", "page-spec", "customers-list.json"),
+        "utf8"
+      )
+    ) as PageSpec;
+    const layout = JSON.stringify(spec.layout);
+    expect(layout).toContain("新建客户");
+    expect(layout).toContain("导出客户");
+    expect(JSON.stringify(spec)).not.toContain("empty-orders");
   });
 
   it("runs the demo-crm project with its own brief and manifest", async () => {
@@ -217,7 +328,7 @@ describe("phase1 CLI", () => {
     );
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain("Phase 1A OK: 1 pages, 0 blockers");
+    expect(result.stdout).toContain("Phase 1A OK: 1 page, 0 blockers");
     expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
 
     const runDir = await findRunDir(runsDir);

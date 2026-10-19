@@ -103,7 +103,11 @@ Options:
   repeat `--manifest` once per profile. A custom brief requires manifests.
 - `--help` prints usage, exits 0, and does not run the pipeline.
 - On success the CLI prints `Phase 1A OK: <n> pages, <n> blockers` and the run
-  directory (`Run: <path>`). All artifacts live under that directory.
+  directory (`Run: <path>`). All artifacts live under that directory. Counts
+  are singular when 1 (`1 page, 1 blocker`).
+- On failure the CLI prints `Phase 1A FAILED: ...`, the run directory, and up to
+  ten reasons (`- <RULE-ID>: <message>`) so the fix is visible without opening
+  the run log.
 
 ## Workspace
 
@@ -161,10 +165,15 @@ Assets are resolved per profile. Each project supplies its own manifests via
 The orchestrator passes each page the manifest for its profile. Validators
 block `ASSET-PROFILE` when `manifest.profile` does not match the page's resolved
 profile and `ASSET-PROJECT` when `manifest.project` does not match the brief
-project. A `list` page uses its `emptyAssetRef` (falling back to
-`empty-orders`), and the c-expressive `feed` template references `empty-feed`.
-The `demo-crm` project therefore declares `empty-contacts` and ships it in
-`samples/projects/demo-crm/asset-manifest.b-dense.json`.
+project.
+
+`emptyAssetRef` on a `list` or `feed` page is optional: when it is present, the
+page's `EmptyState` references that illustration id, and the manifest must
+contain it. When it is omitted, the empty state renders without an illustration
+and no asset is required — there is no implicit `empty-orders`/`empty-feed`
+default. The sample `orders-list` declares `empty-orders`, `home-feed` declares
+`empty-feed`, and the `demo-crm` project declares `empty-contacts`; each project
+ships the matching entry in its own manifest.
 
 Phase 1A does not require the referenced SVG/PNG files to exist; the manifest
 entries are the contract. Real files and hashes arrive when asset ingestion is

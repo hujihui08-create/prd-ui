@@ -5,6 +5,7 @@ import {
   AssetManifestSchema,
   UiBriefSchema,
   type AssetManifest,
+  type Finding,
   type PageSpec,
   type ProjectConfig,
   type RunState,
@@ -41,6 +42,11 @@ export interface Phase1Result {
   blockers: number;
   runDir: string;
   passed: boolean;
+  /**
+   * Blocking findings and run-level failure reasons, in report order. Empty
+   * when the run passes. The CLI prints the first ten.
+   */
+  findings: Finding[];
 }
 
 interface BriefGateFailure {
@@ -55,6 +61,19 @@ interface RunLevelFailure {
   location: string;
   evidence: string;
   issue: string;
+}
+
+/** Convert run-level failures into findings so callers can print the reasons. */
+function failureFindings(failures: RunLevelFailure[]): Finding[] {
+  return failures.map((failure, index) => ({
+    id: `R-${String(index + 1).padStart(3, "0")}`,
+    ruleId: failure.ruleId,
+    severity: "blocker",
+    category: "run",
+    location: failure.location,
+    evidence: failure.evidence,
+    issue: failure.issue,
+  }));
 }
 
 interface ResolvedPhase1Inputs {
@@ -366,6 +385,7 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
       blockers: failures.length,
       runDir,
       passed: false,
+      findings: failureFindings(failures),
     };
   };
 
@@ -417,7 +437,14 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
       await logger.log(
         `run failed: ${gateFailures.length} brief blockers; stage ${state.stage}`
       );
-      return { runId, pages: 0, blockers: gateFailures.length, runDir, passed: false };
+      return {
+        runId,
+        pages: 0,
+        blockers: gateFailures.length,
+        runDir,
+        passed: false,
+        findings: failureFindings(gateFailures),
+      };
     }
 
     state = await writeState(
@@ -456,12 +483,15 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     if (blockers > 0) {
       state = await writeState(failRun(state));
       await logger.log(`run failed: ${blockers} blockers; stage ${state.stage}`);
-      return { runId, pages: specs.length, blockers, runDir, passed: false };
+      const findings = reports.flatMap((report) =>
+        report.findings.filter((finding) => finding.severity === "blocker")
+      );
+      return { runId, pages: specs.length, blockers, runDir, passed: false, findings };
     }
 
     state = await writeState(transition(state, "done"));
     await logger.log(`run succeeded: stage ${state.stage}`);
-    return { runId, pages: specs.length, blockers, runDir, passed: true };
+    return { runId, pages: specs.length, blockers, runDir, passed: true, findings: [] };
   } catch (error) {
     const gates = { ...state.gates };
     if (gates.brief !== "passed") gates.brief = "failed";

@@ -19,8 +19,8 @@ function stringArray(value: unknown): string[] {
  * - `SEMANTIC-META`: name, purpose, route, or roles differ from the brief page.
  * - `SEMANTIC-NAV`: the root shell's nav (web) or tabs (mobile) miss a brief item.
  * - `SEMANTIC-FIELD`: a brief field does not appear anywhere in the layout JSON.
- * - `SEMANTIC-ACTION`: a brief action appears neither in the layout nor in an
- *   interaction trigger.
+ * - `SEMANTIC-FILTER`: a brief filter field does not appear in the layout JSON.
+ * - `SEMANTIC-ACTION`: a brief action does not appear in the layout JSON.
  * - `SEMANTIC-EMPTY`: the brief empty title does not appear in the layout.
  *
  * Every finding is a blocker. Checks are skipped when the corresponding piece
@@ -132,7 +132,6 @@ function checkNavigation(
 
 function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Push): void {
   const layout = JSON.stringify(spec.layout ?? {});
-  const interactions = spec.interactions ?? [];
 
   // The settings template maps known field keys to localized display labels
   // ("notifications" -> "通知设置") and therefore never serializes the raw key.
@@ -151,15 +150,26 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
     }
   }
 
+  for (const field of briefPage.filterFields ?? []) {
+    if (!layout.includes(field)) {
+      push(
+        "SEMANTIC-FILTER",
+        "layout",
+        field,
+        `Brief filter field "${field}" does not appear in the page layout.`
+      );
+    }
+  }
+
+  // Actions must be visibly rendered. Interactions only describe behaviour; a
+  // trigger that never reaches the layout leaves the user without the control.
   for (const action of briefPage.actions ?? []) {
-    const rendered = layout.includes(action);
-    const triggered = interactions.some((interaction) => interaction.trigger === action);
-    if (!rendered && !triggered) {
+    if (!layout.includes(action)) {
       push(
         "SEMANTIC-ACTION",
         "layout",
         action,
-        `Brief action "${action}" does not appear in the page layout or in interactions.`
+        `Brief action "${action}" does not appear in the page layout.`
       );
     }
   }

@@ -88,6 +88,10 @@ export function parseArgs(argv: string[]): ParsedCliArgs {
   return { help, options };
 }
 
+function countLabel(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export async function main(
   argv: string[],
   io: { stdout: (line: string) => void; stderr: (line: string) => void } = {
@@ -115,15 +119,17 @@ export async function main(
   try {
     const result = await runPhase1(parsed.options);
     const status = result.passed ? "OK" : "FAILED";
-    const line = `Phase 1A ${status}: ${result.pages} pages, ${result.blockers} blockers`;
-    if (result.passed) {
-      io.stdout(line);
-      io.stdout(`Run: ${result.runDir}`);
-      return 0;
-    }
+    const line = `Phase 1A ${status}: ${countLabel(result.pages, "page", "pages")}, ${countLabel(
+      result.blockers,
+      "blocker",
+      "blockers"
+    )}`;
     io.stdout(line);
     io.stdout(`Run: ${result.runDir}`);
-    return 1;
+    for (const finding of result.findings.slice(0, 10)) {
+      io.stdout(`- ${finding.ruleId}: ${finding.issue}`);
+    }
+    return result.passed ? 0 : 1;
   } catch (error) {
     io.stderr(error instanceof Error ? error.message : String(error));
     return 1;

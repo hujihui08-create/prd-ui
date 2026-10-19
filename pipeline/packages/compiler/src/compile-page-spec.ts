@@ -38,6 +38,26 @@ function fieldFormNode(field: string, readOnly = true): SpecNode {
   return { type: "FormField", props: { label: field, readOnly } };
 }
 
+/**
+ * Render every brief action as a Button, with the first one primary and the
+ * rest secondary. Archetypes with a conventional action set use it only when
+ * the brief declares no actions.
+ */
+function actionButtons(page: UiBriefPage, defaults: string[]): SpecNode[] {
+  const labels = page.actions && page.actions.length > 0 ? page.actions : defaults;
+  return labels.map((label, index) => btn(label, index === 0 ? "primary" : "secondary"));
+}
+
+/** Empty state with an illustration only when the brief explicitly supplies one. */
+function emptyStateNode(page: UiBriefPage, title: string, description?: string): SpecNode {
+  const node: SpecNode = {
+    type: "EmptyState",
+    props: description === undefined ? { title } : { title, description },
+  };
+  if (page.emptyAssetRef !== undefined) node.assetRef = page.emptyAssetRef;
+  return node;
+}
+
 export function compilePageSpec(input: {
   brief: UiBrief;
   page: UiBriefPage;
@@ -134,8 +154,8 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
       const columns = page.fields ?? ["名称", "状态"];
       const filterFields = page.filterFields ?? page.fields ?? [];
       const emptyTitle = page.emptyTitle ?? `暂无${page.name}`;
-      const emptyAssetRef =
-        page.emptyAssetRef ?? (page.profile === "c-expressive" ? "empty-feed" : "empty-orders");
+      const actions = page.actions ?? [];
+      const extraActions = actions.slice(1);
 
       return {
         type: "PageShell",
@@ -149,18 +169,23 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
               children: [
                 {
                   type: "FilterBar",
-                  props: { fields: filterFields, action: page.actions?.[0] ?? "新建" },
+                  props: { fields: filterFields, action: actions[0] ?? "新建" },
                 },
                 {
                   type: "DataTable",
                   props: { columns, pageSize: 20 },
                 },
                 { type: "Pagination", props: { pageSize: 20 } },
-                {
-                  type: "EmptyState",
-                  props: { title: emptyTitle, description: "调整筛选条件后重试" },
-                  assetRef: emptyAssetRef,
-                },
+                ...(extraActions.length > 0
+                  ? [
+                      {
+                        type: "Row",
+                        props: { gap: "space.2" },
+                        children: extraActions.map((action) => btn(action, "secondary")),
+                      },
+                    ]
+                  : []),
+                emptyStateNode(page, emptyTitle, "调整筛选条件后重试"),
               ],
             },
           ],
@@ -192,10 +217,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
             {
               type: "Section",
               props: { padding: "space.4", gap: "space.2" },
-              children: [
-                btn(page.actions?.[0] ?? "保存"),
-                btn(page.actions?.[1] ?? "取消", "secondary"),
-              ],
+              children: actionButtons(page, ["保存", "取消"]),
             },
           ],
         },
@@ -231,10 +253,10 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
               ],
             },
           ],
-          actions: [btn(page.actions?.[0] ?? "保存")],
+          actions: actionButtons(page, ["保存"]),
         },
       };
-    case "feed":
+    case "feed": {
       return {
         type: "MobileShell",
         props: { title: page.name, tabs },
@@ -247,11 +269,12 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                 props: { title: item.title, body: item.body },
               })
             ),
-            { type: "EmptyState", props: { title: "暂无内容" }, assetRef: "empty-feed" },
+            emptyStateNode(page, "暂无内容"),
           ],
           "bottom-nav": [{ type: "BottomNav", props: { items: tabs } }],
         },
       };
+    }
     case "auth":
       return {
         type: "MobileShell",
@@ -275,7 +298,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
               ],
             };
           }),
-          actions: [btn(page.actions?.[0] ?? "登录")],
+          actions: actionButtons(page, ["登录"]),
         },
       };
     case "onboarding":
@@ -289,7 +312,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
           ],
           title: [text(page.name, "heading.1")],
           body: [text(page.purpose, "body.md")],
-          actions: [btn(page.actions?.[0] ?? "开始"), btn(page.actions?.[1] ?? "稍后", "secondary")],
+          actions: actionButtons(page, ["开始", "稍后"]),
         },
       };
     default:
@@ -300,7 +323,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
 function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNode {
   const fields = page.fields ?? [];
   const summaryTitle = page.summaryTitle ?? `${page.name}摘要`;
-  const action = page.actions?.[0] ?? "编辑";
+  const actions = actionButtons(page, ["编辑"]);
 
   if (page.target === "mobile") {
     return {
@@ -319,7 +342,7 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
           },
         ],
         fields: fields.map((field) => fieldFormNode(field)),
-        actions: [btn(action)],
+        actions,
       },
     };
   }
@@ -343,7 +366,7 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
           children: fields.map((field) => fieldFormNode(field)),
         },
       ],
-      actions: [btn(action)],
+      actions,
     },
   };
 }

@@ -130,7 +130,7 @@ const customersPage: UiBriefPage = {
   reqRefs: ["REQ-ORDER-009"],
   fields: ["customerName", "phone", "email"],
   filterFields: ["name", "phone"],
-  actions: ["新建客户"],
+  actions: ["新建客户", "导出客户"],
   emptyTitle: "暂无客户",
 };
 
@@ -156,6 +156,7 @@ const contactsPage: UiBriefPage = {
   filterFields: ["name", "email"],
   actions: ["新建联系人"],
   emptyTitle: "暂无联系人",
+  emptyAssetRef: "empty-contacts",
 };
 
 const crmBrief = structuredClone(brief) as UiBrief;
@@ -168,7 +169,36 @@ crmBrief.traceability.unmapped = [];
 const contactsSpec = compileProject(crmBrief, deps)[0]!;
 const crmManifestsByProfile: Record<string, AssetManifest> = {
   ...manifestsByProfile,
-  "b-dense": { ...structuredClone(manifestsByProfile["b-dense"]!), project: "demo-crm" },
+  "b-dense": {
+    ...structuredClone(manifestsByProfile["b-dense"]!),
+    project: "demo-crm",
+    assets: [
+      ...structuredClone(manifestsByProfile["b-dense"]!.assets),
+      {
+        id: "empty-contacts",
+        kind: "illustration",
+        library: "local",
+        files: [{ path: "assets/illustrations/empty-contacts.svg", format: "svg" }],
+        license: "internal",
+      },
+    ],
+  },
+};
+
+const customersListOnlyBrief = structuredClone(brief) as UiBrief;
+customersListOnlyBrief.ia.pages = [customersPage];
+customersListOnlyBrief.traceability.reqMap = { "REQ-ORDER-009": ["customers-list"] };
+customersListOnlyBrief.traceability.unmapped = [];
+const customersListOnlySpec = compileProject(customersListOnlyBrief, deps)[0]!;
+
+/** Same project and profile, icons only: no empty-orders illustration exists. */
+const iconsOnlyManifests: Record<string, AssetManifest> = {
+  "b-dense": {
+    ...structuredClone(manifestsByProfile["b-dense"]!),
+    assets: structuredClone(manifestsByProfile["b-dense"]!.assets).filter(
+      (asset) => asset.kind === "icon"
+    ),
+  },
 };
 
 function cloneSpec(pageId: string): PageSpec {
@@ -266,6 +296,31 @@ describe("brief semantic validation", () => {
     );
     expect(report.findings, findingDetail(report)).toEqual([]);
     expect(report.passed).toBe(true);
+
+    const serializedLayout = JSON.stringify(customersSpec.layout);
+    for (const action of ["新建客户", "导出客户"]) {
+      expect(serializedLayout, `missing action ${action}`).toContain(action);
+    }
+  });
+
+  it("passes a list page with no emptyAssetRef against an icons-only manifest", () => {
+    expect(customersListOnlySpec.layout).toBeDefined();
+
+    const report = validatePageSpec(
+      customersListOnlySpec,
+      contextForSpec(
+        customersListOnlySpec,
+        customersPage,
+        customersListOnlyBrief.ia.navigation,
+        iconsOnlyManifests
+      )
+    );
+    expect(report.findings, findingDetail(report)).toEqual([]);
+    expect(report.blockers).toBe(0);
+    expect(report.passed).toBe(true);
+
+    const empty = findNode(customersListOnlySpec, "EmptyState");
+    expect(empty.assetRef).toBeUndefined();
   });
 
   it("reports zero semantic findings for a custom contacts-list page", () => {
@@ -293,7 +348,11 @@ describe("brief semantic validation", () => {
     filter.props = { ...(filter.props ?? {}), action: "新建订单" };
     const empty = findNode(spec, "EmptyState");
     empty.props = { ...(empty.props ?? {}), title: "暂无订单" };
-    spec.interactions = [{ trigger: "新建订单", action: "navigate" }];
+    // Interactions alone never satisfy SEMANTIC-ACTION after the fix.
+    spec.interactions = [
+      { trigger: "新建客户", action: "navigate" },
+      { trigger: "导出客户", action: "navigate" },
+    ];
 
     const report = validatePageSpec(
       spec,
@@ -308,6 +367,51 @@ describe("brief semantic validation", () => {
         .filter((finding) => finding.ruleId.startsWith("SEMANTIC-"))
         .every((finding) => finding.severity === "blocker")
     ).toBe(true);
+    expect(report.passed).toBe(false);
+  });
+
+  it("reports SEMANTIC-FILTER when a brief filter field is absent from the layout", () => {
+    const spec = structuredClone(customersSpec);
+    const filterPage: UiBriefPage = {
+      ...customersPage,
+      filterFields: ["name", "phone", "region"],
+    };
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, filterPage, customersBrief.ia.navigation)
+    );
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-FILTER"
+    );
+    expect(findings, findingDetail(report)).toHaveLength(1);
+    expect(findings[0]?.evidence).toBe("region");
+    expect(findings[0]?.severity).toBe("blocker");
+    expect(report.passed).toBe(false);
+  });
+
+  it("requires actions in the layout even when interactions trigger them", () => {
+    const spec = structuredClone(customersSpec);
+    const filter = findNode(spec, "FilterBar");
+    filter.props = { ...(filter.props ?? {}), action: "查询" };
+    const actionsRow = findNode(spec, "Row");
+    actionsRow.children = [];
+    spec.interactions = [
+      { trigger: "新建客户", action: "navigate" },
+      { trigger: "导出客户", action: "navigate" },
+    ];
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, customersPage, customersBrief.ia.navigation)
+    );
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-ACTION"
+    );
+    expect(findings.map((finding) => finding.evidence).sort(), findingDetail(report)).toEqual(
+      ["新建客户", "导出客户"].sort()
+    );
+    expect(findings.every((finding) => finding.severity === "blocker")).toBe(true);
     expect(report.passed).toBe(false);
   });
 
@@ -521,7 +625,7 @@ describe("catalog validation", () => {
     const spec = cloneSpec("order-detail");
     spec.layout.slots!.actions = [{ type: "Card", props: { title: "Disallowed" } }];
 
-    const report = validatePageSpec(spec, contextFor(spec));
+    const report = validatePageSpec(spec, brieflessContextFor(spec));
     expect(ruleIds(report)).toEqual(["CATALOG-SLOT"]);
   });
 
