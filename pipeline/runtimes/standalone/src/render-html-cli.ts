@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PageSpecSchema, type PageSpec } from "@prd-ui/contracts";
 import { getProfile } from "@prd-ui/design-system";
-import { renderDocument, renderIndex } from "./index.js";
+import { renderDocument, renderIndex } from "@prd-ui/renderer-html";
 
 function valueOf(args: string[], flag: string): string | undefined {
   const index = args.indexOf(flag);

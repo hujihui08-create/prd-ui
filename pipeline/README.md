@@ -134,11 +134,13 @@ Options:
 
 | Path | Package | Responsibility |
 |---|---|---|
-| `packages/contracts` | `@prd-ui/contracts` | Zod schemas and shared types (`PageSpec`, `UiBrief`, catalogs, manifests, findings, run state) |
-| `packages/design-system` | `@prd-ui/design-system` | `b-dense` and `c-expressive` profiles/catalogs, eight archetypes, layout primitives |
-| `packages/compiler` | `@prd-ui/compiler` | Deterministic brief page → Page Spec templates |
-| `packages/validators` | `@prd-ui/validators` | Pure-function rule checks; no content generation, no file writes |
-| `pipeline/orchestrator` | `@prd-ui/orchestrator` | Run state machine, brief gate, artifacts, `phase1:verify` entry point |
+| `core/contracts` | `@prd-ui/contracts` | Zod schemas and shared types (`PageSpec`, `UiBrief`, catalogs, manifests, findings, run state) |
+| `core/design-system` | `@prd-ui/design-system` | `b-dense` and `c-expressive` profiles/catalogs, eight archetypes, layout primitives |
+| `core/compiler` | `@prd-ui/compiler` | Deterministic brief page → Page Spec templates |
+| `core/validators` | `@prd-ui/validators` | Pure-function rule checks; no content generation, no file writes |
+| `core/renderer-html` | `@prd-ui/renderer-html` | Page Spec + profile tokens → HTML |
+| `core/orchestrator` | `@prd-ui/orchestrator` | Run state machine, brief gate, artifacts, `runPhase1` |
+| `runtimes/standalone` | `@prd-ui/runtime-standalone` | File-system/CLI adapters: `phase1:verify`, `render:html`, `asset:review` |
 
 `pipeline/` is isolated from `spike/`.
 

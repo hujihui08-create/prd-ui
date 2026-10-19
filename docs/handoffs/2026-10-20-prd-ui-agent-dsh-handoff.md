@@ -54,10 +54,10 @@ pnpm render:html --run /tmp/employee-app-runs/<runId> --out /tmp/employee-app-ht
 
 | 模块 | 内容 |
 |---|---|
-| `packages/design-system` | `b-mobile` profile/catalog；`home`/`inventory-list` archetype |
-| `packages/contracts` | `UiBriefPage.content` 内容模型 |
-| `packages/compiler` | `home`/`inventory-list` 模板 |
-| `packages/renderer-html` | Page Spec + b-mobile tokens → HTML；默认/空/加载/失败状态 |
+| `core/design-system` | `b-mobile` profile/catalog；`home`/`inventory-list` archetype |
+| `core/contracts` | `UiBriefPage.content` 内容模型 |
+| `core/compiler` | `home`/`inventory-list` 模板 |
+| `core/renderer-html` | Page Spec + b-mobile tokens → HTML；默认/空/加载/失败状态 |
 | `samples/projects/employee-app` | 两页 UI Brief + project.yaml + manifest |
 | `artifacts/employee-app` | 渲染 HTML、截图、README |
 
@@ -342,18 +342,21 @@ python3 -m http.server 4174 --bind 127.0.0.1
 | Agent 组织 | `docs/superpowers/specs/2026-10-20-agent-organization.md` |
 | 资产降级策略 | `docs/superpowers/specs/2026-10-20-asset-source-fallback-policy.md` |
 | 员工端 PRD 审查 | `docs/superpowers/specs/2026-10-20-employee-app-prd-review.md` |
-| b-mobile profile | `pipeline/packages/design-system/src/profiles/b-mobile.ts` |
-| b-mobile catalog | `pipeline/packages/design-system/src/catalogs/b-mobile.ts` |
-| home/inventory archetype | `pipeline/packages/design-system/src/archetypes.ts` |
-| Content Model | `pipeline/packages/contracts/src/ui-brief.ts` |
-| 两页模板 | `pipeline/packages/compiler/src/compile-page-spec.ts` |
-| HTML Renderer | `pipeline/packages/renderer-html/src/index.ts` |
+| b-mobile profile | `pipeline/core/design-system/src/profiles/b-mobile.ts` |
+| b-mobile catalog | `pipeline/core/design-system/src/catalogs/b-mobile.ts` |
+| home/inventory archetype | `pipeline/core/design-system/src/archetypes.ts` |
+| Content Model | `pipeline/core/contracts/src/ui-brief.ts` |
+| 两页模板 | `pipeline/core/compiler/src/compile-page-spec.ts` |
+| HTML Renderer | `pipeline/core/renderer-html/src/index.ts` |
+| core/runtime 设计 | `docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` |
 | 员工端 Brief | `pipeline/samples/projects/employee-app/ui-brief.json` |
 | 渲染产物/截图 | `pipeline/artifacts/employee-app/` |
 
 ---
 
 ## 9. Git 状态（交接时）
+
+> 历史快照。2026-10-20 已完成 checkpoint 提交，并把目录重排为 `core/` + `runtimes/`；下面的路径只反映交接当时。
 
 - 分支：`phase-1b-usability`
 - HEAD：`0084181`

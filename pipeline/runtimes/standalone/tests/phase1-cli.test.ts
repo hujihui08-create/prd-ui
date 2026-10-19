@@ -13,7 +13,7 @@ const pipelineRoot = path.resolve(
   "../../.."
 );
 const tsxCli = path.join(pipelineRoot, "node_modules", "tsx", "dist", "cli.mjs");
-const cliPath = path.join(pipelineRoot, "pipeline", "orchestrator", "src", "cli.ts");
+const cliPath = path.join(pipelineRoot, "runtimes", "standalone", "src", "phase1-cli.ts");
 const samplesDir = path.join(pipelineRoot, "samples");
 
 interface CliResult {

@@ -77,7 +77,7 @@ CHANGELOG.md              # change record
 - `runtimes/standalone/src/phase1-cli.ts` consumes `@prd-ui/orchestrator`.
 - Root scripts: `phase1:verify` → `tsx runtimes/standalone/src/phase1-cli.ts`; `render:html` → `tsx runtimes/standalone/src/render-html-cli.ts`.
 
-- [ ] **Step 1: Move packages with git mv**
+- [x] **Step 1: Move packages with git mv**
 
 ```bash
 cd pipeline
@@ -94,7 +94,7 @@ git mv core/orchestrator/tests/cli.test.ts runtimes/standalone/tests/phase1-cli.
 rmdir packages pipeline 2>/dev/null || true
 ```
 
-- [ ] **Step 2: Fix CLI imports**
+- [x] **Step 2: Fix CLI imports**
 
 In `runtimes/standalone/src/phase1-cli.ts`, replace:
 
@@ -122,7 +122,7 @@ import { renderDocument, renderIndex } from "@prd-ui/renderer-html";
 
 In `runtimes/standalone/tests/phase1-cli.test.ts`, replace `../src/cli.js` with `../src/phase1-cli.js`.
 
-- [ ] **Step 3: Create standalone package**
+- [x] **Step 3: Create standalone package**
 
 `pipeline/runtimes/standalone/package.json`:
 
@@ -156,7 +156,7 @@ In `runtimes/standalone/tests/phase1-cli.test.ts`, replace `../src/cli.js` with 
 
 > `@prd-ui/asset-review` does not exist until Task 2. For Task 1, temporarily omit it from `dependencies`, run the suite, then add it back in Task 2. Do not leave a broken workspace link.
 
-- [ ] **Step 4: Update workspace, scripts, test config**
+- [x] **Step 4: Update workspace, scripts, test config**
 
 `pipeline/pnpm-workspace.yaml`:
 
@@ -188,7 +188,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 5: Run install and full verification**
+- [x] **Step 5: Run install and full verification**
 
 ```bash
 cd pipeline
@@ -201,7 +201,7 @@ pnpm render:html --run /tmp/employee-app-runs/<runId> --out /tmp/employee-app-ht
 
 Expected: 157 tests pass, typecheck clean, `Phase 1A OK: 2 pages, 0 blockers`, renderer writes HTML.
 
-- [ ] **Step 6: Update docs and ZCode adaptation**
+- [x] **Step 6: Update docs and ZCode adaptation**
 
 `pipeline/README.md`: replace `packages/...` with `core/...`; replace `pipeline/orchestrator` with `core/orchestrator`; add `runtimes/standalone` for CLI entries.
 
@@ -244,7 +244,7 @@ pnpm asset:review --project samples/projects/employee-app/project.yaml --assets 
 - Local commits only; no push.
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd "/Users/jihui/Desktop/产品、ui"

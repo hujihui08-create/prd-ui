@@ -1,6 +1,10 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Phase1RunError, runPhase1, type Phase1Options } from "./run-phase1.js";
+import {
+  Phase1RunError,
+  runPhase1,
+  type Phase1Options,
+} from "@prd-ui/orchestrator";
 
 export const USAGE = `Usage: pnpm phase1:verify [options]
 

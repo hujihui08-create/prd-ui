@@ -25,7 +25,7 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5(@types/node@26.6.5)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/compiler:
+  core/compiler:
     dependencies:
       '@prd-ui/contracts':
         specifier: workspace:*
@@ -34,19 +34,37 @@ importers:
         specifier: workspace:*
         version: link:../design-system
 
-  packages/contracts:
+  core/contracts:
     dependencies:
       zod:
         specifier: ^4.6.7
         version: 4.6.7
 
-  packages/design-system:
+  core/design-system:
     dependencies:
       '@prd-ui/contracts':
         specifier: workspace:*
         version: link:../contracts
 
-  packages/renderer-html:
+  core/orchestrator:
+    dependencies:
+      '@prd-ui/compiler':
+        specifier: workspace:*
+        version: link:../compiler
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@prd-ui/design-system':
+        specifier: workspace:*
+        version: link:../design-system
+      '@prd-ui/validators':
+        specifier: workspace:*
+        version: link:../validators
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
+
+  core/renderer-html:
     dependencies:
       '@prd-ui/compiler':
         specifier: workspace:*
@@ -58,7 +76,7 @@ importers:
         specifier: workspace:*
         version: link:../design-system
 
-  packages/validators:
+  core/validators:
     dependencies:
       '@prd-ui/contracts':
         specifier: workspace:*
@@ -71,20 +89,20 @@ importers:
         specifier: workspace:*
         version: link:../compiler
 
-  pipeline/orchestrator:
+  runtimes/standalone:
     dependencies:
-      '@prd-ui/compiler':
-        specifier: workspace:*
-        version: link:../../packages/compiler
       '@prd-ui/contracts':
         specifier: workspace:*
-        version: link:../../packages/contracts
+        version: link:../../core/contracts
       '@prd-ui/design-system':
         specifier: workspace:*
-        version: link:../../packages/design-system
-      '@prd-ui/validators':
+        version: link:../../core/design-system
+      '@prd-ui/orchestrator':
         specifier: workspace:*
-        version: link:../../packages/validators
+        version: link:../../core/orchestrator
+      '@prd-ui/renderer-html':
+        specifier: workspace:*
+        version: link:../../core/renderer-html
       yaml:
         specifier: ^2.9.1
         version: 2.9.1

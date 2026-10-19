@@ -1,5 +1,5 @@
 packages:
-  - "packages/*"
-  - "pipeline/orchestrator"
+  - "core/*"
+  - "runtimes/*"
 allowBuilds:
   esbuild: true
