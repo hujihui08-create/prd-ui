@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img"><title>布谷鑫声 · 三鸟和鸣</title><defs><clipPath id="clip-dark-r"><rect width="1024" height="1024" rx="230"/></clipPath></defs>
+       <g clip-path="url(#clip-dark-r)">
+  <rect width="1024" height="1024" fill="#173B34"/>
+  <circle cx="505" cy="512" r="322" fill="#1D463D"/>
+  <path d="M 140 870 Q 515 700 890 312" fill="none" stroke="#F5E6CD" stroke-width="21" stroke-linecap="round"/>
+  <g transform="translate(175.20 546.48) scale(0.82)">
+    <path d="M 130 246 L 130 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 158 248 L 158 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <ellipse cx="136" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <ellipse cx="164" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <path d="M 172 26
+  C 208 26 228 48 228 82
+  C 228 104 218 116 207 124
+  C 211 148 206 176 195 200
+  C 183 228 163 246 143 254
+  C 123 262 101 264 83 258
+  L 4 302
+  L 24 244
+  C 52 222 62 198 64 174
+  C 68 128 68 92 92 66
+  C 112 42 140 26 172 26 Z" fill="#F5E6CD"/>
+    <path d="M 104 128
+  C 138 128 172 150 188 188
+  C 193 200 187 211 174 213
+  C 145 218 116 199 104 170
+  C 96 151 95 137 104 128 Z" fill="#DFC7A4"/>
+    <circle cx="194" cy="74" r="9.5" fill="#173B34"/>
+    <circle cx="197.2" cy="70.8" r="2.6" fill="#F5E6CD"/>
+    <path d="M 226 66
+  C 244 66 258 74 268 84
+  C 256 92 240 96 224 92 Z" fill="#FF8A68"/>
+  </g>
+  <g transform="translate(365.60 367.64) scale(0.96)">
+    <path d="M 130 246 L 130 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 158 248 L 158 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <ellipse cx="136" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <ellipse cx="164" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <path d="M 172 26
+  C 208 26 228 48 228 82
+  C 228 104 218 116 207 124
+  C 211 148 206 176 195 200
+  C 183 228 163 246 143 254
+  C 123 262 101 264 83 258
+  L 4 302
+  L 24 244
+  C 52 222 62 198 64 174
+  C 68 128 68 92 92 66
+  C 112 42 140 26 172 26 Z" fill="#F5E6CD"/>
+    <path d="M 104 128
+  C 138 128 172 150 188 188
+  C 193 200 187 211 174 213
+  C 145 218 116 199 104 170
+  C 96 151 95 137 104 128 Z" fill="#DFC7A4"/>
+    <circle cx="194" cy="74" r="9.5" fill="#173B34"/>
+    <circle cx="197.2" cy="70.8" r="2.6" fill="#F5E6CD"/>
+    <path d="M 221 77
+  C 233 80 242 83 247 86
+  C 236 88 227 89 221 89 Z" fill="#173B34"/>
+       <path d="M 223 64
+  C 240 58 255 59 264 66
+  C 253 74 239 78 222 80 Z" fill="#FF8A68"/>
+       <path d="M 222 86
+  C 236 88 246 95 252 106
+  C 238 109 227 101 220 94 Z" fill="#FF8A68"/>
+  </g>
+  <g transform="translate(636.80 175.02) scale(0.88)">
+    <path d="M 130 246 L 130 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 158 248 L 158 300" stroke="#DDC3A0" stroke-width="13" stroke-linecap="round"/>
+    <ellipse cx="136" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <ellipse cx="164" cy="301" rx="23" ry="7" fill="#DDC3A0"/>
+    <path d="M 172 26
+  C 208 26 228 48 228 82
+  C 228 104 218 116 207 124
+  C 211 148 206 176 195 200
+  C 183 228 163 246 143 254
+  C 123 262 101 264 83 258
+  L 4 302
+  L 24 244
+  C 52 222 62 198 64 174
+  C 68 128 68 92 92 66
+  C 112 42 140 26 172 26 Z" fill="#F5E6CD"/>
+    <path d="M 104 128
+  C 138 128 172 150 188 188
+  C 193 200 187 211 174 213
+  C 145 218 116 199 104 170
+  C 96 151 95 137 104 128 Z" fill="#DFC7A4"/>
+    <circle cx="194" cy="74" r="9.5" fill="#173B34"/>
+    <circle cx="197.2" cy="70.8" r="2.6" fill="#F5E6CD"/>
+    <path d="M 226 66
+  C 244 66 258 74 268 84
+  C 256 92 240 96 224 92 Z" fill="#FF8A68"/>
+  </g></g></svg>
