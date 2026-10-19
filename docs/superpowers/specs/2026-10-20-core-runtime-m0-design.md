@@ -27,16 +27,40 @@
 - 用 **Asset Reviewer** 做第一个 agent 闭环：13 个资产（10 图标 + 3 插画）走 A 库，产出可审计的 manifest。
 - 证明 **standalone 与 dsh 共用同一 core**：同 fixtures、同 decision trace、同 verdict schema。
 - 建立 **凭据配置规范**：本地、CI、dsh 桌面、项目 profile 各自怎么配，key 放哪，什么不能进 git。
-- 为 M1（IA/Interaction）留下清晰的扩展点，但不提前实现。
+- 为 M1（IA/Interaction/Visual Style）留下清晰的扩展点，但不提前实现。
 
 ### 1.2 非目标
 
-- 不实现 IA Agent、Interaction Design Agent、Visual Style Agent（M1/M2）。
-- 不接 A/B/C 真实供应商（M0 只做 A 库本地索引；B/C 在 M2）。
-- 不做 Figma Renderer、截图 diff、录屏/trace 门禁（M3）。
+- M0 不实现 IA Agent、Interaction Design Agent、Visual Style Agent；它们的角色契约和端口在 M1 接入，M0 只留扩展点，不复制一套缩小版。
+- M0 只接 A 库真实文件；**B/C 的 adapter 接口、source chain、预算、降级、审计在 M0 就实现**，真实供应商的连接、账号/授权/成本在 M2 落地。
+- M0 不做 Figma Renderer、截图 diff、录屏/trace 门禁；HTML 渲染和资产 manifest 稳定后再加，避免 baseline 反复重建。
 - 不把 `asset:review` 接进 phase1 主状态机（M2 再接）。
 - 不做 dsh 桌面端 UX 适配；M0 只做 headless。
 - 不把 `@next` 当默认依赖；只锁精确版本。
+
+### 1.3 为什么这样分层
+
+分层不是“功能重要性”，是 **依赖顺序 + 风险隔离**。M0 的目标是用最小的 agent 面验证运行时底座；底座没跑通之前，不要同时叠主观 agent、外部供应商和视觉门禁。
+
+| 推迟项 | 为什么不放 M0 | 什么时候可以提前 |
+|---|---|---|
+| IA / Interaction / Visual Style Agent | 输出是文档/主观判断，依赖稳定的 UI Brief / Page Spec 契约；dsh headless、vision、工具链没跑通时，会把运行时问题和 prompt/评审问题混在一起，难定位。 | 如果 M0 的 core 契约提前冻结，可以在 M1 让三个 agent 并行；Visual Style 也可以单独提前到 M0.5，但先产出 style pack fixture 即可让资产评审跑起来。 |
+| 真实 B/C 供应商 | 阻塞不是代码，是账号、API key、授权、成本、人工签核。M0 已经实现 B/C 的 adapter 接口和状态机，缺的是外部输入；先接 A 库能把闭环、审计、切源逻辑跑通。 | 有 Recraft/Firefly/IconScout key 时，随时加一个 B/C adapter 到 M0.5；core 不需要改。 |
+| Figma Renderer / 截图 diff / 录屏 trace | 验证层依赖稳定的 Page Spec + RenderPlan + asset manifest + HTML 渲染；契约还在变时做门禁，每次改动都要重建 baseline。Figma 只做静态帧，HTML 是行为/动效事实源，两套 renderer 同时改会漂移。 | 截图 diff 可以早加一个最小 Playwright + pixelmatch harness（便宜、不依赖 Figma）；Figma/录屏/trace 留到 M3。 |
+
+一句话：**M0 少做的是“外部依赖和主观判断”，不是“架构能力”**。B/C 的状态机、降级、审计、adapter 接口在 M0 就写；IA/Interaction/Visual Style 的端口和契约在 M1 接；视觉门禁在契约稳定后加。
+
+### 1.4 里程碑关系
+
+| 里程碑 | 内容 | 前置条件 | 可并行 |
+|---|---|---|---|
+| M0（当前） | core + runtime + Asset Reviewer + A 库 13 资产 | 无 | — |
+| M0.5（可选） | 一个 B/C 真实 adapter（有 key 才做）；最小 Playwright 截图 harness | M0 闭环绿 | 与 M1 并行 |
+| M1 | IA Agent + Interaction Design Agent + Visual Style Agent | M0 的 core 契约冻结；dsh headless 跑通 | 三个 agent 可并行，但每个独立 session |
+| M2 | 真实 A/B/C 链 + HTML motion + degraded 审计 | M1 的 style pack 和 interaction spec | 资产链与动效可并行 |
+| M3 | Figma Renderer + 截图 diff + 录屏/trace + handoff | M0–M2 契约稳定 | Figma 与视觉门禁可并行 |
+
+> 交接文档内部有一处口径差异：`agent-organization.md` §9 把 Visual Style 放在“1C 当前”，而 `handoff` §4.4 把 Visual Style 放在 M2。本 spec 采用“M0 先用 style pack fixture 让资产评审跑通，M1 再接 Visual Style Agent”的折中；如果希望严格按 §9，可把 Visual Style 提前到 M0.5，但仍然先产出 fixture，不阻塞 M0。
 
 ## 2. 现状与约束
 
