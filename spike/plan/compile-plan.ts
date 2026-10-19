@@ -12,6 +12,8 @@ interface FrameOptions {
   padding?: number;
   gap?: number;
   fill?: string;
+  layoutGrow?: number;
+  layoutAlign?: "STRETCH";
 }
 
 interface CompileContext {
@@ -99,6 +101,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
               padding: ctx.space("space.4", "4"),
               gap: ctx.space("space.2", "2"),
               fill: "color.surface.subtle",
+              layoutAlign: "STRETCH",
             }
           ),
           ctx.frame(
@@ -120,11 +123,12 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
                   padding: ctx.space("space.6", "6"),
                   gap: ctx.space("space.2", "2"),
                   fill: "color.surface.default",
+                  layoutAlign: "STRETCH",
                 }
               ),
               ...(node.children ?? []).map((child) => compileNode(child, ctx)),
             ],
-            { fill: "color.surface.default", gap: 0 }
+            { fill: "color.surface.default", gap: 0, layoutGrow: 1, layoutAlign: "STRETCH" }
           ),
         ],
         {
@@ -146,6 +150,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: ctx.space(node.props?.padding, "6"),
           gap: ctx.space(node.props?.gap, "4"),
           fill: "color.surface.default",
+          layoutAlign: "STRETCH",
         }
       );
 
@@ -185,6 +190,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: 0,
           gap: ctx.space("space.3", "3"),
           fill: "color.surface.default",
+          layoutAlign: "STRETCH",
         }
       );
 
@@ -203,6 +209,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: ctx.space("space.3", "3"),
           gap: ctx.space("space.2", "2"),
           fill: "color.surface.subtle",
+          layoutAlign: "STRETCH",
         }
       );
       const body = Array.from({ length: rows }, (_, rowIndex) =>
@@ -221,12 +228,14 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             padding: ctx.space("space.3", "3"),
             gap: ctx.space("space.2", "2"),
             fill: "color.surface.default",
+            layoutAlign: "STRETCH",
           }
         )
       );
       return ctx.frame("DataTable", "VERTICAL", [header, ...body], {
         gap: 0,
         fill: "color.surface.default",
+        layoutAlign: "STRETCH",
       });
     }
 
@@ -255,6 +264,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
               padding: ctx.space("space.4", "4"),
               gap: ctx.space("space.2", "2"),
               fill: "color.surface.default",
+              layoutAlign: "STRETCH",
             }
           ),
           ...(node.children ?? []).map((child) => compileNode(child, ctx)),
@@ -269,6 +279,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
               padding: ctx.space("space.3", "3"),
               gap: ctx.space("space.2", "2"),
               fill: "color.surface.default",
+              layoutAlign: "STRETCH",
             }
           ),
         ],
@@ -317,6 +328,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: ctx.space("space.4", "4"),
           gap: ctx.space("space.3", "3"),
           fill: "color.surface.default",
+          layoutAlign: "STRETCH",
         }
       );
 

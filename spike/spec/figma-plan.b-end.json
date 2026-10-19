@@ -109,7 +109,8 @@
         "width": 240,
         "padding": 16,
         "gap": 8,
-        "fill": "color.surface.subtle"
+        "fill": "color.surface.subtle",
+        "layoutAlign": "STRETCH"
       },
       {
         "type": "FRAME",
@@ -131,7 +132,8 @@
             "height": 64,
             "padding": 24,
             "gap": 8,
-            "fill": "color.surface.default"
+            "fill": "color.surface.default",
+            "layoutAlign": "STRETCH"
           },
           {
             "type": "FRAME",
@@ -174,7 +176,8 @@
                 "height": 56,
                 "padding": 0,
                 "gap": 12,
-                "fill": "color.surface.default"
+                "fill": "color.surface.default",
+                "layoutAlign": "STRETCH"
               },
               {
                 "type": "FRAME",
@@ -220,7 +223,8 @@
                     "height": 40,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.subtle"
+                    "fill": "color.surface.subtle",
+                    "layoutAlign": "STRETCH"
                   },
                   {
                     "type": "FRAME",
@@ -261,7 +265,8 @@
                     "height": 44,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.default"
+                    "fill": "color.surface.default",
+                    "layoutAlign": "STRETCH"
                   },
                   {
                     "type": "FRAME",
@@ -302,7 +307,8 @@
                     "height": 44,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.default"
+                    "fill": "color.surface.default",
+                    "layoutAlign": "STRETCH"
                   },
                   {
                     "type": "FRAME",
@@ -343,7 +349,8 @@
                     "height": 44,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.default"
+                    "fill": "color.surface.default",
+                    "layoutAlign": "STRETCH"
                   },
                   {
                     "type": "FRAME",
@@ -384,7 +391,8 @@
                     "height": 44,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.default"
+                    "fill": "color.surface.default",
+                    "layoutAlign": "STRETCH"
                   },
                   {
                     "type": "FRAME",
@@ -425,20 +433,25 @@
                     "height": 44,
                     "padding": 12,
                     "gap": 8,
-                    "fill": "color.surface.default"
+                    "fill": "color.surface.default",
+                    "layoutAlign": "STRETCH"
                   }
                 ],
                 "gap": 0,
-                "fill": "color.surface.default"
+                "fill": "color.surface.default",
+                "layoutAlign": "STRETCH"
               }
             ],
             "padding": 24,
             "gap": 16,
-            "fill": "color.surface.default"
+            "fill": "color.surface.default",
+            "layoutAlign": "STRETCH"
           }
         ],
         "fill": "color.surface.default",
-        "gap": 0
+        "gap": 0,
+        "layoutGrow": 1,
+        "layoutAlign": "STRETCH"
       }
     ],
     "width": 1440,

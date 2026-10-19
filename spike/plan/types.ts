@@ -44,6 +44,8 @@ export type PlanNode =
       padding?: number;
       gap?: number;
       fill?: string;
+      layoutGrow?: number;
+      layoutAlign?: "STRETCH";
     }
   | {
       type: "TEXT";

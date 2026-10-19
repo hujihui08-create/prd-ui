@@ -132,7 +132,8 @@
           width: 240,
           padding: 16,
           gap: 8,
-          fill: "color.surface.subtle"
+          fill: "color.surface.subtle",
+          layoutAlign: "STRETCH"
         },
         {
           type: "FRAME",
@@ -154,7 +155,8 @@
               height: 64,
               padding: 24,
               gap: 8,
-              fill: "color.surface.default"
+              fill: "color.surface.default",
+              layoutAlign: "STRETCH"
             },
             {
               type: "FRAME",
@@ -197,7 +199,8 @@
                   height: 56,
                   padding: 0,
                   gap: 12,
-                  fill: "color.surface.default"
+                  fill: "color.surface.default",
+                  layoutAlign: "STRETCH"
                 },
                 {
                   type: "FRAME",
@@ -243,7 +246,8 @@
                       height: 40,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.subtle"
+                      fill: "color.surface.subtle",
+                      layoutAlign: "STRETCH"
                     },
                     {
                       type: "FRAME",
@@ -284,7 +288,8 @@
                       height: 44,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.default"
+                      fill: "color.surface.default",
+                      layoutAlign: "STRETCH"
                     },
                     {
                       type: "FRAME",
@@ -325,7 +330,8 @@
                       height: 44,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.default"
+                      fill: "color.surface.default",
+                      layoutAlign: "STRETCH"
                     },
                     {
                       type: "FRAME",
@@ -366,7 +372,8 @@
                       height: 44,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.default"
+                      fill: "color.surface.default",
+                      layoutAlign: "STRETCH"
                     },
                     {
                       type: "FRAME",
@@ -407,7 +414,8 @@
                       height: 44,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.default"
+                      fill: "color.surface.default",
+                      layoutAlign: "STRETCH"
                     },
                     {
                       type: "FRAME",
@@ -448,20 +456,25 @@
                       height: 44,
                       padding: 12,
                       gap: 8,
-                      fill: "color.surface.default"
+                      fill: "color.surface.default",
+                      layoutAlign: "STRETCH"
                     }
                   ],
                   gap: 0,
-                  fill: "color.surface.default"
+                  fill: "color.surface.default",
+                  layoutAlign: "STRETCH"
                 }
               ],
               padding: 24,
               gap: 16,
-              fill: "color.surface.default"
+              fill: "color.surface.default",
+              layoutAlign: "STRETCH"
             }
           ],
           fill: "color.surface.default",
-          gap: 0
+          gap: 0,
+          layoutGrow: 1,
+          layoutAlign: "STRETCH"
         }
       ],
       width: 1440,
@@ -560,7 +573,8 @@
           height: 56,
           padding: 16,
           gap: 8,
-          fill: "color.surface.default"
+          fill: "color.surface.default",
+          layoutAlign: "STRETCH"
         },
         {
           type: "ICON",
@@ -595,7 +609,8 @@
           ],
           padding: 16,
           gap: 12,
-          fill: "color.surface.default"
+          fill: "color.surface.default",
+          layoutAlign: "STRETCH"
         },
         {
           type: "FRAME",
@@ -624,7 +639,8 @@
           ],
           padding: 16,
           gap: 12,
-          fill: "color.surface.default"
+          fill: "color.surface.default",
+          layoutAlign: "STRETCH"
         },
         {
           type: "FRAME",
@@ -659,7 +675,8 @@
           height: 64,
           padding: 12,
           gap: 8,
-          fill: "color.surface.default"
+          fill: "color.surface.default",
+          layoutAlign: "STRETCH"
         }
       ],
       width: 390,
@@ -754,7 +771,7 @@
     return root;
   }
   async function buildNode(node, context) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d;
     switch (node.type) {
       case "FRAME": {
         const frame = figma.createFrame();
@@ -766,8 +783,36 @@
         frame.paddingBottom = padding;
         frame.paddingLeft = padding;
         frame.paddingRight = padding;
-        if (node.width) frame.resize(node.width, (_c = node.height) != null ? _c : 100);
-        if (node.height && !node.width) frame.resize(frame.width, node.height);
+        const hasWidth = node.width != null;
+        const hasHeight = node.height != null;
+        if (hasWidth && hasHeight) {
+          frame.resize(node.width, node.height);
+          frame.primaryAxisSizingMode = "FIXED";
+          frame.counterAxisSizingMode = "FIXED";
+        } else if (hasWidth) {
+          frame.resize(node.width, frame.height);
+          if (node.layout === "HORIZONTAL") {
+            frame.primaryAxisSizingMode = "FIXED";
+            frame.counterAxisSizingMode = "AUTO";
+          } else {
+            frame.primaryAxisSizingMode = "AUTO";
+            frame.counterAxisSizingMode = "FIXED";
+          }
+        } else if (hasHeight) {
+          frame.resize(frame.width, node.height);
+          if (node.layout === "HORIZONTAL") {
+            frame.primaryAxisSizingMode = "AUTO";
+            frame.counterAxisSizingMode = "FIXED";
+          } else {
+            frame.primaryAxisSizingMode = "FIXED";
+            frame.counterAxisSizingMode = "AUTO";
+          }
+        } else {
+          frame.primaryAxisSizingMode = "AUTO";
+          frame.counterAxisSizingMode = "AUTO";
+        }
+        if (node.layoutGrow != null) frame.layoutGrow = node.layoutGrow;
+        if (node.layoutAlign === "STRETCH") frame.layoutAlign = "STRETCH";
         if (node.fill) frame.fills = [paint(node.fill, context.variables)];
         for (const child of node.children) {
           frame.appendChild(await buildNode(child, context));
@@ -784,8 +829,8 @@
         return text;
       }
       case "INSTANCE": {
-        const variant = (_d = node.variant) != null ? _d : "primary";
-        const component = (_e = context.buttons.find((item) => item.name === `Variant=${variant}`)) != null ? _e : context.buttons[0];
+        const variant = (_c = node.variant) != null ? _c : "primary";
+        const component = (_d = context.buttons.find((item) => item.name === `Variant=${variant}`)) != null ? _d : context.buttons[0];
         if (!component) throw new Error("Button component not found");
         const instance = component.createInstance();
         instance.name = node.name;

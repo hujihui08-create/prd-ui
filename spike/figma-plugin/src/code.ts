@@ -115,8 +115,36 @@ async function buildNode(node: PlanNode, context: BuildContext): Promise<SceneNo
       frame.paddingBottom = padding;
       frame.paddingLeft = padding;
       frame.paddingRight = padding;
-      if (node.width) frame.resize(node.width, node.height ?? 100);
-      if (node.height && !node.width) frame.resize(frame.width, node.height);
+      const hasWidth = node.width != null;
+      const hasHeight = node.height != null;
+      if (hasWidth && hasHeight) {
+        frame.resize(node.width, node.height);
+        frame.primaryAxisSizingMode = "FIXED";
+        frame.counterAxisSizingMode = "FIXED";
+      } else if (hasWidth) {
+        frame.resize(node.width, frame.height);
+        if (node.layout === "HORIZONTAL") {
+          frame.primaryAxisSizingMode = "FIXED";
+          frame.counterAxisSizingMode = "AUTO";
+        } else {
+          frame.primaryAxisSizingMode = "AUTO";
+          frame.counterAxisSizingMode = "FIXED";
+        }
+      } else if (hasHeight) {
+        frame.resize(frame.width, node.height);
+        if (node.layout === "HORIZONTAL") {
+          frame.primaryAxisSizingMode = "AUTO";
+          frame.counterAxisSizingMode = "FIXED";
+        } else {
+          frame.primaryAxisSizingMode = "FIXED";
+          frame.counterAxisSizingMode = "AUTO";
+        }
+      } else {
+        frame.primaryAxisSizingMode = "AUTO";
+        frame.counterAxisSizingMode = "AUTO";
+      }
+      if (node.layoutGrow != null) frame.layoutGrow = node.layoutGrow;
+      if (node.layoutAlign === "STRETCH") frame.layoutAlign = "STRETCH";
       if (node.fill) frame.fills = [paint(node.fill, context.variables)];
       for (const child of node.children) {
         frame.appendChild(await buildNode(child, context));
