@@ -5,6 +5,26 @@ into eight Page Specs, validates each page against its design profile, catalog,
 archetype, and asset manifest, and writes a complete run record under
 `runs/<runId>/`.
 
+## Current limitations (Phase 1A)
+
+**Phase 1A is a sample harness, not a general user-facing pipeline.** Independent
+user testing on 2026-10-19 confirmed:
+
+- Only the `demo-orders` sample can pass. Asset manifests are hardcoded per
+  profile; a new project fails `ASSET-PROJECT` and has no supported manifest
+  configuration path.
+- `pnpm phase1:verify` accepts no custom brief or PRD. Extra arguments are
+  ignored; a custom brief requires importing `runPhase1` in a script.
+- Compiler templates are sample-specific. A custom `list` page can validate with
+  0 blockers while still rendering order-specific navigation, filters, empty
+  state, and actions.
+- Validators do not detect Brief-to-layout semantic mismatches.
+- `PageSpec.meta` does not carry `purpose`, `route`, or `roles`.
+- There is no PRD → UI Brief ingestion; `sample-prd.md` is illustrative only.
+
+Full findings and the recommended next steps are in
+[`docs/user-acceptance-2026-10-19.md`](docs/user-acceptance-2026-10-19.md).
+
 ## Commands
 
 Run from `pipeline/`:
