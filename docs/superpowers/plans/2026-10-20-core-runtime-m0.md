@@ -272,7 +272,7 @@ git commit -m "refactor: split pipeline into core and standalone runtime"
 - `validateVerdict(verdict: AssetReviewVerdict, options: { brandCritical: boolean }): VerdictCheck`.
 - `VerdictCheck = { verdict: AssetReviewVerdict; inconsistencies: string[] }`.
 
-- [ ] **Step 1: Write the failing contract/verdict tests**
+- [x] **Step 1: Write the failing contract/verdict tests**
 
 `tests/verdict.test.ts`:
 
@@ -323,12 +323,12 @@ describe("validateVerdict", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests/verdict.test.ts`
 Expected: FAIL because `src/verdict.ts` does not exist.
 
-- [ ] **Step 3: Implement contracts and verdict**
+- [x] **Step 3: Implement contracts and verdict**
 
 `src/contracts.ts` must define Zod schemas with `.strict()` and export inferred types. Use `z.enum(["icon","illustration","poster"])`, `z.enum(["A","B","C"])`, `z.enum(["library","commission","ai-vector","ai-raster","upload"])`. Scores are `z.number().int().min(1).max(5)`.
 
@@ -369,16 +369,16 @@ export function validateVerdict(
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests`
 Expected: PASS.
 
-- [ ] **Step 5: Add package wiring and typecheck**
+- [x] **Step 5: Add package wiring and typecheck**
 
 `core/asset-review/package.json` dependencies: `@prd-ui/contracts`, `zod`, `svgo`, `@xmldom/xmldom` (gates arrive in Task 3). Add `@prd-ui/asset-review` to `runtimes/standalone` dependencies. Run `pnpm install && pnpm typecheck`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pipeline/core/asset-review pipeline/runtimes/standalone/package.json pipeline/pnpm-lock.yaml
