@@ -1,0 +1,19 @@
+[
+  {
+    "id": "illus-unresolved",
+    "kind": "illustration",
+    "scene": "unresolved test scenario",
+    "styleRef": "b-mobile",
+    "size": { "width": 120, "height": 80 },
+    "format": "svg",
+    "constraints": {
+      "noText": true,
+      "noLogo": true,
+      "noScreenshot": true,
+      "palette": ["#2563EB", "#E5E7EB", "#111827", "#F59E0B"]
+    },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  }
+]

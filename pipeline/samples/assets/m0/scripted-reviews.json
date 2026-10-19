@@ -1,0 +1,15 @@
+{
+  "icon-home/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-package/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-search/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-plus/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-minus/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-chevron-left/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-chevron-right/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-circle-alert/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-refresh-cw/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "icon-user/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "illus-empty-inventory/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "illus-network-error/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." },
+  "illus-sync-loading/library/1": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "M0 scripted pass." }
+}

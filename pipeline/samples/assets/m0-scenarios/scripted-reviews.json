@@ -1,0 +1,7 @@
+{
+  "icon-retry/library/1": { "verdict": "retry", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 4, "consistency": 4, "editability": 4, "composition": 4 }, "suggestedChanges": ["tighten the arrow gap"], "reason": "First attempt is close but not there yet." },
+  "icon-retry/library/2": { "verdict": "pass", "hardIssues": [], "scores": { "brandFit": 5, "semantics": 5, "consistency": 4, "editability": 4, "composition": 5 }, "suggestedChanges": [], "reason": "Retry passes." },
+  "illus-unresolved/library/1": { "verdict": "retry", "hardIssues": [], "scores": { "brandFit": 4, "semantics": 4, "consistency": 4, "editability": 4, "composition": 4 }, "suggestedChanges": ["needs a clearer focal point"], "reason": "Not yet." },
+  "illus-unresolved/library/2": { "verdict": "retry", "hardIssues": [], "scores": { "brandFit": 4, "semantics": 4, "consistency": 4, "editability": 4, "composition": 4 }, "suggestedChanges": ["still too generic"], "reason": "Not yet." },
+  "illus-unresolved/library/3": { "verdict": "retry", "hardIssues": [], "scores": { "brandFit": 4, "semantics": 4, "consistency": 4, "editability": 4, "composition": 4 }, "suggestedChanges": ["source exhausted"], "reason": "Three attempts failed." }
+}

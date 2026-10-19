@@ -1,0 +1,122 @@
+[
+  {
+    "id": "icon-home",
+    "kind": "icon",
+    "scene": "home navigation",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-package",
+    "kind": "icon",
+    "scene": "inventory package",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-search",
+    "kind": "icon",
+    "scene": "search inventory",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-plus",
+    "kind": "icon",
+    "scene": "increase quantity",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-minus",
+    "kind": "icon",
+    "scene": "decrease quantity",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-chevron-left",
+    "kind": "icon",
+    "scene": "back navigation",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-chevron-right",
+    "kind": "icon",
+    "scene": "forward navigation",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-circle-alert",
+    "kind": "icon",
+    "scene": "warning state",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-refresh-cw",
+    "kind": "icon",
+    "scene": "refresh or retry",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "icon-user",
+    "kind": "icon",
+    "scene": "employee profile",
+    "styleRef": "b-mobile",
+    "size": { "width": 24, "height": 24 },
+    "format": "svg",
+    "constraints": { "grid": 24, "strokeWidth": 1.5, "currentColor": true, "noText": true },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  }
+]

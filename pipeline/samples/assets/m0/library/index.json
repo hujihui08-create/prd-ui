@@ -1,0 +1,17 @@
+{
+  "assets": [
+    { "id": "icon-home", "kind": "icon", "file": "icons/home.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-package", "kind": "icon", "file": "icons/package.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-search", "kind": "icon", "file": "icons/search.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-plus", "kind": "icon", "file": "icons/plus.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-minus", "kind": "icon", "file": "icons/minus.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-chevron-left", "kind": "icon", "file": "icons/chevron-left.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-chevron-right", "kind": "icon", "file": "icons/chevron-right.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-circle-alert", "kind": "icon", "file": "icons/circle-alert.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-refresh-cw", "kind": "icon", "file": "icons/refresh-cw.svg", "license": "ISC", "library": "lucide" },
+    { "id": "icon-user", "kind": "icon", "file": "icons/user.svg", "license": "ISC", "library": "lucide" },
+    { "id": "illus-empty-inventory", "kind": "illustration", "file": "illustrations/empty-inventory.svg", "license": "test-fixture", "library": "local-test-fixture" },
+    { "id": "illus-network-error", "kind": "illustration", "file": "illustrations/network-error.svg", "license": "test-fixture", "library": "local-test-fixture" },
+    { "id": "illus-sync-loading", "kind": "illustration", "file": "illustrations/sync-loading.svg", "license": "test-fixture", "library": "local-test-fixture" }
+  ]
+}

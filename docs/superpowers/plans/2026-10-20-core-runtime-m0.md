@@ -606,15 +606,15 @@ git commit -m "feat: add standalone asset adapters"
 - `scripted-reviews.json`: all 13 pass with scores `{brandFit:5, semantics:5, consistency:4, editability:4, composition:5}` (average 4.6).
 - `m0-scenarios`: `icon-retry` (retry then pass) and `illustration-unresolved` (three fails, A-only).
 
-- [ ] **Step 1: Download/copy Lucide icons and add license**
+- [x] **Step 1: Download/copy Lucide icons and add license**
 
 Use `curl -L https://unpkg.com/lucide-static@latest/icons/<name>.svg -o ...` or copy from a local `lucide-static` install. Verify each file starts with `<svg` and has `viewBox="0 0 24 24"`.
 
-- [ ] **Step 2: Write 3 test illustrations**
+- [x] **Step 2: Write 3 test illustrations**
 
 Each must pass `checkIllustration`: viewBox `0 0 120 80`, palette values only, no text, elements inside viewBox. Use simple shapes/gradients-free SVGs.
 
-- [ ] **Step 3: Write briefs/index/reviews**
+- [x] **Step 3: Write briefs/index/reviews**
 
 `index.json` shape:
 
@@ -633,11 +633,11 @@ Each must pass `checkIllustration`: viewBox `0 0 120 80`, palette values only, n
 }
 ```
 
-- [ ] **Step 4: Validate fixtures through preflight**
+- [x] **Step 4: Validate fixtures through preflight**
 
 Run a vitest fixture test or a small tsx script to parse every brief and run `checkIcon`/`checkIllustration`; all must pass. Add `pipeline/runtimes/standalone/tests/fixtures.test.ts`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add pipeline/samples/assets

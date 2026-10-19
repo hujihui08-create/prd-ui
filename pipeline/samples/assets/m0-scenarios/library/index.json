@@ -1,0 +1,6 @@
+{
+  "assets": [
+    { "id": "icon-retry", "kind": "icon", "file": "icons/refresh-cw.svg", "license": "ISC", "library": "lucide" },
+    { "id": "illus-unresolved", "kind": "illustration", "file": "illustrations/empty-inventory.svg", "license": "test-fixture", "library": "local-test-fixture" }
+  ]
+}

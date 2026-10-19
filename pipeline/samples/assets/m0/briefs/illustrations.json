@@ -1,0 +1,53 @@
+[
+  {
+    "id": "illus-empty-inventory",
+    "kind": "illustration",
+    "scene": "empty inventory shelf",
+    "styleRef": "b-mobile",
+    "size": { "width": 120, "height": 80 },
+    "format": "svg",
+    "constraints": {
+      "noText": true,
+      "noLogo": true,
+      "noScreenshot": true,
+      "palette": ["#2563EB", "#E5E7EB", "#111827", "#F59E0B"]
+    },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "illus-network-error",
+    "kind": "illustration",
+    "scene": "network error",
+    "styleRef": "b-mobile",
+    "size": { "width": 120, "height": 80 },
+    "format": "svg",
+    "constraints": {
+      "noText": true,
+      "noLogo": true,
+      "noScreenshot": true,
+      "palette": ["#2563EB", "#E5E7EB", "#111827", "#F59E0B"]
+    },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  },
+  {
+    "id": "illus-sync-loading",
+    "kind": "illustration",
+    "scene": "sync loading",
+    "styleRef": "b-mobile",
+    "size": { "width": 120, "height": 80 },
+    "format": "svg",
+    "constraints": {
+      "noText": true,
+      "noLogo": true,
+      "noScreenshot": true,
+      "palette": ["#2563EB", "#E5E7EB", "#111827", "#F59E0B"]
+    },
+    "sourceChain": ["library"],
+    "brandCritical": false,
+    "humanSignoffRequired": false
+  }
+]
