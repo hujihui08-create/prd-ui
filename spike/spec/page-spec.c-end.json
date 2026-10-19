@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "pageId": "home-feed",
+    "name": "首页",
+    "target": "mobile",
+    "profile": "c-expressive",
+    "archetype": "feed"
+  },
+  "layout": {
+    "type": "MobileShell",
+    "props": {
+      "title": "发现",
+      "tabs": ["推荐", "关注", "附近", "我的"]
+    },
+    "children": [
+      {
+        "type": "ICON",
+        "props": { "name": "bookmark", "size": 24 }
+      },
+      {
+        "type": "FeedCard",
+        "props": {
+          "title": "周末去哪儿",
+          "body": "城市周边 5 个小众目的地",
+          "image": "assets/feed-1.png"
+        }
+      },
+      {
+        "type": "FeedCard",
+        "props": {
+          "title": "新店开业",
+          "body": "手冲咖啡买一送一",
+          "image": "assets/feed-2.png"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "pageId": "orders-list",
+    "name": "订单列表",
+    "target": "web",
+    "profile": "b-dense",
+    "archetype": "list"
+  },
+  "layout": {
+    "type": "PageShell",
+    "props": {
+      "title": "订单管理",
+      "nav": ["概览", "订单", "客户", "设置"]
+    },
+    "children": [
+      {
+        "type": "Section",
+        "props": { "padding": "space.6", "gap": "space.4" },
+        "children": [
+          {
+            "type": "FilterBar",
+            "props": { "placeholder": "搜索订单号 / 客户", "action": "新建订单" }
+          },
+          {
+            "type": "DataTable",
+            "props": {
+              "columns": ["订单号", "客户", "金额", "状态", "创建时间"],
+              "rows": 5
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
