@@ -209,11 +209,21 @@ describe("design-system baselines", () => {
       "feed",
       "fields",
       "illustration",
+      "summary",
       "title",
     ]);
-    for (const slot of ["feed", "bottom-nav", "title", "fields", "actions", "illustration", "body"]) {
+    for (const slot of ["feed", "bottom-nav", "summary", "title", "fields", "actions", "illustration", "body"]) {
       expect(mobileShell.slots?.[slot], `MobileShell.${slot}`).toBeDefined();
     }
+    expect(mobileShell.slots?.summary?.allowed).toEqual([
+      "Card",
+      "List",
+      "ListItem",
+      "Badge",
+      "Stack",
+      "Row",
+      "Text",
+    ]);
     expect(mobileShell.slots?.fields?.allowed).not.toContain("Select");
   });
 

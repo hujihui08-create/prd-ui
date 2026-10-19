@@ -7,6 +7,7 @@ import { cExpressiveProfile } from "./profiles/c-expressive.js";
 
 export { archetypes, type ArchetypeDef, type ArchetypeTarget } from "./archetypes.js";
 export { bDenseCatalog, cExpressiveCatalog, bDenseProfile, cExpressiveProfile };
+export { isLayoutPrimitive, layoutPrimitives } from "./primitives.js";
 
 const profiles: Record<string, Profile> = {
   "b-dense": bDenseProfile,
