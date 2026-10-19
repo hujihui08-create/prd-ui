@@ -402,17 +402,17 @@ git commit -m "feat: add asset review contracts and verdict thresholds"
 - `checkIconSet(icons: Array<{ id: string; svg: string }>): HardGateResult`.
 - `checkIllustration(svg: string, brief: AssetBrief): HardGateResult`.
 
-- [ ] **Step 1: Write failing gate tests**
+- [x] **Step 1: Write failing gate tests**
 
 Use a valid 24×24 Lucide-like SVG and invalid variants. Assert codes:
 `SVG_INVALID`, `SVG_NO_VIEWBOX`, `ICON_GRID`, `ICON_STROKE_WIDTH`, `ICON_HARDCODED_COLOR`, `ICON_TEXT`, `SVG_SCRIPT`, `SVG_EXTERNAL_REF`, `ICON_RASTER`, `ICON_SET_INCONSISTENT`, `ILLUSTRATION_TEXT`, `ILLUSTRATION_PALETTE`, `ILLUSTRATION_SIZE`, `ILLUSTRATION_SAFE_AREA`.
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests/gates.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement SVG parsing helpers**
+- [x] **Step 3: Implement SVG parsing helpers**
 
 Use `DOMParser` from `@xmldom/xmldom`. Implement:
 - `parseSvg(svg): Document | null`
@@ -423,18 +423,18 @@ Use `DOMParser` from `@xmldom/xmldom`. Implement:
 
 `normalizeSvg` uses `optimize` from `svgo` with `{ plugins: ["preset-default"] }`; return `result.data`.
 
-- [ ] **Step 4: Implement icon and illustration gates**
+- [x] **Step 4: Implement icon and illustration gates**
 
 Icon gate rules from the spec §4.4. Icon set gate compares the first path's `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, and `fill` across all icons; any mismatch is `ICON_SET_INCONSISTENT`.
 
 Illustration gate: viewBox >= 96×72 (from brief size), palette membership (allow `none`, `currentColor`, `url(#...)` and check gradient stop colors), no `<text>`, no external refs, and no element outside the viewBox.
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests/gates.test.ts && pnpm typecheck`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pipeline/core/asset-review

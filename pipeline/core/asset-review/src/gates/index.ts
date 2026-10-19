@@ -1,0 +1,3 @@
+export * from "./svg.js";
+export * from "./icon.js";
+export * from "./illustration.js";
