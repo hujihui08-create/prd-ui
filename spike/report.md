@@ -3,7 +3,7 @@
 > **状态：PRELIMINARY — Task 7 人工 Figma 视觉验收尚未执行，不能给出最终 go/no-go。**
 > 日期：2026-10-19
 > 分支：`phase-0-spike`
-> 关键 commit：`064c3b0`（docs）→ `69747c0`（插件尺寸修复）→ `2de2654`（忽略构建产物）→ `53d8bb6`（验收文档）→ `48f0449`（最终对齐修复）→ `b35907d`（HTML 字体对齐）
+> 关键 commit：`064c3b0`（docs）→ `69747c0`（插件尺寸修复）→ `2de2654`（忽略构建产物）→ `53d8bb6`（验收文档）→ `48f0449`（最终对齐修复）→ `b35907d`（HTML 字体对齐）→ `868fdea`（字体回退与字号守卫）
 > 人工验收包：`spike/artifacts/figma/checklist.md`、`spike/artifacts/figma/notes.md`
 
 ## 环境
