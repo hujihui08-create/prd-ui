@@ -566,20 +566,20 @@ git commit -m "feat: add asset manifest builder and dry-run preflight"
 - `ScriptedReviewer` reads `scripted-reviews.json` keyed by `${assetId}/${source}/${attempt}`.
 - `ModelReviewer` is optional; missing key → `CONFIGURATION_ERROR` with the env var name.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Library: resolves `icon-home` from a temp index; missing id → `LIBRARY_MISSING`; hash matches file content.
 Scripted: returns configured verdict; missing key → `SCRIPTED_REVIEW_MISSING`.
 
-- [ ] **Step 2: Implement adapters**
+- [x] **Step 2: Implement adapters**
 
 All fs access uses `node:fs/promises`; paths resolve against `runDir`. Writes are atomic (write temp + rename) where practical.
 
-- [ ] **Step 3: Run tests and typecheck**
+- [x] **Step 3: Run tests and typecheck**
 
 Run: `cd pipeline && pnpm vitest run runtimes/standalone/tests && pnpm typecheck`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add pipeline/runtimes/standalone

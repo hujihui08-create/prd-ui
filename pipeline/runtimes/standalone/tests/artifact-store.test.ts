@@ -1,0 +1,34 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { FileArtifactStore } from "../src/asset/artifact-store.js";
+
+const temporaryDirs: string[] = [];
+
+async function tempDir(): Promise<string> {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-store-"));
+  temporaryDirs.push(dir);
+  return dir;
+}
+
+afterEach(async () => {
+  await Promise.all(temporaryDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
+});
+
+describe("FileArtifactStore", () => {
+  it("writes, reads and hashes text and JSON", async () => {
+    const store = new FileArtifactStore(await tempDir());
+    await store.writeText("assets/a.txt", "hello");
+    expect(await store.readText("assets/a.txt")).toBe("hello");
+    expect(await store.hash("assets/a.txt")).toMatch(/^sha256:[a-f0-9]{64}$/);
+
+    await store.writeJson("assets/nested/b.json", { ok: true });
+    expect(await store.readText("assets/nested/b.json")).toContain('"ok": true');
+  });
+
+  it("rejects paths outside the run directory", async () => {
+    const store = new FileArtifactStore(await tempDir());
+    await expect(store.writeText("../escape.txt", "x")).rejects.toThrow(/escapes/);
+  });
+});
