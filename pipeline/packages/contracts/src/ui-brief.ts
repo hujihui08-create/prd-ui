@@ -68,12 +68,12 @@ export const UiBriefPageSchema = z
     target: z.enum(["web", "mobile"]),
     profile: z.string().min(1),
     route: z.string().min(1),
-    roles: z.array(z.string()).min(1),
-    requiredStates: z.array(z.string()).min(1),
+    roles: z.array(z.string().min(1)).min(1),
+    requiredStates: z.array(z.string().min(1)).min(1),
     reqRefs: z.array(z.string().regex(/^REQ-[A-Z0-9]+-\d+$/)).min(1),
-    fields: z.array(z.string()).optional(),
-    actions: z.array(z.string()).optional(),
-    filterFields: z.array(z.string()).optional(),
+    fields: z.array(z.string().min(1)).optional(),
+    actions: z.array(z.string().min(1)).optional(),
+    filterFields: z.array(z.string().min(1)).optional(),
     emptyTitle: z.string().min(1).optional(),
     emptyAssetRef: z.string().min(1).optional(),
     summaryTitle: z.string().min(1).optional(),
@@ -104,7 +104,7 @@ export const UiBriefSchema = z
         type: z.string().min(1),
         goals: z.array(z.string()),
         users: z.array(z.string()),
-        roles: z.array(z.string()).min(1),
+        roles: z.array(z.string().min(1)).min(1),
         scope: z.array(z.string()),
         nonGoals: z.array(z.string()),
         successMetrics: z.array(z.string()),
@@ -114,7 +114,10 @@ export const UiBriefSchema = z
       .object({
         pages: z.array(UiBriefPageSchema).min(1),
         navigation: z
-          .object({ primary: z.array(z.string()), tabs: z.array(z.string()).optional() })
+          .object({
+            primary: z.array(z.string().min(1)),
+            tabs: z.array(z.string().min(1)).optional(),
+          })
           .strict(),
         flows: z.array(z.object({ id: z.string(), steps: z.array(z.string()) }).strict()),
       })

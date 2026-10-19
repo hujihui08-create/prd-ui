@@ -122,6 +122,23 @@ function errorMessage(error: unknown): string {
 }
 
 /**
+ * A failure that happened after a run directory was created. Carrying the
+ * directory lets the CLI print the same `Run:` line as a validation failure
+ * instead of only the raw error. Pre-run configuration errors are not wrapped
+ * because no run exists to point at.
+ */
+export class Phase1RunError extends Error {
+  constructor(
+    message: string,
+    readonly runDir: string,
+    options?: ErrorOptions
+  ) {
+    super(message, options);
+    this.name = "Phase1RunError";
+  }
+}
+
+/**
  * Resolve the brief, manifests, and runs directory before a run starts.
  * A project config supplies paths relative to its own directory; explicit CLI
  * overrides use the working directory. A custom brief without any manifests
@@ -484,7 +501,12 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
       state = await writeState(failRun(state));
       await logger.log(`run failed: ${blockers} blockers; stage ${state.stage}`);
       const findings = reports.flatMap((report) =>
-        report.findings.filter((finding) => finding.severity === "blocker")
+        report.findings
+          .filter((finding) => finding.severity === "blocker")
+          .map((finding) => ({
+            ...finding,
+            location: `${report.pageId}:${finding.location}`,
+          }))
       );
       return { runId, pages: specs.length, blockers, runDir, passed: false, findings };
     }
@@ -497,6 +519,10 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     if (gates.brief !== "passed") gates.brief = "failed";
     state = await writeState({ ...failRun(state), gates });
     await logger.log(`run failed: ${errorMessage(error).replace(/\s+/g, " ").trim()}`);
-    throw error;
+    throw new Phase1RunError(
+      error instanceof Error ? error.message : String(error),
+      runDir,
+      { cause: error }
+    );
   }
 }

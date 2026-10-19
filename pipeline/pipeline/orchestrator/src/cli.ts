@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { runPhase1, type Phase1Options } from "./run-phase1.js";
+import { Phase1RunError, runPhase1, type Phase1Options } from "./run-phase1.js";
 
 export const USAGE = `Usage: pnpm phase1:verify [options]
 
@@ -58,8 +58,13 @@ export function parseArgs(argv: string[]): ParsedCliArgs {
     const inlineValue =
       argument.startsWith("--") && equals > 0 ? argument.slice(equals + 1) : undefined;
 
-    const value = (): string =>
-      inlineValue !== undefined ? inlineValue : readValue(argv, ++index, flag);
+    const value = (): string => {
+      const raw = inlineValue !== undefined ? inlineValue : readValue(argv, ++index, flag);
+      if (raw.length === 0) {
+        throw new CliUsageError(`missing value for ${flag}`);
+      }
+      return raw;
+    };
 
     switch (flag) {
       case "--project":
@@ -131,7 +136,11 @@ export async function main(
     }
     return result.passed ? 0 : 1;
   } catch (error) {
-    io.stderr(error instanceof Error ? error.message : String(error));
+    const message = error instanceof Error ? error.message : String(error);
+    io.stderr(`Phase 1A FAILED: ${message}`);
+    if (error instanceof Phase1RunError) {
+      io.stderr(`Run: ${error.runDir}`);
+    }
     return 1;
   }
 }

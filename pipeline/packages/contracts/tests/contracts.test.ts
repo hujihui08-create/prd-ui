@@ -201,6 +201,34 @@ describe("contracts", () => {
     ).toThrow();
   });
 
+  it("rejects empty content entries in a brief", () => {
+    const page = minimalBrief.ia.pages[0]!;
+    for (const patch of [
+      { roles: [""] },
+      { requiredStates: [""] },
+      { fields: [""] },
+      { actions: [""] },
+      { filterFields: [""] },
+    ]) {
+      expect(() =>
+        UiBriefSchema.parse({
+          ...minimalBrief,
+          ia: { ...minimalBrief.ia, pages: [{ ...page, ...patch }] },
+        })
+      ).toThrow();
+    }
+
+    expect(() =>
+      UiBriefSchema.parse({
+        ...minimalBrief,
+        ia: {
+          ...minimalBrief.ia,
+          navigation: { primary: [""] },
+        },
+      })
+    ).toThrow();
+  });
+
   it("parses a strict project config", () => {
     const config = {
       project: "demo-orders",

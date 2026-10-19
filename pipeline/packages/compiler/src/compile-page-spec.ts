@@ -269,7 +269,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                 props: { title: item.title, body: item.body },
               })
             ),
-            emptyStateNode(page, "暂无内容"),
+            emptyStateNode(page, page.emptyTitle ?? "暂无内容"),
           ],
           "bottom-nav": [{ type: "BottomNav", props: { items: tabs } }],
         },

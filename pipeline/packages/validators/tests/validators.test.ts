@@ -485,6 +485,85 @@ describe("brief semantic validation", () => {
     expect(findings[0]?.location).toBe("layout.props.tabs");
   });
 
+  it("reports SEMANTIC-NAV when a mobile shell omits tabs entirely", () => {
+    const spec = cloneSpec("item-detail");
+    delete spec.layout.props!.tabs;
+
+    const report = validatePageSpec(spec, contextFor(spec));
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-NAV"
+    );
+    expect(findings, findingDetail(report)).toHaveLength(1);
+    expect(findings[0]?.location).toBe("layout.props.tabs");
+    expect(findings[0]?.evidence).toContain("推荐");
+    expect(report.passed).toBe(false);
+  });
+
+  it("checks settings fields via their localized labels instead of skipping them", () => {
+    const settingsPage = brief.ia.pages.find((page) => page.id === "settings")!;
+    const cleanSpec = cloneSpec("settings");
+    const clean = validatePageSpec(
+      cleanSpec,
+      contextForSpec(cleanSpec, settingsPage, brief.ia.navigation)
+    );
+    expect(semanticRuleIds(clean), findingDetail(clean)).toEqual([]);
+
+    const pageWithUnknownField: UiBriefPage = {
+      ...settingsPage,
+      fields: [...(settingsPage.fields ?? []), "bogus-setting"],
+    };
+    const spec = cloneSpec("settings");
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, pageWithUnknownField, brief.ia.navigation)
+    );
+    const findings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-FIELD"
+    );
+    expect(findings, findingDetail(report)).toHaveLength(1);
+    expect(findings[0]?.evidence).toBe("bogus-setting");
+    expect(report.passed).toBe(false);
+  });
+
+  it("matches fields and actions exactly rather than as substrings", () => {
+    const spec = structuredClone(customersSpec);
+    const page: UiBriefPage = {
+      ...customersPage,
+      fields: ["customer"],
+      filterFields: [],
+      actions: ["导出"],
+    };
+
+    const report = validatePageSpec(
+      spec,
+      contextForSpec(spec, page, customersBrief.ia.navigation)
+    );
+    const fieldFindings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-FIELD"
+    );
+    const actionFindings = report.findings.filter(
+      (finding) => finding.ruleId === "SEMANTIC-ACTION"
+    );
+    expect(fieldFindings.map((finding) => finding.evidence)).toEqual(["customer"]);
+    expect(actionFindings.map((finding) => finding.evidence)).toEqual(["导出"]);
+  });
+
+  it("accepts a feed page whose brief emptyTitle is rendered", () => {
+    const feedBrief = structuredClone(brief) as UiBrief;
+    const feedPage = feedBrief.ia.pages.find((page) => page.id === "home-feed")!;
+    feedPage.emptyTitle = "暂无动态";
+    const feedSpec = compileProject(feedBrief, deps).find(
+      (spec) => spec.meta.pageId === "home-feed"
+    )!;
+
+    const report = validatePageSpec(
+      feedSpec,
+      contextForSpec(feedSpec, feedPage, feedBrief.ia.navigation)
+    );
+    expect(report.findings, findingDetail(report)).toEqual([]);
+    expect(report.passed).toBe(true);
+  });
+
   it("reports SEMANTIC-EMPTY when the brief empty title is absent", () => {
     const spec = cloneSpec("orders-list");
     const empty = findNode(spec, "EmptyState");

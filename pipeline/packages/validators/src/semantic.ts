@@ -13,14 +13,59 @@ function stringArray(value: unknown): string[] {
 }
 
 /**
+ * Settings labels are localized by the settings template. This map mirrors the
+ * template's display copy so the validator can independently verify the page:
+ * a localized label proves the field reached the layout just as a raw key does.
+ */
+const settingsFieldLabels: Record<string, string> = {
+  notifications: "通知设置",
+  language: "语言",
+  timezone: "时区",
+};
+
+/**
+ * Collect exact string values from every node's `props`. Node type names and
+ * text roles are deliberately excluded: a field named "Button" must not be
+ * satisfied by the component type that happens to render it.
+ */
+function collectPropStrings(value: unknown, found: Set<string>): void {
+  if (typeof value === "string") {
+    found.add(value);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) collectPropStrings(item, found);
+    return;
+  }
+  if (value && typeof value === "object") {
+    for (const item of Object.values(value)) collectPropStrings(item, found);
+  }
+}
+
+function layoutStrings(root: PageSpec["layout"] | undefined): Set<string> {
+  const found = new Set<string>();
+  const visit = (node: NonNullable<PageSpec["layout"]>): void => {
+    collectPropStrings(node.props, found);
+    for (const child of node.children ?? []) visit(child);
+    for (const nodes of Object.values(node.slots ?? {})) {
+      for (const child of nodes) visit(child);
+    }
+  };
+  if (root) visit(root);
+  return found;
+}
+
+/**
  * Brief-to-spec semantic checks. These catch a spec that is structurally
  * valid but silently renders content from another page/project.
  *
  * - `SEMANTIC-META`: name, purpose, route, or roles differ from the brief page.
  * - `SEMANTIC-NAV`: the root shell's nav (web) or tabs (mobile) miss a brief item.
- * - `SEMANTIC-FIELD`: a brief field does not appear anywhere in the layout JSON.
- * - `SEMANTIC-FILTER`: a brief filter field does not appear in the layout JSON.
- * - `SEMANTIC-ACTION`: a brief action does not appear in the layout JSON.
+ * - `SEMANTIC-FIELD`: a brief field does not appear as an exact layout prop value
+ *   (settings fields may appear as their localized label).
+ * - `SEMANTIC-FILTER`: a brief filter field does not appear as an exact layout
+ *   prop value.
+ * - `SEMANTIC-ACTION`: a brief action does not appear as an exact layout prop value.
  * - `SEMANTIC-EMPTY`: the brief empty title does not appear in the layout.
  *
  * Every finding is a blocker. Checks are skipped when the corresponding piece
@@ -113,11 +158,22 @@ function checkNavigation(
   }
 
   if (root.type === "MobileShell") {
-    // Full-screen mobile pages (auth/onboarding) intentionally render no tabs,
-    // so only a declared tabs prop is cross-checked against the brief.
-    if (!Array.isArray(root.props?.tabs)) return;
+    // Full-screen mobile pages (auth/onboarding) intentionally render no tabs.
+    // Every other mobile archetype must carry the brief's tabs; an omitted
+    // `tabs` prop is a missing navigation, not a pass.
+    if (spec.meta.archetype === "auth" || spec.meta.archetype === "onboarding") return;
+    const expectedTabs = navigation.tabs ?? navigation.primary;
+    if (!Array.isArray(root.props?.tabs)) {
+      push(
+        "SEMANTIC-NAV",
+        "layout.props.tabs",
+        expectedTabs.join(", ") || "(none)",
+        `Root MobileShell has no tabs; expected ${JSON.stringify(expectedTabs)} from the brief.`
+      );
+      return;
+    }
     const tabs = stringArray(root.props.tabs);
-    for (const item of navigation.tabs ?? navigation.primary) {
+    for (const item of expectedTabs) {
       if (!tabs.includes(item)) {
         push(
           "SEMANTIC-NAV",
@@ -131,32 +187,27 @@ function checkNavigation(
 }
 
 function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Push): void {
-  const layout = JSON.stringify(spec.layout ?? {});
+  const strings = layoutStrings(spec.layout);
 
-  // The settings template maps known field keys to localized display labels
-  // ("notifications" -> "通知设置") and therefore never serializes the raw key.
-  // Literal matching cannot apply there; every other archetype renders fields
-  // verbatim (columns, labels, or input names).
-  if (briefPage.archetype !== "settings") {
-    for (const field of briefPage.fields ?? []) {
-      if (!layout.includes(field)) {
-        push(
-          "SEMANTIC-FIELD",
-          "layout",
-          field,
-          `Brief field "${field}" does not appear in the page layout.`
-        );
-      }
+  for (const field of briefPage.fields ?? []) {
+    const localized = briefPage.archetype === "settings" ? settingsFieldLabels[field] : undefined;
+    if (!strings.has(field) && !(localized !== undefined && strings.has(localized))) {
+      push(
+        "SEMANTIC-FIELD",
+        "layout",
+        field,
+        `Brief field "${field}" does not appear as an exact value in the page layout.`
+      );
     }
   }
 
   for (const field of briefPage.filterFields ?? []) {
-    if (!layout.includes(field)) {
+    if (!strings.has(field)) {
       push(
         "SEMANTIC-FILTER",
         "layout",
         field,
-        `Brief filter field "${field}" does not appear in the page layout.`
+        `Brief filter field "${field}" does not appear as an exact value in the page layout.`
       );
     }
   }
@@ -164,17 +215,17 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
   // Actions must be visibly rendered. Interactions only describe behaviour; a
   // trigger that never reaches the layout leaves the user without the control.
   for (const action of briefPage.actions ?? []) {
-    if (!layout.includes(action)) {
+    if (!strings.has(action)) {
       push(
         "SEMANTIC-ACTION",
         "layout",
         action,
-        `Brief action "${action}" does not appear in the page layout.`
+        `Brief action "${action}" does not appear as an exact value in the page layout.`
       );
     }
   }
 
-  if (briefPage.emptyTitle !== undefined && !layout.includes(briefPage.emptyTitle)) {
+  if (briefPage.emptyTitle !== undefined && !strings.has(briefPage.emptyTitle)) {
     push(
       "SEMANTIC-EMPTY",
       "layout",

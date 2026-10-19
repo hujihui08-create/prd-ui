@@ -105,9 +105,13 @@ Options:
 - On success the CLI prints `Phase 1A OK: <n> pages, <n> blockers` and the run
   directory (`Run: <path>`). All artifacts live under that directory. Counts
   are singular when 1 (`1 page, 1 blocker`).
-- On failure the CLI prints `Phase 1A FAILED: ...`, the run directory, and up to
-  ten reasons (`- <RULE-ID>: <message>`) so the fix is visible without opening
+- Pipeline failures (brief gate, project/manifest mismatch, page validation)
+  print `Phase 1A FAILED: ...`, the run directory, and up to ten reasons
+  (`- <RULE-ID>: <message>`) to stdout, so the fix is visible without opening
   the run log.
+- Pre-run argument or configuration errors (an empty option value, a custom
+  brief without manifests, an unreadable project config) print
+  `Phase 1A FAILED: ...` to stderr and create no run directory.
 
 ## Workspace
 

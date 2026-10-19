@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -151,8 +151,52 @@ describe("phase1 CLI", () => {
     );
 
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("missing manifests");
+    expect(result.stderr).toContain("Phase 1A FAILED: missing manifests");
+    expect(result.stderr).not.toContain("Run:");
     await expect(stat(runsDir)).rejects.toThrow();
+  });
+
+  it("rejects an empty option value instead of falling back to the sample", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+
+    const result = await runCli(["--project", "", "--runs", path.join(tmpDir, "runs")], {
+      cwd: tmpDir,
+    });
+
+    expect(result.code).toBe(2);
+    expect(result.stderr).toContain("missing value for --project");
+    expect(await readdir(tmpDir)).toEqual([]);
+  });
+
+  it("prints the run directory when a post-intake failure is thrown", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const runsDir = path.join(tmpDir, "runs");
+    const briefPath = path.join(tmpDir, "invalid-brief.json");
+    await writeFile(briefPath, JSON.stringify({ meta: { project: "broken" } }), "utf8");
+
+    const result = await runCli(
+      [
+        "--brief",
+        briefPath,
+        "--manifest",
+        "b-dense=samples/asset-manifest.b-dense.json",
+        "--manifest",
+        "c-expressive=samples/asset-manifest.c-expressive.json",
+        "--runs",
+        runsDir,
+      ],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("Phase 1A FAILED:");
+    expect(result.stderr).toContain(`Run: ${runsDir}/run-`);
+    const runDir = await findRunDir(runsDir);
+    const state = JSON.parse(
+      await readFile(path.join(runDir, "state.json"), "utf8")
+    ) as { status: string; gates: { brief: string } };
+    expect(state.status).toBe("failed");
+    expect(state.gates.brief).toBe("failed");
   });
 
   it("fails when a page profile has no manifest", async () => {
@@ -316,6 +360,92 @@ describe("phase1 CLI", () => {
     expect(layout).toContain("新建客户");
     expect(layout).toContain("导出客户");
     expect(JSON.stringify(spec)).not.toContain("empty-orders");
+  });
+
+  it("resolves a project runsDir relative to the project file", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const projectDir = path.join(tmpDir, "project");
+    await mkdir(projectDir, { recursive: true });
+    const projectPath = path.join(projectDir, "project.yaml");
+    await writeFile(
+      projectPath,
+      [
+        "project: demo-orders",
+        `brief: ${JSON.stringify(path.join(samplesDir, "ui-brief.sample.json"))}`,
+        "manifests:",
+        `  b-dense: ${JSON.stringify(path.join(samplesDir, "asset-manifest.b-dense.json"))}`,
+        `  c-expressive: ${JSON.stringify(
+          path.join(samplesDir, "asset-manifest.c-expressive.json")
+        )}`,
+        "runsDir: out/runs",
+        "",
+      ].join("\n"),
+      "utf8"
+    );
+
+    const result = await runCli(["--project", projectPath], { cwd: tmpDir });
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Phase 1A OK: 8 pages, 0 blockers");
+    await expect(
+      findRunDir(path.join(projectDir, "out", "runs"))
+    ).resolves.toBeDefined();
+  });
+
+  it("uses --brief to override a project's brief", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const brief = JSON.parse(
+      await readFile(path.join(samplesDir, "ui-brief.sample.json"), "utf8")
+    ) as UiBrief;
+    brief.ia.pages.find((page) => page.id === "orders-list")!.name = "订单列表（覆盖）";
+    const briefPath = path.join(tmpDir, "override-brief.json");
+    await writeFile(briefPath, JSON.stringify(brief), "utf8");
+    const runsDir = path.join(tmpDir, "runs");
+
+    const result = await runCli(
+      [
+        "--project",
+        "samples/project.demo-orders.yaml",
+        "--brief",
+        briefPath,
+        "--runs",
+        runsDir,
+      ],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Phase 1A OK: 8 pages, 0 blockers");
+    const runDir = await findRunDir(runsDir);
+    const spec = JSON.parse(
+      await readFile(
+        path.join(runDir, "artifacts", "page-spec", "orders-list.json"),
+        "utf8"
+      )
+    ) as PageSpec;
+    expect(spec.meta.name).toBe("订单列表（覆盖）");
+  });
+
+  it("applies --manifest overrides over project manifests", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const runsDir = path.join(tmpDir, "runs");
+
+    const result = await runCli(
+      [
+        "--project",
+        "samples/projects/demo-crm/project.yaml",
+        "--manifest",
+        "b-dense=samples/asset-manifest.b-dense.json",
+        "--runs",
+        runsDir,
+      ],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain("Phase 1A FAILED: 0 pages, 1 blocker");
+    expect(result.stdout).toContain("- PROJECT-MANIFEST-PROJECT:");
+    expect(result.stdout).toContain("demo-orders");
   });
 
   it("runs the demo-crm project with its own brief and manifest", async () => {

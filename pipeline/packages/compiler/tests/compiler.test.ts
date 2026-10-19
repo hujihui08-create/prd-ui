@@ -271,6 +271,21 @@ describe("brief-driven page content", () => {
     ]);
   });
 
+  it("uses the brief emptyTitle for feed pages and defaults otherwise", () => {
+    expect(nodesOf(specsByPageId.get("home-feed")!, "EmptyState")[0]?.props?.title).toBe(
+      "暂无内容"
+    );
+
+    const briefWithFeedTitle = structuredClone(brief) as UiBrief;
+    briefWithFeedTitle.ia.pages = briefWithFeedTitle.ia.pages.map((page) =>
+      page.id === "home-feed" ? { ...page, emptyTitle: "暂无动态" } : page
+    );
+    const feedSpec = compileProject(briefWithFeedTitle, deps).find(
+      (spec) => spec.meta.pageId === "home-feed"
+    )!;
+    expect(nodesOf(feedSpec, "EmptyState")[0]?.props?.title).toBe("暂无动态");
+  });
+
   it("uses summary titles from the brief", () => {
     expect(nodesOf(specsByPageId.get("order-detail")!, "Card")[0]?.props?.title).toBe(
       "订单摘要"
