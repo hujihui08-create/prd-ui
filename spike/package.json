@@ -1,0 +1,29 @@
+{
+  "name": "prd-ui-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "plan": "tsx plan/build-plans.ts",
+    "dev:html": "vite --config html/vite.config.ts",
+    "build:html": "vite build --config html/vite.config.ts",
+    "preview:html": "vite preview --config html/vite.config.ts --port 4173",
+    "test:e2e": "playwright test",
+    "build:figma": "pnpm plan && pnpm --dir figma-plugin build"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "zod": "^4.6.7"
+  }
+}
