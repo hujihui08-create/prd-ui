@@ -10,8 +10,12 @@ interface FrameOptions {
   width?: number;
   height?: number;
   padding?: number;
+  paddingX?: number;
+  paddingY?: number;
   gap?: number;
   fill?: string;
+  alignItems?: "CENTER";
+  justifyContent?: "SPACE_BETWEEN";
   layoutGrow?: number;
   layoutAlign?: "STRETCH";
 }
@@ -120,9 +124,11 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
                 ],
                 {
                   height: 64,
-                  padding: ctx.space("space.6", "6"),
+                  paddingX: ctx.space("space.6", "6"),
+                  paddingY: 0,
                   gap: ctx.space("space.2", "2"),
                   fill: "color.surface.default",
+                  alignItems: "CENTER",
                   layoutAlign: "STRETCH",
                 }
               ),
@@ -172,9 +178,11 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             {
               width: 320,
               height: 36,
-              padding: ctx.space("space.3", "3"),
+              paddingX: ctx.space("space.3", "3"),
+              paddingY: 8,
               gap: ctx.space("space.2", "2"),
               fill: "color.surface.subtle",
+              alignItems: "CENTER",
             }
           ),
           {
@@ -190,6 +198,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: 0,
           gap: ctx.space("space.3", "3"),
           fill: "color.surface.default",
+          alignItems: "CENTER",
           layoutAlign: "STRETCH",
         }
       );
@@ -209,6 +218,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
           padding: ctx.space("space.3", "3"),
           gap: ctx.space("space.2", "2"),
           fill: "color.surface.subtle",
+          alignItems: "CENTER",
           layoutAlign: "STRETCH",
         }
       );
@@ -216,10 +226,10 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
         ctx.frame(
           `Row-${rowIndex + 1}`,
           "HORIZONTAL",
-          columns.map((_, columnIndex) =>
+          columns.map((column) =>
             ctx.text(
-              `Cell-${rowIndex + 1}-${columnIndex + 1}`,
-              `示例 ${rowIndex + 1}-${columnIndex + 1}`,
+              `Cell-${rowIndex + 1}-${column}`,
+              `示例 ${rowIndex + 1}-${column}`,
               "body.md"
             )
           ),
@@ -228,6 +238,7 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             padding: ctx.space("space.3", "3"),
             gap: ctx.space("space.2", "2"),
             fill: "color.surface.default",
+            alignItems: "CENTER",
             layoutAlign: "STRETCH",
           }
         )
@@ -261,13 +272,25 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             ],
             {
               height: 56,
-              padding: ctx.space("space.4", "4"),
+              paddingX: ctx.space("space.4", "4"),
+              paddingY: 0,
               gap: ctx.space("space.2", "2"),
-              fill: "color.surface.default",
+              fill: "color.surface.subtle",
+              alignItems: "CENTER",
               layoutAlign: "STRETCH",
             }
           ),
-          ...(node.children ?? []).map((child) => compileNode(child, ctx)),
+          ctx.frame(
+            "FeedContent",
+            "VERTICAL",
+            (node.children ?? []).map((child) => compileNode(child, ctx)),
+            {
+              padding: ctx.space("space.4", "4"),
+              gap: ctx.space("space.4", "4"),
+              fill: "color.surface.subtle",
+              layoutAlign: "STRETCH",
+            }
+          ),
           ctx.frame(
             "BottomNav",
             "HORIZONTAL",
@@ -276,9 +299,12 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             ),
             {
               height: 64,
-              padding: ctx.space("space.3", "3"),
+              paddingX: ctx.space("space.3", "3"),
+              paddingY: 0,
               gap: ctx.space("space.2", "2"),
               fill: "color.surface.default",
+              alignItems: "CENTER",
+              justifyContent: "SPACE_BETWEEN",
               layoutAlign: "STRETCH",
             }
           ),
@@ -313,20 +339,32 @@ function compileNode(node: SpecNode, ctx: CompileContext): PlanNode {
             width: 358,
             height: 180,
           },
-          ctx.text(
-            "FeedTitle",
-            String(node.props?.title ?? "标题"),
-            "heading.3"
-          ),
-          ctx.text(
-            "FeedBody",
-            String(node.props?.body ?? "正文"),
-            "body.md"
+          ctx.frame(
+            "FeedText",
+            "VERTICAL",
+            [
+              ctx.text(
+                "FeedTitle",
+                String(node.props?.title ?? "标题"),
+                "heading.3"
+              ),
+              ctx.text(
+                "FeedBody",
+                String(node.props?.body ?? "正文"),
+                "body.md"
+              ),
+            ],
+            {
+              padding: ctx.space("space.4", "4"),
+              gap: ctx.space("space.3", "3"),
+              fill: "color.surface.default",
+              layoutAlign: "STRETCH",
+            }
           ),
         ],
         {
-          padding: ctx.space("space.4", "4"),
-          gap: ctx.space("space.3", "3"),
+          padding: 0,
+          gap: 0,
           fill: "color.surface.default",
           layoutAlign: "STRETCH",
         }

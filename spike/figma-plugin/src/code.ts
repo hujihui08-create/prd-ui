@@ -115,11 +115,15 @@ async function buildNode(
       frame.name = node.name;
       frame.layoutMode = node.layout;
       frame.itemSpacing = node.gap ?? 0;
-      const padding = node.padding ?? 0;
-      frame.paddingTop = padding;
-      frame.paddingBottom = padding;
-      frame.paddingLeft = padding;
-      frame.paddingRight = padding;
+      const basePadding = node.padding ?? 0;
+      const paddingX = node.paddingX ?? basePadding;
+      const paddingY = node.paddingY ?? basePadding;
+      frame.paddingLeft = paddingX;
+      frame.paddingRight = paddingX;
+      frame.paddingTop = paddingY;
+      frame.paddingBottom = paddingY;
+      if (node.alignItems) frame.counterAxisAlignItems = node.alignItems;
+      if (node.justifyContent) frame.primaryAxisAlignItems = node.justifyContent;
       const sizing = resolveSizingModes({
         ...node,
         layout: node.layout as "VERTICAL" | "HORIZONTAL",
@@ -156,6 +160,7 @@ async function buildNode(
       if (style) text.fontName = style.fontName;
       text.characters = node.characters;
       if (style) text.textStyleId = style.id;
+      text.fills = [paint("color.text.primary", context.variables)];
       return text;
     }
 
@@ -173,6 +178,7 @@ async function buildNode(
     case "ICON": {
       const icon = figma.createNodeFromSvg(node.svg);
       icon.name = node.name;
+      icon.resize(node.size, node.size);
       return icon;
     }
 

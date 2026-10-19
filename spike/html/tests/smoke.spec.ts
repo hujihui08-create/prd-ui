@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
 test("b-end page has no horizontal overflow", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+  page.on("pageerror", (err) => errors.push(err.message));
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/?page=b");
   await expect(page.getByText("订单管理")).toBeVisible();
@@ -8,10 +13,16 @@ test("b-end page has no horizontal overflow", async ({ page }) => {
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth
   );
   expect(overflow).toBe(false);
+  expect(errors).toEqual([]);
   await page.screenshot({ path: "artifacts/b-end.png", fullPage: true });
 });
 
 test("c-end page keeps bottom nav visible", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+  page.on("pageerror", (err) => errors.push(err.message));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/?page=c");
   await expect(page.getByText("发现")).toBeVisible();
@@ -20,5 +31,6 @@ test("c-end page keeps bottom nav visible", async ({ page }) => {
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth
   );
   expect(overflow).toBe(false);
+  expect(errors).toEqual([]);
   await page.screenshot({ path: "artifacts/c-end.png", fullPage: true });
 });

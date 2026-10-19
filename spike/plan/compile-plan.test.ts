@@ -16,6 +16,18 @@ function findNode(node: PlanNode, name: string): PlanNode | undefined {
   return undefined;
 }
 
+function findAllNodes(
+  node: PlanNode,
+  name: string,
+  out: PlanNode[] = []
+): PlanNode[] {
+  if (node.name === name) out.push(node);
+  if (node.type === "FRAME") {
+    for (const child of node.children) findAllNodes(child, name, out);
+  }
+  return out;
+}
+
 describe("compilePlan", () => {
   it("compiles the B-end page into a nested plan", () => {
     const plan = compilePlan(bSpec as PageSpec, bProfile as Profile);
@@ -25,6 +37,13 @@ describe("compilePlan", () => {
 
     const sidebar = findNode(plan.root, "Sidebar");
     expect(sidebar).toMatchObject({ type: "FRAME", width: 240 });
+
+    expect(findNode(plan.root, "Header")).toMatchObject({
+      type: "FRAME",
+      paddingX: 24,
+      paddingY: 0,
+      alignItems: "CENTER",
+    });
 
     const table = findNode(plan.root, "DataTable");
     expect(table).toBeDefined();
@@ -43,12 +62,29 @@ describe("compilePlan", () => {
     if (plan.root.type !== "FRAME") throw new Error("root must be frame");
     expect(plan.root.layout).toBe("VERTICAL");
     expect(plan.root.width).toBe(390);
-    expect(
-      plan.root.children.filter(
-        (node) => node.type === "FRAME" && node.name === "FeedCard"
-      )
-    ).toHaveLength(2);
-    expect(findNode(plan.root, "BottomNav")).toBeDefined();
+    expect(findNode(plan.root, "FeedContent")).toMatchObject({
+      type: "FRAME",
+      padding: 16,
+      gap: 16,
+      layoutAlign: "STRETCH",
+    });
+
+    const feedCards = findAllNodes(plan.root, "FeedCard");
+    expect(feedCards).toHaveLength(2);
+    for (const card of feedCards) {
+      expect(card).toMatchObject({ type: "FRAME", padding: 0 });
+    }
+
+    const feedTexts = findAllNodes(plan.root, "FeedText");
+    expect(feedTexts).toHaveLength(2);
+    for (const feedText of feedTexts) {
+      expect(feedText).toMatchObject({ type: "FRAME", padding: 16 });
+    }
+
+    expect(findNode(plan.root, "BottomNav")).toMatchObject({
+      type: "FRAME",
+      justifyContent: "SPACE_BETWEEN",
+    });
     expect(findNode(plan.root, "bookmark")).toBeDefined();
   });
 });

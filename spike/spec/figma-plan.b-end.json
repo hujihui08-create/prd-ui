@@ -130,9 +130,11 @@
               }
             ],
             "height": 64,
-            "padding": 24,
+            "paddingX": 24,
+            "paddingY": 0,
             "gap": 8,
             "fill": "color.surface.default",
+            "alignItems": "CENTER",
             "layoutAlign": "STRETCH"
           },
           {
@@ -159,9 +161,11 @@
                     ],
                     "width": 320,
                     "height": 36,
-                    "padding": 12,
+                    "paddingX": 12,
+                    "paddingY": 8,
                     "gap": 8,
-                    "fill": "color.surface.subtle"
+                    "fill": "color.surface.subtle",
+                    "alignItems": "CENTER"
                   },
                   {
                     "type": "INSTANCE",
@@ -177,6 +181,7 @@
                 "padding": 0,
                 "gap": 12,
                 "fill": "color.surface.default",
+                "alignItems": "CENTER",
                 "layoutAlign": "STRETCH"
               },
               {
@@ -224,6 +229,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.subtle",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   },
                   {
@@ -233,32 +239,32 @@
                     "children": [
                       {
                         "type": "TEXT",
-                        "name": "Cell-1-1",
-                        "characters": "示例 1-1",
+                        "name": "Cell-1-订单号",
+                        "characters": "示例 1-订单号",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-1-2",
-                        "characters": "示例 1-2",
+                        "name": "Cell-1-客户",
+                        "characters": "示例 1-客户",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-1-3",
-                        "characters": "示例 1-3",
+                        "name": "Cell-1-金额",
+                        "characters": "示例 1-金额",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-1-4",
-                        "characters": "示例 1-4",
+                        "name": "Cell-1-状态",
+                        "characters": "示例 1-状态",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-1-5",
-                        "characters": "示例 1-5",
+                        "name": "Cell-1-创建时间",
+                        "characters": "示例 1-创建时间",
                         "textStyle": "body.md"
                       }
                     ],
@@ -266,6 +272,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.default",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   },
                   {
@@ -275,32 +282,32 @@
                     "children": [
                       {
                         "type": "TEXT",
-                        "name": "Cell-2-1",
-                        "characters": "示例 2-1",
+                        "name": "Cell-2-订单号",
+                        "characters": "示例 2-订单号",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-2-2",
-                        "characters": "示例 2-2",
+                        "name": "Cell-2-客户",
+                        "characters": "示例 2-客户",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-2-3",
-                        "characters": "示例 2-3",
+                        "name": "Cell-2-金额",
+                        "characters": "示例 2-金额",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-2-4",
-                        "characters": "示例 2-4",
+                        "name": "Cell-2-状态",
+                        "characters": "示例 2-状态",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-2-5",
-                        "characters": "示例 2-5",
+                        "name": "Cell-2-创建时间",
+                        "characters": "示例 2-创建时间",
                         "textStyle": "body.md"
                       }
                     ],
@@ -308,6 +315,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.default",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   },
                   {
@@ -317,32 +325,32 @@
                     "children": [
                       {
                         "type": "TEXT",
-                        "name": "Cell-3-1",
-                        "characters": "示例 3-1",
+                        "name": "Cell-3-订单号",
+                        "characters": "示例 3-订单号",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-3-2",
-                        "characters": "示例 3-2",
+                        "name": "Cell-3-客户",
+                        "characters": "示例 3-客户",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-3-3",
-                        "characters": "示例 3-3",
+                        "name": "Cell-3-金额",
+                        "characters": "示例 3-金额",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-3-4",
-                        "characters": "示例 3-4",
+                        "name": "Cell-3-状态",
+                        "characters": "示例 3-状态",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-3-5",
-                        "characters": "示例 3-5",
+                        "name": "Cell-3-创建时间",
+                        "characters": "示例 3-创建时间",
                         "textStyle": "body.md"
                       }
                     ],
@@ -350,6 +358,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.default",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   },
                   {
@@ -359,32 +368,32 @@
                     "children": [
                       {
                         "type": "TEXT",
-                        "name": "Cell-4-1",
-                        "characters": "示例 4-1",
+                        "name": "Cell-4-订单号",
+                        "characters": "示例 4-订单号",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-4-2",
-                        "characters": "示例 4-2",
+                        "name": "Cell-4-客户",
+                        "characters": "示例 4-客户",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-4-3",
-                        "characters": "示例 4-3",
+                        "name": "Cell-4-金额",
+                        "characters": "示例 4-金额",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-4-4",
-                        "characters": "示例 4-4",
+                        "name": "Cell-4-状态",
+                        "characters": "示例 4-状态",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-4-5",
-                        "characters": "示例 4-5",
+                        "name": "Cell-4-创建时间",
+                        "characters": "示例 4-创建时间",
                         "textStyle": "body.md"
                       }
                     ],
@@ -392,6 +401,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.default",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   },
                   {
@@ -401,32 +411,32 @@
                     "children": [
                       {
                         "type": "TEXT",
-                        "name": "Cell-5-1",
-                        "characters": "示例 5-1",
+                        "name": "Cell-5-订单号",
+                        "characters": "示例 5-订单号",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-5-2",
-                        "characters": "示例 5-2",
+                        "name": "Cell-5-客户",
+                        "characters": "示例 5-客户",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-5-3",
-                        "characters": "示例 5-3",
+                        "name": "Cell-5-金额",
+                        "characters": "示例 5-金额",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-5-4",
-                        "characters": "示例 5-4",
+                        "name": "Cell-5-状态",
+                        "characters": "示例 5-状态",
                         "textStyle": "body.md"
                       },
                       {
                         "type": "TEXT",
-                        "name": "Cell-5-5",
-                        "characters": "示例 5-5",
+                        "name": "Cell-5-创建时间",
+                        "characters": "示例 5-创建时间",
                         "textStyle": "body.md"
                       }
                     ],
@@ -434,6 +444,7 @@
                     "padding": 12,
                     "gap": 8,
                     "fill": "color.surface.default",
+                    "alignItems": "CENTER",
                     "layoutAlign": "STRETCH"
                   }
                 ],

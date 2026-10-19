@@ -42,8 +42,12 @@ export type PlanNode =
       width?: number;
       height?: number;
       padding?: number;
+      paddingX?: number;
+      paddingY?: number;
       gap?: number;
       fill?: string;
+      alignItems?: "CENTER";
+      justifyContent?: "SPACE_BETWEEN";
       layoutGrow?: number;
       layoutAlign?: "STRETCH";
     }

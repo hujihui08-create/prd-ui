@@ -153,9 +153,11 @@
                 }
               ],
               height: 64,
-              padding: 24,
+              paddingX: 24,
+              paddingY: 0,
               gap: 8,
               fill: "color.surface.default",
+              alignItems: "CENTER",
               layoutAlign: "STRETCH"
             },
             {
@@ -182,9 +184,11 @@
                       ],
                       width: 320,
                       height: 36,
-                      padding: 12,
+                      paddingX: 12,
+                      paddingY: 8,
                       gap: 8,
-                      fill: "color.surface.subtle"
+                      fill: "color.surface.subtle",
+                      alignItems: "CENTER"
                     },
                     {
                       type: "INSTANCE",
@@ -200,6 +204,7 @@
                   padding: 0,
                   gap: 12,
                   fill: "color.surface.default",
+                  alignItems: "CENTER",
                   layoutAlign: "STRETCH"
                 },
                 {
@@ -247,6 +252,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.subtle",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     },
                     {
@@ -256,32 +262,32 @@
                       children: [
                         {
                           type: "TEXT",
-                          name: "Cell-1-1",
-                          characters: "\u793A\u4F8B 1-1",
+                          name: "Cell-1-\u8BA2\u5355\u53F7",
+                          characters: "\u793A\u4F8B 1-\u8BA2\u5355\u53F7",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-1-2",
-                          characters: "\u793A\u4F8B 1-2",
+                          name: "Cell-1-\u5BA2\u6237",
+                          characters: "\u793A\u4F8B 1-\u5BA2\u6237",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-1-3",
-                          characters: "\u793A\u4F8B 1-3",
+                          name: "Cell-1-\u91D1\u989D",
+                          characters: "\u793A\u4F8B 1-\u91D1\u989D",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-1-4",
-                          characters: "\u793A\u4F8B 1-4",
+                          name: "Cell-1-\u72B6\u6001",
+                          characters: "\u793A\u4F8B 1-\u72B6\u6001",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-1-5",
-                          characters: "\u793A\u4F8B 1-5",
+                          name: "Cell-1-\u521B\u5EFA\u65F6\u95F4",
+                          characters: "\u793A\u4F8B 1-\u521B\u5EFA\u65F6\u95F4",
                           textStyle: "body.md"
                         }
                       ],
@@ -289,6 +295,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.default",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     },
                     {
@@ -298,32 +305,32 @@
                       children: [
                         {
                           type: "TEXT",
-                          name: "Cell-2-1",
-                          characters: "\u793A\u4F8B 2-1",
+                          name: "Cell-2-\u8BA2\u5355\u53F7",
+                          characters: "\u793A\u4F8B 2-\u8BA2\u5355\u53F7",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-2-2",
-                          characters: "\u793A\u4F8B 2-2",
+                          name: "Cell-2-\u5BA2\u6237",
+                          characters: "\u793A\u4F8B 2-\u5BA2\u6237",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-2-3",
-                          characters: "\u793A\u4F8B 2-3",
+                          name: "Cell-2-\u91D1\u989D",
+                          characters: "\u793A\u4F8B 2-\u91D1\u989D",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-2-4",
-                          characters: "\u793A\u4F8B 2-4",
+                          name: "Cell-2-\u72B6\u6001",
+                          characters: "\u793A\u4F8B 2-\u72B6\u6001",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-2-5",
-                          characters: "\u793A\u4F8B 2-5",
+                          name: "Cell-2-\u521B\u5EFA\u65F6\u95F4",
+                          characters: "\u793A\u4F8B 2-\u521B\u5EFA\u65F6\u95F4",
                           textStyle: "body.md"
                         }
                       ],
@@ -331,6 +338,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.default",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     },
                     {
@@ -340,32 +348,32 @@
                       children: [
                         {
                           type: "TEXT",
-                          name: "Cell-3-1",
-                          characters: "\u793A\u4F8B 3-1",
+                          name: "Cell-3-\u8BA2\u5355\u53F7",
+                          characters: "\u793A\u4F8B 3-\u8BA2\u5355\u53F7",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-3-2",
-                          characters: "\u793A\u4F8B 3-2",
+                          name: "Cell-3-\u5BA2\u6237",
+                          characters: "\u793A\u4F8B 3-\u5BA2\u6237",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-3-3",
-                          characters: "\u793A\u4F8B 3-3",
+                          name: "Cell-3-\u91D1\u989D",
+                          characters: "\u793A\u4F8B 3-\u91D1\u989D",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-3-4",
-                          characters: "\u793A\u4F8B 3-4",
+                          name: "Cell-3-\u72B6\u6001",
+                          characters: "\u793A\u4F8B 3-\u72B6\u6001",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-3-5",
-                          characters: "\u793A\u4F8B 3-5",
+                          name: "Cell-3-\u521B\u5EFA\u65F6\u95F4",
+                          characters: "\u793A\u4F8B 3-\u521B\u5EFA\u65F6\u95F4",
                           textStyle: "body.md"
                         }
                       ],
@@ -373,6 +381,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.default",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     },
                     {
@@ -382,32 +391,32 @@
                       children: [
                         {
                           type: "TEXT",
-                          name: "Cell-4-1",
-                          characters: "\u793A\u4F8B 4-1",
+                          name: "Cell-4-\u8BA2\u5355\u53F7",
+                          characters: "\u793A\u4F8B 4-\u8BA2\u5355\u53F7",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-4-2",
-                          characters: "\u793A\u4F8B 4-2",
+                          name: "Cell-4-\u5BA2\u6237",
+                          characters: "\u793A\u4F8B 4-\u5BA2\u6237",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-4-3",
-                          characters: "\u793A\u4F8B 4-3",
+                          name: "Cell-4-\u91D1\u989D",
+                          characters: "\u793A\u4F8B 4-\u91D1\u989D",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-4-4",
-                          characters: "\u793A\u4F8B 4-4",
+                          name: "Cell-4-\u72B6\u6001",
+                          characters: "\u793A\u4F8B 4-\u72B6\u6001",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-4-5",
-                          characters: "\u793A\u4F8B 4-5",
+                          name: "Cell-4-\u521B\u5EFA\u65F6\u95F4",
+                          characters: "\u793A\u4F8B 4-\u521B\u5EFA\u65F6\u95F4",
                           textStyle: "body.md"
                         }
                       ],
@@ -415,6 +424,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.default",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     },
                     {
@@ -424,32 +434,32 @@
                       children: [
                         {
                           type: "TEXT",
-                          name: "Cell-5-1",
-                          characters: "\u793A\u4F8B 5-1",
+                          name: "Cell-5-\u8BA2\u5355\u53F7",
+                          characters: "\u793A\u4F8B 5-\u8BA2\u5355\u53F7",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-5-2",
-                          characters: "\u793A\u4F8B 5-2",
+                          name: "Cell-5-\u5BA2\u6237",
+                          characters: "\u793A\u4F8B 5-\u5BA2\u6237",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-5-3",
-                          characters: "\u793A\u4F8B 5-3",
+                          name: "Cell-5-\u91D1\u989D",
+                          characters: "\u793A\u4F8B 5-\u91D1\u989D",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-5-4",
-                          characters: "\u793A\u4F8B 5-4",
+                          name: "Cell-5-\u72B6\u6001",
+                          characters: "\u793A\u4F8B 5-\u72B6\u6001",
                           textStyle: "body.md"
                         },
                         {
                           type: "TEXT",
-                          name: "Cell-5-5",
-                          characters: "\u793A\u4F8B 5-5",
+                          name: "Cell-5-\u521B\u5EFA\u65F6\u95F4",
+                          characters: "\u793A\u4F8B 5-\u521B\u5EFA\u65F6\u95F4",
                           textStyle: "body.md"
                         }
                       ],
@@ -457,6 +467,7 @@
                       padding: 12,
                       gap: 8,
                       fill: "color.surface.default",
+                      alignItems: "CENTER",
                       layoutAlign: "STRETCH"
                     }
                   ],
@@ -571,75 +582,110 @@
             }
           ],
           height: 56,
-          padding: 16,
+          paddingX: 16,
+          paddingY: 0,
           gap: 8,
-          fill: "color.surface.default",
-          layoutAlign: "STRETCH"
-        },
-        {
-          type: "ICON",
-          name: "bookmark",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h12v16l-6-4-6 4V4z"/></svg>',
-          size: 24
-        },
-        {
-          type: "FRAME",
-          name: "FeedCard",
-          layout: "VERTICAL",
-          children: [
-            {
-              type: "IMAGE",
-              name: "Cover",
-              src: "assets/feed-1.png",
-              width: 358,
-              height: 180
-            },
-            {
-              type: "TEXT",
-              name: "FeedTitle",
-              characters: "\u5468\u672B\u53BB\u54EA\u513F",
-              textStyle: "heading.3"
-            },
-            {
-              type: "TEXT",
-              name: "FeedBody",
-              characters: "\u57CE\u5E02\u5468\u8FB9 5 \u4E2A\u5C0F\u4F17\u76EE\u7684\u5730",
-              textStyle: "body.md"
-            }
-          ],
-          padding: 16,
-          gap: 12,
-          fill: "color.surface.default",
+          fill: "color.surface.subtle",
+          alignItems: "CENTER",
           layoutAlign: "STRETCH"
         },
         {
           type: "FRAME",
-          name: "FeedCard",
+          name: "FeedContent",
           layout: "VERTICAL",
           children: [
             {
-              type: "IMAGE",
-              name: "Cover",
-              src: "assets/feed-2.png",
-              width: 358,
-              height: 180
+              type: "ICON",
+              name: "bookmark",
+              svg: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h12v16l-6-4-6 4V4z"/></svg>',
+              size: 24
             },
             {
-              type: "TEXT",
-              name: "FeedTitle",
-              characters: "\u65B0\u5E97\u5F00\u4E1A",
-              textStyle: "heading.3"
+              type: "FRAME",
+              name: "FeedCard",
+              layout: "VERTICAL",
+              children: [
+                {
+                  type: "IMAGE",
+                  name: "Cover",
+                  src: "assets/feed-1.png",
+                  width: 358,
+                  height: 180
+                },
+                {
+                  type: "FRAME",
+                  name: "FeedText",
+                  layout: "VERTICAL",
+                  children: [
+                    {
+                      type: "TEXT",
+                      name: "FeedTitle",
+                      characters: "\u5468\u672B\u53BB\u54EA\u513F",
+                      textStyle: "heading.3"
+                    },
+                    {
+                      type: "TEXT",
+                      name: "FeedBody",
+                      characters: "\u57CE\u5E02\u5468\u8FB9 5 \u4E2A\u5C0F\u4F17\u76EE\u7684\u5730",
+                      textStyle: "body.md"
+                    }
+                  ],
+                  padding: 16,
+                  gap: 12,
+                  fill: "color.surface.default",
+                  layoutAlign: "STRETCH"
+                }
+              ],
+              padding: 0,
+              gap: 0,
+              fill: "color.surface.default",
+              layoutAlign: "STRETCH"
             },
             {
-              type: "TEXT",
-              name: "FeedBody",
-              characters: "\u624B\u51B2\u5496\u5561\u4E70\u4E00\u9001\u4E00",
-              textStyle: "body.md"
+              type: "FRAME",
+              name: "FeedCard",
+              layout: "VERTICAL",
+              children: [
+                {
+                  type: "IMAGE",
+                  name: "Cover",
+                  src: "assets/feed-2.png",
+                  width: 358,
+                  height: 180
+                },
+                {
+                  type: "FRAME",
+                  name: "FeedText",
+                  layout: "VERTICAL",
+                  children: [
+                    {
+                      type: "TEXT",
+                      name: "FeedTitle",
+                      characters: "\u65B0\u5E97\u5F00\u4E1A",
+                      textStyle: "heading.3"
+                    },
+                    {
+                      type: "TEXT",
+                      name: "FeedBody",
+                      characters: "\u624B\u51B2\u5496\u5561\u4E70\u4E00\u9001\u4E00",
+                      textStyle: "body.md"
+                    }
+                  ],
+                  padding: 16,
+                  gap: 12,
+                  fill: "color.surface.default",
+                  layoutAlign: "STRETCH"
+                }
+              ],
+              padding: 0,
+              gap: 0,
+              fill: "color.surface.default",
+              layoutAlign: "STRETCH"
             }
           ],
           padding: 16,
-          gap: 12,
-          fill: "color.surface.default",
+          gap: 16,
+          fill: "color.surface.subtle",
           layoutAlign: "STRETCH"
         },
         {
@@ -673,9 +719,12 @@
             }
           ],
           height: 64,
-          padding: 12,
+          paddingX: 12,
+          paddingY: 0,
           gap: 8,
           fill: "color.surface.default",
+          alignItems: "CENTER",
+          justifyContent: "SPACE_BETWEEN",
           layoutAlign: "STRETCH"
         }
       ],
@@ -817,18 +866,22 @@
     return root;
   }
   async function buildNode(node, context, parentLayout) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f;
     switch (node.type) {
       case "FRAME": {
         const frame = figma.createFrame();
         frame.name = node.name;
         frame.layoutMode = node.layout;
         frame.itemSpacing = (_a = node.gap) != null ? _a : 0;
-        const padding = (_b = node.padding) != null ? _b : 0;
-        frame.paddingTop = padding;
-        frame.paddingBottom = padding;
-        frame.paddingLeft = padding;
-        frame.paddingRight = padding;
+        const basePadding = (_b = node.padding) != null ? _b : 0;
+        const paddingX = (_c = node.paddingX) != null ? _c : basePadding;
+        const paddingY = (_d = node.paddingY) != null ? _d : basePadding;
+        frame.paddingLeft = paddingX;
+        frame.paddingRight = paddingX;
+        frame.paddingTop = paddingY;
+        frame.paddingBottom = paddingY;
+        if (node.alignItems) frame.counterAxisAlignItems = node.alignItems;
+        if (node.justifyContent) frame.primaryAxisAlignItems = node.justifyContent;
         const sizing = resolveSizingModes(__spreadProps(__spreadValues({}, node), {
           layout: node.layout,
           parentLayout
@@ -863,11 +916,12 @@
         if (style) text.fontName = style.fontName;
         text.characters = node.characters;
         if (style) text.textStyleId = style.id;
+        text.fills = [paint("color.text.primary", context.variables)];
         return text;
       }
       case "INSTANCE": {
-        const variant = (_c = node.variant) != null ? _c : "primary";
-        const component = (_d = context.buttons.find((item) => item.name === `Variant=${variant}`)) != null ? _d : context.buttons[0];
+        const variant = (_e = node.variant) != null ? _e : "primary";
+        const component = (_f = context.buttons.find((item) => item.name === `Variant=${variant}`)) != null ? _f : context.buttons[0];
         if (!component) throw new Error("Button component not found");
         const instance = component.createInstance();
         instance.name = node.name;
@@ -876,6 +930,7 @@
       case "ICON": {
         const icon = figma.createNodeFromSvg(node.svg);
         icon.name = node.name;
+        icon.resize(node.size, node.size);
         return icon;
       }
       case "IMAGE": {

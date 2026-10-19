@@ -83,75 +83,110 @@
           }
         ],
         "height": 56,
-        "padding": 16,
+        "paddingX": 16,
+        "paddingY": 0,
         "gap": 8,
-        "fill": "color.surface.default",
-        "layoutAlign": "STRETCH"
-      },
-      {
-        "type": "ICON",
-        "name": "bookmark",
-        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M6 4h12v16l-6-4-6 4V4z\"/></svg>",
-        "size": 24
-      },
-      {
-        "type": "FRAME",
-        "name": "FeedCard",
-        "layout": "VERTICAL",
-        "children": [
-          {
-            "type": "IMAGE",
-            "name": "Cover",
-            "src": "assets/feed-1.png",
-            "width": 358,
-            "height": 180
-          },
-          {
-            "type": "TEXT",
-            "name": "FeedTitle",
-            "characters": "周末去哪儿",
-            "textStyle": "heading.3"
-          },
-          {
-            "type": "TEXT",
-            "name": "FeedBody",
-            "characters": "城市周边 5 个小众目的地",
-            "textStyle": "body.md"
-          }
-        ],
-        "padding": 16,
-        "gap": 12,
-        "fill": "color.surface.default",
+        "fill": "color.surface.subtle",
+        "alignItems": "CENTER",
         "layoutAlign": "STRETCH"
       },
       {
         "type": "FRAME",
-        "name": "FeedCard",
+        "name": "FeedContent",
         "layout": "VERTICAL",
         "children": [
           {
-            "type": "IMAGE",
-            "name": "Cover",
-            "src": "assets/feed-2.png",
-            "width": 358,
-            "height": 180
+            "type": "ICON",
+            "name": "bookmark",
+            "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M6 4h12v16l-6-4-6 4V4z\"/></svg>",
+            "size": 24
           },
           {
-            "type": "TEXT",
-            "name": "FeedTitle",
-            "characters": "新店开业",
-            "textStyle": "heading.3"
+            "type": "FRAME",
+            "name": "FeedCard",
+            "layout": "VERTICAL",
+            "children": [
+              {
+                "type": "IMAGE",
+                "name": "Cover",
+                "src": "assets/feed-1.png",
+                "width": 358,
+                "height": 180
+              },
+              {
+                "type": "FRAME",
+                "name": "FeedText",
+                "layout": "VERTICAL",
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "name": "FeedTitle",
+                    "characters": "周末去哪儿",
+                    "textStyle": "heading.3"
+                  },
+                  {
+                    "type": "TEXT",
+                    "name": "FeedBody",
+                    "characters": "城市周边 5 个小众目的地",
+                    "textStyle": "body.md"
+                  }
+                ],
+                "padding": 16,
+                "gap": 12,
+                "fill": "color.surface.default",
+                "layoutAlign": "STRETCH"
+              }
+            ],
+            "padding": 0,
+            "gap": 0,
+            "fill": "color.surface.default",
+            "layoutAlign": "STRETCH"
           },
           {
-            "type": "TEXT",
-            "name": "FeedBody",
-            "characters": "手冲咖啡买一送一",
-            "textStyle": "body.md"
+            "type": "FRAME",
+            "name": "FeedCard",
+            "layout": "VERTICAL",
+            "children": [
+              {
+                "type": "IMAGE",
+                "name": "Cover",
+                "src": "assets/feed-2.png",
+                "width": 358,
+                "height": 180
+              },
+              {
+                "type": "FRAME",
+                "name": "FeedText",
+                "layout": "VERTICAL",
+                "children": [
+                  {
+                    "type": "TEXT",
+                    "name": "FeedTitle",
+                    "characters": "新店开业",
+                    "textStyle": "heading.3"
+                  },
+                  {
+                    "type": "TEXT",
+                    "name": "FeedBody",
+                    "characters": "手冲咖啡买一送一",
+                    "textStyle": "body.md"
+                  }
+                ],
+                "padding": 16,
+                "gap": 12,
+                "fill": "color.surface.default",
+                "layoutAlign": "STRETCH"
+              }
+            ],
+            "padding": 0,
+            "gap": 0,
+            "fill": "color.surface.default",
+            "layoutAlign": "STRETCH"
           }
         ],
         "padding": 16,
-        "gap": 12,
-        "fill": "color.surface.default",
+        "gap": 16,
+        "fill": "color.surface.subtle",
         "layoutAlign": "STRETCH"
       },
       {
@@ -185,9 +220,12 @@
           }
         ],
         "height": 64,
-        "padding": 12,
+        "paddingX": 12,
+        "paddingY": 0,
         "gap": 8,
         "fill": "color.surface.default",
+        "alignItems": "CENTER",
+        "justifyContent": "SPACE_BETWEEN",
         "layoutAlign": "STRETCH"
       }
     ],

@@ -3,7 +3,7 @@
 > **状态：PRELIMINARY — Task 7 人工 Figma 视觉验收尚未执行，不能给出最终 go/no-go。**
 > 日期：2026-10-19
 > 分支：`phase-0-spike`
-> 关键 commit：`064c3b0`（docs）→ `69747c0`（插件尺寸修复）→ `2de2654`（忽略构建产物）
+> 关键 commit：`064c3b0`（docs）→ `69747c0`（插件尺寸修复）→ `2de2654`（忽略构建产物）→ `53d8bb6`（验收文档）
 > 人工验收包：`spike/artifacts/figma/checklist.md`、`spike/artifacts/figma/notes.md`
 
 ## 环境
@@ -26,8 +26,8 @@
 | 单元测试 | **pass** | `pnpm test` 输出 | 4 个测试文件 / 20 个测试全部通过 |
 | plan 编译 | **pass** | `spike/spec/figma-plan.{b,c}-end.json` | `pnpm plan` 生成两份 plan；B 有 12 个 `STRETCH` + Content `layoutGrow: 1`，C 有 4 个 `STRETCH` |
 | HTML 构建 | **pass** | `spike/dist-html/` | Vite 构建成功，21 个模块 |
-| HTML 布局 / 无溢出 | **pass** | `spike/artifacts/b-end.png`、`spike/artifacts/c-end.png` | `pnpm test:e2e` 2 passed；无控制台错误（实现者人工检查）；两张截图已人工查看 |
-| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 29,531 bytes，含两份 plan，无未解析 import |
+| HTML 布局 / 无溢出 | **pass** | `spike/artifacts/b-end.png`、`spike/artifacts/c-end.png` | `pnpm test:e2e` 2 passed；console / pageerror 断言为空（自动化）；两张截图已人工查看 |
+| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,597 bytes，含两份 plan，无未解析 import |
 | 类型检查 | **not clean（非门禁）** | `tsc --noEmit` | 插件 JSON import 推断导致 8 个 type-only 错误；`build-plans.ts` 缺 `@types/node`；CSS side-effect import 缺 `vite/client`。esbuild / vitest / Vite 构建均不受影响；计划没有把 `tsc` 设为 Phase 0 门禁 |
 
 ## Figma 人工结果（待执行）
@@ -49,6 +49,7 @@
 ### 实现过程中对计划代码的修正
 
 - **Auto Layout 尺寸**：计划的插件代码设置 `layoutMode` 后没有设置 sizing mode，frame 会停留在 100×100；fill 轴保持 `AUTO` 也与 Figma 类型约束冲突。已新增 `layoutGrow` / `layoutAlign` 字段与纯函数 `resolveSizingModes`，保证 fill 轴为 `FIXED`、hug 轴为 `AUTO`，并新增 14 个单元测试。
+- **最终验收前对齐修复**：C 端新增 `FeedContent` 包裹层（padding 16 / gap 16），FeedCard 宽 358、封面满宽、`FeedText` 内缩 16，与 HTML 一致；文本填充绑定 `color.text.primary`；Header / TopBar / Search 改为水平 padding 并垂直居中，FilterBar / HeaderRow / Row 垂直居中，BottomNav 两端对齐；图标按 plan `size` 缩放；表格示例文案改用列名。以上均在最终修复波次完成。
 - **Zod v4**：计划测试使用 Zod 3 的单参数 `z.record()`；安装的是 Zod 4，改为双参数形式，语义等价。
 - **`findNode` 测试 helper**：计划中的 guard 顺序会让 ICON 节点永远找不到；调整为先比较 name，再判断 type，断言未变。
 - **Vite 预览地址**：`vite preview` 默认只绑定 `::1`，已给 `preview:html` / `dev:html` 加 `--host 127.0.0.1`，与计划中的 URL 和 Playwright `baseURL` 一致。
@@ -58,9 +59,11 @@
 - 图片使用 1×1 占位 PNG，FeedCard 封面为纯色/空白；fixture 的 `assets/feed-*.png` 未加载。
 - 字重映射：`>=600` 统一 `SemiBold`，`500` 为 `Regular`；Noto Sans SC 缺失时回退 PingFang SC Regular。
 - 按钮实例文案固定为 “按钮”，不应用 plan 的 `props.label`。
-- C 端 FeedCard 宽度 390（HTML 为 358，因为 HTML 有 16px 内容区 padding）。
 - BottomNav 在 Figma 中顺序排列，未固定在底部。
 - 表格列不自动均分；组件圆角固定 8px，未引用 `radius.*` token。
+- FeedCard / FeedText 未设置圆角；表格行分隔线未绘制。
+- 两页分别创建同名文本样式（`heading.1/2/3`、`body.md`、`label.sm`），本地样式面板会出现重复项。
+- 同一文件重复运行插件会产生重复页面、变量集合和文本样式；应使用全新空白文件。
 - Button 组件集与根 Frame 都在页面原点，可能互相遮挡；用图层面板查看。
 
 ## 结论

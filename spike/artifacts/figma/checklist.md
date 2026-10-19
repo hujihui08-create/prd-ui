@@ -42,11 +42,15 @@
 - **图片是占位**：插件用 1×1 占位 PNG 填充 IMAGE 节点，FeedCard 封面会显示为纯色/空白；fixture 中的 `assets/feed-*.png` 没有被加载。
 - **字体字重会压缩**：`fontWeight >= 600` 统一映射为 `SemiBold`，`500` 映射为 `Regular`；Noto Sans SC 缺失时回退 PingFang SC Regular。
 - **按钮文案固定**：组件实例使用组件内的 “按钮”，不会应用 plan 里的 `props.label`（`新建订单`）。
-- **C 端内容区没有 16px 包裹层**：Figma 的 FeedCard 宽度为 390，HTML 内容区卡片宽度为 358（HTML 有左右 16px padding）。
-- **BottomNav 未固定在底部**：Figma 里它排在 FeedCard 之后；HTML 里是 `position: fixed` 底部导航。
+- **BottomNav 未固定在底部**：Figma 里它排在 FeedContent 之后；HTML 里是 `position: fixed` 底部导航。
 - **表格列不会自动均分**：HeaderRow / Row 已横向拉伸，但单元格文本是左对齐紧凑排列，不会像 HTML 表格一样按列宽分布。
-- **组件圆角固定 8px**：没有引用 `radius.*` token；C 端 `radius.md` 是 16px。
+- **表格行分隔线未绘制**：HTML 表格有行边框/分隔线，Figma 只用填充区分表头与数据行。
+- **组件圆角固定 8px**：Button 组件没有引用 `radius.*` token；C 端 `radius.md` 是 16px。
+- **FeedCard / FeedText 未设置圆角**：HTML 卡片是圆角，Figma 里为直角。
 - **Button 组件集位置**：组件集创建在页面原点，根 Frame 也追加在 0,0，可能遮挡组件集；用图层面板查看即可。
+- **文本样式同名重复**：两个页面都会创建 `heading.1/2/3`、`body.md`、`label.sm`；每个文本节点使用各自正确的 style ID，但本地样式面板会出现重复项。
+- **重复运行会产生重复内容**：在同一文件再次运行插件会创建重复的 `Spike B` / `Spike C` 页面、变量集合和文本样式；请使用全新的空白文件。
+- **Bar 内边距与垂直对齐**：Header / TopBar / Search 已改为水平方向 padding（Header、TopBar `paddingY: 0`，Search `paddingY: 8`）并设置垂直居中；其他 frame 仍使用统一 padding。
 
 ## 结论填写
 
