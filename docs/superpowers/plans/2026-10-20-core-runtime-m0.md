@@ -839,11 +839,11 @@ git commit -m "feat: add project-local dsh profile and vision key setup"
 - Normalize timestamps and run paths; compare the decision traces: `{assetId, source, attempt, verdict}` sequence and final statuses.
 - Assert byte-identical `normalized.svg` and `gate.json` for deterministic tools.
 
-- [ ] **Step 1: Write conformance test**
+- [x] **Step 1: Write conformance test**
 
 Use `vi.useFakeTimers()` or a fixed clock. Compare arrays with `expect(traceA).toEqual(traceB)`.
 
-- [ ] **Step 2: Run full regression**
+- [x] **Step 2: Run full regression**
 
 ```bash
 cd pipeline
@@ -856,7 +856,7 @@ pnpm asset:review --project samples/projects/employee-app/project.yaml --assets 
 
 Expected: 157+ tests pass; phase1 2 pages/0 blockers; m0 13/13; m0-scenarios exits 1 with the expected retry/unresolved trace.
 
-- [ ] **Step 3: Update docs and changelog**
+- [x] **Step 3: Update docs and changelog**
 
 `CHANGELOG.md` entries:
 - 2026-10-20: checkpoint commits `884e8d7`, `e6569a8`, `88efc68`.
@@ -867,7 +867,7 @@ Expected: 157+ tests pass; phase1 2 pages/0 blockers; m0 13/13; m0-scenarios exi
 
 Spec/handoff: add an "Implementation status" section with commits and checklist results.
 
-- [ ] **Step 4: Update ZCode memory**
+- [x] **Step 4: Update ZCode memory**
 
 Update `dsh-single-core-dual-runtime.md` with:
 - implemented packages/paths;
@@ -876,7 +876,7 @@ Update `dsh-single-core-dual-runtime.md` with:
 - link to `CHANGELOG.md`.
 Update `MEMORY.md` hook line.
 
-- [ ] **Step 5: Final commit**
+- [x] **Step 5: Final commit**
 
 ```bash
 git add pipeline docs CHANGELOG.md AGENTS.md

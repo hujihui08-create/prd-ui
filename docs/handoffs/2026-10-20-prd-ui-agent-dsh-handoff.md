@@ -3,9 +3,11 @@
 - 日期：2026-10-20
 - 工作目录：`/Users/jihui/Desktop/产品、ui`
 - 当前分支：`phase-1b-usability`
-- 当前 HEAD：`0084181`（`fix: close phase 1b final review gates`）
-- 状态：**有大量未提交改动**（见 §9），新会话先检查 `git status`
-- 下一阶段：把 Agent 组织架构 + 资产降级策略适配到 **dsh（DeepSeek Harness）**，从 M0 开始开发
+- 当前 HEAD：以 `git log -1` 为准（M0 提交链见 `CHANGELOG.md`）
+- 状态：**checkpoint 已提交；core/runtimes 重排与 M0 asset review 已实现**；真实 dsh 视觉评审待 `PRD_UI_VISION_API_KEY`
+- 下一阶段：配置 vision key 跑通真实 dsh 评审；然后 M1 IA/Interaction/Visual Style
+
+> **2026-10-20 实施更新**：目录已重排为 `pipeline/core/*` + `pipeline/runtimes/*`；新增 `asset-review`、standalone/dsh runtime、`samples/assets/m0`、项目内 dsh profile。当前验证：231 tests、typecheck clean、`2 pages / 0 blockers`、`13 assets / 13 passed`；dsh profile 可加载、插件可激活，无 key 时报 `MISSING_CREDENTIAL`。详见 `README.md`、`pipeline/docs/asset-review-m0.md`、`CHANGELOG.md` 和 spec §15。
 
 ---
 
@@ -292,21 +294,19 @@ dsh/
 
 ## 6. 新会话第一步
 
-1. 读本交接文档 + 下面三份设计文档：
-   - `docs/superpowers/specs/2026-10-20-agent-organization.md`
-   - `docs/superpowers/specs/2026-10-20-asset-source-fallback-policy.md`
-   - `docs/superpowers/specs/2026-10-20-illustration-system-research.md`
-2. `git status`：当前有大量未提交改动；先决定是否提交（建议先提交一个 checkpoint）。
-3. 安装 dsh + `svgo`/`sharp`/`pixelmatch`；确认 dsh 版本/API。
-4. 按 M0 建 `dsh/plugins/assets`，先跑 3 插画 + 10 图标的 A 库闭环。
-5. 再进 M1 IA/Interaction。
+> 2026-10-20 更新：M0 已实现；下面的步骤 3–4 已过期，保留作为历史。
+
+1. 读 `README.md`、`CHANGELOG.md`、`docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` §15，以及三份 agent/资产设计文档。
+2. `git status`：checkpoint 与 M0 提交已完成；确认工作树干净。
+3. 配 `pipeline/.env` 的 `PRD_UI_VISION_API_KEY`，先跑 `--only icon-home --runtime dsh` 验证真实评审；没有 key 时预期 `MISSING_CREDENTIAL`。
+4. 再进 M1 IA/Interaction/Visual Style；B/C 真实供应商在 M2。
 
 ### 建议的新会话开场
 
 ```text
-请阅读 docs/handoffs/2026-10-20-prd-ui-agent-dsh-handoff.md，
-按 M0 开始：安装 dsh、创建 assets 插件和确定性工具，
-用 3 张插画 + 10 个图标跑 A 库的 asset review 闭环。
+请阅读 README.md、CHANGELOG.md 和 docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md §15。
+M0 已完成；先跑 pnpm test / pnpm phase1:verify / pnpm asset:review（standalone），
+再配置 PRD_UI_VISION_API_KEY 跑 --runtime dsh 的真实评审。
 先不要改 Page Spec/视觉基线。
 ```
 
@@ -322,6 +322,16 @@ pnpm typecheck
 pnpm phase1:verify --project samples/projects/employee-app/project.yaml --runs /tmp/employee-app-runs
 pnpm render:html --run /tmp/employee-app-runs/<runId> --out /tmp/employee-app-html
 open /tmp/employee-app-html/index.html
+
+# M0 asset review
+pnpm asset:review --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0 --runtime standalone --runs /tmp/m0-runs
+pnpm asset:review --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0-scenarios --runtime standalone --runs /tmp/m0-scenarios
+
+# dsh headless smoke（需要 PRD_UI_VISION_API_KEY）
+DSH_HOME="$PWD/dsh/home" ./node_modules/.bin/dsh --profile prd-ui-assets \
+  "Return the JSON {\"ok\":true} and nothing else."
 
 # 本地预览（当前 4174 可能已在跑）
 cd pipeline/artifacts/employee-app/html

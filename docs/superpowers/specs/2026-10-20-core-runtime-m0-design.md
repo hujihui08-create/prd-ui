@@ -125,7 +125,7 @@ pipeline/
       preset/asset-reviewer/
       cordis.patch.yml
   dsh/                           # 项目内 dsh profile（不污染 ~/.dsh）
-    home/                        # DSH_HOME（gitignored）
+    home/                        # DSH_HOME；profile 定义提交，node_modules/sessions/credentials/.env 忽略
     .env.example
     README.md
   samples/
@@ -911,3 +911,39 @@ find "$RUN/assets/attempts" -maxdepth 3 -type f | sort
 ## 14. 一句话总结
 
 **一份 core 状态机 + 两个薄 adapter**：standalone 负责 CI/离线，dsh 负责真实 vision 评审；`runs/<id>/` 是唯一事实源，key 只以引用名出现，M0 先用 10 图标 + 3 个 test-fixture 插画把 A 库闭环和审计跑通。
+
+## 15. Implementation status（2026-10-20）
+
+M0 已实现并完成本地验证；真实 dsh 视觉评审仍阻塞在 vision key。
+
+### 15.1 已完成
+
+- `pipeline/core/*` + `pipeline/runtimes/*` 目录重排，包名/import 不变。
+- `@prd-ui/asset-review`：契约、ports、硬门禁、verdict 阈值、prompt、状态机、manifest、preflight。
+- `@prd-ui/runtime-standalone`：fs artifact store、A 库 adapter、scripted/model reviewer、`asset:review` CLI。
+- `@prd-ui/runtime-dsh`：Cordis 插件、四个工具、headless adapter、esbuild 单文件构建。
+- `pipeline/dsh`：项目内 pinned profile（`@deepseek-ai/dsh@0.2.1-rc.2`），不修改 `~/.dsh`。
+- `samples/assets/m0`（10 图标 + 3 插画）与 `m0-scenarios`（retry / unresolved）。
+- `README.md`、`CHANGELOG.md`、`AGENTS.md`、`pipeline/docs/asset-review-m0.md`、`pipeline/dsh/README.md`。
+
+### 15.2 验证证据
+
+| 检查 | 结果 |
+|---|---|
+| `pnpm test` | 231 passed |
+| `pnpm typecheck` | clean |
+| `pnpm phase1:verify`（employee-app） | `2 pages, 0 blockers` |
+| `pnpm asset:review --assets samples/assets/m0 --runtime standalone` | `13 assets, 13 passed` |
+| `pnpm asset:review --assets samples/assets/m0-scenarios --runtime standalone` | `1 passed, 1 unresolved`，exit 1 |
+| standalone vs dsh-like conformance | 相同 decision trace；确定性资产 byte-identical |
+| dsh profile spike | profile 加载、插件激活；无 key 时报 `MISSING_CREDENTIAL: PRD_UI_VISION_API_KEY` |
+
+### 15.3 当前阻塞 / 后续
+
+- 真实 dsh 评审需要用户配置 `PRD_UI_VISION_API_KEY`（及 base URL/model）；未配置时不会伪造 pass。
+- B/C 真实供应商、IA/Interaction/Visual Style Agent、Figma、截图 diff、录屏/trace 仍按 §1.4 的 M1–M3 顺序。
+- dsh 仍是 rc；CLI 与 bundle 版本锁定，`@next` 不作为默认依赖。
+
+### 15.4 提交记录
+
+见 [`CHANGELOG.md`](../../../CHANGELOG.md) 的 “2026-10-20 — Core + dual runtime + M0 asset review”。
