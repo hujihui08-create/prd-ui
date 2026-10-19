@@ -6,7 +6,8 @@
     "test": "vitest run",
     "typecheck": "pnpm -r typecheck",
     "phase1:verify": "tsx runtimes/standalone/src/phase1-cli.ts",
-    "render:html": "tsx runtimes/standalone/src/render-html-cli.ts"
+    "render:html": "tsx runtimes/standalone/src/render-html-cli.ts",
+    "asset:review": "tsx runtimes/standalone/src/asset-cli.ts"
   },
   "dependencies": {
     "zod": "^4.6.7"

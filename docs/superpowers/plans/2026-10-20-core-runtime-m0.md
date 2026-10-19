@@ -661,7 +661,7 @@ pnpm asset:review --project <yaml> --assets <dir> --runtime standalone|dsh \
   [--budget-usd <n>] [--budget-minutes <n>] [--help]
 ```
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 Cover:
 - `--help` → exit 0, prints usage.
@@ -672,11 +672,11 @@ Cover:
 - `--runtime dsh` without adapter → clear `RUNTIME_UNAVAILABLE` (until Task 9 wires it).
 - `--reviewer model` without key → exit 1 with `PRD_UI_VISION_API_KEY`.
 
-- [ ] **Step 2: Implement CLI**
+- [x] **Step 2: Implement CLI**
 
 Parse args with the same style as `phase1-cli.ts`. Load project config via `loadProjectConfig`; load briefs from `briefs/*.json` (arrays) or `briefs.json`; load `library/index.json`; construct ports; call `runAssetReview` or `preflightAssetBriefs`. Print summary and run dir.
 
-- [ ] **Step 3: Run tests and full suite**
+- [x] **Step 3: Run tests and full suite**
 
 ```bash
 cd pipeline
@@ -689,7 +689,7 @@ pnpm asset:review --project samples/projects/employee-app/project.yaml --assets 
 
 Expected: 13 assets pass, exit 0.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add pipeline/runtimes/standalone pipeline/package.json
