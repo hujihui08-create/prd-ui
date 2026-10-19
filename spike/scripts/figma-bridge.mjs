@@ -202,7 +202,12 @@ return "spike built";
       })),
       componentSets: allNodes
         .filter((n) => n.type === "COMPONENT_SET")
-        .map((n) => ({ name: n.name, variants: n.children.length })),
+        .map((n) => ({
+          name: n.name,
+          variants: n.children.length,
+          x: n.x,
+          y: n.y,
+        })),
       instances: allNodes
         .filter((n) => n.type === "INSTANCE")
         .map((n) => ({

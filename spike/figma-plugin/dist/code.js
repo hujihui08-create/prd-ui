@@ -842,6 +842,7 @@
       textStyles[name] = textStyle;
     }
     const buttons = [];
+    let buttonSet = null;
     const variants = (_b = (_a = plan.components.Button) == null ? void 0 : _a.variants) != null ? _b : {};
     for (const [variant, style] of Object.entries(variants)) {
       const component = figma.createComponent();
@@ -863,12 +864,16 @@
       buttons.push(component);
     }
     if (buttons.length > 0) {
-      const set = figma.combineAsVariants(buttons, page);
-      set.name = "Button";
+      buttonSet = figma.combineAsVariants(buttons, page);
+      buttonSet.name = "Button";
     }
     const context = { variables, textStyles, buttons };
     const root = await buildNode(plan.root, context);
     page.appendChild(root);
+    if (buttonSet) {
+      buttonSet.x = plan.width + 100;
+      buttonSet.y = 0;
+    }
     figma.viewport.scrollAndZoomIntoView([root]);
     return root;
   }

@@ -43,6 +43,7 @@
 - Header / TopBar / Search 使用水平 padding + 垂直居中；BottomNav 使用 space-between。
 - 表格正文单元格使用列名，与 HTML 一致；ICON 尺寸来自 plan。
 - HTML 字体层级已消费 profile type scale（heading.1/2/3、body.md、label.sm）。
+- 页面内容全部为 Auto Layout，未使用绝对定位；Button 组件集移到根 Frame 右侧（`x = 页面宽度 + 100`），不再遮挡页面。
 
 ## 已知偏差（预期内，不算失败）
 
@@ -56,7 +57,6 @@
 - **表格行分隔线未绘制**：HTML 表格有行边框/分隔线，Figma 只用填充区分表头与数据行。
 - **组件圆角固定 8px**：Button 组件没有引用 `radius.*` token；C 端 `radius.md` 是 16px。
 - **FeedCard / FeedText 未设置圆角**：HTML 卡片是圆角，Figma 里为直角。
-- **Button 组件集位置**：组件集创建在页面原点，根 Frame 也追加在 0,0，可能遮挡组件集；用图层面板查看即可。
 - **文本样式同名重复**：两个页面都会创建 `heading.1/2/3`、`body.md`、`label.sm`；每个文本节点使用各自正确的 style ID，但本地样式面板会出现重复项。
 - **重复运行会产生重复内容**：在同一文件再次运行插件会创建重复的 `Spike B` / `Spike C` 页面、变量集合和文本样式；请使用全新的空白文件。
 

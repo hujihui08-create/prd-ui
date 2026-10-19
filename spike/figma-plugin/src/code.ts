@@ -76,6 +76,7 @@ async function buildPlan(plan: Plan, pageName: string) {
   }
 
   const buttons: ComponentNode[] = [];
+  let buttonSet: ComponentSetNode | null = null;
   const variants = plan.components.Button?.variants ?? {};
   for (const [variant, style] of Object.entries(variants)) {
     const component = figma.createComponent();
@@ -98,13 +99,18 @@ async function buildPlan(plan: Plan, pageName: string) {
     buttons.push(component);
   }
   if (buttons.length > 0) {
-    const set = figma.combineAsVariants(buttons, page);
-    set.name = "Button";
+    buttonSet = figma.combineAsVariants(buttons, page);
+    buttonSet.name = "Button";
   }
 
   const context: BuildContext = { variables, textStyles, buttons };
   const root = await buildNode(plan.root, context);
   page.appendChild(root);
+  if (buttonSet) {
+    // Keep the component library off to the right so it cannot hide the page.
+    buttonSet.x = plan.width + 100;
+    buttonSet.y = 0;
+  }
   figma.viewport.scrollAndZoomIntoView([root]);
   return root;
 }
