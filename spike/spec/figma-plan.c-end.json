@@ -1,0 +1,196 @@
+{
+  "page": "home-feed",
+  "width": 390,
+  "height": 844,
+  "tokens": {
+    "color.surface.default": "#FFFFFF",
+    "color.surface.subtle": "#FFF1E6",
+    "color.text.primary": "#1F2937",
+    "color.text.secondary": "#6B7280",
+    "color.action.primary": "#FF5A5F",
+    "color.onAction": "#FFFFFF",
+    "color.border.subtle": "#FDE2D2",
+    "space.2": "8px",
+    "space.3": "12px",
+    "space.4": "16px",
+    "space.6": "24px",
+    "space.8": "32px",
+    "radius.sm": "8px",
+    "radius.md": "16px",
+    "radius.lg": "24px"
+  },
+  "textStyles": {
+    "heading.1": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 28,
+      "fontWeight": 700,
+      "lineHeight": 36
+    },
+    "heading.2": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 22,
+      "fontWeight": 600,
+      "lineHeight": 30
+    },
+    "heading.3": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "lineHeight": 26
+    },
+    "body.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 400,
+      "lineHeight": 24
+    },
+    "label.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "lineHeight": 16
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "fill": "color.action.primary",
+          "text": "color.onAction"
+        },
+        "secondary": {
+          "fill": "color.surface.default",
+          "text": "color.text.primary"
+        }
+      }
+    }
+  },
+  "root": {
+    "type": "FRAME",
+    "name": "MobileShell",
+    "layout": "VERTICAL",
+    "children": [
+      {
+        "type": "FRAME",
+        "name": "TopBar",
+        "layout": "HORIZONTAL",
+        "children": [
+          {
+            "type": "TEXT",
+            "name": "PageTitle",
+            "characters": "发现",
+            "textStyle": "heading.1"
+          }
+        ],
+        "height": 56,
+        "padding": 16,
+        "gap": 8,
+        "fill": "color.surface.default"
+      },
+      {
+        "type": "ICON",
+        "name": "bookmark",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M6 4h12v16l-6-4-6 4V4z\"/></svg>",
+        "size": 24
+      },
+      {
+        "type": "FRAME",
+        "name": "FeedCard",
+        "layout": "VERTICAL",
+        "children": [
+          {
+            "type": "IMAGE",
+            "name": "Cover",
+            "src": "assets/feed-1.png",
+            "width": 358,
+            "height": 180
+          },
+          {
+            "type": "TEXT",
+            "name": "FeedTitle",
+            "characters": "周末去哪儿",
+            "textStyle": "heading.3"
+          },
+          {
+            "type": "TEXT",
+            "name": "FeedBody",
+            "characters": "城市周边 5 个小众目的地",
+            "textStyle": "body.md"
+          }
+        ],
+        "padding": 16,
+        "gap": 12,
+        "fill": "color.surface.default"
+      },
+      {
+        "type": "FRAME",
+        "name": "FeedCard",
+        "layout": "VERTICAL",
+        "children": [
+          {
+            "type": "IMAGE",
+            "name": "Cover",
+            "src": "assets/feed-2.png",
+            "width": 358,
+            "height": 180
+          },
+          {
+            "type": "TEXT",
+            "name": "FeedTitle",
+            "characters": "新店开业",
+            "textStyle": "heading.3"
+          },
+          {
+            "type": "TEXT",
+            "name": "FeedBody",
+            "characters": "手冲咖啡买一送一",
+            "textStyle": "body.md"
+          }
+        ],
+        "padding": 16,
+        "gap": 12,
+        "fill": "color.surface.default"
+      },
+      {
+        "type": "FRAME",
+        "name": "BottomNav",
+        "layout": "HORIZONTAL",
+        "children": [
+          {
+            "type": "TEXT",
+            "name": "Tab-1",
+            "characters": "推荐",
+            "textStyle": "label.sm"
+          },
+          {
+            "type": "TEXT",
+            "name": "Tab-2",
+            "characters": "关注",
+            "textStyle": "label.sm"
+          },
+          {
+            "type": "TEXT",
+            "name": "Tab-3",
+            "characters": "附近",
+            "textStyle": "label.sm"
+          },
+          {
+            "type": "TEXT",
+            "name": "Tab-4",
+            "characters": "我的",
+            "textStyle": "label.sm"
+          }
+        ],
+        "height": 64,
+        "padding": 12,
+        "gap": 8,
+        "fill": "color.surface.default"
+      }
+    ],
+    "width": 390,
+    "height": 844,
+    "padding": 0,
+    "gap": 0,
+    "fill": "color.surface.subtle"
+  }
+}
