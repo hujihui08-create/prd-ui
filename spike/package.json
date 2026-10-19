@@ -5,9 +5,9 @@
   "scripts": {
     "test": "vitest run",
     "plan": "tsx plan/build-plans.ts",
-    "dev:html": "vite --config html/vite.config.ts",
+    "dev:html": "vite --config html/vite.config.ts --host 127.0.0.1",
     "build:html": "vite build --config html/vite.config.ts",
-    "preview:html": "vite preview --config html/vite.config.ts --port 4173",
+    "preview:html": "vite preview --config html/vite.config.ts --host 127.0.0.1 --port 4173",
     "test:e2e": "playwright test",
     "build:figma": "pnpm plan && pnpm --dir figma-plugin build"
   },
