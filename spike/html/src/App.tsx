@@ -30,7 +30,7 @@ function typographyVars(profile: Profile): CSSProperties {
     vars[`--${name}-size`] = `${style.fontSize}px`;
     vars[`--${name}-line-height`] = `${style.lineHeight}px`;
     vars[`--${name}-weight`] = `${style.fontWeight}`;
-    vars[`--${name}-family`] = style.fontFamily;
+    vars[`--${name}-family`] = `${style.fontFamily}, "PingFang SC", system-ui, sans-serif`;
   }
   return vars as CSSProperties;
 }

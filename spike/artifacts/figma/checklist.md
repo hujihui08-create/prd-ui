@@ -38,6 +38,7 @@
 ## 已对齐（本轮 parity 修复，验收时按已对齐检查）
 
 - C 端 FeedContent 16px 包裹与 16px 卡片间距；FeedCard 358 宽、封面 358×180 全宽。
+- FeedText 水平 16px / 垂直 12px 内边距，与 HTML 卡片文字边距一致；BottomNav 水平 padding 12 / 垂直 0。
 - 文本填充绑定 `color.text.primary`。
 - Header / TopBar / Search 使用水平 padding + 垂直居中；BottomNav 使用 space-between。
 - 表格正文单元格使用列名，与 HTML 一致；ICON 尺寸来自 plan。
@@ -58,7 +59,6 @@
 - **Button 组件集位置**：组件集创建在页面原点，根 Frame 也追加在 0,0，可能遮挡组件集；用图层面板查看即可。
 - **文本样式同名重复**：两个页面都会创建 `heading.1/2/3`、`body.md`、`label.sm`；每个文本节点使用各自正确的 style ID，但本地样式面板会出现重复项。
 - **重复运行会产生重复内容**：在同一文件再次运行插件会创建重复的 `Spike B` / `Spike C` 页面、变量集合和文本样式；请使用全新的空白文件。
-- **其他普通容器 padding**：除已对齐的 Header / TopBar / Search 外，其他帧仍使用统一 padding。
 
 ## 结论填写
 
