@@ -33,6 +33,11 @@ describe("contracts", () => {
     expect(PageSpecSchema.parse(minimalPageSpec).meta.pageId).toBe("orders-list");
   });
 
+  it("types parsed output as a page spec", () => {
+    const parsed: PageSpec = PageSpecSchema.parse(minimalPageSpec);
+    expect(parsed.meta.reqRefs[0]).toBe("REQ-ORDER-001");
+  });
+
   it("rejects raw colors in spec props", () => {
     const bad = {
       ...minimalPageSpec,

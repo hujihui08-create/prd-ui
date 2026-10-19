@@ -87,7 +87,7 @@ export interface PageSpec {
   traceability: PageTraceability;
 }
 
-export const PageSpecSchema = z
+export const PageSpecSchema: z.ZodType<PageSpec> = z
   .object({
     meta: z
       .object({
@@ -97,7 +97,7 @@ export const PageSpecSchema = z
         target: z.enum(["web", "mobile"]),
         profile: z.string().min(1),
         archetype: z.string().min(1),
-        reqRefs: z.array(z.string().regex(/^REQ-[A-Z0-9]+-\d+$/)).min(1),
+        reqRefs: z.array(ReqIdSchema).min(1),
         version: z.string().min(1),
       })
       .strict(),
@@ -130,7 +130,7 @@ export const PageSpecSchema = z
           trigger: z.string().min(1),
           action: z.string().min(1),
           target: z.string().optional(),
-          reqRef: z.string().regex(/^REQ-[A-Z0-9]+-\d+$/).optional(),
+          reqRef: ReqIdSchema.optional(),
         })
         .strict()
     ),
