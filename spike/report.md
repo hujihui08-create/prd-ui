@@ -11,6 +11,7 @@
 - macOS / Node `v24.19.0` / pnpm `11.19.0`
 - Vite `8.3.4`、Vitest `5.0.5`、Playwright（Chromium）
 - Figma 桌面版已安装；Figma Brio MCP 未连接（本 phase 不依赖）
+- ZCode Computer Use 未获得 macOS「辅助功能」授权，无法读取 Figma 窗口；Task 7 必须由人执行
 - 字体：Noto Sans SC（主），PingFang SC 回退
 
 ## 验证范围
