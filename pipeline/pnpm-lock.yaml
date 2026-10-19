@@ -59,6 +59,21 @@ importers:
         specifier: workspace:*
         version: link:../compiler
 
+  pipeline/orchestrator:
+    dependencies:
+      '@prd-ui/compiler':
+        specifier: workspace:*
+        version: link:../../packages/compiler
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@prd-ui/design-system':
+        specifier: workspace:*
+        version: link:../../packages/design-system
+      '@prd-ui/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
+
 packages:
 
   '@esbuild/aix-ppc64@0.28.2':
