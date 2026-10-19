@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { PageIdSchema, type PageId } from "./page-id.js";
 
 export interface UiBriefPage {
-  id: string;
+  id: PageId;
   name: string;
   purpose: string;
   archetype: string;
@@ -54,7 +55,7 @@ export interface UiBrief {
 
 export const UiBriefPageSchema = z
   .object({
-    id: z.string().min(1),
+    id: PageIdSchema,
     name: z.string().min(1),
     purpose: z.string().min(1),
     archetype: z.string().min(1),
@@ -144,4 +145,17 @@ export const UiBriefSchema = z
       .object({ reqMap: z.record(z.string(), z.array(z.string())), unmapped: z.array(z.string()) })
       .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((brief, ctx) => {
+    const seen = new Set<string>();
+    brief.ia.pages.forEach((page, index) => {
+      if (seen.has(page.id)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["ia", "pages", index, "id"],
+          message: `duplicate page id "${page.id}"`,
+        });
+      }
+      seen.add(page.id);
+    });
+  });

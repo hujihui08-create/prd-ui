@@ -228,7 +228,7 @@
   },
   "assets": {
     "icons": ["search", "filter", "plus", "chevron", "user", "bell"],
-    "illustrations": ["empty-orders"],
+    "illustrations": ["empty-orders", "empty-feed"],
     "images": []
   },
   "designDirection": {

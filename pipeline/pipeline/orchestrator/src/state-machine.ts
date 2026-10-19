@@ -11,7 +11,7 @@ export function createRunState(runId: string): RunState {
     status: "running",
     attempts: {},
     degraded: false,
-    gates: { brief: "passed" },
+    gates: { brief: "pending" },
     startedAt: now,
     updatedAt: now,
   };

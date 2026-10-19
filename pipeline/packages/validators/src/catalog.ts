@@ -12,8 +12,8 @@ import {
 /**
  * Catalog contract checks.
  *
- * - `CATALOG-UNKNOWN`: type is neither a layout primitive, a root shell, nor a
- *   catalog component.
+ * - `CATALOG-UNKNOWN`: type is neither a layout primitive nor a catalog
+ *   component. Root shells are catalog components and are checked here too.
  * - `CATALOG-UNAVAILABLE`: a known component is not fully available.
  * - `CATALOG-PROP-UNKNOWN`: a prop is not declared by the component contract.
  * - `CATALOG-PROP-ENUM`: a prop value falls outside its declared enum.
@@ -25,8 +25,8 @@ import {
  *   undeclared slot key.
  *
  * Layout primitives have no catalog contract and are skipped. Root shells are
- * checked as components (availability/props/slots) but are skipped by the
- * archetype allow-list because archetypes intentionally exclude them.
+ * checked as components (presence/availability/props/slots) but are skipped by
+ * the archetype allow-list because archetypes intentionally exclude them.
  */
 export function validateCatalog(spec: PageSpec, ctx: ValidationContext): Finding[] {
   const drafts: FindingDraft[] = [];
@@ -54,14 +54,12 @@ export function validateCatalog(spec: PageSpec, ctx: ValidationContext): Finding
 
     const component = components.get(node.type);
     if (!component) {
-      if (!rootShellComponents.has(node.type)) {
-        push(
-          "CATALOG-UNKNOWN",
-          `${path}.type`,
-          node.type,
-          `Component "${node.type}" is not in catalog "${ctx.catalog.meta.library}".`
-        );
-      }
+      push(
+        "CATALOG-UNKNOWN",
+        `${path}.type`,
+        node.type,
+        `Component "${node.type}" is not in catalog "${ctx.catalog.meta.library}".`
+      );
       continue;
     }
 

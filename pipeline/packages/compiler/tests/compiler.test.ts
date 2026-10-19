@@ -7,7 +7,7 @@ import {
   isLayoutPrimitive,
 } from "@prd-ui/design-system";
 import briefJson from "../../../samples/ui-brief.sample.json";
-import { compileProject } from "../src/index.js";
+import { compilePageSpec, compileProject } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
 const deps = { getProfile, getCatalog, getArchetype };
@@ -149,5 +149,43 @@ describe("compileProject", () => {
         );
       }
     }
+  });
+
+  it("references the profile-specific empty-state asset", () => {
+    const bDenseEmpty = collectNodes(specsByPageId.get("orders-list")!.layout).find(
+      (node) => node.type === "EmptyState"
+    );
+    expect(bDenseEmpty?.assetRef).toBe("empty-orders");
+
+    const cExpressiveEmpty = collectNodes(specsByPageId.get("home-feed")!.layout).find(
+      (node) => node.type === "EmptyState"
+    );
+    expect(cExpressiveEmpty?.assetRef).toBe("empty-feed");
+  });
+
+  it("rejects a mobile page whose catalog lacks MobileShell", () => {
+    const page = brief.ia.pages.find((candidate) => candidate.id === "auth")!;
+    expect(() =>
+      compilePageSpec({
+        brief,
+        page: { ...page, profile: "b-dense" },
+        profile: getProfile("b-dense"),
+        catalog: getCatalog("b-dense"),
+        archetype: getArchetype("auth"),
+      })
+    ).toThrow(/does not provide root shell "MobileShell"/);
+  });
+
+  it("rejects a web page whose catalog lacks PageShell", () => {
+    const page = brief.ia.pages.find((candidate) => candidate.id === "orders-overview")!;
+    expect(() =>
+      compilePageSpec({
+        brief,
+        page: { ...page, profile: "c-expressive" },
+        profile: getProfile("c-expressive"),
+        catalog: getCatalog("c-expressive"),
+        archetype: getArchetype("overview"),
+      })
+    ).toThrow(/does not provide root shell "PageShell"/);
   });
 });

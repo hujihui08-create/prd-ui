@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
+    "typecheck": "pnpm -r typecheck",
     "phase1:verify": "tsx pipeline/orchestrator/src/run-phase1.ts"
   },
   "dependencies": {

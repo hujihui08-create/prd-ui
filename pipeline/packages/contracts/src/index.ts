@@ -1,4 +1,5 @@
 export * from "./ids.js";
+export * from "./page-id.js";
 export * from "./page-spec.js";
 export * from "./profile.js";
 export * from "./catalog.js";

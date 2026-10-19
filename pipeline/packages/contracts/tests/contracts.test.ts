@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   PageSpecSchema,
+  PageIdSchema,
   ProfileSchema,
   CatalogSchema,
   UiBriefSchema,
@@ -9,6 +10,7 @@ import {
   RunStateSchema,
   reqId,
   type PageSpec,
+  type UiBrief,
 } from "../src/index.js";
 
 const minimalPageSpec: PageSpec = {
@@ -26,6 +28,51 @@ const minimalPageSpec: PageSpec = {
   states: { default: { name: "default" } },
   interactions: [],
   traceability: { reqMap: { "REQ-ORDER-001": ["orders-list"] }, designDefaults: [], unmapped: [] },
+};
+
+const minimalBrief: UiBrief = {
+  meta: {
+    project: "demo-orders",
+    version: "0.1.0",
+    sourcePrdHash: "sha256:demo",
+    date: "2026-10-19",
+    profile: "b-dense",
+    platforms: ["web"],
+  },
+  product: {
+    name: "订单管理",
+    type: "b-end",
+    goals: ["管理订单"],
+    users: ["运营"],
+    roles: ["admin"],
+    scope: ["订单列表"],
+    nonGoals: [],
+    successMetrics: ["可完成订单查看"],
+  },
+  ia: {
+    pages: [
+      {
+        id: "orders-list",
+        name: "订单列表",
+        purpose: "查看订单",
+        archetype: "list",
+        target: "web",
+        profile: "b-dense",
+        route: "/orders",
+        roles: ["admin"],
+        requiredStates: ["default", "empty"],
+        reqRefs: [reqId("order", 1)],
+      },
+    ],
+    navigation: { primary: ["订单"] },
+    flows: [],
+  },
+  data: { entities: [{ name: "Order", fields: [{ name: "orderNo", type: "string", required: true }] }] },
+  assets: { icons: ["search"], illustrations: [], images: [] },
+  designDirection: { profile: "b-dense", density: "dense", tone: "neutral", motionLevel: "low" },
+  openQuestions: [],
+  assumptions: [],
+  traceability: { reqMap: { "REQ-ORDER-001": ["orders-list"] }, unmapped: [] },
 };
 
 describe("contracts", () => {
@@ -82,51 +129,42 @@ describe("contracts", () => {
   });
 
   it("parses a UI brief", () => {
-    const brief = {
-      meta: {
-        project: "demo-orders",
-        version: "0.1.0",
-        sourcePrdHash: "sha256:demo",
-        date: "2026-10-19",
-        profile: "b-dense",
-        platforms: ["web"],
-      },
-      product: {
-        name: "订单管理",
-        type: "b-end",
-        goals: ["管理订单"],
-        users: ["运营"],
-        roles: ["admin"],
-        scope: ["订单列表"],
-        nonGoals: [],
-        successMetrics: ["可完成订单查看"],
-      },
+    expect(UiBriefSchema.parse(minimalBrief).ia.pages[0]?.id).toBe("orders-list");
+  });
+
+  it("accepts valid kebab-case page ids", () => {
+    expect(PageIdSchema.parse("orders-list-2")).toBe("orders-list-2");
+    expect(() => PageSpecSchema.parse(minimalPageSpec)).not.toThrow();
+  });
+
+  it("rejects path-like page ids in specs and briefs", () => {
+    expect(() => PageIdSchema.parse("../orders")).toThrow();
+    expect(() =>
+      PageSpecSchema.parse({
+        ...minimalPageSpec,
+        meta: { ...minimalPageSpec.meta, pageId: "../orders" },
+      })
+    ).toThrow();
+    expect(() =>
+      UiBriefSchema.parse({
+        ...minimalBrief,
+        ia: {
+          ...minimalBrief.ia,
+          pages: [{ ...minimalBrief.ia.pages[0]!, id: "../orders" }],
+        },
+      })
+    ).toThrow();
+  });
+
+  it("rejects duplicate page ids in a brief", () => {
+    const duplicated = {
+      ...minimalBrief,
       ia: {
-        pages: [
-          {
-            id: "orders-list",
-            name: "订单列表",
-            purpose: "查看订单",
-            archetype: "list",
-            target: "web",
-            profile: "b-dense",
-            route: "/orders",
-            roles: ["admin"],
-            requiredStates: ["default", "empty"],
-            reqRefs: [reqId("order", 1)],
-          },
-        ],
-        navigation: { primary: ["订单"] },
-        flows: [],
+        ...minimalBrief.ia,
+        pages: [minimalBrief.ia.pages[0]!, { ...minimalBrief.ia.pages[0]! }],
       },
-      data: { entities: [{ name: "Order", fields: [{ name: "orderNo", type: "string", required: true }] }] },
-      assets: { icons: ["search"], illustrations: [], images: [] },
-      designDirection: { profile: "b-dense", density: "dense", tone: "neutral", motionLevel: "low" },
-      openQuestions: [],
-      assumptions: [],
-      traceability: { reqMap: { "REQ-ORDER-001": ["orders-list"] }, unmapped: [] },
     };
-    expect(UiBriefSchema.parse(brief).ia.pages[0]?.id).toBe("orders-list");
+    expect(() => UiBriefSchema.parse(duplicated)).toThrow(/duplicate page id/i);
   });
 
   it("parses an asset manifest", () => {

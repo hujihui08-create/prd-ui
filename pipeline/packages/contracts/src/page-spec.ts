@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ReqId } from "./ids.js";
+import { PageIdSchema, type PageId } from "./page-id.js";
 
 export type Target = "web" | "mobile";
 
@@ -72,7 +73,7 @@ export interface PageTraceability {
 
 export interface PageSpec {
   meta: {
-    pageId: string;
+    pageId: PageId;
     project: string;
     name: string;
     target: Target;
@@ -91,7 +92,7 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
   .object({
     meta: z
       .object({
-        pageId: z.string().min(1),
+        pageId: PageIdSchema,
         project: z.string().min(1),
         name: z.string().min(1),
         target: z.enum(["web", "mobile"]),

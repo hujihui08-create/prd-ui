@@ -13,6 +13,8 @@ export interface ValidationContext {
   catalog: Catalog;
   archetype: ArchetypeDef;
   manifest: AssetManifest;
+  /** States required by the page's own brief entry, beyond the archetype set. */
+  requiredStates?: string[];
 }
 
 export interface ValidationReport {
@@ -27,8 +29,9 @@ export interface ValidationReport {
 
 /**
  * Root shell per platform. The compiler emits these as the page root; they are
- * catalog components, but archetype `allowedComponents` intentionally excludes
- * them because the shell is validated by the layout rules instead.
+ * catalog components checked by the catalog validator, while archetype
+ * `allowedComponents` intentionally excludes them because the root is
+ * validated by the layout rules instead.
  */
 export const ROOT_SHELL = {
   web: "PageShell",

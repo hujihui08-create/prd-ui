@@ -22,29 +22,55 @@ const brief = UiBriefSchema.parse(briefJson);
 const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
 const specByPageId = new Map(specs.map((spec) => [spec.meta.pageId, spec]));
 
-const manifest: AssetManifest = {
-  project: "demo-orders",
-  profile: "b-dense",
-  assets: [
-    {
-      id: "search",
-      kind: "icon",
-      library: "lucide",
-      style: "outline",
-      files: [{ path: "assets/icons/search.svg", format: "svg" }],
-      license: "ISC",
-      hash: "sha256:search",
-    },
-    {
-      id: "empty-orders",
-      kind: "illustration",
-      library: "local",
-      files: [{ path: "assets/illustrations/empty-orders.svg", format: "svg" }],
-      license: "internal",
-    },
-  ],
-  placeholders: [],
-  complete: true,
+const manifestsByProfile: Record<string, AssetManifest> = {
+  "b-dense": {
+    project: "demo-orders",
+    profile: "b-dense",
+    assets: [
+      {
+        id: "search",
+        kind: "icon",
+        library: "lucide",
+        style: "outline",
+        files: [{ path: "assets/icons/search.svg", format: "svg" }],
+        license: "ISC",
+        hash: "sha256:search",
+      },
+      {
+        id: "empty-orders",
+        kind: "illustration",
+        library: "local",
+        files: [{ path: "assets/illustrations/empty-orders.svg", format: "svg" }],
+        license: "internal",
+      },
+    ],
+    placeholders: [],
+    complete: true,
+  },
+  "c-expressive": {
+    project: "demo-orders",
+    profile: "c-expressive",
+    assets: [
+      {
+        id: "search",
+        kind: "icon",
+        library: "lucide",
+        style: "outline",
+        files: [{ path: "assets/icons/search.svg", format: "svg" }],
+        license: "ISC",
+        hash: "sha256:search",
+      },
+      {
+        id: "empty-feed",
+        kind: "illustration",
+        library: "local",
+        files: [{ path: "assets/illustrations/empty-feed.svg", format: "svg" }],
+        license: "internal",
+      },
+    ],
+    placeholders: [],
+    complete: true,
+  },
 };
 
 function requiredSpec(pageId: string): PageSpec {
@@ -54,11 +80,15 @@ function requiredSpec(pageId: string): PageSpec {
 }
 
 function contextFor(spec: PageSpec): ValidationContext {
+  const manifest = manifestsByProfile[spec.meta.profile];
+  if (!manifest) throw new Error(`Unknown manifest profile: ${spec.meta.profile}`);
+  const page = brief.ia.pages.find((candidate) => candidate.id === spec.meta.pageId);
   return {
     profile: getProfile(spec.meta.profile),
     catalog: getCatalog(spec.meta.profile),
     archetype: getArchetype(spec.meta.archetype),
     manifest,
+    requiredStates: page?.requiredStates,
   };
 }
 
@@ -148,6 +178,44 @@ describe("catalog validation", () => {
 
     const report = validatePageSpec(spec, contextFor(spec));
     expect(ruleIds(report)).toEqual(["CATALOG-UNKNOWN"]);
+  });
+
+  it("rejects a mobile root shell missing from the b-dense catalog", () => {
+    const spec = cloneSpec("auth");
+    const report = validatePageSpec(spec, {
+      profile: getProfile("b-dense"),
+      catalog: getCatalog("b-dense"),
+      archetype: getArchetype("auth"),
+      manifest: manifestsByProfile["b-dense"]!,
+      requiredStates: ["default", "loading", "error", "disabled"],
+    });
+
+    expect(
+      report.findings.some(
+        (finding) => finding.ruleId === "CATALOG-UNKNOWN" && finding.evidence === "MobileShell"
+      )
+    ).toBe(true);
+    expect(report.blockers).toBeGreaterThan(0);
+    expect(report.passed).toBe(false);
+  });
+
+  it("rejects a web root shell missing from the c-expressive catalog", () => {
+    const spec = cloneSpec("orders-overview");
+    const report = validatePageSpec(spec, {
+      profile: getProfile("c-expressive"),
+      catalog: getCatalog("c-expressive"),
+      archetype: getArchetype("overview"),
+      manifest: manifestsByProfile["c-expressive"]!,
+      requiredStates: ["default", "loading", "error"],
+    });
+
+    expect(
+      report.findings.some(
+        (finding) => finding.ruleId === "CATALOG-UNKNOWN" && finding.evidence === "PageShell"
+      )
+    ).toBe(true);
+    expect(report.blockers).toBeGreaterThan(0);
+    expect(report.passed).toBe(false);
   });
 
   it("reports CATALOG-UNAVAILABLE when a component is not available", () => {
@@ -292,7 +360,11 @@ describe("layout validation", () => {
     spec.layout.type = "MobileShell";
 
     const report = validatePageSpec(spec, contextFor(spec));
-    expect(ruleIds(report)).toEqual(["LAYOUT-ARCHETYPE"]);
+    expect(ruleIds(report)).toContain("LAYOUT-ARCHETYPE");
+    // MobileShell is also absent from the b-dense catalog, so the catalog gate
+    // reports it as well.
+    expect(ruleIds(report)).toContain("CATALOG-UNKNOWN");
+    expect(report.passed).toBe(false);
   });
 
   it("reports LAYOUT-ABSOLUTE for position, top, left, right, and bottom", () => {
@@ -341,6 +413,18 @@ describe("state validation", () => {
     expect(ruleIds(report)).toEqual(["STATE-REQUIRED"]);
   });
 
+  it("reports STATE-REQUIRED for a page-only required state", () => {
+    const spec = cloneSpec("orders-list");
+    const report = validatePageSpec(spec, {
+      ...contextFor(spec),
+      requiredStates: ["filtered"],
+    });
+
+    expect(ruleIds(report)).toEqual(["STATE-REQUIRED"]);
+    expect(report.findings[0]?.evidence).toBe("filtered");
+    expect(report.passed).toBe(false);
+  });
+
   it("reports STATE-DEFAULT and the schema error when default is absent", () => {
     const spec = cloneSpec("orders-list");
     delete spec.states.default;
@@ -381,6 +465,34 @@ describe("state validation", () => {
 });
 
 describe("asset validation", () => {
+  it("exercises a c-expressive assetRef against the c-expressive manifest", () => {
+    const spec = requiredSpec("home-feed");
+    const emptyState = walkSpecNodes(spec.layout).find(({ node }) => node.type === "EmptyState");
+
+    expect(emptyState?.node.assetRef).toBe("empty-feed");
+    expect(validatePageSpec(spec, contextFor(spec)).findings).toEqual([]);
+  });
+
+  it("reports ASSET-PROFILE when the manifest profile differs", () => {
+    const spec = cloneSpec("orders-list");
+    const ctx = structuredClone(contextFor(spec));
+    ctx.manifest.profile = "c-expressive";
+
+    const report = validatePageSpec(spec, ctx);
+    expect(ruleIds(report)).toEqual(["ASSET-PROFILE"]);
+    expect(report.blockers).toBe(1);
+  });
+
+  it("reports ASSET-PROJECT when the manifest project differs", () => {
+    const spec = cloneSpec("orders-list");
+    const ctx = structuredClone(contextFor(spec));
+    ctx.manifest.project = "another-project";
+
+    const report = validatePageSpec(spec, ctx);
+    expect(ruleIds(report)).toEqual(["ASSET-PROJECT"]);
+    expect(report.blockers).toBe(1);
+  });
+
   it("reports ASSET-MISSING for node.assetRef values", () => {
     const spec = cloneSpec("item-detail");
     findNode(spec, "Card").assetRef = "hero-missing";

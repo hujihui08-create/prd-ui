@@ -28,7 +28,8 @@ function findAbsoluteKeys(value: unknown, path: string, found: string[]): void {
 /**
  * Structural layout checks.
  *
- * - `LAYOUT-ARCHETYPE`: root node is not the shell for the page target.
+ * - `LAYOUT-ARCHETYPE`: root node is not the shell for the page target, or
+ *   the selected catalog does not provide that shell.
  * - `LAYOUT-ABSOLUTE`: any node carries absolute-positioning props.
  * - `LAYOUT-SLOT`: a slot required by the archetype is missing or empty.
  */
@@ -56,6 +57,14 @@ export function validateLayout(spec: PageSpec, ctx: ValidationContext): Finding[
         "layout.type",
         root.type,
         `Root node must be "${expectedRoot}" for ${target} pages; found "${root.type}".`
+      );
+    }
+    if (!ctx.catalog.components.some((component) => component.id === expectedRoot)) {
+      push(
+        "LAYOUT-ARCHETYPE",
+        "layout.type",
+        expectedRoot,
+        `Catalog "${ctx.catalog.meta.library}" does not provide the required root shell "${expectedRoot}".`
       );
     }
   }

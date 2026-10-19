@@ -12,6 +12,12 @@ import type { ArchetypeDef } from "@prd-ui/design-system";
 const nav = ["概览", "订单", "客户", "设置"];
 const tabs = ["推荐", "关注", "附近", "我的"];
 
+/** Root shell the compiler emits per page target. */
+const ROOT_SHELL = {
+  web: "PageShell",
+  mobile: "MobileShell",
+} as const;
+
 const authFieldMeta: Record<string, { label: string; inputType: "text" | "email" | "password" }> = {
   email: { label: "邮箱", inputType: "email" },
   password: { label: "密码", inputType: "password" },
@@ -42,11 +48,21 @@ export function compilePageSpec(input: {
   catalog: Catalog;
   archetype: ArchetypeDef;
 }): PageSpec {
-  const { brief, page, archetype } = input;
+  const { brief, page, catalog, archetype } = input;
 
   if (archetype.target !== "any" && archetype.target !== page.target) {
     throw new Error(
       `Archetype ${archetype.id} targets ${archetype.target}, but page ${page.id} targets ${page.target}`
+    );
+  }
+
+  // A page must compile against a catalog that actually ships its root shell;
+  // otherwise the page would validate against a shell the design system does
+  // not provide (for example a mobile page using the web-only b-dense catalog).
+  const expectedRoot = ROOT_SHELL[page.target];
+  if (!catalog.components.some((component) => component.id === expectedRoot)) {
+    throw new Error(
+      `Catalog "${catalog.meta.library}" for profile "${page.profile}" does not provide root shell "${expectedRoot}" required by ${page.target} page "${page.id}"`
     );
   }
 
@@ -136,6 +152,11 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
                   },
                 },
                 { type: "Pagination", props: { pageSize: 20 } },
+                {
+                  type: "EmptyState",
+                  props: { title: "暂无订单", description: "调整筛选条件后重试" },
+                  assetRef: "empty-orders",
+                },
               ],
             },
           ],
@@ -222,6 +243,7 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
               props: { title: "周末去哪儿", body: "城市周边 5 个小众目的地" },
             },
             { type: "FeedCard", props: { title: "新店开业", body: "手冲咖啡买一送一" } },
+            { type: "EmptyState", props: { title: "暂无内容" }, assetRef: "empty-feed" },
           ],
           "bottom-nav": [{ type: "BottomNav", props: { items: tabs } }],
         },

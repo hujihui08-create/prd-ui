@@ -40,6 +40,8 @@ function collectAssetRefs(node: SpecNode): AssetReference[] {
 /**
  * Asset-manifest checks.
  *
+ * - `ASSET-PROFILE`: the manifest belongs to a different design profile.
+ * - `ASSET-PROJECT`: the manifest belongs to a different project.
  * - `ASSET-MISSING`: a referenced asset id is not in the manifest.
  * - `ASSET-PLACEHOLDER`: placeholders remain (final-gate blocker).
  * - `ASSET-INCOMPLETE`: manifest is explicitly incomplete.
@@ -67,6 +69,25 @@ export function validateAsset(spec: PageSpec, ctx: ValidationContext): Finding[]
   };
 
   const manifestIds = new Set(manifest.assets.map((asset) => asset.id));
+
+  if (manifest.profile !== ctx.profile.meta.name) {
+    push(
+      "ASSET-PROFILE",
+      "manifest.profile",
+      manifest.profile,
+      `Asset manifest profile "${manifest.profile}" does not match page profile "${ctx.profile.meta.name}".`
+    );
+  }
+
+  if (manifest.project !== spec.meta.project) {
+    push(
+      "ASSET-PROJECT",
+      "manifest.project",
+      manifest.project,
+      `Asset manifest project "${manifest.project}" does not match page project "${spec.meta.project}".`
+    );
+  }
+
   for (const { node, path } of walkSpecNodes(spec.layout)) {
     const seen = new Set<string>();
     for (const reference of collectAssetRefs(node)) {

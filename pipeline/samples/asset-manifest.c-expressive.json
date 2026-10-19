@@ -1,0 +1,15 @@
+{
+  "project": "demo-orders",
+  "profile": "c-expressive",
+  "assets": [
+    { "id": "search", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/search.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "filter", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/filter.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "plus", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/plus.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "chevron", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/chevron.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "user", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/user.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "bell", "kind": "icon", "library": "lucide", "files": [{ "path": "samples/assets/icons/bell.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "empty-feed", "kind": "illustration", "style": "c-soft", "files": [{ "path": "samples/assets/illustrations/empty-feed@2x.png", "scale": 2, "format": "png" }], "license": "internal" }
+  ],
+  "placeholders": [],
+  "complete": true
+}

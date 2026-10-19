@@ -13,6 +13,11 @@ describe("state machine", () => {
     expect(state.status).toBe("success");
   });
 
+  it("starts with a pending brief gate", () => {
+    const state = createRunState("run-test");
+    expect(state.gates.brief).toBe("pending");
+  });
+
   it("rejects an invalid transition", () => {
     const state = createRunState("run-test");
     expect(() => transition(state, "done")).toThrow(/invalid transition/i);

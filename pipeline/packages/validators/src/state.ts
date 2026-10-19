@@ -9,7 +9,8 @@ import {
 /**
  * Page-state checks.
  *
- * - `STATE-REQUIRED`: an archetype-required state is absent.
+ * - `STATE-REQUIRED`: a state required by the archetype or the page's brief
+ *   entry is absent.
  * - `STATE-DEFAULT`: the default state is absent (also caught by the schema,
  *   kept here so the report always names the state rule).
  * - `STATE-OVERRIDE`: an override targets an unknown node id or a component
@@ -43,6 +44,19 @@ export function validateState(spec: PageSpec, ctx: ValidationContext): Finding[]
         "states",
         required,
         `Archetype "${ctx.archetype.id}" requires state "${required}".`
+      );
+    }
+  }
+
+  const archetypeStates = new Set(ctx.archetype.requiredStates);
+  for (const required of ctx.requiredStates ?? []) {
+    if (archetypeStates.has(required)) continue;
+    if (!Object.prototype.hasOwnProperty.call(states, required)) {
+      push(
+        "STATE-REQUIRED",
+        "states",
+        required,
+        `Page brief requires state "${required}".`
       );
     }
   }
