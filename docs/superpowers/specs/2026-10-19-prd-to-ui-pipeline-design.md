@@ -728,9 +728,14 @@ git:
 | Agent | 职责 | 模型/温度 | 工具 | 看得到 | 看不到 | 输出 |
 |---|---|---|---|---|---|---|
 | PRD Reviewer | 独立评审 PRD 是否 UI-ready | 与作者不同模型，temp 0 | 无（只读） | PRD + 评审契约 | 作者推理、UI Brief | findings + readiness |
-| UI Briefer | 抽取 UI Brief、生成追问 | 强推理，temp 0–0.2 | 读文件 | PRD + 签核记录 | Page Spec、渲染结果 | UI Brief + questions |
+| IA Agent | 检查 PRD 信息架构：页面清单、层级、导航、流程、角色、命名、断链/死路 | 强推理，temp 0 | 只读 PRD + 现有 IA/截图 | UI Brief、视觉 | ia-map + ia-findings + proposed IA |
+| UI Briefer | 抽取 UI Brief、生成追问 | 强推理，temp 0–0.2 | 读文件 | PRD + 签核记录 + IA map | Page Spec、渲染结果 | UI Brief + questions |
+| Interaction Design Agent | 交互模型、状态矩阵、动效规范、原型交互/动效评审 | 强推理 + video/vision，temp 0 | 只读 UI Brief/Page Spec/motion tokens/原型 | 视觉风格、代码 | interaction-spec + motion-spec + review |
 | Spec Engineer | 编译 Page Spec；修复校验问题 | 强结构化输出，temp 0 | catalog 查询、schema 校验、沙箱渲染 | UI Brief + Profile + 当前库 Catalog + findings | PRD 全文、另一个库 | Page Spec / patch |
 | Visual Critic | 看截图做视觉评审 | Vision 模型，temp 0 | 只看截图 | 截图 + spec + profile | 作者推理、代码 | visual findings |
+| Visual Style Agent | 品牌视觉方向、插画/图片/logo 风格、资产 brief、来源策略 | Vision + 强推理，temp 0.2 | 读品牌资产、截图、UI Brief；写 style pack/brief | PRD 全文、Spec 细节 | visual-style pack + asset briefs |
+| Asset Producer | 库检索 / AI 生成 / 上传，执行资产 brief | 按来源，temp 0.2 | 库、生成、上传 | brief + style pack | asset candidates |
+| Asset Reviewer | 独立评审资产，输出 pass/retry/fallback + 评分 | Vision，temp 0 | 只读候选 + brief + style pack | 生成推理、成本 | review verdict + scores |
 
 确定性节点：Intake、Validators、HTML Renderer、Figma Renderer、Asset Compiler、Sandbox Orchestrator、Handoff Packager。
 
