@@ -440,6 +440,20 @@ pnpm asset:review \
   --runs /tmp/m0-runs
 ```
 
+CLI 参数：
+
+| 参数 | 作用 |
+|---|---|
+| `--runtime standalone\|dsh` | 选择执行层；默认 `standalone` |
+| `--assets <dir>` | briefs + library 的目录 |
+| `--runs <dir>` | run 产物目录 |
+| `--only <assetId>` | 只跑指定资产，可重复；用于先试一个图标/插画 |
+| `--dry-run` | 只做 brief 解析、source 解析、hard gate；不调模型、不写 frozen |
+| `--reviewer scripted\|model` | standalone 的评审后端；默认 `scripted` |
+| `--budget-usd <n>` / `--budget-minutes <n>` | 覆盖默认预算（默认 $1.0 / 30 分钟） |
+
+`--only` 和 `--dry-run` 是 M0 的“先试一个”入口：先跑 `--only icon-home --dry-run` 看 brief/gate 是否成立，再跑 scripted，最后跑 dsh。
+
 ### 5.2 与 dsh 的关系
 
 - Standalone 是 **CI/离线的执行层**，不是第二个产品版本。
@@ -705,6 +719,109 @@ DSH_HOME="$PWD/dsh/home" \
 - [ ] 没有 key 进入 git、日志、artifacts；`.env` 被忽略。
 - [ ] dsh CLI 版本锁定在 `pipeline/package.json` + `pnpm-lock.yaml`；profile 目录不重复钉内部包版本；`@next` 不在默认链路。
 - [ ] 文档：`pipeline/dsh/README.md`（key 配置）、`pipeline/docs/asset-review-m0.md`（运行与产物）。
+
+### 8.4 第一次使用：从 0 到 13 个资产
+
+```bash
+cd pipeline
+pnpm install
+pnpm test
+pnpm typecheck
+
+# 1. 先看一个图标：只解析 brief、source、hard gate，不调模型
+pnpm asset:review \
+  --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0 \
+  --only icon-home --dry-run \
+  --runs /tmp/m0-smoke
+
+# 2. 一个图标走完整状态机（scripted reviewer，无 key、无成本）
+pnpm asset:review \
+  --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0 \
+  --only icon-home --runtime standalone \
+  --runs /tmp/m0-smoke
+
+# 3. 13 个资产全跑（scripted）
+pnpm asset:review \
+  --project samples/projects/employee-app/project.yaml \
+  --assets samples/assets/m0 \
+  --runtime standalone \
+  --runs /tmp/m0-runs
+
+# 4. 配置 vision key 后，先用一个图标验证 dsh
+#    pipeline/.env: PRD_UI_VISION_API_KEY / PRD_UI_VISION_BASE_URL / PRD_UI_VISION_MODEL
+cd pipeline
+DSH_HOME="$PWD/dsh/home" \
+  pnpm asset:review \
+    --project samples/projects/employee-app/project.yaml \
+    --assets samples/assets/m0 \
+    --only icon-home --runtime dsh \
+    --runs /tmp/m0-dsh-smoke
+
+# 5. 13 个资产真实评审
+DSH_HOME="$PWD/dsh/home" \
+  pnpm asset:review \
+    --project samples/projects/employee-app/project.yaml \
+    --assets samples/assets/m0 \
+    --runtime dsh \
+    --runs /tmp/m0-runs-dsh
+```
+
+顺序的理由：先 `--dry-run` 排除 brief/source/gate 问题，再 scripted 排除状态机问题，最后 dsh 只看模型/凭据/评审问题。每次只引入一个变量。
+
+### 8.5 结果怎么看
+
+CLI 结束会打印一行摘要和 run 目录：
+
+```text
+Asset review OK: 13 assets, 13 passed, 0 retried, 0 unresolved, 0 degraded
+Run: /tmp/m0-runs/run-2026-10-20T....
+```
+
+看总账：
+
+```bash
+RUN=/tmp/m0-runs/run-2026-10-20T....
+jq '.summary' "$RUN/asset-review.json"
+jq '.assets[] | {id, status, sourceTier, degraded, attempts: (.attempts | length)}' "$RUN/asset-review.json"
+jq '.complete, (.assets | length)' "$RUN/manifest.json"
+```
+
+看单个失败/重试：
+
+```bash
+jq '.assets[] | select(.status != "passed")' "$RUN/asset-review.json"
+# 每次 attempt 的候选、normalized、gate、review 都在：
+find "$RUN/assets/attempts" -maxdepth 3 -type f | sort
+```
+
+目录语义：
+
+| 路径 | 内容 |
+|---|---|
+| `run.json` | run 状态、stage、预算、时间；失败原因 |
+| `asset-review.json` | 完整审计：每个资产每次 attempt 的 source/verdict/scores/issues/cost/timestamp、fallback/degraded |
+| `manifest.json` | 冻结后的资产清单；`complete: true` 才能交给 renderer |
+| `assets/briefs/<id>.json` | 实际使用的 brief |
+| `assets/attempts/<id>/<source>-<n>/` | candidate、`candidate.meta.json`、`normalized.svg`、`gate.json`、`review.json`、`prompt.md` |
+| `assets/frozen/<id>/` | 最终冻结文件 + record |
+| `log.ndjson` | 事件流；key 已脱敏 |
+| `dsh/<sessionId>/` | dsh stdout/stderr/session 元数据（provider/model/trajectory hash） |
+
+退出码：
+
+- `0`：所有资产 frozen，`manifest.json complete`。
+- `1`：有 `unresolved`、`reviewer_error`、`configuration_error` 或预算超限；看 `run.json` 的 `error` 和 `log.ndjson`。
+- `--dry-run` 不写 frozen，只看 gate；适合改 brief/SVG 时快速迭代。
+
+常见处理：
+
+- `gate.json` 有 blocker → 先修 SVG 或 brief 的尺寸/网格/currentColor/文字；不要先怀疑模型。
+- `review.json` verdict=retry → 看 `suggestedChanges`；同一 source 内重试，最多 3 次。
+- `review.json` verdict=fallback → 该 source 不适合，状态机会切下一个 source；M0 A-only 时可能直接 `unresolved`。
+- `unresolved` → manifest 不完整，handoff 阻断；人工决定补资产、换 source 或降级 waiver。
+- dsh 报错但 standalone 正常 → 先查 key/model/profile，不要改 core。
 
 ## 9. 测试策略
 
