@@ -14,6 +14,12 @@ export interface UiBriefPage {
   reqRefs: string[];
   fields?: string[];
   actions?: string[];
+  filterFields?: string[];
+  emptyTitle?: string;
+  emptyAssetRef?: string;
+  summaryTitle?: string;
+  feedItems?: Array<{ title: string; body: string }>;
+  stats?: Array<{ label: string; value: string }>;
 }
 
 export interface UiBrief {
@@ -37,7 +43,7 @@ export interface UiBrief {
   };
   ia: {
     pages: UiBriefPage[];
-    navigation: { primary: string[] };
+    navigation: { primary: string[]; tabs?: string[] };
     flows: Array<{ id: string; steps: string[] }>;
   };
   data: {
@@ -67,6 +73,16 @@ export const UiBriefPageSchema = z
     reqRefs: z.array(z.string().regex(/^REQ-[A-Z0-9]+-\d+$/)).min(1),
     fields: z.array(z.string()).optional(),
     actions: z.array(z.string()).optional(),
+    filterFields: z.array(z.string()).optional(),
+    emptyTitle: z.string().min(1).optional(),
+    emptyAssetRef: z.string().min(1).optional(),
+    summaryTitle: z.string().min(1).optional(),
+    feedItems: z
+      .array(z.object({ title: z.string().min(1), body: z.string().min(1) }).strict())
+      .optional(),
+    stats: z
+      .array(z.object({ label: z.string().min(1), value: z.string().min(1) }).strict())
+      .optional(),
   })
   .strict();
 
@@ -97,7 +113,9 @@ export const UiBriefSchema = z
     ia: z
       .object({
         pages: z.array(UiBriefPageSchema).min(1),
-        navigation: z.object({ primary: z.array(z.string()) }).strict(),
+        navigation: z
+          .object({ primary: z.array(z.string()), tabs: z.array(z.string()).optional() })
+          .strict(),
         flows: z.array(z.object({ id: z.string(), steps: z.array(z.string()) }).strict()),
       })
       .strict(),

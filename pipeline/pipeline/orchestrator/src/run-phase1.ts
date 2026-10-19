@@ -6,6 +6,7 @@ import {
   UiBriefSchema,
   type AssetManifest,
   type PageSpec,
+  type ProjectConfig,
   type RunState,
   type UiBrief,
 } from "@prd-ui/contracts";
@@ -16,13 +17,22 @@ import {
   type ValidationContext,
   type ValidationReport,
 } from "@prd-ui/validators";
+import { loadProjectConfig } from "./project-config.js";
 import { createRunState, failRun, transition } from "./state-machine.js";
 
 export interface Phase1Options {
+  /** Project YAML file. Defaults to `samples/project.demo-orders.yaml` when no custom input is given. */
+  projectPath?: string;
+  /** UI brief JSON. Overrides the project config's `brief` when both are provided. */
+  briefPath?: string;
+  /**
+   * Asset manifests keyed by profile. These are merged over the project
+   * config's manifests; relative paths are resolved against the working
+   * directory (project config paths resolve against the project file).
+   */
+  manifests?: Record<string, string>;
   /** Directory that receives `<runId>/...`. Defaults to `<cwd>/runs`. */
   runsDir?: string;
-  /** UI brief to intake. Defaults to `samples/ui-brief.sample.json`. */
-  briefPath?: string;
 }
 
 export interface Phase1Result {
@@ -40,13 +50,23 @@ interface BriefGateFailure {
   issue: string;
 }
 
+interface RunLevelFailure {
+  ruleId: string;
+  location: string;
+  evidence: string;
+  issue: string;
+}
+
+interface ResolvedPhase1Inputs {
+  briefPath: string;
+  manifestPaths: Record<string, string>;
+  runsDir: string;
+  project?: ProjectConfig;
+}
+
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const pipelineRoot = path.resolve(moduleDir, "..", "..", "..");
-const sampleBriefPath = path.join(pipelineRoot, "samples", "ui-brief.sample.json");
-const manifestPathsByProfile: Record<string, string> = {
-  "b-dense": path.join(pipelineRoot, "samples", "asset-manifest.b-dense.json"),
-  "c-expressive": path.join(pipelineRoot, "samples", "asset-manifest.c-expressive.json"),
-};
+const defaultProjectPath = path.join(pipelineRoot, "samples", "project.demo-orders.yaml");
 
 /** Timestamp run id: `run-2026-10-19T10-00-00-000Z` (no `:` or `.`). */
 export function createRunId(now = new Date()): string {
@@ -80,6 +100,62 @@ async function createLogger(logPath: string): Promise<RunLogger> {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+}
+
+/**
+ * Resolve the brief, manifests, and runs directory before a run starts.
+ * A project config supplies paths relative to its own directory; explicit CLI
+ * overrides use the working directory. A custom brief without any manifests
+ * is rejected rather than falling back to the sample project.
+ */
+function resolveInputs(options: Phase1Options): ResolvedPhase1Inputs {
+  const hasManifestOverrides = Object.keys(options.manifests ?? {}).length > 0;
+  const useDefaultProject =
+    !options.projectPath && !options.briefPath && !hasManifestOverrides;
+  const projectPath = options.projectPath
+    ? path.resolve(options.projectPath)
+    : useDefaultProject
+      ? defaultProjectPath
+      : undefined;
+
+  if (!projectPath && !options.briefPath) {
+    throw new Error("missing brief: pass --brief <path> or --project <path>");
+  }
+  if (!projectPath && !hasManifestOverrides) {
+    throw new Error(
+      "missing manifests: pass --manifest <profile>=<path> or --project"
+    );
+  }
+
+  let project: ProjectConfig | undefined;
+  let baseDir = process.cwd();
+  if (projectPath) {
+    const loaded = loadProjectConfig(projectPath);
+    project = loaded.config;
+    baseDir = loaded.baseDir;
+  }
+
+  const briefPath = options.briefPath
+    ? path.resolve(options.briefPath)
+    : path.resolve(baseDir, project!.brief);
+
+  const manifestPaths: Record<string, string> = {};
+  if (project) {
+    for (const [profile, manifestPath] of Object.entries(project.manifests)) {
+      manifestPaths[profile] = path.resolve(baseDir, manifestPath);
+    }
+  }
+  for (const [profile, manifestPath] of Object.entries(options.manifests ?? {})) {
+    manifestPaths[profile] = path.resolve(manifestPath);
+  }
+
+  const runsDir = options.runsDir
+    ? path.resolve(options.runsDir)
+    : project?.runsDir
+      ? path.resolve(baseDir, project.runsDir)
+      : path.resolve(process.cwd(), "runs");
+
+  return { briefPath, manifestPaths, runsDir, project };
 }
 
 /**
@@ -136,14 +212,75 @@ function assertUniquePageIds(brief: UiBrief): void {
   }
 }
 
-async function readManifests(): Promise<Record<string, AssetManifest>> {
+async function readManifests(
+  manifestPaths: Record<string, string>
+): Promise<Record<string, AssetManifest>> {
   const entries = await Promise.all(
-    Object.entries(manifestPathsByProfile).map(async ([profile, filePath]) => {
-      const manifest = AssetManifestSchema.parse(await readJson(filePath)) as AssetManifest;
-      return [profile, manifest] as const;
+    Object.entries(manifestPaths).map(async ([profile, filePath]) => {
+      try {
+        const manifest = AssetManifestSchema.parse(
+          await readJson(filePath)
+        ) as AssetManifest;
+        return [profile, manifest] as const;
+      } catch (error) {
+        throw new Error(
+          `Invalid asset manifest for profile "${profile}" at ${filePath}: ${errorMessage(error)}`,
+          { cause: error }
+        );
+      }
     })
   );
   return Object.fromEntries(entries);
+}
+
+/**
+ * Check that every page profile has a manifest and that each manifest declares
+ * the profile key it is filed under and the project from the brief/config.
+ */
+function checkManifests(
+  brief: UiBrief,
+  manifestsByProfile: Record<string, AssetManifest>,
+  expectedProject: string
+): RunLevelFailure[] {
+  const failures: RunLevelFailure[] = [];
+
+  for (const [profile, manifest] of Object.entries(manifestsByProfile)) {
+    if (manifest.profile !== profile) {
+      failures.push({
+        ruleId: "PROJECT-MANIFEST-PROFILE",
+        location: `manifests[${profile}]`,
+        evidence: manifest.profile,
+        issue: `Manifest filed under profile "${profile}" declares profile "${manifest.profile}".`,
+      });
+    }
+    if (manifest.project !== expectedProject) {
+      failures.push({
+        ruleId: "PROJECT-MANIFEST-PROJECT",
+        location: `manifests[${profile}]`,
+        evidence: manifest.project,
+        issue: `Manifest for profile "${profile}" belongs to project "${manifest.project}", expected "${expectedProject}".`,
+      });
+    }
+  }
+
+  const missingByProfile = new Map<string, string[]>();
+  for (const page of brief.ia.pages) {
+    if (manifestsByProfile[page.profile]) continue;
+    const pages = missingByProfile.get(page.profile) ?? [];
+    pages.push(page.id);
+    missingByProfile.set(page.profile, pages);
+  }
+
+  for (const [profile, pageIds] of missingByProfile) {
+    failures.push({
+      ruleId: "PROJECT-MANIFEST-MISSING",
+      location: `manifests[${profile}]`,
+      evidence: profile,
+      issue: `No asset manifest for profile "${profile}" required by page(s): ${pageIds.join(", ")}.`,
+    });
+  }
+
+  return failures;
 }
 
 function buildContexts(
@@ -179,14 +316,15 @@ function buildContexts(
  * validate them against the per-profile asset manifests, and persist every run
  * artifact. Parse/compile/validation infrastructure errors write a failed
  * state and log line before propagating to the caller.
+ *
+ * Project-level problems (project/brief mismatch, manifest selection) are
+ * recorded as failed runs and returned as `passed: false`, so the CLI can
+ * print the run directory and exit 1.
  */
 export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Result> {
-  const runsDir = options.runsDir
-    ? path.resolve(options.runsDir)
-    : path.resolve(process.cwd(), "runs");
-  const briefPath = options.briefPath ? path.resolve(options.briefPath) : sampleBriefPath;
+  const inputs = resolveInputs(options);
   const runId = createRunId();
-  const runDir = path.join(runsDir, runId);
+  const runDir = path.join(inputs.runsDir, runId);
   const artifactsDir = path.join(runDir, "artifacts");
   const pageSpecDir = path.join(artifactsDir, "page-spec");
   const reportsDir = path.join(runDir, "reports");
@@ -204,6 +342,30 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     return next;
   };
 
+  const failRunWith = async (
+    failures: RunLevelFailure[],
+    pages: number
+  ): Promise<Phase1Result> => {
+    for (const failure of failures) {
+      await logger.log(
+        `run failed: ${failure.ruleId} at ${failure.location}: ${failure.issue}`
+      );
+    }
+    const gates = { ...state.gates };
+    if (gates.brief !== "passed") gates.brief = "failed";
+    state = await writeState({ ...failRun(state), gates });
+    await logger.log(
+      `run failed: ${failures.length} project blockers; stage ${state.stage}`
+    );
+    return {
+      runId,
+      pages,
+      blockers: failures.length,
+      runDir,
+      passed: false,
+    };
+  };
+
   try {
     await logger.log(`run ${runId} started at stage ${state.stage}`);
     await writeState(state);
@@ -211,14 +373,30 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     // intake: parse and persist the UI brief.
     let brief: UiBrief;
     try {
-      brief = UiBriefSchema.parse(await readJson(briefPath)) as UiBrief;
+      brief = UiBriefSchema.parse(await readJson(inputs.briefPath)) as UiBrief;
     } catch (error) {
-      throw new Error(`Invalid UI brief at ${briefPath}: ${errorMessage(error)}`, {
+      throw new Error(`Invalid UI brief at ${inputs.briefPath}: ${errorMessage(error)}`, {
         cause: error,
       });
     }
     assertUniquePageIds(brief);
     await writeJson(path.join(artifactsDir, "ui-brief.json"), brief);
+
+    // project config: the config project and brief project must agree.
+    if (inputs.project && inputs.project.project !== brief.meta.project) {
+      return await failRunWith(
+        [
+          {
+            ruleId: "PROJECT-MISMATCH",
+            location: inputs.project.project,
+            evidence: brief.meta.project,
+            issue: `Project config declares "${inputs.project.project}" but brief "${inputs.briefPath}" declares "${brief.meta.project}".`,
+          },
+        ],
+        0
+      );
+    }
+    const expectedProject = inputs.project?.project ?? brief.meta.project;
 
     // brief gate: only pass after blocking questions, unmapped requirements,
     // and page reqRefs have all been checked.
@@ -244,6 +422,14 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     );
     await logger.log(`intake complete: brief ${brief.meta.project}@${brief.meta.version}`);
 
+    // project manifests: read every configured manifest, then require one for
+    // each profile the brief's pages use.
+    const manifestsByProfile = await readManifests(inputs.manifestPaths);
+    const manifestFailures = checkManifests(brief, manifestsByProfile, expectedProject);
+    if (manifestFailures.length > 0) {
+      return await failRunWith(manifestFailures, 0);
+    }
+
     // compile: one Page Spec per brief page.
     state = await writeState(transition(state, "compile"));
     const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
@@ -254,7 +440,6 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
 
     // validate: build a context per page from its profile's asset manifest.
     state = await writeState(transition(state, "validate"));
-    const manifestsByProfile = await readManifests();
     const contextsByPage = buildContexts(specs, brief, manifestsByProfile);
     const reports: ValidationReport[] = validateProject(specs, contextsByPage);
     const blockers = reports.reduce((total, report) => total + report.blockers, 0);
@@ -281,25 +466,4 @@ export async function runPhase1(options: Phase1Options = {}): Promise<Phase1Resu
     await logger.log(`run failed: ${errorMessage(error).replace(/\s+/g, " ").trim()}`);
     throw error;
   }
-}
-
-const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : "";
-const isMain = invokedPath === fileURLToPath(import.meta.url);
-
-if (isMain) {
-  runPhase1()
-    .then((result) => {
-      if (result.passed) {
-        console.log(`Phase 1A OK: ${result.pages} pages, ${result.blockers} blockers`);
-        return;
-      }
-      console.error(
-        `Phase 1A FAILED: ${result.pages} pages, ${result.blockers} blockers (${result.runDir})`
-      );
-      process.exitCode = 1;
-    })
-    .catch((error: unknown) => {
-      console.error(error);
-      process.exitCode = 1;
-    });
 }

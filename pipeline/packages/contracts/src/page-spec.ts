@@ -79,6 +79,9 @@ export interface PageSpec {
     target: Target;
     profile: string;
     archetype: string;
+    purpose: string;
+    route: string;
+    roles: string[];
     reqRefs: ReqId[];
     version: string;
   };
@@ -98,6 +101,9 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
         target: z.enum(["web", "mobile"]),
         profile: z.string().min(1),
         archetype: z.string().min(1),
+        purpose: z.string().min(1),
+        route: z.string().min(1),
+        roles: z.array(z.string().min(1)).min(1),
         reqRefs: z.array(ReqIdSchema).min(1),
         version: z.string().min(1),
       })

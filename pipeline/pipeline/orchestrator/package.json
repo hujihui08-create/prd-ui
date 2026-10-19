@@ -11,6 +11,7 @@
     "@prd-ui/compiler": "workspace:*",
     "@prd-ui/contracts": "workspace:*",
     "@prd-ui/design-system": "workspace:*",
-    "@prd-ui/validators": "workspace:*"
+    "@prd-ui/validators": "workspace:*",
+    "yaml": "^2.9.1"
   }
 }

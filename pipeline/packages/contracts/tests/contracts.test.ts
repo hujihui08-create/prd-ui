@@ -8,6 +8,7 @@ import {
   AssetManifestSchema,
   FindingSchema,
   RunStateSchema,
+  ProjectConfigSchema,
   reqId,
   type PageSpec,
   type UiBrief,
@@ -21,6 +22,9 @@ const minimalPageSpec: PageSpec = {
     target: "web",
     profile: "b-dense",
     archetype: "list",
+    purpose: "查看并筛选订单",
+    route: "/orders",
+    roles: ["admin", "operator"],
     reqRefs: [reqId("order", 1)],
     version: "0.1.0",
   },
@@ -93,6 +97,29 @@ describe("contracts", () => {
     expect(() => PageSpecSchema.parse(bad)).toThrow();
   });
 
+  it("requires purpose, route, and roles in page spec meta", () => {
+    for (const field of ["purpose", "route", "roles"] as const) {
+      const meta: Record<string, unknown> = { ...minimalPageSpec.meta };
+      delete meta[field];
+      expect(() =>
+        PageSpecSchema.parse({ ...minimalPageSpec, meta })
+      ).toThrow();
+    }
+    expect(() =>
+      PageSpecSchema.parse({
+        ...minimalPageSpec,
+        meta: { ...minimalPageSpec.meta, roles: [] },
+      })
+    ).toThrow();
+  });
+
+  it("carries page purpose, route, and roles through the schema", () => {
+    const parsed = PageSpecSchema.parse(minimalPageSpec);
+    expect(parsed.meta.purpose).toBe("查看并筛选订单");
+    expect(parsed.meta.route).toBe("/orders");
+    expect(parsed.meta.roles).toEqual(["admin", "operator"]);
+  });
+
   it("parses a profile", () => {
     const profile = {
       meta: { name: "b-dense", library: "b-dense", version: "0.1.0", origin: "baseline" },
@@ -130,6 +157,70 @@ describe("contracts", () => {
 
   it("parses a UI brief", () => {
     expect(UiBriefSchema.parse(minimalBrief).ia.pages[0]?.id).toBe("orders-list");
+  });
+
+  it("accepts optional page presentation fields and navigation tabs", () => {
+    const page = {
+      ...minimalBrief.ia.pages[0]!,
+      filterFields: ["status", "date"],
+      emptyTitle: "暂无订单",
+      emptyAssetRef: "empty-orders",
+      summaryTitle: "订单摘要",
+      feedItems: [{ title: "推荐", body: "今日精选" }],
+      stats: [{ label: "今日订单", value: "128" }],
+    };
+    const parsed = UiBriefSchema.parse({
+      ...minimalBrief,
+      ia: {
+        ...minimalBrief.ia,
+        pages: [page],
+        navigation: { ...minimalBrief.ia.navigation, tabs: ["推荐", "关注"] },
+      },
+    });
+
+    const parsedPage = parsed.ia.pages[0]!;
+    expect(parsedPage.filterFields).toEqual(["status", "date"]);
+    expect(parsedPage.emptyTitle).toBe("暂无订单");
+    expect(parsedPage.emptyAssetRef).toBe("empty-orders");
+    expect(parsedPage.summaryTitle).toBe("订单摘要");
+    expect(parsedPage.feedItems).toEqual([{ title: "推荐", body: "今日精选" }]);
+    expect(parsedPage.stats).toEqual([{ label: "今日订单", value: "128" }]);
+    expect(parsed.ia.navigation.tabs).toEqual(["推荐", "关注"]);
+  });
+
+  it("rejects malformed optional page presentation fields", () => {
+    const page = {
+      ...minimalBrief.ia.pages[0]!,
+      feedItems: [{ title: "推荐" }],
+    };
+    expect(() =>
+      UiBriefSchema.parse({
+        ...minimalBrief,
+        ia: { ...minimalBrief.ia, pages: [page] },
+      })
+    ).toThrow();
+  });
+
+  it("parses a strict project config", () => {
+    const config = {
+      project: "demo-orders",
+      brief: "ui-brief.sample.json",
+      manifests: {
+        "b-dense": "asset-manifest.b-dense.json",
+        "c-expressive": "asset-manifest.c-expressive.json",
+      },
+      runsDir: "runs",
+    };
+    expect(ProjectConfigSchema.parse(config).manifests["b-dense"]).toBe(
+      "asset-manifest.b-dense.json"
+    );
+    expect(() => ProjectConfigSchema.parse({ ...config, extra: true })).toThrow();
+    expect(() =>
+      ProjectConfigSchema.parse({ ...config, manifests: "not-a-record" })
+    ).toThrow();
+    expect(() =>
+      ProjectConfigSchema.parse({ project: "x", manifests: {} })
+    ).toThrow();
   });
 
   it("accepts valid kebab-case page ids", () => {

@@ -1,15 +1,28 @@
 import { mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import type { PageSpec, RunState, UiBrief } from "@prd-ui/contracts";
 import type { ValidationReport } from "@prd-ui/validators";
 import sampleBrief from "../../../samples/ui-brief.sample.json";
 import { runPhase1 } from "../src/run-phase1.js";
 
+const samplesDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../samples"
+);
+const sampleBriefPath = path.join(samplesDir, "ui-brief.sample.json");
+const sampleProjectPath = path.join(samplesDir, "project.demo-orders.yaml");
+const sampleManifests: Record<string, string> = {
+  "b-dense": path.join(samplesDir, "asset-manifest.b-dense.json"),
+  "c-expressive": path.join(samplesDir, "asset-manifest.c-expressive.json"),
+};
+
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await readFile(filePath, "utf8")) as T;
 }
+
 
 async function writeBriefFile(
   dir: string,
@@ -89,9 +102,9 @@ describe("runPhase1", () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
     const missing = path.join(tmpDir, "missing-brief.json");
 
-    await expect(runPhase1({ runsDir: tmpDir, briefPath: missing })).rejects.toThrow(
-      /Invalid UI brief/
-    );
+    await expect(
+      runPhase1({ runsDir: tmpDir, briefPath: missing, manifests: sampleManifests })
+    ).rejects.toThrow(/Invalid UI brief/);
 
     const runDir = await findRunDir(tmpDir);
     const state = await readJson<RunState>(path.join(runDir, "state.json"));
@@ -108,9 +121,9 @@ describe("runPhase1", () => {
     const briefPath = path.join(tmpDir, "invalid-brief.json");
     await writeFile(briefPath, JSON.stringify({ meta: {} }), "utf8");
 
-    await expect(runPhase1({ runsDir: tmpDir, briefPath })).rejects.toThrow(
-      /Invalid UI brief/
-    );
+    await expect(
+      runPhase1({ runsDir: tmpDir, briefPath, manifests: sampleManifests })
+    ).rejects.toThrow(/Invalid UI brief/);
 
     const runDir = await findRunDir(tmpDir);
     const state = await readJson<RunState>(path.join(runDir, "state.json"));
@@ -127,9 +140,9 @@ describe("runPhase1", () => {
       brief.ia.pages.push({ ...brief.ia.pages[1]! });
     });
 
-    await expect(runPhase1({ runsDir: tmpDir, briefPath })).rejects.toThrow(
-      /duplicate page id/i
-    );
+    await expect(
+      runPhase1({ runsDir: tmpDir, briefPath, manifests: sampleManifests })
+    ).rejects.toThrow(/duplicate page id/i);
 
     const runDir = await findRunDir(tmpDir);
     const state = await readJson<RunState>(path.join(runDir, "state.json"));
@@ -149,7 +162,11 @@ describe("runPhase1", () => {
       });
     });
 
-    const result = await runPhase1({ runsDir: tmpDir, briefPath });
+    const result = await runPhase1({
+      runsDir: tmpDir,
+      briefPath,
+      manifests: sampleManifests,
+    });
     expect(result.passed).toBe(false);
     expect(result.pages).toBe(0);
     expect(result.blockers).toBe(1);
@@ -168,7 +185,11 @@ describe("runPhase1", () => {
       brief.traceability.unmapped = ["REQ-ORDER-009"];
     });
 
-    const result = await runPhase1({ runsDir: tmpDir, briefPath });
+    const result = await runPhase1({
+      runsDir: tmpDir,
+      briefPath,
+      manifests: sampleManifests,
+    });
     expect(result.passed).toBe(false);
     expect(result.blockers).toBe(1);
 
@@ -186,7 +207,11 @@ describe("runPhase1", () => {
       brief.ia.pages[0]!.reqRefs = ["REQ-ORDER-999"];
     });
 
-    const result = await runPhase1({ runsDir: tmpDir, briefPath });
+    const result = await runPhase1({
+      runsDir: tmpDir,
+      briefPath,
+      manifests: sampleManifests,
+    });
     expect(result.passed).toBe(false);
     expect(result.blockers).toBe(1);
 
@@ -195,5 +220,81 @@ describe("runPhase1", () => {
 
     const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
     expect(state.gates.brief).toBe("failed");
+  });
+
+  it("loads the sample project config", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+    const result = await runPhase1({ runsDir: tmpDir, projectPath: sampleProjectPath });
+
+    expect(result.passed).toBe(true);
+    expect(result.pages).toBe(8);
+    expect(result.blockers).toBe(0);
+  });
+
+  it("runs a custom brief with explicit manifests", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+    const result = await runPhase1({
+      runsDir: tmpDir,
+      briefPath: sampleBriefPath,
+      manifests: sampleManifests,
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.pages).toBe(8);
+    expect(result.blockers).toBe(0);
+  });
+
+  it("rejects a custom brief without manifests instead of using sample manifests", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+
+    await expect(
+      runPhase1({ runsDir: tmpDir, briefPath: sampleBriefPath })
+    ).rejects.toThrow(/missing manifests/);
+
+    expect(await readdir(tmpDir)).toEqual([]);
+  });
+
+  it("fails the run when the project config and brief projects disagree", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+    const projectPath = path.join(tmpDir, "project.bad.yaml");
+    await writeFile(
+      projectPath,
+      [
+        "project: another-project",
+        `brief: ${JSON.stringify(sampleBriefPath)}`,
+        "manifests:",
+        `  b-dense: ${JSON.stringify(sampleManifests["b-dense"])}`,
+        `  c-expressive: ${JSON.stringify(sampleManifests["c-expressive"])}`,
+        "",
+      ].join("\n"),
+      "utf8"
+    );
+
+    const result = await runPhase1({ runsDir: tmpDir, projectPath });
+
+    expect(result.passed).toBe(false);
+    expect(result.blockers).toBe(1);
+    const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
+    expect(state.status).toBe("failed");
+    const log = await readFile(path.join(result.runDir, "logs", "run.log"), "utf8");
+    expect(log).toContain("PROJECT-MISMATCH");
+  });
+
+  it("fails the run when a page profile has no manifest", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+
+    const result = await runPhase1({
+      runsDir: tmpDir,
+      briefPath: sampleBriefPath,
+      manifests: { "b-dense": sampleManifests["b-dense"]! },
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.blockers).toBe(1);
+    const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
+    expect(state.status).toBe("failed");
+    const log = await readFile(path.join(result.runDir, "logs", "run.log"), "utf8");
+    expect(log).toContain("PROJECT-MANIFEST-MISSING");
+    expect(log).toContain("c-expressive");
   });
 });

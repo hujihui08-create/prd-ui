@@ -1,0 +1,5 @@
+project: demo-orders
+brief: ui-brief.sample.json
+manifests:
+  b-dense: asset-manifest.b-dense.json
+  c-expressive: asset-manifest.c-expressive.json

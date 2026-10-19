@@ -45,6 +45,9 @@ describe("compileProject", () => {
         target: page.target,
         profile: page.profile,
         archetype: page.archetype,
+        purpose: page.purpose,
+        route: page.route,
+        roles: page.roles,
       });
       expect(spec!.meta.reqRefs).toEqual(page.reqRefs);
     }
