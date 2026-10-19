@@ -1,0 +1,3 @@
+- insert:
+    - id: prd-ui-assets
+      name: '@prd-ui/runtime-dsh'

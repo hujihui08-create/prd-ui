@@ -181,7 +181,7 @@ describe("asset:review CLI", () => {
     expect(result.stderr).toContain("PRD_UI_VISION_API_KEY");
   });
 
-  it("reports the dsh runtime as unavailable until it is wired", async () => {
+  it("surfaces a missing dsh binary without a fake pass", async () => {
     const runs = await tempRuns();
     const result = await runCli([
       "--project",
@@ -194,6 +194,6 @@ describe("asset:review CLI", () => {
       runs,
     ]);
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("RUNTIME_UNAVAILABLE");
+    expect(result.stderr).toContain("DSH_UNAVAILABLE");
   });
 });

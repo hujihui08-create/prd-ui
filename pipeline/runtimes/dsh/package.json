@@ -1,0 +1,29 @@
+{
+  "name": "@prd-ui/runtime-dsh",
+  "private": true,
+  "type": "module",
+  "main": "dist/plugin.js",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./adapter": {
+      "types": "./src/adapter.ts",
+      "default": "./src/adapter.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "esbuild src/plugin.ts --bundle --platform=node --format=esm --outfile=dist/plugin.js && esbuild src/adapter.ts --bundle --platform=node --format=esm --outfile=dist/adapter.js",
+    "prepare": "pnpm build"
+  },
+  "dependencies": {
+    "@prd-ui/asset-review": "workspace:*",
+    "@prd-ui/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

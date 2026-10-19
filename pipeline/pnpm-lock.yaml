@@ -104,6 +104,19 @@ importers:
         specifier: workspace:*
         version: link:../compiler
 
+  runtimes/dsh:
+    dependencies:
+      '@prd-ui/asset-review':
+        specifier: workspace:*
+        version: link:../../core/asset-review
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../../core/contracts
+    devDependencies:
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
+
   runtimes/standalone:
     dependencies:
       '@prd-ui/asset-review':
@@ -121,6 +134,9 @@ importers:
       '@prd-ui/renderer-html':
         specifier: workspace:*
         version: link:../../core/renderer-html
+      '@prd-ui/runtime-dsh':
+        specifier: workspace:*
+        version: link:../dsh
       yaml:
         specifier: ^2.9.1
         version: 2.9.1

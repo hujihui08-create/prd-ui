@@ -13,6 +13,7 @@
     "@prd-ui/design-system": "workspace:*",
     "@prd-ui/orchestrator": "workspace:*",
     "@prd-ui/renderer-html": "workspace:*",
+    "@prd-ui/runtime-dsh": "workspace:*",
     "yaml": "^2.9.1"
   }
 }

@@ -177,7 +177,8 @@ async function loadPolicy(assetsDir: string): Promise<SourcePolicy> {
 
 async function createReviewer(assetsDir: string, options: AssetCliOptions): Promise<AssetReviewerPort> {
   if (options.runtime === "dsh") {
-    throw new Error("RUNTIME_UNAVAILABLE: dsh runtime is wired in Task 9");
+    const { createDshAssetReviewer } = await import("@prd-ui/runtime-dsh/adapter");
+    return createDshAssetReviewer();
   }
   if (options.reviewer === "model") {
     return modelReviewerFromEnv();

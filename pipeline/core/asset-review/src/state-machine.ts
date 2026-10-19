@@ -37,6 +37,14 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+function errorDetails(error: unknown): string {
+  if (typeof error === "object" && error !== null && "code" in error) {
+    const code = (error as { code?: unknown }).code;
+    if (typeof code === "string") return `${code}: ${errorMessage(error)}`;
+  }
+  return errorMessage(error);
+}
+
 function extensionOf(format: string): string {
   if (format === "svg") return "svg";
   if (format === "png") return "png";
@@ -252,15 +260,15 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
           });
         } catch (error) {
           attemptRecord.status = "reviewer_error";
-          attemptRecord.issues = [`REVIEWER_ERROR: ${errorMessage(error)}`];
+          attemptRecord.issues = [`REVIEWER_ERROR: ${errorDetails(error)}`];
           attempts.push(attemptRecord);
-          fatalError = `REVIEWER_ERROR: ${errorMessage(error)}`;
+          fatalError = `REVIEWER_ERROR: ${errorDetails(error)}`;
           await input.ports.log.log({
             type: "reviewer_error",
             assetId: brief.id,
             source,
             attempt,
-            error: errorMessage(error),
+            error: errorDetails(error),
           });
           break;
         }

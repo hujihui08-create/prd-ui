@@ -720,21 +720,21 @@ git commit -m "feat: add asset review CLI with standalone runtime"
 - `apply(ctx, config)` registers `read_asset_brief`, `normalize_svg`, `validate_icon`, `score_asset` via `ctx.tools.register(defineTool(...))`.
 - `defineTool` output: `{ schema: { type: "json" }, render: (_args, value) => [{ type: "text", text: JSON.stringify(value) }] }`.
 
-- [ ] **Step 1: Write failing parser tests**
+- [x] **Step 1: Write failing parser tests**
 
 `dsh-process.test.ts`: input stdout with ` ```json ... ``` ` → parsed; non-zero exit → `DSH_EXIT_NONZERO`; timeout → `DSH_TIMEOUT`; invalid schema → `REVIEWER_SCHEMA_INVALID`.
 
-- [ ] **Step 2: Write failing plugin tests**
+- [x] **Step 2: Write failing plugin tests**
 
 Fake `ctx.tools.register` captures definitions; assert four tools registered; call `score_asset` with a pass verdict below threshold → returns `retry` + `VERDICT_INCONSISTENT`.
 
-- [ ] **Step 3: Implement plugin, tools, adapter**
+- [x] **Step 3: Implement plugin, tools, adapter**
 
 Use `defineTool` from `@deepseek-ai/dsh-tools` only in the bundled plugin source. To keep TypeScript typechecking without dsh installed, add a local type shim `src/dsh-tools.d.ts` with the minimal `defineTool`/`Context` types, or add `@deepseek-ai/dsh-tools` as a devDependency pinned. Prefer the devDependency if install is reliable; otherwise use the shim and bundle.
 
 The plugin must import only Node builtins + core; esbuild bundles `@prd-ui/asset-review`.
 
-- [ ] **Step 4: Build and test**
+- [x] **Step 4: Build and test**
 
 Add `esbuild` devDependency and scripts:
 
@@ -745,7 +745,7 @@ Add `esbuild` devDependency and scripts:
 
 Run: `cd pipeline && pnpm vitest run runtimes/dsh/tests && pnpm --filter @prd-ui/runtime-dsh build`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add pipeline/runtimes/dsh
