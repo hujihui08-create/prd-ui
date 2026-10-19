@@ -46,6 +46,18 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
+  packages/renderer-html:
+    dependencies:
+      '@prd-ui/compiler':
+        specifier: workspace:*
+        version: link:../compiler
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@prd-ui/design-system':
+        specifier: workspace:*
+        version: link:../design-system
+
   packages/validators:
     dependencies:
       '@prd-ui/contracts':

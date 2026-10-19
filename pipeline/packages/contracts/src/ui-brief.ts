@@ -1,6 +1,34 @@
 import { z } from "zod";
 import { PageIdSchema, type PageId } from "./page-id.js";
 
+export interface UiBriefPageContent {
+  storeName?: string;
+  hasMessage?: boolean;
+  quickActions?: Array<{ label: string; icon: string; tone?: "neutral" | "customer" | "inventory" }>;
+  appointments?: Array<{
+    customer: string;
+    item: string;
+    time: string;
+    status: string;
+    statusTone?: string;
+  }>;
+  callbacks?: Array<{ customer: string; item: string; daysAgo: string }>;
+  appointmentsEmptyTitle?: string;
+  callbacksEmptyTitle?: string;
+  inventorySummary?: string;
+  inventoryEmptyTitle?: string;
+  products?: Array<{
+    name: string;
+    spec?: string;
+    badge?: string;
+    badgeTone?: string;
+    attributes?: Array<{ label: string; value: string }>;
+    currentStock?: string;
+    availableStock?: string;
+    inTransit?: string;
+  }>;
+}
+
 export interface UiBriefPage {
   id: PageId;
   name: string;
@@ -20,6 +48,7 @@ export interface UiBriefPage {
   summaryTitle?: string;
   feedItems?: Array<{ title: string; body: string }>;
   stats?: Array<{ label: string; value: string }>;
+  content?: UiBriefPageContent;
 }
 
 export interface UiBrief {
@@ -59,6 +88,72 @@ export interface UiBrief {
   traceability: { reqMap: Record<string, string[]>; unmapped: string[] };
 }
 
+export const UiBriefPageContentSchema = z
+  .object({
+    storeName: z.string().min(1).optional(),
+    hasMessage: z.boolean().optional(),
+    quickActions: z
+      .array(
+        z
+          .object({
+            label: z.string().min(1),
+            icon: z.string().min(1),
+            tone: z.enum(["neutral", "customer", "inventory"]).optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    appointments: z
+      .array(
+        z
+          .object({
+            customer: z.string().min(1),
+            item: z.string().min(1),
+            time: z.string().min(1),
+            status: z.string().min(1),
+            statusTone: z.string().min(1).optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    callbacks: z
+      .array(
+        z
+          .object({
+            customer: z.string().min(1),
+            item: z.string().min(1),
+            daysAgo: z.string().min(1),
+          })
+          .strict()
+      )
+      .optional(),
+    appointmentsEmptyTitle: z.string().min(1).optional(),
+    callbacksEmptyTitle: z.string().min(1).optional(),
+    inventorySummary: z.string().min(1).optional(),
+    inventoryEmptyTitle: z.string().min(1).optional(),
+    products: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1),
+            spec: z.string().min(1).optional(),
+            badge: z.string().min(1).optional(),
+            badgeTone: z.string().min(1).optional(),
+            attributes: z
+              .array(
+                z.object({ label: z.string().min(1), value: z.string().min(1) }).strict()
+              )
+              .optional(),
+            currentStock: z.string().min(1).optional(),
+            availableStock: z.string().min(1).optional(),
+            inTransit: z.string().min(1).optional(),
+          })
+          .strict()
+      )
+      .optional(),
+  })
+  .strict();
+
 export const UiBriefPageSchema = z
   .object({
     id: PageIdSchema,
@@ -83,6 +178,7 @@ export const UiBriefPageSchema = z
     stats: z
       .array(z.object({ label: z.string().min(1), value: z.string().min(1) }).strict())
       .optional(),
+    content: UiBriefPageContentSchema.optional(),
   })
   .strict();
 

@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>库存查询 · 员工端</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+  <style>:root{
+  --color-surface-default:#FFFFFF;
+  --color-surface-subtle:#F5F6F8;
+  --color-surface-raised:#FFFFFF;
+  --color-text-primary:#111827;
+  --color-text-secondary:#6B7280;
+  --color-text-tertiary:#9CA3AF;
+  --color-text-onAction:#FFFFFF;
+  --color-action-primary:#111827;
+  --color-action-secondary:#F3F4F6;
+  --color-accent-customer:#2563EB;
+  --color-accent-inventory:#F97316;
+  --color-status-success:#16A34A;
+  --color-status-warning:#D97706;
+  --color-status-danger:#DC2626;
+  --color-status-info:#2563EB;
+  --color-border-subtle:#E5E7EB;
+  --color-border-strong:#D1D5DB;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-6:24px;
+  --space-8:32px;
+  --radius-sm:4px;
+  --radius-md:6px;
+  --radius-lg:12px;
+  --radius-full:9999px;
+  --motion-fast:120ms;
+  --motion-normal:200ms;
+  --motion-slow:320ms;
+  --type-heading-1-size:24px;--type-heading-1-line:32px;--type-heading-1-weight:600;
+  --type-heading-2-size:16px;--type-heading-2-line:24px;--type-heading-2-weight:600;
+  --type-heading-3-size:15px;--type-heading-3-line:22px;--type-heading-3-weight:600;
+  --type-body-md-size:13px;--type-body-md-line:18px;--type-body-md-weight:500;
+  --type-body-sm-size:13px;--type-body-sm-line:18px;--type-body-sm-weight:400;
+  --type-label-sm-size:12px;--type-label-sm-line:16px;--type-label-sm-weight:400;
+  --type-label-strong-size:12px;--type-label-strong-line:16px;--type-label-strong-weight:500;
+  font-family:"Noto Sans SC","PingFang SC",system-ui,-apple-system,sans-serif;
+  color:var(--color-text-primary);
+  background:#e9ebef;
+  -webkit-font-smoothing:antialiased;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{min-height:100vh;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;}
+.typo-heading-1{font-size:var(--type-heading-1-size);line-height:var(--type-heading-1-line);font-weight:var(--type-heading-1-weight);}
+.typo-heading-2{font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
+.typo-heading-3{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
+.typo-body-md{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
+.typo-body-sm{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);font-weight:var(--type-body-sm-weight);}
+.typo-label-sm{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);font-weight:var(--type-label-sm-weight);}
+.typo-label-strong{font-size:var(--type-label-strong-size);line-height:var(--type-label-strong-line);font-weight:var(--type-label-strong-weight);}
+.material-symbols-rounded{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:"FILL" 1,"wght" 500,"GRAD" 0,"opsz" 24;}
+.app{width:390px;height:844px;margin:0 auto;background:var(--color-surface-subtle);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 24px 64px rgba(0,0,0,.12);}
+.app-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:var(--space-4);scrollbar-width:none;}
+.app-scroll::-webkit-scrollbar{display:none;}
+.topbar{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;justify-content:space-between;background:var(--color-surface-subtle);position:relative;z-index:5;}
+.topbar-store{font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;gap:2px;}
+.topbar-chevron{font-size:20px;color:var(--color-text-secondary);}
+.topbar-bell{font-size:24px;color:var(--color-text-primary);}
+.page-header{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;gap:var(--space-2);background:var(--color-surface-subtle);}
+.back-icon{font-size:20px;}
+.page-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
+.tabbar{flex:0 0 64px;height:64px;background:var(--color-surface-default);border-top:1px solid var(--color-border-subtle);}
+.tabbar-inner{height:100%;display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0);}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--color-text-tertiary);min-width:56px;}
+.tab.active{color:var(--color-action-primary);}
+.tab-icon{font-size:22px;}
+.tab-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);font-weight:var(--type-label-sm-weight);}
+.section{display:flex;flex-direction:column;}
+.row{display:flex;align-items:stretch;}
+.stack{display:flex;flex-direction:column;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);}
+.card{background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-4);box-shadow:0 1px 2px rgba(17,24,39,.04);}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);}
+.card-illustration{width:80px;height:56px;flex:0 0 80px;display:block;}
+.card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
+.card-body{margin-top:var(--space-2);display:flex;flex-direction:column;gap:0;}
+.card-body>.list-row:not(:last-child){border-bottom:1px solid var(--color-border-subtle);}
+.quick-action{flex:1;height:56px;border:0;border-radius:var(--radius-md);background:var(--color-surface-subtle);display:flex;align-items:center;justify-content:center;gap:var(--space-2);transition:transform var(--motion-fast) ease,background var(--motion-normal) ease;}
+.quick-action:active{transform:scale(.98);}
+.quick-action.tone-customer{background:color-mix(in srgb,var(--color-accent-customer) 10%,white);}
+.quick-action.tone-inventory{background:color-mix(in srgb,var(--color-accent-inventory) 12%,white);}
+.quick-icon{font-size:24px;color:var(--color-action-primary);}
+.quick-action.tone-customer .quick-icon{color:var(--color-accent-customer);}
+.quick-action.tone-inventory .quick-icon{color:var(--color-accent-inventory);}
+.quick-label{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:10px 0;}
+.list-row-main{flex:1;min-width:0;}
+.list-row-title{display:flex;align-items:center;gap:6px;min-width:0;}
+.row-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-subtitle{margin-top:2px;font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);font-weight:var(--type-body-sm-weight);color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-meta{display:flex;align-items:center;gap:2px;white-space:nowrap;font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);}
+.row-chevron{font-size:16px;color:var(--color-text-tertiary);}
+.badge{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius-sm);font-size:var(--type-label-strong-size);line-height:var(--type-label-strong-line);font-weight:var(--type-label-strong-weight);white-space:nowrap;}
+.badge.tone-neutral{background:var(--color-surface-subtle);color:var(--color-text-secondary);}
+.badge.tone-success{background:color-mix(in srgb,var(--color-status-success) 12%,white);color:var(--color-status-success);}
+.badge.tone-warning{background:color-mix(in srgb,var(--color-status-warning) 12%,white);color:var(--color-status-warning);}
+.badge.tone-danger{background:color-mix(in srgb,var(--color-status-danger) 12%,white);color:var(--color-status-danger);}
+.badge.tone-info{background:color-mix(in srgb,var(--color-status-info) 12%,white);color:var(--color-status-info);}
+.badge.tone-customer{background:color-mix(in srgb,var(--color-accent-customer) 12%,white);color:var(--color-accent-customer);}
+.badge.tone-inventory{background:color-mix(in srgb,var(--color-accent-inventory) 12%,white);color:var(--color-accent-inventory);}
+.searchbar{height:36px;border-radius:var(--radius-md);background:var(--color-surface-default);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-3);color:var(--color-text-tertiary);}
+.search-icon{font-size:20px;}
+.search-placeholder{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
+.filter-row{display:flex;align-items:center;gap:var(--space-2);}
+.filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
+.filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
+.filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
+.filter-chevron{font-size:16px;color:var(--color-text-tertiary);}
+.switch-row{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.switch-label{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);}
+.switch{width:36px;height:20px;border-radius:var(--radius-full);position:relative;display:inline-block;transition:background var(--motion-fast) ease;}
+.switch.off{background:var(--color-border-strong);}
+.switch.on{background:var(--color-status-success);}
+.switch-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform var(--motion-fast) ease;}
+.switch.on .switch-thumb{transform:translateX(16px);}
+.switch-value{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
+.summary{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);padding:0 2px;}
+.inventory-card{background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);box-shadow:0 1px 2px rgba(17,24,39,.04);animation:fade-up var(--motion-slow) ease both;}
+.inventory-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-2);}
+.inventory-name{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
+.inventory-spec{font-size:var(--type-body-sm-size);font-weight:var(--type-body-sm-weight);color:var(--color-text-secondary);margin-left:2px;}
+.inventory-attrs{display:flex;flex-direction:column;gap:2px;}
+.attr{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
+.attr-label{color:var(--color-text-tertiary);}
+.attr-value{color:var(--color-text-secondary);font-weight:var(--type-body-md-weight);}
+.inventory-numbers{border-top:1px solid var(--color-border-subtle);padding-top:var(--space-2);display:flex;flex-direction:column;gap:2px;}
+.num-row{display:flex;align-items:baseline;gap:2px;}
+.num-label{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);color:var(--color-text-tertiary);}
+.num-value{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
+.in-transit{margin-left:auto;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
+.empty-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-6) var(--space-4);text-align:center;gap:4px;}
+.empty-icon{font-size:40px;color:var(--color-text-tertiary);margin-bottom:4px;}
+.empty-title{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);}
+.empty-desc{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
+.empty-actions{margin-top:var(--space-2);}
+body[data-state="empty"] .empty-state{display:flex;}
+body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card{display:none;}
+body[data-state="empty"] .summary{display:none;}
+.state-panel{display:none;position:absolute;left:0;right:0;top:48px;bottom:0;z-index:30;background:var(--color-surface-subtle);padding:var(--space-4);flex-direction:column;gap:var(--space-3);}
+.app.has-tabs .state-panel{bottom:64px;}
+body[data-state="loading"] .state-panel.loading{display:flex;}
+body[data-state="error"] .state-panel.error{display:flex;align-items:center;justify-content:center;}
+.skeleton{border-radius:var(--radius-lg);background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
+.skeleton.short{height:48px;}
+.skeleton.card{height:140px;}
+.error-box{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+.error-icon{font-size:40px;color:var(--color-text-tertiary);}
+.error-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
+.error-desc{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);color:var(--color-text-secondary);}
+.btn{height:36px;padding:0 var(--space-4);border:0;border-radius:var(--radius-md);font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
+.btn.primary{background:var(--color-action-primary);color:var(--color-text-onAction);}
+.btn.secondary{background:var(--color-action-secondary);color:var(--color-text-primary);}
+.btn.ghost{background:transparent;color:var(--color-text-secondary);}
+.state-switcher{position:fixed;left:calc(50% + 230px);top:24px;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:12px;background:#fff;box-shadow:0 4px 20px rgba(17,24,39,.12);font-size:12px;color:#6B7280;}
+.state-switcher-label{font-weight:600;color:#111827;}
+.state-switcher a{padding:2px 0;}
+.state-switcher a:hover{color:#111827;}
+@keyframes fade-up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@keyframes shimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:700px){body{background:var(--color-surface-subtle);}.app{box-shadow:none;height:100vh;min-height:844px;}.state-switcher{display:none;}}</style>
+</head>
+<body data-state="default">
+  <nav class="state-switcher" aria-label="预览状态">
+  <span class="state-switcher-label">状态</span>
+  <a href="?state=default">默认</a>
+  <a href="?state=empty">空</a>
+  <a href="?state=loading">加载</a>
+  <a href="?state=error">失败</a>
+</nav>
+  <div class="app ">
+  <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">库存查询</h1></header>
+  <main class="app-scroll"><section class="section" style="padding:var(--space-4);gap:var(--space-2)"><div class="searchbar">
+  <span class="material-symbols-rounded search-icon">search</span>
+  <span class="search-placeholder">搜索产品名称 / 规格</span>
+</div><div class="row filter-row" style="gap:var(--space-2)"><button class="filter" type="button">
+  <span class="filter-label">产品分类</span>
+  <span class="filter-value">全部</span>
+  <span class="material-symbols-rounded filter-chevron">expand_more</span>
+</button><div class="switch-row">
+  <span class="switch-label">仅看预警</span>
+  <span class="switch off"><span class="switch-thumb"></span></span>
+  <span class="switch-value">关</span>
+</div></div><div class="summary">共 128 个产品</div><article class="inventory-card">
+  <div class="inventory-head">
+    <div class="inventory-name">医用面膜<span class="inventory-spec">（25ml）</span></div>
+    <span class="badge tone-warning">低库存</span>
+  </div>
+  <div class="inventory-attrs"><div class="attr"><span class="attr-label">属性：</span><span class="attr-value">耗材</span></div><div class="attr"><span class="attr-label">分类：</span><span class="attr-value">面膜类</span></div><div class="attr"><span class="attr-label">单位：</span><span class="attr-value">瓶</span></div></div>
+  <div class="inventory-numbers">
+    <div class="num-row">
+      <span class="num-label">当前库存：</span>
+      <span class="num-value">1 瓶 2 次</span>
+    </div>
+    <div class="num-row">
+      <span class="num-label">可用库存：</span>
+      <span class="num-value">1 瓶 2 次</span>
+      <span class="in-transit">待收 20 次</span>
+    </div>
+  </div>
+</article><article class="inventory-card">
+  <div class="inventory-head">
+    <div class="inventory-name">玻尿酸原液<span class="inventory-spec">（2ml）</span></div>
+    <span class="badge tone-danger">缺货</span>
+  </div>
+  <div class="inventory-attrs"><div class="attr"><span class="attr-label">属性：</span><span class="attr-value">耗材</span></div><div class="attr"><span class="attr-label">分类：</span><span class="attr-value">原液类</span></div><div class="attr"><span class="attr-label">单位：</span><span class="attr-value">盒</span></div></div>
+  <div class="inventory-numbers">
+    <div class="num-row">
+      <span class="num-label">当前库存：</span>
+      <span class="num-value">0</span>
+    </div>
+    <div class="num-row">
+      <span class="num-label">可用库存：</span>
+      <span class="num-value">0</span>
+      
+    </div>
+  </div>
+</article><article class="inventory-card">
+  <div class="inventory-head">
+    <div class="inventory-name">光子仪器<span class="inventory-spec">（标准台）</span></div>
+    
+  </div>
+  <div class="inventory-attrs"><div class="attr"><span class="attr-label">属性：</span><span class="attr-value">仪器</span></div><div class="attr"><span class="attr-label">分类：</span><span class="attr-value">仪器类</span></div><div class="attr"><span class="attr-label">单位：</span><span class="attr-value">台</span></div></div>
+  <div class="inventory-numbers">
+    <div class="num-row">
+      <span class="num-label">当前库存：</span>
+      <span class="num-value">3 台</span>
+    </div>
+    <div class="num-row">
+      <span class="num-label">可用库存：</span>
+      <span class="num-value">3 台</span>
+      
+    </div>
+  </div>
+</article><article class="inventory-card">
+  <div class="inventory-head">
+    <div class="inventory-name">焕颜精华<span class="inventory-spec">（30ml）</span></div>
+    
+  </div>
+  <div class="inventory-attrs"><div class="attr"><span class="attr-label">属性：</span><span class="attr-value">零售</span></div><div class="attr"><span class="attr-label">分类：</span><span class="attr-value">精华类</span></div><div class="attr"><span class="attr-label">单位：</span><span class="attr-value">盒</span></div></div>
+  <div class="inventory-numbers">
+    <div class="num-row">
+      <span class="num-label">当前库存：</span>
+      <span class="num-value">5 盒</span>
+    </div>
+    <div class="num-row">
+      <span class="num-label">可用库存：</span>
+      <span class="num-value">5 盒</span>
+      <span class="in-transit">发出 2 盒</span>
+    </div>
+  </div>
+</article><article class="inventory-card">
+  <div class="inventory-head">
+    <div class="inventory-name">舒缓面膜<span class="inventory-spec">（25ml）</span></div>
+    
+  </div>
+  <div class="inventory-attrs"><div class="attr"><span class="attr-label">属性：</span><span class="attr-value">耗材</span></div><div class="attr"><span class="attr-label">分类：</span><span class="attr-value">面膜类</span></div><div class="attr"><span class="attr-label">单位：</span><span class="attr-value">盒</span></div></div>
+  <div class="inventory-numbers">
+    <div class="num-row">
+      <span class="num-label">当前库存：</span>
+      <span class="num-value">8 盒</span>
+    </div>
+    <div class="num-row">
+      <span class="num-label">可用库存：</span>
+      <span class="num-value">8 盒</span>
+      
+    </div>
+  </div>
+</article><div class="empty-state">
+  <span class="material-symbols-rounded empty-icon">search_off</span>
+  <div class="empty-title">没有匹配的产品</div>
+  <div class="empty-desc">试试清空筛选或更换关键词</div>
+  <div class="empty-actions"><button class="btn secondary" type="button">清空筛选</button></div>
+</div></section></main>
+  
+  
+  <div class="state-panel loading" aria-hidden="true">
+    <div class="skeleton short"></div>
+    <div class="skeleton card"></div>
+    <div class="skeleton card"></div>
+  </div>
+  <div class="state-panel error" aria-hidden="true">
+    <div class="error-box">
+      <span class="material-symbols-rounded error-icon">cloud_off</span>
+      <div class="error-title">加载失败</div>
+      <div class="error-desc">网络不稳定，请稍后重试</div>
+      <button class="btn primary" type="button">重试</button>
+    </div>
+  </div>
+</div>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const state = params.get("state");
+      if (state) document.body.dataset.state = state;
+    })();
+  </script>
+</body>
+</html>

@@ -5,7 +5,8 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "pnpm -r typecheck",
-    "phase1:verify": "tsx pipeline/orchestrator/src/cli.ts"
+    "phase1:verify": "tsx pipeline/orchestrator/src/cli.ts",
+    "render:html": "tsx packages/renderer-html/src/cli.ts"
   },
   "dependencies": {
     "zod": "^4.6.7"

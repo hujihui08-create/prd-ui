@@ -85,6 +85,23 @@ brief and manifest):
 pnpm phase1:verify --project samples/projects/demo-crm/project.yaml --runs /tmp/demo-crm-runs
 ```
 
+### Employee-app mobile slice
+
+`samples/projects/employee-app/` is a two-page mobile B-end slice generated from
+the employee mini-program PRD (`今日` + `库存查询`). It uses the `b-mobile`
+profile (mobile B-end baseline) and demonstrates the HTML renderer:
+
+```bash
+pnpm phase1:verify --project samples/projects/employee-app/project.yaml --runs /tmp/employee-app-runs
+pnpm render:html --run /tmp/employee-app-runs/<runId> --out /tmp/employee-app-html
+open /tmp/employee-app-html/index.html
+```
+
+The renderer uses the Page Spec + `b-mobile` tokens; `?state=empty|loading|error`
+switches states. A checked-in copy of the rendered slice and screenshots is under
+`artifacts/employee-app/`.
+
+
 ### CLI options
 
 ```text

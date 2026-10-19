@@ -1,21 +1,32 @@
 import type { Catalog, Profile } from "@prd-ui/contracts";
 import { archetypes, type ArchetypeDef } from "./archetypes.js";
 import { bDenseCatalog } from "./catalogs/b-dense.js";
+import { bMobileCatalog } from "./catalogs/b-mobile.js";
 import { cExpressiveCatalog } from "./catalogs/c-expressive.js";
 import { bDenseProfile } from "./profiles/b-dense.js";
+import { bMobileProfile } from "./profiles/b-mobile.js";
 import { cExpressiveProfile } from "./profiles/c-expressive.js";
 
 export { archetypes, type ArchetypeDef, type ArchetypeTarget } from "./archetypes.js";
-export { bDenseCatalog, cExpressiveCatalog, bDenseProfile, cExpressiveProfile };
+export {
+  bDenseCatalog,
+  bMobileCatalog,
+  cExpressiveCatalog,
+  bDenseProfile,
+  bMobileProfile,
+  cExpressiveProfile,
+};
 export { isLayoutPrimitive, layoutPrimitives } from "./primitives.js";
 
 const profiles: Record<string, Profile> = {
   "b-dense": bDenseProfile,
+  "b-mobile": bMobileProfile,
   "c-expressive": cExpressiveProfile,
 };
 
 const catalogs: Record<string, Catalog> = {
   "b-dense": bDenseCatalog,
+  "b-mobile": bMobileCatalog,
   "c-expressive": cExpressiveCatalog,
 };
 

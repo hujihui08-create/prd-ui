@@ -275,6 +275,202 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
         },
       };
     }
+    case "home": {
+      const content = page.content ?? {};
+      const quickActions =
+        content.quickActions && content.quickActions.length > 0
+          ? content.quickActions
+          : [
+              { label: "开单", icon: "receipt" },
+              { label: "预约", icon: "calendar" },
+            ];
+      const appointments = content.appointments ?? [];
+      const callbacks = content.callbacks ?? [];
+      const storeName = content.storeName ?? "星光店";
+      const hasMessage = content.hasMessage ?? true;
+      const activeTab = tabs[0] ?? page.name;
+
+      return {
+        type: "MobileShell",
+        props: {
+          title: page.name,
+          tabs,
+          showTabs: true,
+          storeName,
+          hasMessage,
+          activeTab,
+        },
+        reqRef: page.reqRefs[0] as ReqId | undefined,
+        slots: {
+          "top-bar": [{ type: "TopBar", props: { storeName, hasMessage } }],
+          content: [
+            {
+              type: "Section",
+              props: { padding: "space.4", gap: "space.3" },
+              children: [
+                {
+                  type: "Card",
+                  props: { title: "快捷操作" },
+                  children: [
+                    {
+                      type: "Row",
+                      props: { gap: "space.2" },
+                      children: quickActions.map((action) => ({
+                        type: "QuickAction",
+                        props: {
+                          label: action.label,
+                          icon: action.icon,
+                          tone: action.tone ?? "neutral",
+                        },
+                      })),
+                    },
+                  ],
+                },
+                {
+                  type: "Card",
+                  props: { title: "我的预约" },
+                  children: [
+                    ...appointments.map((appointment) => ({
+                      type: "ListRow",
+                      props: {
+                        title: appointment.customer,
+                        subtitle: appointment.item,
+                        meta: appointment.time,
+                        status: appointment.status,
+                        statusTone: appointment.statusTone ?? "info",
+                      },
+                    })),
+                    {
+                      type: "EmptyState",
+                      props: {
+                        title: content.appointmentsEmptyTitle ?? "今天没有预约",
+                        description: "客户直接上门？",
+                        icon: "event_busy",
+                      },
+                      children: [
+                        {
+                          type: "Button",
+                          props: { label: "当场开单", emphasis: "secondary" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: "Card",
+                  props: { title: "待回访" },
+                  children: [
+                    ...callbacks.map((callback) => ({
+                      type: "ListRow",
+                      props: {
+                        title: callback.customer,
+                        subtitle: callback.item,
+                        meta: callback.daysAgo,
+                      },
+                    })),
+                    {
+                      type: "EmptyState",
+                      props: {
+                        title: content.callbacksEmptyTitle ?? "暂无待回访",
+                        description: "近 30 天服务过、尚未回访的记录会出现在这里",
+                        icon: "call",
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+          "bottom-nav": [
+            { type: "TabBar", props: { items: tabs, active: activeTab } },
+          ],
+        },
+      };
+    }
+    case "inventory-list": {
+      const content = page.content ?? {};
+      const products = content.products ?? [];
+
+      return {
+        type: "MobileShell",
+        props: {
+          title: page.name,
+          tabs,
+          showTabs: false,
+          back: true,
+          activeTab: tabs[0] ?? "",
+        },
+        reqRef: page.reqRefs[0] as ReqId | undefined,
+        slots: {
+          content: [
+            {
+              type: "Section",
+              props: { padding: "space.4", gap: "space.2" },
+              children: [
+                {
+                  type: "SearchBar",
+                  props: { placeholder: "搜索产品名称 / 规格" },
+                },
+                {
+                  type: "Row",
+                  props: { gap: "space.2", variant: "filter" },
+                  children: [
+                    {
+                      type: "CollapsedFilter",
+                      props: {
+                        label: "产品分类",
+                        value: "全部",
+                        options: ["全部", "面膜类", "原液类", "仪器类", "精华类"],
+                      },
+                    },
+                    {
+                      type: "Switch",
+                      props: { label: "仅看预警", value: "关", state: "off" },
+                    },
+                  ],
+                },
+                {
+                  type: "SummaryRow",
+                  props: { text: content.inventorySummary ?? "共 128 个产品" },
+                },
+                ...products.map((product) => ({
+                  type: "InventoryCard",
+                  props: {
+                    name: product.name,
+                    spec: product.spec ?? "",
+                    badge: product.badge ?? "",
+                    badgeTone: product.badgeTone ?? "neutral",
+                    attributes: product.attributes ?? [],
+                    currentLabel: "当前库存",
+                    currentStock: product.currentStock ?? "0",
+                    availableLabel: "可用库存",
+                    availableStock: product.availableStock ?? "0",
+                    inTransit: product.inTransit ?? "",
+                  },
+                })),
+                {
+                  type: "EmptyState",
+                  props: {
+                    title:
+                      page.emptyTitle ??
+                      content.inventoryEmptyTitle ??
+                      "没有匹配的产品",
+                    description: "试试清空筛选或更换关键词",
+                    icon: "search_off",
+                  },
+                  children: [
+                    {
+                      type: "Button",
+                      props: { label: "清空筛选", emphasis: "secondary" },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      };
+    }
     case "auth":
       return {
         type: "MobileShell",

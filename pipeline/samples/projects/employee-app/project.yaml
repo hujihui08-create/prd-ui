@@ -1,0 +1,4 @@
+project: employee-app
+brief: ui-brief.json
+manifests:
+  b-mobile: asset-manifest.b-mobile.json

@@ -159,9 +159,9 @@ function checkNavigation(
 
   if (root.type === "MobileShell") {
     // Full-screen mobile pages (auth/onboarding) intentionally render no tabs.
-    // Every other mobile archetype must carry the brief's tabs; an omitted
-    // `tabs` prop is a missing navigation, not a pass.
+    // Secondary mobile pages can opt out explicitly with `showTabs: false`.
     if (spec.meta.archetype === "auth" || spec.meta.archetype === "onboarding") return;
+    if (root.props?.showTabs === false) return;
     const expectedTabs = navigation.tabs ?? navigation.primary;
     if (!Array.isArray(root.props?.tabs)) {
       push(
