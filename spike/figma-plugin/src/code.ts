@@ -1,6 +1,7 @@
 // spike/figma-plugin/src/code.ts
 import bPlan from "../../spec/figma-plan.b-end.json";
 import cPlan from "../../spec/figma-plan.c-end.json";
+import { resolveSizingModes } from "../../plan/layout-sizing";
 
 type Plan = typeof bPlan;
 type PlanNode = Plan["root"];
@@ -103,7 +104,11 @@ async function buildPlan(plan: Plan, pageName: string) {
   return root;
 }
 
-async function buildNode(node: PlanNode, context: BuildContext): Promise<SceneNode> {
+async function buildNode(
+  node: PlanNode,
+  context: BuildContext,
+  parentLayout?: "VERTICAL" | "HORIZONTAL"
+): Promise<SceneNode> {
   switch (node.type) {
     case "FRAME": {
       const frame = figma.createFrame();
@@ -115,39 +120,31 @@ async function buildNode(node: PlanNode, context: BuildContext): Promise<SceneNo
       frame.paddingBottom = padding;
       frame.paddingLeft = padding;
       frame.paddingRight = padding;
-      const hasWidth = node.width != null;
-      const hasHeight = node.height != null;
-      if (hasWidth && hasHeight) {
+      const sizing = resolveSizingModes({
+        ...node,
+        layout: node.layout as "VERTICAL" | "HORIZONTAL",
+        parentLayout,
+      });
+      if (node.width != null && node.height != null) {
         frame.resize(node.width, node.height);
-        frame.primaryAxisSizingMode = "FIXED";
-        frame.counterAxisSizingMode = "FIXED";
-      } else if (hasWidth) {
+      } else if (node.width != null) {
         frame.resize(node.width, frame.height);
-        if (node.layout === "HORIZONTAL") {
-          frame.primaryAxisSizingMode = "FIXED";
-          frame.counterAxisSizingMode = "AUTO";
-        } else {
-          frame.primaryAxisSizingMode = "AUTO";
-          frame.counterAxisSizingMode = "FIXED";
-        }
-      } else if (hasHeight) {
+      } else if (node.height != null) {
         frame.resize(frame.width, node.height);
-        if (node.layout === "HORIZONTAL") {
-          frame.primaryAxisSizingMode = "AUTO";
-          frame.counterAxisSizingMode = "FIXED";
-        } else {
-          frame.primaryAxisSizingMode = "FIXED";
-          frame.counterAxisSizingMode = "AUTO";
-        }
-      } else {
-        frame.primaryAxisSizingMode = "AUTO";
-        frame.counterAxisSizingMode = "AUTO";
       }
+      frame.primaryAxisSizingMode = sizing.primary;
+      frame.counterAxisSizingMode = sizing.counter;
       if (node.layoutGrow != null) frame.layoutGrow = node.layoutGrow;
       if (node.layoutAlign === "STRETCH") frame.layoutAlign = "STRETCH";
       if (node.fill) frame.fills = [paint(node.fill, context.variables)];
       for (const child of node.children) {
-        frame.appendChild(await buildNode(child, context));
+        frame.appendChild(
+          await buildNode(
+            child,
+            context,
+            node.layout as "VERTICAL" | "HORIZONTAL"
+          )
+        );
       }
       return frame;
     }

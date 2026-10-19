@@ -687,6 +687,52 @@
     }
   };
 
+  // ../plan/layout-sizing.ts
+  function resolveSizingModes(input) {
+    const hasWidth = input.width != null;
+    const hasHeight = input.height != null;
+    let primary;
+    let counter;
+    if (hasWidth && hasHeight) {
+      primary = "FIXED";
+      counter = "FIXED";
+    } else if (hasWidth) {
+      if (input.layout === "HORIZONTAL") {
+        primary = "FIXED";
+        counter = "AUTO";
+      } else {
+        primary = "AUTO";
+        counter = "FIXED";
+      }
+    } else if (hasHeight) {
+      if (input.layout === "HORIZONTAL") {
+        primary = "AUTO";
+        counter = "FIXED";
+      } else {
+        primary = "FIXED";
+        counter = "AUTO";
+      }
+    } else {
+      primary = "AUTO";
+      counter = "AUTO";
+    }
+    if (input.parentLayout) {
+      const parentHorizontal = input.parentLayout === "HORIZONTAL";
+      const childHorizontal = input.layout === "HORIZONTAL";
+      if (input.layoutGrow === 1) {
+        const growAffectsChildPrimary = parentHorizontal === childHorizontal;
+        if (growAffectsChildPrimary) primary = "FIXED";
+        else counter = "FIXED";
+      }
+      if (input.layoutAlign === "STRETCH") {
+        const stretchAffectsChildPrimary = parentHorizontal !== childHorizontal;
+        if (stretchAffectsChildPrimary) primary = "FIXED";
+        else counter = "FIXED";
+      }
+    }
+    return { primary, counter };
+  }
+
   // src/code.ts
   var SAMPLE_PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lK3l5QAAAABJRU5ErkJggg==";
   function hexToRgb(hex) {
@@ -770,7 +816,7 @@
     figma.viewport.scrollAndZoomIntoView([root]);
     return root;
   }
-  async function buildNode(node, context) {
+  async function buildNode(node, context, parentLayout) {
     var _a, _b, _c, _d;
     switch (node.type) {
       case "FRAME": {
@@ -783,39 +829,30 @@
         frame.paddingBottom = padding;
         frame.paddingLeft = padding;
         frame.paddingRight = padding;
-        const hasWidth = node.width != null;
-        const hasHeight = node.height != null;
-        if (hasWidth && hasHeight) {
+        const sizing = resolveSizingModes(__spreadProps(__spreadValues({}, node), {
+          layout: node.layout,
+          parentLayout
+        }));
+        if (node.width != null && node.height != null) {
           frame.resize(node.width, node.height);
-          frame.primaryAxisSizingMode = "FIXED";
-          frame.counterAxisSizingMode = "FIXED";
-        } else if (hasWidth) {
+        } else if (node.width != null) {
           frame.resize(node.width, frame.height);
-          if (node.layout === "HORIZONTAL") {
-            frame.primaryAxisSizingMode = "FIXED";
-            frame.counterAxisSizingMode = "AUTO";
-          } else {
-            frame.primaryAxisSizingMode = "AUTO";
-            frame.counterAxisSizingMode = "FIXED";
-          }
-        } else if (hasHeight) {
+        } else if (node.height != null) {
           frame.resize(frame.width, node.height);
-          if (node.layout === "HORIZONTAL") {
-            frame.primaryAxisSizingMode = "AUTO";
-            frame.counterAxisSizingMode = "FIXED";
-          } else {
-            frame.primaryAxisSizingMode = "FIXED";
-            frame.counterAxisSizingMode = "AUTO";
-          }
-        } else {
-          frame.primaryAxisSizingMode = "AUTO";
-          frame.counterAxisSizingMode = "AUTO";
         }
+        frame.primaryAxisSizingMode = sizing.primary;
+        frame.counterAxisSizingMode = sizing.counter;
         if (node.layoutGrow != null) frame.layoutGrow = node.layoutGrow;
         if (node.layoutAlign === "STRETCH") frame.layoutAlign = "STRETCH";
         if (node.fill) frame.fills = [paint(node.fill, context.variables)];
         for (const child of node.children) {
-          frame.appendChild(await buildNode(child, context));
+          frame.appendChild(
+            await buildNode(
+              child,
+              context,
+              node.layout
+            )
+          );
         }
         return frame;
       }
