@@ -53,7 +53,12 @@ async function buildPlan(plan: Plan, pageName: string) {
   const variables: Record<string, Variable> = {};
   for (const [name, value] of Object.entries(plan.tokens)) {
     if (!name.startsWith("color.")) continue;
-    const variable = figma.variables.createVariable(name, collection, "COLOR");
+    const variable = figma.variables.createVariable(
+      // Figma variable names do not allow dots; use slash-separated groups.
+      name.replace(/\./g, "/"),
+      collection,
+      "COLOR"
+    );
     variable.setValueForMode(modeId, { ...hexToRgb(value as string), a: 1 });
     variables[name] = variable;
   }
