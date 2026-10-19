@@ -24,7 +24,7 @@
 | 检查项 | 结果 | 证据 | 备注 |
 |---|---|---|---|
 | 单元测试 | **pass** | `pnpm test` 输出 | 4 个测试文件 / 20 个测试全部通过 |
-| plan 编译 | **pass** | `spike/spec/figma-plan.{b,c}-end.json` | `pnpm plan` 生成两份 plan；B 有 12 个 `STRETCH` + Content `layoutGrow: 1`，C 有 4 个 `STRETCH` |
+| plan 编译 | **pass** | `spike/spec/figma-plan.{b,c}-end.json` | `pnpm plan` 生成两份 plan；B 有 12 个 `STRETCH` + Content `layoutGrow: 1`，C 有 7 个 `STRETCH`（含 FeedContent / FeedText / FeedCard） |
 | HTML 构建 | **pass** | `spike/dist-html/` | Vite 构建成功，21 个模块 |
 | HTML 布局 / 无溢出 | **pass** | `spike/artifacts/b-end.png`、`spike/artifacts/c-end.png` | `pnpm test:e2e` 2 passed；console / pageerror 断言为空（自动化）；两张截图已人工查看 |
 | Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,663 bytes，含两份 plan，无未解析 import |
