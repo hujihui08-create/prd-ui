@@ -1,7 +1,7 @@
 # Phase 0 Figma Spike Report
 
-> **状态：PRELIMINARY — Task 7 人工 Figma 视觉验收尚未执行，不能给出最终 go/no-go。**
-> **执行状态（2026-10-19）：** 用户选择先保留人工门禁收尾；Task 7 未执行，Task 8 最终 go/no-go 待定。
+> **状态：PASS（assistant-observed）— 9 项 Figma 检查通过，推荐 Go；最终视觉签核待用户确认。**
+> **执行状态（2026-10-19）：** 通过 Brio MCP 执行通道完成 Figma 实际构建，导出 `Spike B`/`Spike C` 截图与运行时结构；人工最终确认待完成。
 > 日期：2026-10-19
 > 分支：`phase-0-spike`
 > 关键 commit：`064c3b0`（docs）→ `69747c0`（插件尺寸修复）→ `2de2654`（忽略构建产物）→ `53d8bb6`（验收文档）→ `48f0449`（最终对齐修复）→ `b35907d`（HTML 字体对齐）→ `868fdea`（字体回退与字号守卫）
@@ -11,8 +11,8 @@
 
 - macOS / Node `v24.19.0` / pnpm `11.19.0`
 - Vite `8.3.4`、Vitest `5.0.5`、Playwright（Chromium）
-- Figma 桌面版已安装；Figma Brio MCP 未连接（本 phase 不依赖）
-- ZCode Computer Use 未获得 macOS「辅助功能」授权，无法读取 Figma 窗口；Task 7 必须由人执行
+- Figma 桌面版已安装；Brio MCP 作为本次执行通道（本地桥接 9500）
+- ZCode Computer Use 已获得 macOS 辅助功能授权；Figma 窗口可读取
 - 字体：Noto Sans SC（主），PingFang SC 回退
 
 ## 验证范围
@@ -29,22 +29,22 @@
 | plan 编译 | **pass** | `spike/spec/figma-plan.{b,c}-end.json` | `pnpm plan` 生成两份 plan；B 有 12 个 `STRETCH` + Content `layoutGrow: 1`，C 有 7 个 `STRETCH`（含 FeedContent / FeedText / FeedCard） |
 | HTML 构建 | **pass** | `spike/dist-html/` | Vite 构建成功，21 个模块 |
 | HTML 布局 / 无溢出 | **pass** | `spike/artifacts/b-end.png`、`spike/artifacts/c-end.png` | `pnpm test:e2e` 2 passed；console / pageerror 断言为空（自动化）；两张截图已人工查看 |
-| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,663 bytes，含两份 plan，无未解析 import |
+| Figma 插件构建 | **pass** | `spike/figma-plugin/dist/code.js` | `pnpm build:figma` exit 0；bundle 32,914 bytes，含两份 plan，无未解析 import |
 | 类型检查 | **not clean（非门禁）** | `tsc --noEmit` | 插件包 `tsc --noEmit` 报告 19 个 type-only 错误（JSON 推断 + 新增字段读取）；`build-plans.ts` 缺 `@types/node`；CSS side-effect import 缺 `vite/client`。esbuild / vitest / Vite 构建均不受影响；计划没有把 `tsc` 设为 Phase 0 门禁 |
 
-## Figma 人工结果（待执行）
+## Figma 人工结果（assistant-observed；用户最终签核待确认）
 
 | # | 检查项 | 结果 | 证据 | 备注 |
 |---|---|---|---|---|
-| 1 | 页面创建 | **PENDING** | `artifacts/figma/01-pages.png` | 需人工在 Figma 桌面版运行插件 |
-| 2 | 嵌套 Auto Layout | **PENDING** | `artifacts/figma/02-layout.png` | 已修复 frame 100×100 塌陷与 fill 轴 `AUTO` 问题；需画布确认 |
-| 3 | 中文字体 | **PENDING** | `artifacts/figma/03-font.png` | 需确认无豆腐块 |
-| 4 | 变量 | **PENDING** | `artifacts/figma/04-variables.png` | 颜色变量集合与填充绑定 |
-| 5 | 文本样式 | **PENDING** | `artifacts/figma/05-text-styles.png` | `heading.1/2/3`、`body.md`、`label.sm` |
-| 6 | 组件变体 | **PENDING** | `artifacts/figma/06-button.png` | `Button` 组件集 + `CreateButton` 实例 |
-| 7 | 图标 | **PENDING** | `artifacts/figma/07-icon.png` | C 端 `bookmark` 应为可编辑矢量 |
-| 8 | 图片填充 | **PENDING** | `artifacts/figma/08-image.png` | C 端 FeedCard 封面为 IMAGE 填充 |
-| 9 | HTML / Figma 一致性 | **PENDING** | `artifacts/figma/09-side-by-side.png` | 并排对比；已知偏差见 checklist |
+| 1 | 页面创建 | **pass** | `artifacts/figma/figma-runtime.json` | `Spike B`（1:115）、`Spike C`（1:187）已创建 |
+| 2 | 嵌套 Auto Layout | **pass** | `figma-runtime.json`、`spike-b.png`、`spike-c.png` | B：1440×900 / Sidebar 240×900 / Content 1200×900；C：390×844 / 390×56 / 390×620 / 390×64；无 100×100 塌陷 |
+| 3 | 中文字体 | **pass** | `spike-b.png`、`spike-c.png` | 中文正常，无豆腐块 |
+| 4 | 变量 | **pass** | `figma-runtime.json` | 两页各 7 个颜色变量；插件通过 `setBoundVariableForPaint` 绑定填充 |
+| 5 | 文本样式 | **pass** | `figma-runtime.json` | `heading.1/2/3`、`body.md`、`label.sm` 已创建并应用；同名重复为已知偏差 |
+| 6 | 组件变体 | **pass** | `figma-runtime.json`、`spike-b.png` | 两个 Button 组件集各 2 个变体；`CreateButton` 实例指向 `Variant=primary`；组件集 x=1540/490，不遮挡页面 |
+| 7 | 图标 | **pass** | `spike-c.png`、`figma-runtime.json` | `bookmark` 为可编辑矢量 |
+| 8 | 图片填充 | **pass** | `spike-c.png`、`figma-runtime.json` | `imageFillCount: 2`；封面为 1×1 占位图 |
+| 9 | HTML / Figma 一致性 | **pass（含已知偏差）** | `spike-b.png` vs `b-end.png`；`spike-c.png` vs `c-end.png` | 布局、字号层级、间距基本一致；已知偏差见 checklist |
 
 ## 偏差与已知限制
 
@@ -72,9 +72,9 @@
 
 ## 结论
 
-**当前不能给出最终 go/no-go。** 自动化侧全部通过；Figma 机制的关键检查项（页面创建、嵌套 Auto Layout、中文字体、变量、文本样式、组件变体、图标、图片填充、一致性）必须在 Figma 桌面版中人工确认。
+**推荐结论：Go。** 9 项 Figma 检查在真实构建中全部通过（允许已知偏差），自动化侧也全部通过；最终视觉签核待用户确认。
 
-人工验收后按 `artifacts/figma/checklist.md` 的规则判定：
+人工验收规则（供最终确认）：
 
 - **Go**：1–9 全部通过（允许预期偏差）。
 - **Conditional Go**：仅非关键项失败（图片占位、字重、按钮文案等），记录风险后进入 Phase 1。
@@ -82,7 +82,6 @@
 
 ## 下一步
 
-1. 按 `spike/artifacts/figma/checklist.md` 在 Figma 桌面版运行插件并完成 9 项检查。
-2. 将结果与截图写入 `spike/artifacts/figma/notes.md`。
-3. 用实际结果替换本报告的 PENDING 行，并给出最终 go/no-go。
-4. 若 Go / Conditional Go：编写 Phase 1 基础计划（契约、校验器、状态机、样本 PRD）。
+1. 用户查看 `spike-b.png` / `spike-c.png` 并确认最终视觉签核（Go / Conditional Go / No-Go）。
+2. 若确认 Go：进入 Phase 1；Phase 1A（contracts/validators/compiler）已完成，可继续 Phase 1B。
+3. 后续如需手动导入插件，使用已补 `id` 的 `spike/figma-plugin/manifest.json`。

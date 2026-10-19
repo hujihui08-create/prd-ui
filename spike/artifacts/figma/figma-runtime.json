@@ -1,0 +1,212 @@
+{
+  "fileName": "Untitled",
+  "pages": [
+    {
+      "name": "Page 1",
+      "id": "0:1",
+      "root": null
+    },
+    {
+      "name": "Spike B",
+      "id": "1:115",
+      "root": {
+        "name": "PageShell",
+        "id": "1:134",
+        "width": 1440,
+        "height": 900,
+        "layoutMode": "HORIZONTAL",
+        "primaryAxisSizingMode": "FIXED",
+        "counterAxisSizingMode": "FIXED",
+        "children": [
+          {
+            "name": "Sidebar",
+            "type": "FRAME",
+            "width": 240,
+            "height": 900,
+            "layoutMode": "VERTICAL",
+            "primaryAxisSizingMode": "FIXED",
+            "counterAxisSizingMode": "FIXED",
+            "layoutAlign": "STRETCH",
+            "layoutGrow": 0
+          },
+          {
+            "name": "Content",
+            "type": "FRAME",
+            "width": 1200,
+            "height": 900,
+            "layoutMode": "VERTICAL",
+            "primaryAxisSizingMode": "FIXED",
+            "counterAxisSizingMode": "FIXED",
+            "layoutAlign": "STRETCH",
+            "layoutGrow": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Spike C",
+      "id": "1:187",
+      "root": {
+        "name": "MobileShell",
+        "id": "1:206",
+        "width": 390,
+        "height": 844,
+        "layoutMode": "VERTICAL",
+        "primaryAxisSizingMode": "FIXED",
+        "counterAxisSizingMode": "FIXED",
+        "children": [
+          {
+            "name": "TopBar",
+            "type": "FRAME",
+            "width": 390,
+            "height": 56,
+            "layoutMode": "HORIZONTAL",
+            "primaryAxisSizingMode": "FIXED",
+            "counterAxisSizingMode": "FIXED",
+            "layoutAlign": "STRETCH",
+            "layoutGrow": 0
+          },
+          {
+            "name": "FeedContent",
+            "type": "FRAME",
+            "width": 390,
+            "height": 620,
+            "layoutMode": "VERTICAL",
+            "primaryAxisSizingMode": "AUTO",
+            "counterAxisSizingMode": "FIXED",
+            "layoutAlign": "STRETCH",
+            "layoutGrow": 0
+          },
+          {
+            "name": "BottomNav",
+            "type": "FRAME",
+            "width": 390,
+            "height": 64,
+            "layoutMode": "HORIZONTAL",
+            "primaryAxisSizingMode": "FIXED",
+            "counterAxisSizingMode": "FIXED",
+            "layoutAlign": "STRETCH",
+            "layoutGrow": 0
+          }
+        ]
+      }
+    }
+  ],
+  "textStyles": [
+    {
+      "name": "heading.1",
+      "fontSize": 32,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 40
+      }
+    },
+    {
+      "name": "heading.2",
+      "fontSize": 24,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 32
+      }
+    },
+    {
+      "name": "heading.3",
+      "fontSize": 18,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 26
+      }
+    },
+    {
+      "name": "body.md",
+      "fontSize": 14,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 20
+      }
+    },
+    {
+      "name": "label.sm",
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    },
+    {
+      "name": "heading.1",
+      "fontSize": 28,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 36
+      }
+    },
+    {
+      "name": "heading.2",
+      "fontSize": 22,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 30
+      }
+    },
+    {
+      "name": "heading.3",
+      "fontSize": 18,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 26
+      }
+    },
+    {
+      "name": "body.md",
+      "fontSize": 15,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 24
+      }
+    },
+    {
+      "name": "label.sm",
+      "fontSize": 12,
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 16
+      }
+    }
+  ],
+  "collections": [
+    {
+      "name": "Spike B Tokens",
+      "variables": 7
+    },
+    {
+      "name": "Spike C Tokens",
+      "variables": 7
+    }
+  ],
+  "componentSets": [
+    {
+      "name": "Button",
+      "variants": 2,
+      "x": 1540,
+      "y": 0
+    },
+    {
+      "name": "Button",
+      "variants": 2,
+      "x": 490,
+      "y": 0
+    }
+  ],
+  "instances": [
+    {
+      "name": "CreateButton",
+      "mainComponent": "Variant=primary"
+    }
+  ],
+  "textNodeCount": 51,
+  "imageFillCount": 2,
+  "vectorIconNames": [
+    "bookmark"
+  ]
+}

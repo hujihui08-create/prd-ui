@@ -86,12 +86,26 @@ function execute(ws, code, timeout = 120000) {
   });
 }
 
+function parseResult(value) {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 async function run(ws) {
   const cleanupCode = `
     const stalePages = figma.root.children.filter(
       (p) =>
         p.type === "PAGE" && (p.name === "Spike B" || p.name === "Spike C"),
     );
+    const keepPage = figma.root.children.find(
+      (p) =>
+        p.type === "PAGE" && !stalePages.some((stale) => stale.id === p.id),
+    );
+    if (keepPage) await figma.setCurrentPageAsync(keepPage);
     for (const page of stalePages) page.remove();
 
     const staleCollections = figma.variables
@@ -231,7 +245,7 @@ return "spike built";
   const inspect = await execute(ws, inspectCode);
   writeFileSync(
     join(artifacts, "figma-runtime.json"),
-    JSON.stringify(inspect.result, null, 2),
+    JSON.stringify(parseResult(inspect.result), null, 2),
   );
   log("inspection written");
 
@@ -258,12 +272,13 @@ return "spike built";
 
     log(`exporting ${pageName}...`);
     const shot = await execute(ws, shotCode, 180000);
-    if (shot.result && shot.result.bytes) {
-      const buffer = Buffer.from(shot.result.bytes);
+    const shotResult = parseResult(shot.result);
+    if (shotResult && shotResult.bytes) {
+      const buffer = Buffer.from(shotResult.bytes);
       writeFileSync(join(artifacts, fileName), buffer);
       log(`wrote ${fileName}`, buffer.length);
     } else {
-      log("screenshot failed", pageName, JSON.stringify(shot.result));
+      log("screenshot failed", pageName, JSON.stringify(shotResult));
     }
   }
 
