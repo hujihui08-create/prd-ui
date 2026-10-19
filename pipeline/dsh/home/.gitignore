@@ -1,0 +1,7 @@
+node_modules/
+.credentials.yaml
+.env
+*.log
+sessions/
+storages/
+.anonymous-user-id

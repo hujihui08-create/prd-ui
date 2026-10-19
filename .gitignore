@@ -2,5 +2,9 @@ node_modules/
 .DS_Store
 .superpowers/
 
+# local secrets
+.env
+pipeline/.env
+
 # spike bridge logs
 spike/artifacts/figma/*.log

@@ -772,7 +772,7 @@ git commit -m "feat: add dsh asset reviewer plugin and headless adapter"
 - `cordis.patch.yml`: register `dsh-llm-pi-ai` vision provider with `apiKeyEnv: PRD_UI_VISION_API_KEY`, `defaultInput: [text, image]`, and `agent-default-model` pointing to it; insert `@prd-ui/runtime-dsh`.
 - `.env.example`: `PRD_UI_VISION_API_KEY=`, `PRD_UI_VISION_BASE_URL=`, `PRD_UI_VISION_MODEL=`.
 
-- [ ] **Step 1: Install pinned dsh**
+- [x] **Step 1: Install pinned dsh**
 
 ```bash
 cd pipeline
@@ -781,7 +781,7 @@ pnpm add -D @deepseek-ai/dsh@0.2.1-rc.2
 
 If install fails, record the failure and keep the devDependency pin in `package.json`; do not add `@next`.
 
-- [ ] **Step 2: Create profile and install**
+- [x] **Step 2: Create profile and install**
 
 ```bash
 cd pipeline/dsh/home/profiles/prd-ui-assets
@@ -790,7 +790,7 @@ pnpm install
 
 Verify `node_modules/@prd-ui/runtime-dsh` and the dsh bundles resolve.
 
-- [ ] **Step 3: Spike: headless profile**
+- [x] **Step 3: Spike: headless profile**
 
 Run:
 
@@ -801,11 +801,11 @@ DSH_HOME="$PWD/dsh/home" ./node_modules/.bin/dsh --profile prd-ui-assets "Return
 
 Expected: stdout contains `{"ok":true}` and exit 0. If the profile/plugin loader fails, record the exact error in `pipeline/dsh/README.md` and try the fallback (direct `npx -y @deepseek-ai/dsh@0.2.1-rc.2` with the same `DSH_HOME`). Do not modify `~/.dsh`.
 
-- [ ] **Step 4: Wire `--runtime dsh` in the CLI**
+- [x] **Step 4: Wire `--runtime dsh` in the CLI**
 
 Add `DshAssetReviewer` to `asset-cli.ts` with dynamic import. `DSH_HOME` defaults to `pipeline/dsh/home`; `profile` defaults to `prd-ui-assets`; `dshBin` defaults to `pipeline/node_modules/.bin/dsh`; `cwd` defaults to `pipeline`. Missing key or binary → `configuration_error` with the exact env var/path.
 
-- [ ] **Step 5: Run dsh smoke test**
+- [x] **Step 5: Run dsh smoke test**
 
 ```bash
 cd pipeline
@@ -814,7 +814,7 @@ pnpm asset:review --project samples/projects/employee-app/project.yaml --assets 
 
 If no key: assert a clear `configuration_error`; do not fake a pass. Record the blocker in the changelog.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pipeline/dsh pipeline/.env.example pipeline/package.json pipeline/pnpm-lock.yaml .gitignore

@@ -1,5 +1,4 @@
-import { DOMParser, type Document, type Element, type Node } from "@xmldom/xmldom";
-import { optimize } from "svgo";
+import { DOMParser, XMLSerializer, type Document, type Element, type Node } from "@xmldom/xmldom";
 import type { HardGateIssue, HardGateResult } from "../contracts.js";
 
 export interface ParsedSvg {
@@ -25,7 +24,11 @@ export function parseSvg(svg: string): ParsedSvg | null {
 }
 
 export function normalizeSvg(svg: string): string {
-  return optimize(svg, { plugins: ["preset-default"] }).data;
+  const parsed = parseSvg(svg);
+  if (!parsed) {
+    throw new Error("SVG_INVALID: cannot normalize a malformed SVG document");
+  }
+  return new XMLSerializer().serializeToString(parsed.document);
 }
 
 export function elementName(element: Element): string {

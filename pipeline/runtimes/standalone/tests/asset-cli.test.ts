@@ -181,19 +181,22 @@ describe("asset:review CLI", () => {
     expect(result.stderr).toContain("PRD_UI_VISION_API_KEY");
   });
 
-  it("surfaces a missing dsh binary without a fake pass", async () => {
+  it("surfaces a missing vision credential without a fake pass", async () => {
     const runs = await tempRuns();
-    const result = await runCli([
-      "--project",
-      projectPath,
-      "--assets",
-      m0,
-      "--runtime",
-      "dsh",
-      "--runs",
-      runs,
-    ]);
+    const result = await runCli(
+      [
+        "--project",
+        projectPath,
+        "--assets",
+        m0,
+        "--runtime",
+        "dsh",
+        "--runs",
+        runs,
+      ],
+      { ...process.env, PRD_UI_VISION_API_KEY: "" }
+    );
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("DSH_UNAVAILABLE");
+    expect(result.stderr).toMatch(/MISSING_CREDENTIAL|PRD_UI_VISION_API_KEY/);
   });
 });

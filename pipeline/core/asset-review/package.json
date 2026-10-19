@@ -10,7 +10,6 @@
   "dependencies": {
     "@prd-ui/contracts": "workspace:*",
     "@xmldom/xmldom": "^0.9.12",
-    "svgo": "^4.1.0",
     "zod": "^4.6.7"
   }
 }
