@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "project": "demo-crm",
+    "version": "0.1.0",
+    "sourcePrdHash": "sha256:demo-crm",
+    "date": "2026-10-19",
+    "profile": "b-dense",
+    "platforms": ["web"]
+  },
+  "product": {
+    "name": "联系人管理",
+    "type": "b-end",
+    "goals": ["管理联系人"],
+    "users": ["销售"],
+    "roles": ["admin"],
+    "scope": ["联系人列表"],
+    "nonGoals": [],
+    "successMetrics": ["可以查看联系人"]
+  },
+  "ia": {
+    "pages": [
+      {
+        "id": "contacts-list",
+        "name": "联系人列表",
+        "purpose": "查看和管理联系人",
+        "archetype": "list",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/contacts",
+        "roles": ["admin"],
+        "requiredStates": ["default", "empty", "loading", "error"],
+        "reqRefs": ["REQ-CRM-001"],
+        "fields": ["name", "email", "phone"],
+        "filterFields": ["name", "email"],
+        "actions": ["新建联系人"],
+        "emptyTitle": "暂无联系人",
+        "emptyAssetRef": "empty-contacts"
+      }
+    ],
+    "navigation": {
+      "primary": ["联系人", "设置"]
+    },
+    "flows": [
+      {
+        "id": "contacts-view",
+        "steps": ["contacts-list"]
+      }
+    ]
+  },
+  "data": {
+    "entities": [
+      {
+        "name": "Contact",
+        "fields": [
+          { "name": "name", "type": "string", "required": true },
+          { "name": "email", "type": "string" },
+          { "name": "phone", "type": "string" }
+        ]
+      }
+    ]
+  },
+  "assets": {
+    "icons": ["search", "plus", "user"],
+    "illustrations": [],
+    "images": []
+  },
+  "designDirection": {
+    "profile": "b-dense",
+    "density": "dense",
+    "tone": "neutral",
+    "motionLevel": "low"
+  },
+  "openQuestions": [],
+  "assumptions": [
+    { "id": "A-001", "statement": "联系人数据为示例数据" }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-CRM-001": ["contacts-list"]
+    },
+    "unmapped": []
+  }
+}

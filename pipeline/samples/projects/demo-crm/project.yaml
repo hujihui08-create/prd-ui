@@ -1,0 +1,4 @@
+project: demo-crm
+brief: ui-brief.json
+manifests:
+  b-dense: asset-manifest.b-dense.json

@@ -5,24 +5,25 @@ into eight Page Specs, validates each page against its design profile, catalog,
 archetype, and asset manifest, and writes a complete run record under
 `runs/<runId>/`.
 
-## Current limitations (Phase 1A)
+Phase 1B adds project configuration (`project.yaml`), CLI overrides for custom
+briefs and manifests, brief-driven page content, Brief → Page Spec semantic
+validation, and a second end-to-end project, `samples/projects/demo-crm`.
 
-**Phase 1A is a sample harness, not a general user-facing pipeline.** Independent
-user testing on 2026-10-19 confirmed:
+## Current limitations
 
-- Only the `demo-orders` sample can pass. Asset manifests are hardcoded per
-  profile; a new project fails `ASSET-PROJECT` and has no supported manifest
-  configuration path.
-- `pnpm phase1:verify` accepts no custom brief or PRD. Extra arguments are
-  ignored; a custom brief requires importing `runPhase1` in a script.
-- Compiler templates are sample-specific. A custom `list` page can validate with
-  0 blockers while still rendering order-specific navigation, filters, empty
-  state, and actions.
-- Validators do not detect Brief-to-layout semantic mismatches.
-- `PageSpec.meta` does not carry `purpose`, `route`, or `roles`.
-- There is no PRD → UI Brief ingestion; `sample-prd.md` is illustrative only.
+- There is no PRD → UI Brief ingestion. `samples/sample-prd.md` is illustrative
+  only; users author a `UiBrief` JSON (and project config) by hand until
+  Phase 2.
+- There is no real design-system ingestion. `b-dense` and `c-expressive` are
+  built-in baselines; custom profiles and catalogs cannot be registered yet.
+- The `onboarding` archetype is implemented but not exercised by a sample
+  project.
+- Some compiler fallback copy is generic, for example `暂无${page.name}` when a
+  `list` page omits `emptyTitle`.
+- Asset manifests declare file paths, formats, licenses, and optional hashes,
+  but real asset files and hashes are not ingested or verified.
 
-Full findings and the recommended next steps are in
+The original independent user-acceptance findings are in
 [`docs/user-acceptance-2026-10-19.md`](docs/user-acceptance-2026-10-19.md).
 
 ## Commands
@@ -43,6 +44,66 @@ Phase 1A OK: 8 pages, 0 blockers
 ```
 
 and exit 0. Any blocking finding exits 1 and leaves a failed run behind.
+
+## Using your own project
+
+A project is a directory containing a `project.yaml`, a `UiBrief` JSON file, and
+one asset manifest per design profile:
+
+```text
+my-project/
+  project.yaml
+  ui-brief.json
+  asset-manifest.b-dense.json
+```
+
+`project.yaml`:
+
+```yaml
+project: my-project        # must match ui-brief.json meta.project
+brief: ui-brief.json       # resolved relative to this file
+manifests:                 # resolved relative to this file
+  b-dense: asset-manifest.b-dense.json
+# runsDir: runs            # optional; resolved relative to this file
+```
+
+Every page `profile` used by the brief must have a manifest entry, and each
+manifest must declare the same `project` and `profile`. Run the project with:
+
+```bash
+pnpm phase1:verify --project <path/to/project.yaml>
+```
+
+The project's brief and manifests are loaded from the config, so `--brief` and
+`--manifest` are not needed. The runs directory defaults to `./runs` unless
+`--runs` or the project's `runsDir` is set.
+
+`demo-crm` is a complete second example (one `contacts-list` page with its own
+brief and manifest):
+
+```bash
+pnpm phase1:verify --project samples/projects/demo-crm/project.yaml --runs /tmp/demo-crm-runs
+```
+
+### CLI options
+
+```text
+pnpm phase1:verify [options]
+
+Options:
+  --project <path>              Load a project config (YAML)
+  --brief <path>                Override the brief path
+  --manifest <profile>=<path>   Add or override an asset manifest (repeatable)
+  --runs <dir>                  Directory that receives run artifacts
+  -h, --help                    Print this help and exit
+```
+
+- With no options, `samples/project.demo-orders.yaml` runs.
+- `--brief` and `--manifest` paths are resolved against the working directory;
+  repeat `--manifest` once per profile. A custom brief requires manifests.
+- `--help` prints usage, exits 0, and does not run the pipeline.
+- On success the CLI prints `Phase 1A OK: <n> pages, <n> blockers` and the run
+  directory (`Run: <path>`). All artifacts live under that directory.
 
 ## Workspace
 
@@ -84,13 +145,15 @@ The brief gate runs after parsing and before compilation:
 
 Only after all three checks pass does `state.gates.brief` become `"passed"`.
 
-Per-page validators cover schema, catalog, tokens, layout, states, assets, and
-traceability. A page passes when it has zero blockers; major/minor findings are
-reported but do not fail the page.
+Per-page validators cover schema, catalog, tokens, layout, states, assets,
+traceability, and Brief → Page Spec semantics (`SEMANTIC-*`). A page passes
+when it has zero blockers; major/minor findings are reported but do not fail
+the page.
 
 ## Asset manifests
 
-Assets are resolved per profile:
+Assets are resolved per profile. Each project supplies its own manifests via
+`project.yaml` (or `--manifest`); the built-in sample uses:
 
 - `samples/asset-manifest.b-dense.json` — icons plus `empty-orders`.
 - `samples/asset-manifest.c-expressive.json` — icons plus `empty-feed`.
@@ -98,9 +161,10 @@ Assets are resolved per profile:
 The orchestrator passes each page the manifest for its profile. Validators
 block `ASSET-PROFILE` when `manifest.profile` does not match the page's resolved
 profile and `ASSET-PROJECT` when `manifest.project` does not match the brief
-project. The b-dense `list` template references `empty-orders`; the
-c-expressive `feed` template references `empty-feed`, so both asset paths are
-exercised by the sample run.
+project. A `list` page uses its `emptyAssetRef` (falling back to
+`empty-orders`), and the c-expressive `feed` template references `empty-feed`.
+The `demo-crm` project therefore declares `empty-contacts` and ships it in
+`samples/projects/demo-crm/asset-manifest.b-dense.json`.
 
 Phase 1A does not require the referenced SVG/PNG files to exist; the manifest
 entries are the contract. Real files and hashes arrive when asset ingestion is
@@ -149,3 +213,9 @@ orchestrator re-checks defensively.
 | mobile | `home-feed` | feed | c-expressive |
 | mobile | `item-detail` | detail | c-expressive |
 | mobile | `auth` | auth | c-expressive |
+
+`samples/projects/demo-crm` is a second, independent project: one
+`contacts-list` page (list archetype, b-dense) with contact fields, filters,
+action, empty state, navigation, and asset manifest. It proves the
+custom-project workflow end to end and that no order copy leaks into another
+project's pages.

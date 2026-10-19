@@ -14,6 +14,12 @@ const samplesDir = path.resolve(
 );
 const sampleBriefPath = path.join(samplesDir, "ui-brief.sample.json");
 const sampleProjectPath = path.join(samplesDir, "project.demo-orders.yaml");
+const demoCrmProjectPath = path.join(
+  samplesDir,
+  "projects",
+  "demo-crm",
+  "project.yaml"
+);
 const sampleManifests: Record<string, string> = {
   "b-dense": path.join(samplesDir, "asset-manifest.b-dense.json"),
   "c-expressive": path.join(samplesDir, "asset-manifest.c-expressive.json"),
@@ -296,5 +302,62 @@ describe("runPhase1", () => {
     const log = await readFile(path.join(result.runDir, "logs", "run.log"), "utf8");
     expect(log).toContain("PROJECT-MANIFEST-MISSING");
     expect(log).toContain("c-expressive");
+  });
+
+  it("compiles the demo-crm project from its own brief and manifest", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-phase1-"));
+    const result = await runPhase1({
+      projectPath: demoCrmProjectPath,
+      runsDir: tmpDir,
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.pages).toBe(1);
+    expect(result.blockers).toBe(0);
+
+    const state = await readJson<RunState>(path.join(result.runDir, "state.json"));
+    expect(state.stage).toBe("done");
+    expect(state.status).toBe("success");
+    expect(state.gates.brief).toBe("passed");
+
+    const reports = await readJson<ValidationReport[]>(
+      path.join(result.runDir, "reports", "validation.json")
+    );
+    expect(reports).toHaveLength(1);
+    expect(reports[0]!.pageId).toBe("contacts-list");
+    expect(reports[0]!.passed).toBe(true);
+    expect(reports[0]!.blockers).toBe(0);
+
+    const spec = await readJson<PageSpec>(
+      path.join(result.runDir, "artifacts", "page-spec", "contacts-list.json")
+    );
+    expect(spec.meta.pageId).toBe("contacts-list");
+    expect(spec.meta.purpose).toBe("查看和管理联系人");
+    expect(spec.meta.route).toBe("/contacts");
+    expect(spec.meta.roles).toContain("admin");
+
+    const content = spec.layout.slots?.content ?? [];
+    expect(content[0]?.type).toBe("Section");
+    const contentChildren = content[0]?.children ?? [];
+
+    const table = contentChildren.find((node) => node.type === "DataTable");
+    expect(table?.props?.columns).toEqual(["name", "email", "phone"]);
+
+    const filterBar = contentChildren.find((node) => node.type === "FilterBar");
+    expect(filterBar?.props?.fields).toEqual(["name", "email"]);
+    expect(filterBar?.props?.action).toBe("新建联系人");
+
+    const emptyState = contentChildren.find((node) => node.type === "EmptyState");
+    expect(emptyState?.props?.title).toBe("暂无联系人");
+    expect(emptyState?.assetRef).toBe("empty-contacts");
+
+    expect(spec.layout.props?.nav).toEqual(["联系人", "设置"]);
+
+    const serialized = JSON.stringify(spec);
+    expect(serialized).not.toContain("新建订单");
+    expect(serialized).not.toContain("暂无订单");
+    expect(serialized).not.toContain("status");
+    expect(serialized).not.toContain("date");
+    expect(serialized).not.toContain("keyword");
   });
 });

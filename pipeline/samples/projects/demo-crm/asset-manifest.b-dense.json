@@ -1,0 +1,12 @@
+{
+  "project": "demo-crm",
+  "profile": "b-dense",
+  "assets": [
+    { "id": "search", "kind": "icon", "library": "lucide", "files": [{ "path": "assets/icons/search.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "plus", "kind": "icon", "library": "lucide", "files": [{ "path": "assets/icons/plus.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "user", "kind": "icon", "library": "lucide", "files": [{ "path": "assets/icons/user.svg", "format": "svg" }], "license": "ISC" },
+    { "id": "empty-contacts", "kind": "illustration", "style": "c-soft", "files": [{ "path": "assets/illustrations/empty-contacts@2x.png", "scale": 2, "format": "png" }], "license": "internal" }
+  ],
+  "placeholders": [],
+  "complete": true
+}

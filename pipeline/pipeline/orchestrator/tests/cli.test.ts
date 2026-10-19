@@ -206,4 +206,28 @@ describe("phase1 CLI", () => {
     const log = await readLog(await findRunDir(runsDir));
     expect(log).toContain("PROJECT-MISMATCH");
   });
+
+  it("runs the demo-crm project with its own brief and manifest", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const runsDir = path.join(tmpDir, "runs");
+
+    const result = await runCli(
+      ["--project", "samples/projects/demo-crm/project.yaml", "--runs", runsDir],
+      { cwd: pipelineRoot }
+    );
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Phase 1A OK: 1 pages, 0 blockers");
+    expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
+
+    const runDir = await findRunDir(runsDir);
+    const state = JSON.parse(
+      await readFile(path.join(runDir, "state.json"), "utf8")
+    ) as { stage: string; status: string };
+    expect(state.stage).toBe("done");
+    expect(state.status).toBe("success");
+    await expect(
+      stat(path.join(runDir, "artifacts", "page-spec", "contacts-list.json"))
+    ).resolves.toBeDefined();
+  });
 });
