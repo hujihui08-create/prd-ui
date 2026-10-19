@@ -12,9 +12,8 @@ import {
   type SourceTier,
   SourceTierBySource,
 } from "./contracts.js";
-import { checkIcon } from "./gates/icon.js";
-import { checkIllustration } from "./gates/illustration.js";
-import { gateResult, issue, normalizeSvg } from "./gates/svg.js";
+import { runGate } from "./gate.js";
+import { normalizeSvg } from "./gates/svg.js";
 import type { AssetReviewPorts, VisualStyle } from "./ports.js";
 import { validateVerdict } from "./verdict.js";
 
@@ -50,14 +49,6 @@ function attemptPath(assetId: string, source: SourceId, attempt: number, file: s
 
 function freezePath(assetId: string, format: string): string {
   return `assets/frozen/${assetId}/asset.${extensionOf(format)}`;
-}
-
-function runGate(brief: AssetBrief, svg: string): HardGateResult {
-  if (brief.kind === "icon") return checkIcon(svg, brief);
-  if (brief.kind === "illustration") return checkIllustration(svg, brief);
-  return gateResult([
-    issue("POSTER_NOT_IMPLEMENTED", "Poster hard gates are not implemented in M0.", brief.kind),
-  ]);
 }
 
 export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetReviewRunResult> {

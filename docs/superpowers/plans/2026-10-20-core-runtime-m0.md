@@ -530,17 +530,17 @@ git commit -m "feat: add independent asset review state machine"
 - `toAssetManifest(input: { project; profile; records; }): AssetManifest`.
 - `preflightAssetBriefs(input: { briefs; producer; store; }): Promise<PreflightResult>` — resolves candidates and runs hard gates, no reviewer.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Manifest: only frozen records become assets; `complete` is false if any record is unresolved; `degraded` is surfaced in the record, not the legacy manifest.
 
 Preflight: returns per-brief `{ assetId, candidate, gate }`; missing library file produces a failure, not a throw.
 
-- [ ] **Step 2: Implement and run**
+- [x] **Step 2: Implement and run**
 
 Run: `cd pipeline && pnpm vitest run core/asset-review/tests && pnpm typecheck`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add pipeline/core/asset-review
