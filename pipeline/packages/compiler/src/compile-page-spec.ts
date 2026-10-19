@@ -9,9 +9,6 @@ import type {
 } from "@prd-ui/contracts";
 import type { ArchetypeDef } from "@prd-ui/design-system";
 
-const nav = ["概览", "订单", "客户", "设置"];
-const tabs = ["推荐", "关注", "附近", "我的"];
-
 /** Root shell the compiler emits per page target. */
 const ROOT_SHELL = {
   web: "PageShell",
@@ -66,7 +63,7 @@ export function compilePageSpec(input: {
     );
   }
 
-  const layout = buildLayout(page, archetype);
+  const layout = buildLayout(brief, page, archetype);
   const states = Object.fromEntries(
     [...new Set([...archetype.requiredStates, ...page.requiredStates])].map((name) => [
       name,
@@ -99,7 +96,10 @@ export function compilePageSpec(input: {
   };
 }
 
-function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
+function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
+  const nav = brief.ia.navigation.primary;
+  const tabs = brief.ia.navigation.tabs ?? nav;
+
   switch (archetype.id) {
     case "overview":
       return {
@@ -115,16 +115,14 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
                 {
                   type: "Grid",
                   props: { columns: 4, gap: "space.4" },
-                  children: [
-                    { type: "Stat", props: { label: "今日订单", value: "128" } },
-                    { type: "Stat", props: { label: "待处理", value: "12" } },
-                    { type: "Stat", props: { label: "已完成", value: "96" } },
-                    { type: "Stat", props: { label: "异常", value: "3" } },
-                  ],
+                  children: (page.stats ?? [{ label: "指标", value: "—" }]).map((stat) => ({
+                    type: "Stat",
+                    props: { label: stat.label, value: stat.value },
+                  })),
                 },
                 {
                   type: "Card",
-                  props: { title: "近期订单" },
+                  props: { title: `${page.name}近期数据` },
                   children: [{ type: "List", props: { items: 5 } }],
                 },
               ],
@@ -132,7 +130,13 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
           ],
         },
       };
-    case "list":
+    case "list": {
+      const columns = page.fields ?? ["名称", "状态"];
+      const filterFields = page.filterFields ?? page.fields ?? [];
+      const emptyTitle = page.emptyTitle ?? `暂无${page.name}`;
+      const emptyAssetRef =
+        page.emptyAssetRef ?? (page.profile === "c-expressive" ? "empty-feed" : "empty-orders");
+
       return {
         type: "PageShell",
         props: { title: page.name, nav },
@@ -145,28 +149,26 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
               children: [
                 {
                   type: "FilterBar",
-                  props: { fields: ["status", "date", "keyword"], action: "新建订单" },
+                  props: { fields: filterFields, action: page.actions?.[0] ?? "新建" },
                 },
                 {
                   type: "DataTable",
-                  props: {
-                    columns: page.fields ?? ["orderNo", "customer", "amount", "status", "createdAt"],
-                    pageSize: 20,
-                  },
+                  props: { columns, pageSize: 20 },
                 },
                 { type: "Pagination", props: { pageSize: 20 } },
                 {
                   type: "EmptyState",
-                  props: { title: "暂无订单", description: "调整筛选条件后重试" },
-                  assetRef: "empty-orders",
+                  props: { title: emptyTitle, description: "调整筛选条件后重试" },
+                  assetRef: emptyAssetRef,
                 },
               ],
             },
           ],
         },
       };
+    }
     case "detail":
-      return detailLayout(page);
+      return detailLayout(page, nav, tabs);
     case "form":
       return {
         type: "PageShell",
@@ -177,7 +179,7 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
             {
               type: "Section",
               props: { padding: "space.6", gap: "space.4" },
-              children: (page.fields ?? ["orderNo", "customer", "amount"]).map((field) => ({
+              children: (page.fields ?? []).map((field) => ({
                 type: "FormField",
                 props: { label: field, required: true },
                 children: [
@@ -212,26 +214,24 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
                 {
                   type: "Card",
                   props: { title: "偏好设置" },
-                  children: (page.fields ?? ["notifications", "language", "timezone"]).map(
-                    (field) => {
-                      const meta = settingsFieldMeta[field];
-                      return {
-                        type: "FormField",
-                        props: { label: meta?.label ?? field },
-                        children: [
-                          {
-                            type: "Select",
-                            props: { options: meta?.options ?? ["开启", "关闭"] },
-                          },
-                        ],
-                      };
-                    }
-                  ),
+                  children: (page.fields ?? []).map((field) => {
+                    const meta = settingsFieldMeta[field];
+                    return {
+                      type: "FormField",
+                      props: { label: meta?.label ?? field },
+                      children: [
+                        {
+                          type: "Select",
+                          props: { options: meta?.options ?? ["开启", "关闭"] },
+                        },
+                      ],
+                    };
+                  }),
                 },
               ],
             },
           ],
-          actions: [btn(page.actions?.[0] ?? "保存设置")],
+          actions: [btn(page.actions?.[0] ?? "保存")],
         },
       };
     case "feed":
@@ -241,11 +241,12 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
         reqRef: page.reqRefs[0] as ReqId | undefined,
         slots: {
           feed: [
-            {
-              type: "FeedCard",
-              props: { title: "周末去哪儿", body: "城市周边 5 个小众目的地" },
-            },
-            { type: "FeedCard", props: { title: "新店开业", body: "手冲咖啡买一送一" } },
+            ...(page.feedItems ?? [{ title: "示例内容", body: "请配置 feedItems" }]).map(
+              (item) => ({
+                type: "FeedCard",
+                props: { title: item.title, body: item.body },
+              })
+            ),
             { type: "EmptyState", props: { title: "暂无内容" }, assetRef: "empty-feed" },
           ],
           "bottom-nav": [{ type: "BottomNav", props: { items: tabs } }],
@@ -287,7 +288,7 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
             { type: "Image", props: { assetRef: "onboarding-1", ratio: "4:3" } },
           ],
           title: [text(page.name, "heading.1")],
-          body: [text("用三步完成设置", "body.md")],
+          body: [text(page.purpose, "body.md")],
           actions: [btn(page.actions?.[0] ?? "开始"), btn(page.actions?.[1] ?? "稍后", "secondary")],
         },
       };
@@ -296,8 +297,10 @@ function buildLayout(page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
   }
 }
 
-function detailLayout(page: UiBriefPage): SpecNode {
+function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNode {
   const fields = page.fields ?? [];
+  const summaryTitle = page.summaryTitle ?? `${page.name}摘要`;
+  const action = page.actions?.[0] ?? "编辑";
 
   if (page.target === "mobile") {
     return {
@@ -308,7 +311,7 @@ function detailLayout(page: UiBriefPage): SpecNode {
         summary: [
           {
             type: "Card",
-            props: { title: "商品摘要" },
+            props: { title: summaryTitle },
             children: [
               { type: "List", props: { items: Math.max(fields.length, 3) } },
               { type: "Badge", props: { label: "在售", tone: "success" } },
@@ -316,7 +319,7 @@ function detailLayout(page: UiBriefPage): SpecNode {
           },
         ],
         fields: fields.map((field) => fieldFormNode(field)),
-        actions: [btn(page.actions?.[0] ?? "立即购买")],
+        actions: [btn(action)],
       },
     };
   }
@@ -329,7 +332,7 @@ function detailLayout(page: UiBriefPage): SpecNode {
       summary: [
         {
           type: "Card",
-          props: { title: "订单摘要" },
+          props: { title: summaryTitle },
           children: [{ type: "List", props: { items: 4 } }],
         },
       ],
@@ -340,7 +343,7 @@ function detailLayout(page: UiBriefPage): SpecNode {
           children: fields.map((field) => fieldFormNode(field)),
         },
       ],
-      actions: [btn(page.actions?.[0] ?? "编辑订单")],
+      actions: [btn(action)],
     },
   };
 }

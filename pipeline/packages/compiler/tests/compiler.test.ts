@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { PageSpecSchema, UiBriefSchema, type SpecNode } from "@prd-ui/contracts";
+import {
+  PageSpecSchema,
+  UiBriefSchema,
+  type PageSpec,
+  type SpecNode,
+  type UiBrief,
+  type UiBriefPage,
+} from "@prd-ui/contracts";
 import {
   getArchetype,
   getCatalog,
@@ -190,5 +197,186 @@ describe("compileProject", () => {
         archetype: getArchetype("overview"),
       })
     ).toThrow(/does not provide root shell "PageShell"/);
+  });
+});
+
+function nodesOf(spec: PageSpec, type: string): SpecNode[] {
+  return collectNodes(spec.layout).filter((node) => node.type === type);
+}
+
+function expectNoOrderCopy(spec: PageSpec): void {
+  const serialized = JSON.stringify(spec);
+  for (const forbidden of [
+    "新建订单",
+    "暂无订单",
+    "status",
+    "date",
+    "keyword",
+    "订单摘要",
+    "orderNo",
+  ]) {
+    expect(serialized, `${spec.meta.pageId} contains "${forbidden}"`).not.toContain(forbidden);
+  }
+}
+
+describe("brief-driven page content", () => {
+  it("renders all eight sample pages and parses each with PageSpecSchema", () => {
+    expect(specs).toHaveLength(8);
+    const schemaFailures = specs.filter((spec) => !PageSpecSchema.safeParse(spec).success);
+    expect(schemaFailures).toEqual([]);
+  });
+
+  it("takes web nav and mobile tabs from the brief", () => {
+    for (const spec of specs) {
+      if (spec.layout.type === "PageShell") {
+        expect(spec.layout.props?.nav, spec.meta.pageId).toEqual(brief.ia.navigation.primary);
+      }
+    }
+
+    const expectedTabs = brief.ia.navigation.tabs ?? brief.ia.navigation.primary;
+    for (const pageId of ["home-feed", "item-detail"]) {
+      expect(specsByPageId.get(pageId)!.layout.props?.tabs, pageId).toEqual(expectedTabs);
+    }
+  });
+
+  it("renders sample list, overview, and feed content from the brief", () => {
+    const listSpec = specsByPageId.get("orders-list")!;
+    expect(nodesOf(listSpec, "DataTable")[0]?.props?.columns).toEqual([
+      "orderNo",
+      "customer",
+      "amount",
+      "status",
+      "createdAt",
+    ]);
+    expect(nodesOf(listSpec, "FilterBar")[0]?.props).toMatchObject({
+      fields: ["status", "date", "keyword"],
+      action: "新建订单",
+    });
+    expect(nodesOf(listSpec, "EmptyState")[0]?.props?.title).toBe("暂无订单");
+    expect(nodesOf(listSpec, "EmptyState")[0]?.assetRef).toBe("empty-orders");
+
+    const overviewSpec = specsByPageId.get("orders-overview")!;
+    expect(nodesOf(overviewSpec, "Stat").map((node) => node.props)).toEqual([
+      { label: "今日订单", value: "128" },
+      { label: "待处理", value: "12" },
+      { label: "已完成", value: "96" },
+      { label: "异常", value: "3" },
+    ]);
+    expect(nodesOf(overviewSpec, "Card")[0]?.props?.title).toBe("订单概览近期数据");
+
+    const feedSpec = specsByPageId.get("home-feed")!;
+    expect(nodesOf(feedSpec, "FeedCard").map((node) => node.props)).toEqual([
+      { title: "周末去哪儿", body: "城市周边 5 个小众目的地" },
+      { title: "新店开业", body: "手冲咖啡买一送一" },
+    ]);
+  });
+
+  it("uses summary titles from the brief", () => {
+    expect(nodesOf(specsByPageId.get("order-detail")!, "Card")[0]?.props?.title).toBe(
+      "订单摘要"
+    );
+    expect(nodesOf(specsByPageId.get("item-detail")!, "Card")[0]?.props?.title).toBe(
+      "商品摘要"
+    );
+  });
+
+  it("compiles a custom customers-list page with its own content", () => {
+    const customersPage: UiBriefPage = {
+      id: "customers-list",
+      name: "客户列表",
+      purpose: "查看和管理客户",
+      archetype: "list",
+      target: "web",
+      profile: "b-dense",
+      route: "/customers",
+      roles: ["admin", "operator"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-ORDER-009"],
+      fields: ["customerName", "phone", "email"],
+      filterFields: ["name", "phone"],
+      actions: ["新建客户"],
+      emptyTitle: "暂无客户",
+    };
+
+    const customersBrief: UiBrief = structuredClone(brief);
+    customersBrief.ia.pages.push(customersPage);
+    customersBrief.traceability.reqMap["REQ-ORDER-009"] = ["customers-list"];
+
+    const customersSpec = compileProject(customersBrief, deps).find(
+      (spec) => spec.meta.pageId === "customers-list"
+    )!;
+
+    expect(PageSpecSchema.safeParse(customersSpec).success).toBe(true);
+    expect(nodesOf(customersSpec, "DataTable")[0]?.props?.columns).toEqual([
+      "customerName",
+      "phone",
+      "email",
+    ]);
+    expect(nodesOf(customersSpec, "FilterBar")[0]?.props).toMatchObject({
+      fields: ["name", "phone"],
+      action: "新建客户",
+    });
+    expect(nodesOf(customersSpec, "EmptyState")[0]?.props?.title).toBe("暂无客户");
+    expect(nodesOf(customersSpec, "EmptyState")[0]?.assetRef).toBe("empty-orders");
+    expect(customersSpec.layout.props?.nav).toEqual(brief.ia.navigation.primary);
+
+    expect(customersSpec.meta).toMatchObject({
+      purpose: customersPage.purpose,
+      route: customersPage.route,
+      roles: customersPage.roles,
+    });
+    expectNoOrderCopy(customersSpec);
+  });
+
+  it("compiles a demo-crm contacts-list page without order copy", () => {
+    const contactsPage: UiBriefPage = {
+      id: "contacts-list",
+      name: "联系人列表",
+      purpose: "查看和管理联系人",
+      archetype: "list",
+      target: "web",
+      profile: "b-dense",
+      route: "/contacts",
+      roles: ["admin", "operator"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-CRM-001"],
+      fields: ["name", "email", "phone"],
+      filterFields: ["name", "email"],
+      actions: ["新建联系人"],
+      emptyTitle: "暂无联系人",
+    };
+
+    const crmBrief: UiBrief = structuredClone(brief);
+    crmBrief.meta.project = "demo-crm";
+    crmBrief.ia.pages = [contactsPage];
+    crmBrief.ia.navigation = { primary: ["联系人", "设置"] };
+    crmBrief.ia.flows = [];
+    crmBrief.traceability.reqMap = { "REQ-CRM-001": ["contacts-list"] };
+    crmBrief.traceability.unmapped = [];
+
+    const crmSpecs = compileProject(crmBrief, deps);
+    expect(crmSpecs).toHaveLength(1);
+    const contactsSpec = crmSpecs[0]!;
+
+    expect(PageSpecSchema.safeParse(contactsSpec).success).toBe(true);
+    expect(nodesOf(contactsSpec, "DataTable")[0]?.props?.columns).toEqual([
+      "name",
+      "email",
+      "phone",
+    ]);
+    expect(nodesOf(contactsSpec, "FilterBar")[0]?.props).toMatchObject({
+      fields: ["name", "email"],
+      action: "新建联系人",
+    });
+    expect(nodesOf(contactsSpec, "EmptyState")[0]?.props?.title).toBe("暂无联系人");
+    expect(nodesOf(contactsSpec, "EmptyState")[0]?.assetRef).toBe("empty-orders");
+    expect(contactsSpec.layout.props?.nav).toEqual(["联系人", "设置"]);
+    expect(contactsSpec.meta).toMatchObject({
+      project: "demo-crm",
+      purpose: contactsPage.purpose,
+      route: contactsPage.route,
+      roles: contactsPage.roles,
+    });
+    expectNoOrderCopy(contactsSpec);
   });
 });

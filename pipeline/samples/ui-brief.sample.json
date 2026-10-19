@@ -54,7 +54,13 @@
         "requiredStates": ["default", "loading", "error"],
         "reqRefs": ["REQ-ORDER-001"],
         "fields": [],
-        "actions": []
+        "actions": [],
+        "stats": [
+          { "label": "今日订单", "value": "128" },
+          { "label": "待处理", "value": "12" },
+          { "label": "已完成", "value": "96" },
+          { "label": "异常", "value": "3" }
+        ]
       },
       {
         "id": "orders-list",
@@ -68,7 +74,9 @@
         "requiredStates": ["default", "empty", "loading", "error"],
         "reqRefs": ["REQ-ORDER-002"],
         "fields": ["orderNo", "customer", "amount", "status", "createdAt"],
-        "actions": ["新建订单"]
+        "actions": ["新建订单"],
+        "filterFields": ["status", "date", "keyword"],
+        "emptyTitle": "暂无订单"
       },
       {
         "id": "order-detail",
@@ -82,7 +90,8 @@
         "requiredStates": ["default", "loading", "error"],
         "reqRefs": ["REQ-ORDER-003"],
         "fields": ["orderNo", "customer", "amount", "status", "createdAt"],
-        "actions": ["编辑订单"]
+        "actions": ["编辑订单"],
+        "summaryTitle": "订单摘要"
       },
       {
         "id": "order-form",
@@ -124,7 +133,11 @@
         "requiredStates": ["default", "empty", "loading", "error"],
         "reqRefs": ["REQ-ORDER-006"],
         "fields": [],
-        "actions": []
+        "actions": [],
+        "feedItems": [
+          { "title": "周末去哪儿", "body": "城市周边 5 个小众目的地" },
+          { "title": "新店开业", "body": "手冲咖啡买一送一" }
+        ]
       },
       {
         "id": "item-detail",
@@ -138,7 +151,8 @@
         "requiredStates": ["default", "loading", "error"],
         "reqRefs": ["REQ-ORDER-007"],
         "fields": ["title", "price", "description"],
-        "actions": ["立即购买"]
+        "actions": ["立即购买"],
+        "summaryTitle": "商品摘要"
       },
       {
         "id": "auth",
@@ -156,7 +170,8 @@
       }
     ],
     "navigation": {
-      "primary": ["概览", "订单", "客户", "设置"]
+      "primary": ["概览", "订单", "客户", "设置"],
+      "tabs": ["推荐", "关注", "附近", "我的"]
     },
     "flows": [
       {
