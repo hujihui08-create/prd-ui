@@ -5,7 +5,7 @@ export default defineConfig({
     include: ["core/**/*.test.ts", "runtimes/**/*.test.ts"],
     // The dsh integration test spawns the real CLI and a local mock server;
     // it runs only through `pnpm test:dsh`.
-    exclude: [...configDefaults.exclude, "runtimes/dsh/tests/dsh-integration.test.ts"],
+    exclude: [...configDefaults.exclude, "runtimes/dsh/tests/*integration.test.ts"],
     environment: "node",
   },
 });

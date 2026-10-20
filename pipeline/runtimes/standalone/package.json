@@ -8,6 +8,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@prd-ui/agents": "workspace:*",
     "@prd-ui/asset-review": "workspace:*",
     "@prd-ui/contracts": "workspace:*",
     "@prd-ui/design-system": "workspace:*",

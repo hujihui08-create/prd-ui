@@ -1,0 +1,25 @@
+# Project-local dsh profile for the M1 IA / Interaction / Visual Style agents.
+# No tools are mounted: agents receive all inputs in the prompt and return one
+# structured JSON object. DSH_HOME points here; ~/.dsh is never modified.
+
+- insert:
+    - id: llm-pi-ai
+      name: '@deepseek-ai/dsh-llm-pi-ai'
+      config:
+        providers:
+          prd-ui-vision:
+            displayName: PRD UI Vision
+            apiKeyEnv: PRD_UI_VISION_API_KEY
+            api: openai-completions
+            baseURL: !!js process.env.PRD_UI_VISION_BASE_URL
+            defaultInput: [text, image]
+            models:
+              - id: !!js process.env.PRD_UI_VISION_MODEL
+                name: PRD UI Vision
+                contextWindow: 128000
+                maxTokens: 8192
+
+- id: agent-default-model
+  config:
+    provider: prd-ui-vision
+    model: !!js process.env.PRD_UI_VISION_MODEL

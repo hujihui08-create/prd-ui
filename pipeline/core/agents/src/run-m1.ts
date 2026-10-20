@@ -233,10 +233,16 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
     );
   };
 
+  let writeChain: Promise<void> = Promise.resolve();
   const writeState = async (): Promise<void> => {
     state = { ...state, updatedAt: clock.now().toISOString() };
     state = M1RunStateSchema.parse(state);
-    await store.writeJson("state.json", state);
+    const snapshot = state;
+    // Design agents run in parallel; serialize state writes so the last
+    // snapshot on disk is always the newest one.
+    const queued = writeChain.then(() => store.writeJson("state.json", snapshot));
+    writeChain = queued.catch(() => undefined);
+    await queued;
   };
 
   const finish = async (

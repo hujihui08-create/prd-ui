@@ -4,6 +4,7 @@ import {
   defaultCommandRunner,
   extractVerdict,
   runDshReview,
+  runDshTask,
   type CommandRunner,
 } from "../src/dsh-process.js";
 
@@ -244,6 +245,52 @@ describe("runDshReview", () => {
       usageComplete: true,
       ignoredKeys: expect.arrayContaining(["reason_note"]),
     });
+  });
+});
+
+describe("runDshTask", () => {
+  const base = {
+    task: "do the task",
+    dshHome: "/tmp/dsh-home",
+    profile: "prd-ui-agents",
+    dshBin: "/tmp/dsh",
+    cwd: "/tmp",
+    runDir: "/tmp/run",
+  };
+
+  it("returns final.text and usage without applying an asset verdict schema", async () => {
+    let stdin = "";
+    const runner: CommandRunner = async (_command, _args, options) => {
+      stdin = options.stdin ?? "";
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 30, outputTokens: 10, cacheReadTokens: 2 }),
+          final('{"ok":true}')
+        ),
+        stderr: "noise",
+      };
+    };
+
+    const result = await runDshTask({ ...base, runner });
+
+    expect(stdin).toBe("do the task");
+    expect(result.answer).toBe('{"ok":true}');
+    expect(result.usage).toMatchObject({ inputTokens: 30, outputTokens: 10, cacheReadTokens: 2 });
+    expect(result.usageComplete).toBe(true);
+    expect(result.usageSource).toBe("json-events");
+    expect(result.stdout).toContain("final");
+    expect(result.stderr).toBe("noise");
+    expect(result.session.profile).toBe("prd-ui-agents");
+  });
+
+  it("returns no answer when the stream has no final event", async () => {
+    const runner: CommandRunner = async () => ({
+      stdout: ndjson(stepEnd({ inputTokens: 1, outputTokens: 1 })),
+      stderr: "",
+    });
+    const result = await runDshTask({ ...base, runner });
+    expect(result.answer).toBeUndefined();
+    expect(result.usageComplete).toBe(true);
   });
 });
 

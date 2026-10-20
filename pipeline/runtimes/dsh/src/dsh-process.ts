@@ -155,7 +155,7 @@ export const defaultCommandRunner: CommandRunner = (command, args, options) =>
     }
   });
 
-export interface DshReviewInput {
+export interface DshTaskInput {
   task: string;
   dshHome: string;
   profile: string;
@@ -165,6 +165,9 @@ export interface DshReviewInput {
   timeoutMs?: number;
   runner?: CommandRunner;
 }
+
+/** Asset review keeps its historical name; the transport is generic. */
+export type DshReviewInput = DshTaskInput;
 
 export interface DshSession {
   profile: string;
@@ -181,6 +184,17 @@ export interface DshReviewResult {
   usageSource: "json-events" | "unavailable";
   raw: string;
   ignoredKeys: string[];
+  stdout: string;
+  stderr: string;
+  session: DshSession;
+}
+
+/** One headless task: `final.text` is the answer; usage comes from `step_end`. */
+export interface DshTaskResult {
+  answer?: string;
+  usage?: ReviewUsage;
+  usageComplete: boolean;
+  usageSource: "json-events" | "unavailable";
   stdout: string;
   stderr: string;
   session: DshSession;
@@ -371,8 +385,8 @@ function errorDetails(
   };
 }
 
-/** Run one headless dsh review over stdin/NDJSON and parse its final answer. */
-export async function runDshReview(input: DshReviewInput): Promise<DshReviewResult> {
+/** Run one headless dsh task over stdin/NDJSON and return its final answer. */
+export async function runDshTask(input: DshTaskInput): Promise<DshTaskResult> {
   const timeoutMs = input.timeoutMs ?? 300_000;
   const runner = input.runner ?? defaultCommandRunner;
   const args = ["--profile", input.profile, "--json", "-"];
@@ -408,34 +422,11 @@ export async function runDshReview(input: DshReviewInput): Promise<DshReviewResu
   }
 
   const parsed = parseDshOutput(stdout);
-  const verdictSource =
-    parsed.answer ?? (parsed.usageSource === "unavailable" ? stdout : "");
-
-  let details: VerdictDetails;
-  try {
-    details = extractVerdictDetails(verdictSource);
-  } catch (error) {
-    if (error instanceof DshError) {
-      throw new DshError("DSH_INVALID_VERDICT", error.message, {
-        cause: error,
-        ...(parsed.usage === undefined ? {} : { usage: parsed.usage }),
-        usageComplete: parsed.usageComplete,
-        raw: error.raw ?? verdictSource,
-        ignoredKeys: error.ignoredKeys ?? [],
-        stdout,
-        stderr,
-      });
-    }
-    throw error;
-  }
-
   return {
-    verdict: details.verdict,
+    ...(parsed.answer === undefined ? {} : { answer: parsed.answer }),
     ...(parsed.usage === undefined ? {} : { usage: parsed.usage }),
     usageComplete: parsed.usageComplete,
     usageSource: parsed.usageSource,
-    raw: verdictSource,
-    ignoredKeys: details.ignoredKeys,
     stdout,
     stderr,
     session: {
@@ -445,5 +436,42 @@ export async function runDshReview(input: DshReviewInput): Promise<DshReviewResu
       durationMs: Date.now() - startedAt,
       stdoutHash: `sha256:${createHash("sha256").update(stdout).digest("hex")}`,
     },
+  };
+}
+
+/** Run one headless dsh review and parse its final verdict. */
+export async function runDshReview(input: DshReviewInput): Promise<DshReviewResult> {
+  const task = await runDshTask(input);
+  const verdictSource =
+    task.answer ?? (task.usageSource === "unavailable" ? task.stdout : "");
+
+  let details: VerdictDetails;
+  try {
+    details = extractVerdictDetails(verdictSource);
+  } catch (error) {
+    if (error instanceof DshError) {
+      throw new DshError("DSH_INVALID_VERDICT", error.message, {
+        cause: error,
+        ...(task.usage === undefined ? {} : { usage: task.usage }),
+        usageComplete: task.usageComplete,
+        raw: error.raw ?? verdictSource,
+        ignoredKeys: error.ignoredKeys ?? [],
+        stdout: task.stdout,
+        stderr: task.stderr,
+      });
+    }
+    throw error;
+  }
+
+  return {
+    verdict: details.verdict,
+    ...(task.usage === undefined ? {} : { usage: task.usage }),
+    usageComplete: task.usageComplete,
+    usageSource: task.usageSource,
+    raw: verdictSource,
+    ignoredKeys: details.ignoredKeys,
+    stdout: task.stdout,
+    stderr: task.stderr,
+    session: task.session,
   };
 }

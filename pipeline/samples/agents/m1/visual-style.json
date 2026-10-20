@@ -1,0 +1,161 @@
+{
+  "output": {
+    "visualStyle": {
+      "direction": {
+        "tone": "neutral, efficient, low-noise",
+        "density": "dense",
+        "palette": [
+          "#111827",
+          "#FFFFFF",
+          "#F5F6F8",
+          "#2563EB",
+          "#F97316",
+          "#16A34A",
+          "#D97706",
+          "#DC2626"
+        ],
+        "typography": {
+          "heading": "Noto Sans SC 16/24 600",
+          "body": "Noto Sans SC 13/18 400"
+        },
+        "radius": "12px cards, 6px controls",
+        "motionLevel": "low"
+      },
+      "references": [],
+      "constraints": [
+        "Neutral b-mobile baseline until the brand palette and type family are supplied.",
+        "Icon style: library line icons are an interim choice; the PRD's filled style is pending brand confirmation.",
+        "Empty-state illustrations may use placeholders in the first slice."
+      ],
+      "assetStrategy": {
+        "icons": "library",
+        "illustrations": "library",
+        "images": "placeholder"
+      }
+    },
+    "assetBriefs": [
+      {
+        "id": "receipt",
+        "kind": "icon",
+        "scene": "今日快捷操作：开单",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide receipt"
+      },
+      {
+        "id": "calendar",
+        "kind": "icon",
+        "scene": "今日快捷操作：预约",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide calendar"
+      },
+      {
+        "id": "bell",
+        "kind": "icon",
+        "scene": "今日顶栏消息提醒",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide bell"
+      },
+      {
+        "id": "search",
+        "kind": "icon",
+        "scene": "库存查询搜索框",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide search"
+      },
+      {
+        "id": "chevron-down",
+        "kind": "icon",
+        "scene": "库存筛选器展开指示",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide chevron-down"
+      },
+      {
+        "id": "inventory",
+        "kind": "icon",
+        "scene": "今日快捷入口：库存查询",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide package"
+      },
+      {
+        "id": "user",
+        "kind": "icon",
+        "scene": "客户与我的入口",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide user"
+      },
+      {
+        "id": "settings",
+        "kind": "icon",
+        "scene": "工作台设置入口",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide settings"
+      },
+      {
+        "id": "home",
+        "kind": "icon",
+        "scene": "底部导航：今日",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide house"
+      },
+      {
+        "id": "workbench",
+        "kind": "icon",
+        "scene": "底部导航：工作台",
+        "styleRef": "employee-app/b-mobile-neutral",
+        "size": { "width": 24, "height": 24 },
+        "format": "svg",
+        "constraints": { "grid": 24, "currentColor": true, "noText": true },
+        "sourceChain": ["library", "commission", "ai-vector"],
+        "visualRef": "line icon, 24px grid, currentColor, rounded joins",
+        "sourceHint": "lucide layout-grid"
+      }
+    ]
+  },
+  "usage": { "inputTokens": 6800, "outputTokens": 4200, "cacheReadTokens": 0 },
+  "usageComplete": true
+}

@@ -1,9 +1,10 @@
-import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { access, appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { AgentArtifactStorePort } from "@prd-ui/agents";
 import type { ArtifactStorePort } from "@prd-ui/asset-review";
 
-export class FileArtifactStore implements ArtifactStorePort {
+export class FileArtifactStore implements ArtifactStorePort, AgentArtifactStorePort {
   private readonly root: string;
 
   constructor(rootDir: string) {
@@ -21,7 +22,7 @@ export class FileArtifactStore implements ArtifactStorePort {
   async writeText(relativePath: string, value: string): Promise<void> {
     const absolute = this.resolve(relativePath);
     await mkdir(path.dirname(absolute), { recursive: true });
-    const temporary = `${absolute}.tmp-${process.pid}-${Date.now()}`;
+    const temporary = `${absolute}.tmp-${process.pid}-${randomUUID()}`;
     await writeFile(temporary, value, "utf8");
     await rename(temporary, absolute);
   }
@@ -38,6 +39,15 @@ export class FileArtifactStore implements ArtifactStorePort {
 
   async readText(relativePath: string): Promise<string> {
     return readFile(this.resolve(relativePath), "utf8");
+  }
+
+  async exists(relativePath: string): Promise<boolean> {
+    try {
+      await access(this.resolve(relativePath));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async hash(relativePath: string): Promise<string> {

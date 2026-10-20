@@ -1,0 +1,18 @@
+{
+  "name": "prd-ui-agents-dsh-profile",
+  "private": true,
+  "dependencies": {
+    "@deepseek-ai/dsh-base": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-headless": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-llm-pi-ai": "0.2.1-rc.2"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-headless",
+        "@deepseek-ai/dsh-llm-pi-ai"
+      ]
+    }
+  }
+}

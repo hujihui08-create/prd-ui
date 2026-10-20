@@ -12,6 +12,10 @@
     "./adapter": {
       "types": "./src/adapter.ts",
       "default": "./src/adapter.ts"
+    },
+    "./agent-runner": {
+      "types": "./src/agent-runner.ts",
+      "default": "./src/agent-runner.ts"
     }
   },
   "scripts": {
@@ -20,6 +24,7 @@
     "prepare": "pnpm build"
   },
   "dependencies": {
+    "@prd-ui/agents": "workspace:*",
     "@prd-ui/asset-review": "workspace:*",
     "@prd-ui/contracts": "workspace:*"
   },
