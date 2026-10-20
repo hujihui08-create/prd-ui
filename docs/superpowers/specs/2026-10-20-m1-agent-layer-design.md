@@ -497,7 +497,8 @@ Interaction Gate   Visual Style Gate
   `13 assets / 13 passed`。
 - 真实 dsh（`deepseek-flash`）：三 Agent 各 1 次调用，无 schema repair、无门禁修复；
   `status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，
-  10 个 asset briefs，**¥0.2081**，`usageComplete=true`。另一次只用
+  10 个 asset briefs，**¥0.2487**（最终代码复跑；早前一次 ¥0.2081），
+  `usageComplete=true`。另一次只用
   `--allow-unreviewed` 的 run 按设计停在 `awaiting_signoff`（¥0.2756）。
 - IA 在 employee-app 切片上发现 3 个真实 blocker（3 个死 Tab、brief 缺少库存入口、
   库管无落地页）；真实 run 用开发 waiver 继续以验证 Interaction/Visual。这些是

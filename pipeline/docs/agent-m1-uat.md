@@ -62,14 +62,16 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - 10 个 `asset-briefs/*.json`；`interaction-spec.pages=[today, inventory-query]`
 - 每角色 1 次调用，无 schema repair、无门禁修复
 
+最终代码复跑（2026-10-20，run `run-2026-10-20T06-25-15-081Z`）：
+
 | Agent | input | cache read | output | cost CNY |
 |---|---:|---:|---:|---:|
-| IA | 254 | 14,720 | 7,055 | 0.0621 |
-| Interaction | 9,528 | 6,144 | 6,531 | 0.0773 |
-| Visual Style | 6,373 | 6,016 | 6,328 | 0.0687 |
-| **合计** | | | | **0.2081** |
+| IA | 5,019 | 10,496 | 5,344 | 0.0575 |
+| Interaction | 10,105 | 6,144 | 13,562 | 0.1393 |
+| Visual Style | 6,950 | 6,016 | 4,245 | 0.0519 |
+| **合计** | | | | **0.2487** |
 
-`usageComplete=true`，低于 10 CNY 上限。IA 的 input 较低是因为同 prompt 在之前的 IA-only run 中已缓存。
+`usageComplete=true`，低于 10 CNY 上限。同一命令在早前代码上的一次 run 为 **¥0.2081**；两者都通过，差异来自模型输出长度与缓存命中。
 
 ### 3.2 无签核（awaiting_signoff）
 

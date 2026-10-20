@@ -98,7 +98,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - `--allow-unreviewed` 只用于开发冒烟，最终状态必须是 `awaiting_signoff`，不会产生 `success`。
 - 产物布局、签核格式、门禁代码和退出码见 [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md)。
 
-> 真实 `deepseek-flash` 三 Agent 回归：`status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，10 个 asset briefs，**¥0.2081**，`usageComplete=true`。同一切片只用 `--allow-unreviewed` 时按设计停在 `awaiting_signoff`（¥0.2756）。
+> 真实 `deepseek-flash` 三 Agent 回归：`status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，10 个 asset briefs，**¥0.2487**（最终代码复跑；早前一次 ¥0.2081），`usageComplete=true`。同一切片只用 `--allow-unreviewed` 时按设计停在 `awaiting_signoff`（¥0.2756）。
 
 ## M0 资产评审
 
@@ -166,7 +166,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - `pnpm asset:review ... --assets samples/assets/m0 --runtime standalone`：`13 assets / 13 passed`。
 - `pnpm asset:review ... --assets samples/assets/m0 --runtime dsh`（真实 `deepseek-flash`）：`13 assets / 13 passed`。
 - `pnpm agent:run ... --runtime standalone`：三个 Agent 产物齐全；缺签核时 `awaiting_signoff`，签核后 `success`。
-- `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.2081，`usageComplete=true`。
+- `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.2487，`usageComplete=true`。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 

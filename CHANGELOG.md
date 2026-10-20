@@ -42,7 +42,8 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `13 assets / 13 passed`.
 - Real `deepseek-flash`: three agents, one call each, no repair;
   `status=success`, `gates={ia:waived, interaction:passed, visualStyle:passed}`,
-  10 asset briefs, **¥0.2081**, `usageComplete=true` (10 CNY cap). The same
+  10 asset briefs, **¥0.2081** (earlier run) / **¥0.2487** (final-code rerun),
+  `usageComplete=true` (10 CNY cap). The same
   slice without signoffs stops at `awaiting_signoff` (¥0.2756).
 - Real dsh asset review after the shared-contract refactor:
   `13 assets / 13 passed`, ¥0.3541, `usageComplete=true`.

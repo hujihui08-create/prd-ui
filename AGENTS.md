@@ -57,7 +57,7 @@ real dsh `deepseek-flash` `13 assets / 13 passed` with
 (10 CNY default cap). M1 real dsh: three agents, `success`,
 `gates={ia:waived, interaction:passed, visualStyle:passed}`, 10 asset briefs,
 ¥0.2081, `usageComplete=true`; the same slice without signoffs stops at
-`awaiting_signoff` (¥0.2756).
+`awaiting_signoff` (¥0.2756). Final-code rerun: ¥0.2487.
 
 ## Architecture boundaries
 
