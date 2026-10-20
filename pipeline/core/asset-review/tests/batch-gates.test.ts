@@ -208,7 +208,7 @@ describe("runBatchGates", () => {
     };
     const reviewer: AssetReviewerPort = {
       async review() {
-        return passVerdict;
+        return { verdict: passVerdict };
       },
     };
 

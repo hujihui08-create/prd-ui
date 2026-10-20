@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -6,12 +6,15 @@ import {
   DEFAULT_SOURCE_POLICY,
   SourcePolicySchema,
   VisualStyleSchema,
+  parsePricingConfig,
   preflightAssetBriefs,
+  resolvePricing,
   runAssetReview,
   toAssetManifest,
   validateProviderEnv,
   type AssetBrief,
   type AssetReviewerPort,
+  type ReviewPricing,
   type SourcePolicy,
   type VisualStyle,
 } from "@prd-ui/asset-review";
@@ -38,8 +41,11 @@ Options:
   --only <assetId>           Run only one asset (repeatable)
   --dry-run                  Resolve brief/source/gate only; no reviewer, no freeze
   --fail-fast                Stop the batch on the first reviewer error
-  --budget-usd <n>           Per-asset cost cap
+  --budget-usd <n>           Per-asset producer cost cap (not the review budget)
   --budget-minutes <n>       Per-asset time cap
+  --max-review-cost-cny <n>  Global review cost cap in CNY (default: 10 for dsh)
+  --allow-unknown-cost       Continue when review usage is incomplete
+  --pricing <path>           Pricing file (default: <assets>/pricing.json or pipeline/pricing.json)
   -h, --help                 Print this help and exit`;
 
 export interface AssetCliOptions {
@@ -54,6 +60,9 @@ export interface AssetCliOptions {
   failFast: boolean;
   maxCostUsd?: number;
   maxMinutes?: number;
+  maxReviewCostCny?: number;
+  allowUnknownCost: boolean;
+  pricingPath?: string;
   help: boolean;
 }
 
@@ -85,6 +94,7 @@ export function parseArgs(argv: string[]): AssetCliOptions {
     only: [],
     dryRun: false,
     failFast: false,
+    allowUnknownCost: false,
     help: false,
   };
 
@@ -145,9 +155,22 @@ export function parseArgs(argv: string[]): AssetCliOptions {
       case "--budget-minutes":
         options.maxMinutes = parseNumber(flag, value());
         break;
+      case "--max-review-cost-cny":
+        options.maxReviewCostCny = parseNumber(flag, value());
+        break;
+      case "--allow-unknown-cost":
+        options.allowUnknownCost = true;
+        break;
+      case "--pricing":
+        options.pricingPath = path.resolve(value());
+        break;
       default:
         throw new AssetCliUsageError(`unknown argument: ${argument}`);
     }
+  }
+
+  if (options.maxReviewCostCny === undefined && options.runtime === "dsh") {
+    options.maxReviewCostCny = 10;
   }
 
   return options;
@@ -198,6 +221,34 @@ async function loadPolicy(assetsDir: string): Promise<SourcePolicy> {
   } catch (error) {
     throw new Error(`INVALID_SOURCE_POLICY: ${file}: ${errorMessage(error)}`);
   }
+}
+
+async function fileExists(file: string): Promise<boolean> {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function loadPricing(
+  assetsDir: string,
+  explicitPath?: string
+): Promise<ReviewPricing> {
+  const override = path.join(assetsDir, "pricing.json");
+  const file =
+    explicitPath ??
+    ((await fileExists(override)) ? override : path.join(pipelineRoot, "pricing.json"));
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(await readFile(file, "utf8")) as unknown;
+  } catch (error) {
+    throw new Error(`INVALID_PRICING: ${file}: ${errorMessage(error)}`);
+  }
+  const config = parsePricingConfig(raw, file);
+  return resolvePricing(config, process.env.PRD_UI_VISION_MODEL);
 }
 
 async function createReviewer(assetsDir: string, options: AssetCliOptions): Promise<AssetReviewerPort> {
@@ -283,6 +334,7 @@ export async function main(
     });
     const style = await loadStyle(options.assetsDir);
     const policy = await loadPolicy(options.assetsDir);
+    const pricing = await loadPricing(options.assetsDir, options.pricingPath);
 
     if (options.dryRun) {
       const result = await preflightAssetBriefs({
@@ -316,8 +368,13 @@ export async function main(
       ports: { producer, reviewer, store, clock: { now: () => new Date() }, log: createLogger(store) },
       only: options.only,
       continueOnReviewerError: !options.failFast,
+      pricing,
       ...(options.maxCostUsd === undefined ? {} : { maxCostUsd: options.maxCostUsd }),
       ...(options.maxMinutes === undefined ? {} : { maxMinutes: options.maxMinutes }),
+      ...(options.maxReviewCostCny === undefined
+        ? {}
+        : { maxReviewCostCny: options.maxReviewCostCny }),
+      allowUnknownCost: options.allowUnknownCost,
     });
     const manifest = toAssetManifest({ project: config.project, profile, records: result.assets });
     const complete =
@@ -332,6 +389,15 @@ export async function main(
       } passed, ${result.summary.retried} retried, ${result.summary.unresolved} unresolved, ${
         result.summary.degraded
       } degraded`
+    );
+    const reviewCostCny =
+      result.summary.reviewCostCny === undefined
+        ? "unavailable"
+        : result.summary.reviewCostCny.toFixed(4);
+    io.stdout(
+      `Review cost: reviewCostCny=${reviewCostCny} usageSource=${
+        result.usageSource ?? "unavailable"
+      } usageComplete=${result.usageComplete ?? false}`
     );
     for (const record of result.assets.filter((asset) => asset.status !== "passed").slice(0, 10)) {
       const reasons = record.attempts

@@ -46,33 +46,149 @@ const input: AssetReviewerInput = {
   runDir: "",
 };
 
+function ndjson(...events: unknown[]): string {
+  return `${events.map((event) => JSON.stringify(event)).join("\n")}\n`;
+}
+
+function stepEnd(usage: unknown) {
+  return { type: "status", phase: "step_end", turn: 1, step: 1, usage };
+}
+
+function final(text: string) {
+  return { type: "final", text };
+}
+
 const temporaryDirs: string[] = [];
 afterEach(async () => {
   await Promise.all(temporaryDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
+function reviewerWith(runner: CommandRunner): DshAssetReviewer {
+  return new DshAssetReviewer({
+    dshHome: "/tmp/dsh-home",
+    profile: "prd-ui-assets",
+    dshBin: "/tmp/dsh",
+    cwd: "/tmp",
+    runner,
+    env: providerEnv,
+  });
+}
+
 describe("DshAssetReviewer", () => {
-  it("runs a headless review and writes evidence", async () => {
+  it("runs a headless review, returns usage and writes raw evidence", async () => {
     const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
     temporaryDirs.push(runDir);
-    const runner: CommandRunner = async () => ({
-      stdout: JSON.stringify(verdict),
+    const reviewer = reviewerWith(async () => ({
+      stdout: ndjson(
+        stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 5 }),
+        final(JSON.stringify({ ...verdict, reason_note: "extra" }))
+      ),
       stderr: "",
-    });
-    const reviewer = new DshAssetReviewer({
-      dshHome: "/tmp/dsh-home",
-      profile: "prd-ui-assets",
-      dshBin: "/tmp/dsh",
-      cwd: "/tmp",
-      runner,
-      env: providerEnv,
-    });
+    }));
+
     const result = await reviewer.review({ ...input, runDir });
-    expect(result.verdict).toBe("pass");
+
+    expect(result.verdict.verdict).toBe("pass");
+    expect(result.usage).toEqual({
+      inputTokens: 100,
+      outputTokens: 20,
+      cacheReadTokens: 5,
+      totalTokens: 125,
+    });
+    expect(result.usageComplete).toBe(true);
+    expect(result.repairAttempted).toBe(false);
+    expect(result.ignoredKeys).toEqual(["reason_note"]);
+    expect(result.raw).toContain("reason_note");
+
     const evidence = path.join(runDir, "dsh", "icon-home-library-1");
     expect((await stat(path.join(evidence, "prompt.md"))).isFile()).toBe(true);
-    expect(await readFile(path.join(evidence, "stdout.txt"), "utf8")).toContain('"verdict"');
+    expect(await readFile(path.join(evidence, "stdout.txt"), "utf8")).toContain(
+      '"type":"final"'
+    );
     expect(await readFile(path.join(evidence, "session.json"), "utf8")).toContain("prd-ui-assets");
+    const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
+      raw: string;
+      ignoredKeys: string[];
+      usageComplete: boolean;
+      repairAttempted: boolean;
+    };
+    expect(raw.raw).toContain("reason_note");
+    expect(raw.ignoredKeys).toEqual(["reason_note"]);
+    expect(raw.usageComplete).toBe(true);
+    expect(raw.repairAttempted).toBe(false);
+  });
+
+  it("repairs one invalid verdict and merges both attempts' usage", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    let calls = 0;
+    const captured: string[] = [];
+    const reviewer = reviewerWith(async (_command, _args, options) => {
+      calls += 1;
+      captured.push(options.stdin ?? "");
+      if (calls === 1) {
+        return {
+          stdout: ndjson(
+            stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
+            final('{"verdict":"pass"}')
+          ),
+          stderr: "",
+        };
+      }
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 200, outputTokens: 40, totalTokens: 250, cacheReadTokens: 10 }),
+          final(JSON.stringify(verdict))
+        ),
+        stderr: "",
+      };
+    });
+
+    const result = await reviewer.review({ ...input, runDir });
+
+    expect(calls).toBe(2);
+    expect(captured[1]).toContain("previous response");
+    expect(result.verdict.verdict).toBe("pass");
+    expect(result.repairAttempted).toBe(true);
+    expect(result.usage).toEqual({
+      inputTokens: 300,
+      outputTokens: 60,
+      cacheReadTokens: 10,
+      totalTokens: 370,
+    });
+    expect(result.usageComplete).toBe(true);
+
+    const evidence = path.join(runDir, "dsh", "icon-home-library-1");
+    expect((await stat(path.join(evidence, "repair-prompt.md"))).isFile()).toBe(true);
+    expect((await stat(path.join(evidence, "first-stdout.txt"))).isFile()).toBe(true);
+  });
+
+  it("throws with merged usage when the repair is also invalid", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    let calls = 0;
+    const reviewer = reviewerWith(async () => {
+      calls += 1;
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
+          final('{"verdict":"pass"}')
+        ),
+        stderr: "",
+      };
+    });
+
+    await expect(reviewer.review({ ...input, runDir })).rejects.toMatchObject({
+      code: "DSH_INVALID_VERDICT",
+      usage: {
+        inputTokens: 200,
+        outputTokens: 40,
+        cacheReadTokens: 0,
+        totalTokens: 240,
+      },
+      usageComplete: true,
+    });
+    expect(calls).toBe(2);
   });
 
   it("rejects missing provider env when constructed", () => {

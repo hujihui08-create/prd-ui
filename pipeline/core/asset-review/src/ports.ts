@@ -1,8 +1,8 @@
 import type {
   AssetBrief,
   AssetCandidate,
-  AssetReviewVerdict,
   HardGateResult,
+  ReviewResult,
   SourceId,
 } from "./contracts.js";
 import type { VisualStyle } from "./visual-style.js";
@@ -28,7 +28,7 @@ export interface AssetReviewerInput {
 }
 
 export interface AssetReviewerPort {
-  review(input: AssetReviewerInput): Promise<AssetReviewVerdict>;
+  review(input: AssetReviewerInput): Promise<ReviewResult>;
 }
 
 /**

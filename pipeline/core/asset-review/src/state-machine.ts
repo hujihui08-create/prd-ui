@@ -1,12 +1,15 @@
 import {
+  AssetReviewRunSchema,
+  ReviewUsageSchema,
   type AssetAttempt,
   type AssetBrief,
   type AssetCandidate,
   type AssetReviewRecord,
   type AssetReviewRun,
   type AssetReviewSummary,
-  type AssetReviewVerdict,
   type HardGateResult,
+  type ReviewResult,
+  type ReviewUsage,
   type SourceId,
   type SourcePolicy,
   type SourceTier,
@@ -16,6 +19,7 @@ import { runBatchGates } from "./batch-gates.js";
 import { runGate } from "./gate.js";
 import { normalizeSvg } from "./gates/svg.js";
 import type { AssetReviewPorts } from "./ports.js";
+import { reviewCost, type ReviewPricing } from "./pricing.js";
 import type { VisualStyle } from "./visual-style.js";
 import { validateVerdict } from "./verdict.js";
 
@@ -32,6 +36,9 @@ export interface RunAssetReviewInput {
   maxCostUsd?: number;
   maxMinutes?: number;
   continueOnReviewerError?: boolean;
+  pricing?: ReviewPricing;
+  maxReviewCostCny?: number;
+  allowUnknownCost?: boolean;
 }
 
 export type AssetReviewRunResult = AssetReviewRun;
@@ -46,6 +53,58 @@ function errorDetails(error: unknown): string {
     if (typeof code === "string") return `${code}: ${errorMessage(error)}`;
   }
   return errorMessage(error);
+}
+
+interface ReviewAccounting {
+  usage?: ReviewUsage;
+  usageComplete?: boolean;
+}
+
+/**
+ * Reviewers report captured usage on failure too (dsh attaches it to
+ * `DshError`). Core reads the fields structurally so it stays runtime-neutral.
+ */
+function reviewAccountingFromError(error: unknown): ReviewAccounting {
+  if (typeof error !== "object" || error === null) return {};
+  const candidate = error as { usage?: unknown; usageComplete?: unknown };
+  const usage =
+    candidate.usage === undefined ? undefined : ReviewUsageSchema.safeParse(candidate.usage);
+  return {
+    ...(usage?.success === true ? { usage: usage.data } : {}),
+    ...(typeof candidate.usageComplete === "boolean"
+      ? { usageComplete: candidate.usageComplete }
+      : {}),
+  };
+}
+
+function accountIsIncomplete(accounting: ReviewAccounting): boolean {
+  return accounting.usage === undefined || accounting.usageComplete === false;
+}
+
+function unresolvedForLimit(
+  brief: AssetBrief,
+  status: "budget_exceeded" | "usage_incomplete",
+  issue: string,
+  timestamp: string
+): AssetReviewRecord {
+  const source = brief.sourceChain[0]!;
+  return {
+    assetId: brief.id,
+    brief,
+    status: "unresolved",
+    attempts: [
+      {
+        assetId: brief.id,
+        source,
+        sourceTier: SourceTierBySource[source],
+        attempt: 1,
+        status,
+        issues: [issue],
+        timestamp,
+      },
+    ],
+    degraded: false,
+  };
 }
 
 function extensionOf(format: string): string {
@@ -71,12 +130,74 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
   const maxCostUsd = input.maxCostUsd ?? input.policy.maxCostUsd;
   const maxMinutes = input.maxMinutes ?? input.policy.maxMinutes;
   const continueOnReviewerError = input.continueOnReviewerError ?? true;
+  const maxReviewCostCny = input.maxReviewCostCny;
+  const allowUnknownCost = input.allowUnknownCost ?? false;
+  if (maxReviewCostCny !== undefined && input.pricing === undefined) {
+    throw new Error("CONFIGURATION_ERROR: pricing is required when maxReviewCostCny is set");
+  }
 
   const records: AssetReviewRecord[] = [];
   let fatalError: string | undefined;
   let reviewerErrors = 0;
+  let costBudgetExceeded = false;
+  let usageIncomplete = false;
+  let totalReviewCostUsd = 0;
+  let totalReviewCostCny = 0;
+  let reviewInputTokens = 0;
+  let reviewOutputTokens = 0;
+  let reviewCacheTokens = 0;
+  let hasUsage = false;
+  let reviewCount = 0;
+  let anyIncomplete = false;
+
+  const recordReview = (
+    accounting: ReviewAccounting,
+    attempt: AssetAttempt,
+    enforceCompleteness = true
+  ): void => {
+    reviewCount += 1;
+    if (accounting.usage !== undefined) {
+      hasUsage = true;
+      attempt.reviewUsage = accounting.usage;
+      reviewInputTokens += accounting.usage.inputTokens;
+      reviewOutputTokens += accounting.usage.outputTokens;
+      reviewCacheTokens += accounting.usage.cacheReadTokens;
+      if (input.pricing !== undefined) {
+        const cost = reviewCost(accounting.usage, input.pricing);
+        attempt.reviewCostUsd = cost.usd;
+        attempt.reviewCostCny = cost.cny;
+        totalReviewCostUsd += cost.usd;
+        totalReviewCostCny += cost.cny;
+      }
+    }
+    if (accountIsIncomplete(accounting)) anyIncomplete = true;
+    if (maxReviewCostCny !== undefined) {
+      if (totalReviewCostCny > maxReviewCostCny) {
+        costBudgetExceeded = true;
+      } else if (
+        enforceCompleteness &&
+        accountIsIncomplete(accounting) &&
+        !allowUnknownCost
+      ) {
+        // A reviewer crash already fails the run with its own error; only a
+        // review that produced a verdict can trip the fail-closed cost guard.
+        usageIncomplete = true;
+      }
+    }
+  };
 
   for (const brief of selected) {
+    if (costBudgetExceeded || usageIncomplete) {
+      records.push(
+        unresolvedForLimit(
+          brief,
+          costBudgetExceeded ? "budget_exceeded" : "usage_incomplete",
+          costBudgetExceeded ? "REVIEW_COST_BUDGET_EXCEEDED" : "REVIEW_USAGE_INCOMPLETE",
+          input.ports.clock.now().toISOString()
+        )
+      );
+      continue;
+    }
     if (fatalError !== undefined) {
       records.push({
         assetId: brief.id,
@@ -120,7 +241,9 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
         final !== undefined ||
         fatalError !== undefined ||
         reviewerFailed ||
-        budgetExceeded
+        budgetExceeded ||
+        costBudgetExceeded ||
+        usageIncomplete
       ) {
         break;
       }
@@ -134,7 +257,14 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
       });
 
       for (let attempt = 1; attempt <= input.policy.maxAttemptsPerSource; attempt += 1) {
-        if (final !== undefined || fatalError !== undefined) break;
+        if (
+          final !== undefined ||
+          fatalError !== undefined ||
+          costBudgetExceeded ||
+          usageIncomplete
+        ) {
+          break;
+        }
 
         const elapsedMinutes = (input.ports.clock.now().getTime() - startedAt.getTime()) / 60_000;
         if (
@@ -261,9 +391,9 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
           continue;
         }
 
-        let verdict: AssetReviewVerdict;
+        let reviewResult: ReviewResult;
         try {
-          verdict = await input.ports.reviewer.review({
+          reviewResult = await input.ports.reviewer.review({
             brief,
             style: input.style,
             candidate,
@@ -272,6 +402,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
             runDir: input.runDir,
           });
         } catch (error) {
+          recordReview(reviewAccountingFromError(error), attemptRecord, false);
           attemptRecord.status = "reviewer_error";
           attemptRecord.issues = [`REVIEWER_ERROR: ${errorDetails(error)}`];
           attempts.push(attemptRecord);
@@ -290,7 +421,9 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
           break;
         }
 
-        const check = validateVerdict(verdict, {
+        recordReview(reviewResult, attemptRecord);
+
+        const check = validateVerdict(reviewResult.verdict, {
           brandCritical: brief.brandCritical ?? false,
         });
         attemptRecord.review = check.verdict;
@@ -394,6 +527,16 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     unresolved: records.filter((record) => record.status === "unresolved").length,
     degraded: records.filter((record) => record.degraded).length,
     reviewerErrors,
+    ...(hasUsage
+      ? {
+          reviewInputTokens,
+          reviewOutputTokens,
+          reviewCacheTokens,
+          ...(input.pricing === undefined
+            ? {}
+            : { reviewCostUsd: totalReviewCostUsd, reviewCostCny: totalReviewCostCny }),
+        }
+      : {}),
   };
   const batchGates = await runBatchGates({
     records,
@@ -417,9 +560,13 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
         : undefined;
   const reviewerError =
     reviewerErrors > 0 ? `REVIEWER_ERROR: ${reviewerErrors} asset(s)` : undefined;
-  // A reviewer crash is operational and must not be masked by a set mismatch;
-  // icon-over-illustration precedence still applies within `setError`.
-  const error = fatalError ?? reviewerError ?? setError;
+  // Usage/cost failures stop the batch and take precedence; otherwise a
+  // reviewer crash must not be masked by a set mismatch.
+  const error = usageIncomplete
+    ? "REVIEW_USAGE_INCOMPLETE"
+    : costBudgetExceeded
+      ? "REVIEW_COST_BUDGET_EXCEEDED"
+      : (fatalError ?? reviewerError ?? setError);
   const finishedAt = input.ports.clock.now().toISOString();
   const result: AssetReviewRunResult = {
     runId: input.runId,
@@ -431,16 +578,28 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     assets: records,
     summary,
     batchGates,
+    ...(reviewCount === 0
+      ? {}
+      : {
+          usageSource: hasUsage ? ("json-events" as const) : ("unavailable" as const),
+          usageComplete: !anyIncomplete,
+        }),
     passed:
       summary.unresolved === 0 &&
       summary.total > 0 &&
       fatalError === undefined &&
       reviewerErrors === 0 &&
-      !setFailed,
+      !setFailed &&
+      !costBudgetExceeded &&
+      !usageIncomplete,
     ...(error === undefined ? {} : { error }),
   };
 
-  await input.ports.store.writeJson("asset-review.json", result);
+  const validated = AssetReviewRunSchema.safeParse(result);
+  if (!validated.success) {
+    throw new Error(`CONTRACT_VIOLATION: asset-review.json: ${validated.error.message}`);
+  }
+  await input.ports.store.writeJson("asset-review.json", validated.data);
   await input.ports.log.log({ type: "run_finished", summary, passed: result.passed });
-  return result;
+  return validated.data;
 }

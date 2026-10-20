@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
+import { parseArgs } from "../src/asset-cli.js";
 
 const execFileAsync = promisify(execFile);
 const pipelineRoot = path.resolve(
@@ -99,6 +100,7 @@ describe("asset:review CLI", () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("pnpm asset:review");
     expect(result.stdout).toContain("--fail-fast");
+    expect(result.stdout).toContain("--max-review-cost-cny");
   });
 
   it("rejects an unknown argument with exit 2", async () => {
@@ -401,5 +403,117 @@ describe("asset:review CLI", () => {
     );
     expect(result.code).toBe(1);
     expect(result.stderr).toMatch(/MISSING_CREDENTIAL|PRD_UI_VISION_API_KEY/);
+  });
+
+  it("fails fast on malformed pricing with INVALID_PRICING", async () => {
+    const assets = await tempAssets();
+    const pricingPath = path.join(assets, "pricing.json");
+    await writeFile(pricingPath, JSON.stringify({ default: "x", providers: {} }), "utf8");
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--dry-run",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("INVALID_PRICING");
+    expect(result.stderr).toContain(pricingPath);
+  });
+
+  it("accepts an explicit --pricing file", async () => {
+    const assets = await tempAssets();
+    const pricingFile = path.join(assets, "custom-pricing.json");
+    await writeFile(
+      pricingFile,
+      JSON.stringify({
+        default: "custom",
+        providers: {
+          custom: {
+            inputMissUsdPerMillion: 1,
+            inputCacheUsdPerMillion: 0.1,
+            outputUsdPerMillion: 2,
+            usdToCny: 7,
+          },
+        },
+      }),
+      "utf8"
+    );
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--only",
+      "icon-home",
+      "--pricing",
+      pricingFile,
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Review cost: reviewCostCny=unavailable");
+  });
+
+  it("fails closed when a review budget is set but usage is unavailable", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--max-review-cost-cny",
+      "0.1",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("REVIEW_USAGE_INCOMPLETE");
+
+    const runDir = await onlyRun(runs);
+    const review = await readJson(path.join(runDir, "asset-review.json"));
+    expect(review.error).toBe("REVIEW_USAGE_INCOMPLETE");
+    expect(review.usageComplete).toBe(false);
+    expect((review.summary as { reviewCostCny?: number }).reviewCostCny).toBeUndefined();
+  });
+
+  it("continues past unknown review cost with --allow-unknown-cost", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--max-review-cost-cny",
+      "0.1",
+      "--allow-unknown-cost",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain(
+      "Review cost: reviewCostCny=unavailable usageSource=unavailable usageComplete=false"
+    );
+  });
+});
+
+describe("parseArgs", () => {
+  it("defaults the global review budget to 10 CNY only for dsh", () => {
+    expect(parseArgs([]).maxReviewCostCny).toBeUndefined();
+    expect(parseArgs(["--runtime", "dsh"]).maxReviewCostCny).toBe(10);
+    expect(
+      parseArgs(["--runtime", "dsh", "--max-review-cost-cny", "2"]).maxReviewCostCny
+    ).toBe(2);
+    expect(parseArgs(["--runtime", "dsh", "--allow-unknown-cost"]).allowUnknownCost).toBe(
+      true
+    );
   });
 });

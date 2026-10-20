@@ -132,6 +132,31 @@ export const AssetReviewVerdictSchema = z.object({
 });
 export type AssetReviewVerdict = z.infer<typeof AssetReviewVerdictSchema>;
 
+/**
+ * Billing-relevant token usage from one review call. `inputTokens` is
+ * cache-miss input only; cache reads are tracked separately and `totalTokens`
+ * is audit-only (never used to compute cost).
+ */
+export const ReviewUsageSchema = z
+  .object({
+    inputTokens: z.number().int().nonnegative(),
+    outputTokens: z.number().int().nonnegative(),
+    cacheReadTokens: z.number().int().nonnegative(),
+    totalTokens: z.number().int().nonnegative().optional(),
+    cacheWriteTokens: z.number().int().nonnegative().optional(),
+    reasoningTokens: z.number().int().nonnegative().optional(),
+  })
+  .strict();
+export type ReviewUsage = z.infer<typeof ReviewUsageSchema>;
+
+export interface ReviewResult {
+  verdict: AssetReviewVerdict;
+  usage?: ReviewUsage;
+  usageComplete?: boolean;
+  raw?: string;
+  ignoredKeys?: string[];
+  repairAttempted?: boolean;
+}
 export const AttemptStatusSchema = z.enum([
   "passed",
   "retry",
@@ -140,6 +165,7 @@ export const AttemptStatusSchema = z.enum([
   "normalize_failed",
   "reviewer_error",
   "budget_exceeded",
+  "usage_incomplete",
 ]);
 export type AttemptStatus = z.infer<typeof AttemptStatusSchema>;
 
@@ -155,6 +181,9 @@ export const AssetAttemptSchema = z
     review: AssetReviewVerdictSchema.optional(),
     issues: z.array(z.string()),
     costUsd: z.number().nonnegative().optional(),
+    reviewUsage: ReviewUsageSchema.optional(),
+    reviewCostUsd: z.number().nonnegative().optional(),
+    reviewCostCny: z.number().nonnegative().optional(),
     timestamp: z.string().min(1),
   })
   .strict();
@@ -204,6 +233,11 @@ export const AssetReviewSummarySchema = z
     unresolved: z.number().int().min(0),
     degraded: z.number().int().min(0),
     reviewerErrors: z.number().int().min(0).default(0),
+    reviewInputTokens: z.number().int().nonnegative().optional(),
+    reviewOutputTokens: z.number().int().nonnegative().optional(),
+    reviewCacheTokens: z.number().int().nonnegative().optional(),
+    reviewCostUsd: z.number().nonnegative().optional(),
+    reviewCostCny: z.number().nonnegative().optional(),
   })
   .strict();
 export type AssetReviewSummary = z.infer<typeof AssetReviewSummarySchema>;
@@ -219,6 +253,8 @@ export const AssetReviewRunSchema = z
     assets: z.array(AssetReviewRecordSchema),
     summary: AssetReviewSummarySchema,
     batchGates: BatchGateResultSchema.optional(),
+    usageSource: z.enum(["json-events", "unavailable"]).optional(),
+    usageComplete: z.boolean().optional(),
     passed: z.boolean(),
     error: z.string().optional(),
   })

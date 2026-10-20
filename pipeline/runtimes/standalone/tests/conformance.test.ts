@@ -13,6 +13,7 @@ import {
   type AssetReviewVerdict,
   type AssetReviewerInput,
   type AssetReviewerPort,
+  type ReviewResult,
 } from "@prd-ui/asset-review";
 import { extractVerdict } from "../../dsh/src/dsh-process.js";
 import { FileArtifactStore } from "../src/asset/artifact-store.js";
@@ -50,11 +51,11 @@ async function loadBriefs(assetsDir: string): Promise<AssetBrief[]> {
 class DshLikeReviewer implements AssetReviewerPort {
   constructor(private readonly reviews: Map<string, AssetReviewVerdict>) {}
 
-  async review(input: AssetReviewerInput): Promise<AssetReviewVerdict> {
+  async review(input: AssetReviewerInput): Promise<ReviewResult> {
     const key = `${input.brief.id}/${input.candidate.source}/${input.candidate.attempt}`;
     const verdict = this.reviews.get(key);
     if (!verdict) throw new Error(`missing scripted review: ${key}`);
-    return extractVerdict(JSON.stringify(verdict));
+    return { verdict: extractVerdict(JSON.stringify(verdict)) };
   }
 }
 

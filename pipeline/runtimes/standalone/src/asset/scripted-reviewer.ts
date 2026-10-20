@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   AssetReviewVerdictSchema,
   type AssetReviewVerdict,
+  type ReviewResult,
 } from "@prd-ui/asset-review";
 import type { AssetReviewerInput, AssetReviewerPort } from "@prd-ui/asset-review";
 
@@ -25,12 +26,12 @@ export async function loadScriptedReviews(filePath: string): Promise<Map<string,
 export class ScriptedReviewer implements AssetReviewerPort {
   constructor(private readonly reviews: Map<string, AssetReviewVerdict>) {}
 
-  async review(input: AssetReviewerInput): Promise<AssetReviewVerdict> {
+  async review(input: AssetReviewerInput): Promise<ReviewResult> {
     const key = `${input.brief.id}/${input.candidate.source}/${input.candidate.attempt}`;
     const verdict = this.reviews.get(key);
     if (!verdict) {
       throw new Error(`SCRIPTED_REVIEW_MISSING: ${key}`);
     }
-    return verdict;
+    return { verdict };
   }
 }

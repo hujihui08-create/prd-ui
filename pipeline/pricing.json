@@ -1,0 +1,11 @@
+{
+  "default": "deepseek-flash",
+  "providers": {
+    "deepseek-flash": {
+      "inputMissUsdPerMillion": 0.3,
+      "inputCacheUsdPerMillion": 0.006,
+      "outputUsdPerMillion": 1.2,
+      "usdToCny": 7.2
+    }
+  }
+}

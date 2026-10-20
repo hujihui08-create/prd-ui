@@ -41,7 +41,7 @@ const verdict = {
   reason: "ok",
 };
 
-function response(content: string, ok = true, status = 200) {
+function response(content: string, ok = true, status = 200, usage?: unknown) {
   return {
     ok,
     status,
@@ -49,7 +49,10 @@ function response(content: string, ok = true, status = 200) {
       return content;
     },
     async json() {
-      return { choices: [{ message: { content } }] };
+      return {
+        choices: [{ message: { content } }],
+        ...(usage === undefined ? {} : { usage }),
+      };
     },
   };
 }
@@ -63,7 +66,29 @@ describe("ModelReviewer", () => {
       model: "vision",
       fetch: fetchImpl,
     });
-    expect((await reviewer.review(input)).verdict).toBe("pass");
+    expect((await reviewer.review(input)).verdict.verdict).toBe("pass");
+  });
+
+  it("maps OpenAI usage into ReviewUsage", async () => {
+    const reviewer = new ModelReviewer({
+      apiKey: "key",
+      baseUrl: "https://example.test/v1",
+      model: "vision",
+      fetch: async () =>
+        response(JSON.stringify(verdict), true, 200, {
+          prompt_tokens: 100,
+          completion_tokens: 20,
+          total_tokens: 120,
+        }),
+    });
+    const result = await reviewer.review(input);
+    expect(result.usage).toEqual({
+      inputTokens: 100,
+      outputTokens: 20,
+      cacheReadTokens: 0,
+      totalTokens: 120,
+    });
+    expect(result.usageComplete).toBe(true);
   });
 
   it("fails fast without a key", async () => {

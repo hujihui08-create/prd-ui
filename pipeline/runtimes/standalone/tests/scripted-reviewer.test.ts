@@ -53,7 +53,7 @@ describe("ScriptedReviewer", () => {
 
   it("returns the configured verdict and fails on a missing key", async () => {
     const reviewer = new ScriptedReviewer(parseScriptedReviews({ "icon-home/library/1": verdict }));
-    expect((await reviewer.review(input)).verdict).toBe("pass");
+    expect((await reviewer.review(input)).verdict.verdict).toBe("pass");
     await expect(
       reviewer.review({ ...input, candidate: { ...input.candidate, attempt: 2 } })
     ).rejects.toThrow(/SCRIPTED_REVIEW_MISSING/);

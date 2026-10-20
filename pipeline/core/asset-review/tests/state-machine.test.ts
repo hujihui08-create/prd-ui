@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  AssetReviewRunSchema,
   DEFAULT_SOURCE_POLICY,
   type AssetBrief,
   type AssetCandidate,
   type AssetReviewVerdict,
+  type ReviewResult,
+  type ReviewUsage,
   type SourceId,
   type SourceTier,
 } from "../src/contracts.js";
+import type { ReviewPricing } from "../src/pricing.js";
 import type {
   ArtifactStorePort,
   AssetProducerPort,
@@ -41,6 +45,19 @@ const passVerdict: AssetReviewVerdict = {
 
 const retryVerdict: AssetReviewVerdict = { ...passVerdict, verdict: "retry", reason: "try again" };
 const fallbackVerdict: AssetReviewVerdict = { ...passVerdict, verdict: "fallback", reason: "wrong source" };
+
+const pricing: ReviewPricing = {
+  inputMissUsdPerMillion: 0.3,
+  inputCacheUsdPerMillion: 0.006,
+  outputUsdPerMillion: 1.2,
+  usdToCny: 7.2,
+};
+
+const oneMillionInput: ReviewUsage = {
+  inputTokens: 1_000_000,
+  outputTokens: 0,
+  cacheReadTokens: 0,
+};
 
 class MemoryStore implements ArtifactStorePort {
   readonly files = new Map<string, string>();
@@ -94,14 +111,15 @@ function producerWith(
 }
 
 function reviewerWith(
-  verdicts: Record<string, AssetReviewVerdict | Error> = {}
+  results: Record<string, AssetReviewVerdict | ReviewResult | Error> = {},
+  fallback: AssetReviewVerdict | ReviewResult = { verdict: passVerdict }
 ): AssetReviewerPort {
   return {
-    async review({ brief, candidate }) {
+    async review({ brief, candidate }): Promise<ReviewResult> {
       const key = `${brief.id}/${candidate.source}/${candidate.attempt}`;
-      const value = verdicts[key] ?? passVerdict;
+      const value = results[key] ?? fallback;
       if (value instanceof Error) throw value;
-      return value;
+      return typeof value.verdict === "string" ? { verdict: value } : value;
     },
   };
 }
@@ -213,7 +231,7 @@ describe("runAssetReview", () => {
     const reviewer: AssetReviewerPort = {
       async review({ brief }) {
         if (brief.id === "icon-home") throw new Error("model down");
-        return passVerdict;
+        return { verdict: passVerdict };
       },
     };
     const result = await run(store, reviewer, {
@@ -335,6 +353,146 @@ describe("runAssetReview", () => {
     expect(result.batchGates?.iconSet?.passed).toBe(false);
     expect(result.error).toContain("REVIEWER_ERROR");
     expect(result.passed).toBe(false);
+  });
+
+  it("records review usage and cost on the attempt and summary", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        {},
+        { verdict: passVerdict, usage: oneMillionInput, usageComplete: true }
+      ),
+      { pricing }
+    );
+
+    const attempt = result.assets[0]!.attempts[0]!;
+    expect(attempt.reviewUsage).toEqual(oneMillionInput);
+    expect(attempt.reviewCostUsd).toBeCloseTo(0.3);
+    expect(attempt.reviewCostCny).toBeCloseTo(2.16);
+    expect(result.summary.reviewInputTokens).toBe(1_000_000);
+    expect(result.summary.reviewOutputTokens).toBe(0);
+    expect(result.summary.reviewCacheTokens).toBe(0);
+    expect(result.summary.reviewCostUsd).toBeCloseTo(0.3);
+    expect(result.summary.reviewCostCny).toBeCloseTo(2.16);
+    expect(result.usageSource).toBe("json-events");
+    expect(result.usageComplete).toBe(true);
+    expect(() => AssetReviewRunSchema.parse(result)).not.toThrow();
+  });
+
+  it("stops the batch when the review cost exceeds the CNY budget", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        {},
+        { verdict: passVerdict, usage: oneMillionInput, usageComplete: true }
+      ),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 0.5,
+      }
+    );
+
+    expect(result.assets[0]!.status).toBe("passed");
+    expect(result.assets[1]!.status).toBe("unresolved");
+    expect(result.assets[1]!.attempts[0]!.status).toBe("budget_exceeded");
+    expect(result.assets[1]!.attempts[0]!.issues).toContain(
+      "REVIEW_COST_BUDGET_EXCEEDED"
+    );
+    expect(result.error).toBe("REVIEW_COST_BUDGET_EXCEEDED");
+    expect(result.passed).toBe(false);
+    expect(() => AssetReviewRunSchema.parse(result)).not.toThrow();
+  });
+
+  it("fails closed when usage is incomplete and a review budget is set", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        {},
+        {
+          verdict: passVerdict,
+          usage: { inputTokens: 10, outputTokens: 0, cacheReadTokens: 0 },
+          usageComplete: false,
+        }
+      ),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 10,
+      }
+    );
+
+    expect(result.assets[0]!.status).toBe("passed");
+    expect(result.assets[1]!.status).toBe("unresolved");
+    expect(result.assets[1]!.attempts[0]!.status).toBe("usage_incomplete");
+    expect(result.assets[1]!.attempts[0]!.issues).toContain("REVIEW_USAGE_INCOMPLETE");
+    expect(result.error).toBe("REVIEW_USAGE_INCOMPLETE");
+    expect(result.usageComplete).toBe(false);
+    expect(result.passed).toBe(false);
+  });
+
+  it("continues past incomplete usage with allowUnknownCost", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        {},
+        { verdict: passVerdict, usageComplete: false }
+      ),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 10,
+        allowUnknownCost: true,
+      }
+    );
+
+    expect(result.assets[0]!.status).toBe("passed");
+    expect(result.assets[1]!.status).toBe("passed");
+    expect(result.error).toBeUndefined();
+    expect(result.usageComplete).toBe(false);
+    expect(result.summary.reviewCostCny).toBeUndefined();
+    expect(result.passed).toBe(true);
+  });
+
+  it("records usage carried by a reviewer error", async () => {
+    const store = new MemoryStore();
+    const usage = { inputTokens: 100, outputTokens: 20, cacheReadTokens: 0 };
+    const error = Object.assign(new Error("invalid verdict"), {
+      code: "DSH_INVALID_VERDICT",
+      usage,
+      usageComplete: true,
+    });
+    const result = await run(
+      store,
+      reviewerWith({ "icon-home/library/1": error }),
+      { pricing }
+    );
+
+    const attempt = result.assets[0]!.attempts[0]!;
+    expect(attempt.status).toBe("reviewer_error");
+    expect(attempt.reviewUsage).toEqual(usage);
+    expect(attempt.reviewCostUsd).toBeCloseTo((100 / 1e6) * 0.3 + (20 / 1e6) * 1.2);
+    expect(attempt.reviewCostCny).toBeCloseTo(
+      ((100 / 1e6) * 0.3 + (20 / 1e6) * 1.2) * 7.2
+    );
+    expect(result.summary.reviewInputTokens).toBe(100);
+    expect(result.summary.reviewOutputTokens).toBe(20);
+    expect(result.usageComplete).toBe(true);
+  });
+
+  it("does not invent zero cost when usage is unavailable", async () => {
+    const store = new MemoryStore();
+    const result = await run(store, reviewerWith(), { pricing });
+
+    expect(result.assets[0]!.attempts[0]!.reviewUsage).toBeUndefined();
+    expect(result.assets[0]!.attempts[0]!.reviewCostCny).toBeUndefined();
+    expect(result.summary.reviewCostCny).toBeUndefined();
+    expect(result.usageSource).toBe("unavailable");
+    expect(result.usageComplete).toBe(false);
   });
 });
 

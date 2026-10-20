@@ -2,7 +2,8 @@ import {
   AssetReviewVerdictSchema,
   buildReviewPrompt,
   validateProviderEnv,
-  type AssetReviewVerdict,
+  type ReviewResult,
+  type ReviewUsage,
 } from "@prd-ui/asset-review";
 import type { AssetReviewerInput, AssetReviewerPort } from "@prd-ui/asset-review";
 
@@ -39,6 +40,33 @@ function stripFence(text: string): string {
   return text.trim();
 }
 
+function usageFromPayload(raw: unknown): ReviewUsage | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const usage = raw as {
+    prompt_tokens?: unknown;
+    completion_tokens?: unknown;
+    total_tokens?: unknown;
+  };
+  if (
+    typeof usage.prompt_tokens !== "number" ||
+    typeof usage.completion_tokens !== "number" ||
+    !Number.isFinite(usage.prompt_tokens) ||
+    !Number.isFinite(usage.completion_tokens) ||
+    usage.prompt_tokens < 0 ||
+    usage.completion_tokens < 0
+  ) {
+    return undefined;
+  }
+  return {
+    inputTokens: usage.prompt_tokens,
+    outputTokens: usage.completion_tokens,
+    cacheReadTokens: 0,
+    ...(typeof usage.total_tokens === "number" && Number.isFinite(usage.total_tokens)
+      ? { totalTokens: usage.total_tokens }
+      : {}),
+  };
+}
+
 /**
  * Optional standalone model reviewer. The real asset review path is dsh; this
  * exists so offline/CI runs can use an OpenAI-compatible vision endpoint with
@@ -53,7 +81,7 @@ export class ModelReviewer implements AssetReviewerPort {
     this.timeoutMs = options.timeoutMs ?? 120_000;
   }
 
-  async review(input: AssetReviewerInput): Promise<AssetReviewVerdict> {
+  async review(input: AssetReviewerInput): Promise<ReviewResult> {
     if (!this.options.apiKey) {
       throw new Error("CONFIGURATION_ERROR: PRD_UI_VISION_API_KEY is not set");
     }
@@ -90,6 +118,7 @@ export class ModelReviewer implements AssetReviewerPort {
 
       const payload = (await response.json()) as {
         choices?: Array<{ message?: { content?: string } }>;
+        usage?: unknown;
       };
       const content = payload.choices?.[0]?.message?.content;
       if (typeof content !== "string" || content.trim().length === 0) {
@@ -102,7 +131,11 @@ export class ModelReviewer implements AssetReviewerPort {
       } catch {
         throw new Error("MODEL_INVALID_JSON: reviewer did not return JSON");
       }
-      return AssetReviewVerdictSchema.parse(parsed);
+      const verdict = AssetReviewVerdictSchema.parse(parsed);
+      const usage = usageFromPayload(payload.usage);
+      return usage === undefined
+        ? { verdict, usageComplete: false }
+        : { verdict, usage, usageComplete: true };
     } finally {
       clearTimeout(timer);
     }
