@@ -633,8 +633,9 @@ describe("createLogger", () => {
       authorization: "Bearer auth-token-value",
     });
     await logger.log({ type: "second" });
+    await logger.log({ type: "third", inconsistencies: ["authorization: missing"] });
 
-    expect(appended).toHaveLength(2);
+    expect(appended).toHaveLength(3);
     expect(appended.every((line) => line.endsWith("\n"))).toBe(true);
     expect(appended[0]).toContain("sk-***");
     expect(appended[0]).not.toContain("sk-abcdefgh12345678");
@@ -649,12 +650,16 @@ describe("createLogger", () => {
     expect(appended.map((line) => (JSON.parse(line) as { type: string }).type)).toEqual([
       "first",
       "second",
+      "third",
     ]);
     expect(JSON.parse(appended[0]!)).toMatchObject({
       apiKey: "***",
       token: "***",
       secret: "***",
       authorization: "***",
+    });
+    expect(JSON.parse(appended[2]!)).toMatchObject({
+      inconsistencies: ["authorization: ***"],
     });
     expect(rewrites).toBe(0);
   });

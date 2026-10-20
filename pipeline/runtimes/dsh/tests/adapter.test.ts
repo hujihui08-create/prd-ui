@@ -193,7 +193,7 @@ describe("DshAssetReviewer", () => {
       return {
         stdout: ndjson(
           stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
-          final('{"verdict":"pass"}')
+          final('{"verdict":"pass","reason":"Token: expired"}')
         ),
         stderr: "",
       };
@@ -225,6 +225,12 @@ describe("DshAssetReviewer", () => {
     };
     expect(raw.repairAttempted).toBe(false);
     await expect(stat(path.join(evidence, "repair-prompt.md"))).rejects.toThrow();
+
+    const errorJson = JSON.parse(
+      await readFile(path.join(evidence, "error.json"), "utf8")
+    ) as { message: string };
+    expect(errorJson.message).toContain("Token: ***");
+    expect(errorJson.message).not.toContain("expired");
   });
 
   it("redacts secrets from prompt, stdout, stderr and raw evidence", async () => {
@@ -270,6 +276,48 @@ describe("DshAssetReviewer", () => {
       raw: string;
     };
     expect(raw.raw).toContain("sk-***");
+  });
+
+  it("keeps raw evidence and stdout JSON parseable when the reason looks like a secret", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    let calls = 0;
+    const reviewer = reviewerWith(async () => {
+      calls += 1;
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
+          final(
+            calls === 1
+              ? '{"verdict":"pass","reason":"Token: expired"}'
+              : JSON.stringify({ ...verdict, reason: "Token: expired" })
+          )
+        ),
+        stderr: "",
+      };
+    });
+
+    const result = await reviewer.review({ ...input, runDir });
+
+    expect(result.verdict.reason).toBe("Token: expired");
+
+    const evidence = path.join(runDir, "dsh", "icon-home-library-1");
+    const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
+      parsed: { reason: string };
+    };
+    expect(raw.parsed.reason).toBe("Token: ***");
+
+    for (const file of ["stdout.txt", "first-stdout.txt", "repair-stdout.txt"]) {
+      const lines = (await readFile(path.join(evidence, file), "utf8")).trimEnd().split("\n");
+      const events = lines.map(
+        (line) => JSON.parse(line) as { type: string; text?: string }
+      );
+      const finalEvent = events.find((event) => event.type === "final");
+      expect(finalEvent?.text, `${file} missing final event`).toBeDefined();
+      const verdictJson = JSON.parse(finalEvent!.text!) as { reason: string };
+      expect(verdictJson.reason).toBe("Token: ***");
+      expect(lines.join("\n")).not.toContain("expired");
+    }
   });
 
   it("throws with merged usage when the repair is also invalid", async () => {

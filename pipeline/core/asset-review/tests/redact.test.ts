@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { redactSecrets } from "../src/redact.js";
+import { redactSecrets, redactValue } from "../src/redact.js";
 
 describe("redactSecrets", () => {
   it("masks sk- keys", () => {
@@ -64,5 +64,33 @@ describe("redactSecrets", () => {
     expect(redactSecrets("token=abc secret: xyz Authorization: Bearer def")).toBe(
       "token=*** secret: *** Authorization: ***"
     );
+  });
+
+  it("keeps serialized JSON parseable when a value looks like a secret", () => {
+    const redacted = redactSecrets(JSON.stringify({ reason: "Token: expired" }));
+    expect(JSON.parse(redacted)).toEqual({ reason: "Token: ***" });
+  });
+
+  it("keeps arrays parseable when entries look like secrets", () => {
+    const redacted = redactSecrets(
+      JSON.stringify({ inconsistencies: ["authorization: missing"] })
+    );
+    expect(JSON.parse(redacted)).toEqual({ inconsistencies: ["authorization: ***"] });
+  });
+
+  it("redacts string leaves and sensitive keys recursively", () => {
+    expect(
+      redactValue({
+        token: "tok_live",
+        note: "Token: expired",
+        count: 2,
+        nested: ["secret: x"],
+      })
+    ).toEqual({
+      token: "***",
+      note: "Token: ***",
+      count: 2,
+      nested: ["secret: ***"],
+    });
   });
 });

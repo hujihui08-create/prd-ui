@@ -9,7 +9,7 @@ import {
   VisualStyleSchema,
   parsePricingConfig,
   preflightAssetBriefs,
-  redactSecrets,
+  redactValue,
   resolvePricing,
   runAssetReview,
   toAssetManifest,
@@ -300,8 +300,8 @@ export function assertContract<T>(
 export function createLogger(store: ArtifactStorePort) {
   return {
     async log(event: Record<string, unknown>): Promise<void> {
-      const line = redactSecrets(
-        JSON.stringify({ ...event, timestamp: new Date().toISOString() })
+      const line = JSON.stringify(
+        redactValue({ ...event, timestamp: new Date().toISOString() })
       );
       await store.appendText("log.ndjson", `${line}\n`);
     },

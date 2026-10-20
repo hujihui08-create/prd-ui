@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildReviewPrompt,
   redactSecrets,
+  redactValue,
   validateProviderEnv,
   type AssetReviewerInput,
   type AssetReviewerPort,
@@ -213,7 +214,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
       );
       await writeFile(
         path.join(evidenceDir, "session.json"),
-        `${JSON.stringify(outcome.result.session, null, 2)}\n`,
+        `${JSON.stringify(redactValue(outcome.result.session), null, 2)}\n`,
         "utf8"
       );
     }
@@ -281,10 +282,10 @@ export class DshAssetReviewer implements AssetReviewerPort {
       : (finalError?.usageComplete ?? false);
     await writeFile(
       path.join(evidenceDir, "review.raw.json"),
-      `${redactSecrets(
-        JSON.stringify(
+      `${JSON.stringify(
+        redactValue(
           {
-            raw: redactSecrets(raw),
+            raw,
             ignoredKeys,
             ...(outcome.result === undefined
               ? {}
@@ -292,18 +293,20 @@ export class DshAssetReviewer implements AssetReviewerPort {
             ...(usage === undefined ? {} : { usage }),
             usageComplete,
             repairAttempted,
-          },
-          null,
-          2
-        )
+          }
+        ),
+        null,
+        2
       )}\n`,
       "utf8"
     );
     if (finalError !== undefined) {
       await writeFile(
         path.join(evidenceDir, "error.json"),
-        `${redactSecrets(
-          JSON.stringify({ code: finalError.code, message: finalError.message }, null, 2)
+        `${JSON.stringify(
+          redactValue({ code: finalError.code, message: finalError.message }),
+          null,
+          2
         )}\n`,
         "utf8"
       );
