@@ -415,8 +415,9 @@ pnpm spec:engineer \
 ## 13. 验收记录（2026-10-20）
 
 - 实现：`core/spec-engineer`（apply/gates/run）、`PageSpec.interactions[].nodeId`、`PageSpec.motion`、agents artifact schema 导出、`pnpm spec:engineer`、`pipeline/docs/spec-engineer-v0.md`。
-- 测试：`pnpm test` **448 passed**（原 423）；`pnpm test:dsh` **2 passed**；`pnpm typecheck` clean。
+- 测试：`pnpm test` **453 passed**（原 423）；`pnpm test:dsh` **2 passed**；`pnpm typecheck` clean。
 - 回归：employee-app Phase 1 `2 pages / 0 blockers`；standalone asset review `13/13`；renderer HTML 不变；M1 回归不退化。
 - 真实 employee-app clean M1 run 被消费：2 个增强 Page Spec；每页 10 条 interactions；states 覆盖 default/empty/loading/error/disabled/success；两页都有 motion；**0 blockers**；28 warnings（19 个 `SPEC_MOTION_NODE_UNRESOLVED`、9 个 `SPEC_ASSET_UNUSED`）；`assets.referenced=["inventory"]`，`missing=[]`。
 - 实现中修正：移除 `SPEC_ACTION_ORPHAN` warning。M1 interaction spec 会合法地包含 tab/刷新/筛选/错误重试等系统 trigger；gate 只要求 brief actions 被覆盖，不把额外 trigger 当 orphan。
+- 实现中补强：`SPEC_PAGE_MISSING` 同时覆盖“brief 页在 interaction spec 中缺失”。否则 compiler 生成的 base interactions 会掩盖缺口，action gate 仍可能通过；新增缺失 interaction 页、未知 interaction 页、CLI 项目不一致的测试。
 - 已知 v0 限制：motion 未动画到 HTML；未解析 nodeId 只记 warning；不做 Spec Repair；6 条 M1 非阻断 findings 不在范围。

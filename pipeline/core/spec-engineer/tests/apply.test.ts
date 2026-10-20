@@ -7,6 +7,7 @@ import {
 import {
   assetBriefs,
   baseSpecs,
+  interactionSpec,
   makeInput,
   motionSpec,
 } from "./fixtures.js";
@@ -45,12 +46,67 @@ describe("applySpecs", () => {
     );
   });
 
+  it("replaces base interactions, dedupes repeats, and keeps transitions first", () => {
+    const duplicated = {
+      ...interactionSpec,
+      pages: interactionSpec.pages.map((page) =>
+        page.id === "today"
+          ? { ...page, triggers: [...page.triggers, ...page.triggers] }
+          : page
+      ),
+    };
+    const today = applySpecs(makeInput({ interactionSpec: duplicated })).find(
+      (spec) => spec.meta.pageId === "today"
+    )!;
+
+    expect(today.interactions[0]).toEqual({
+      trigger: "点击库存查询",
+      action: "navigate",
+      target: "/inventory",
+      reqRef: "REQ-EMP-001",
+    });
+    expect(today.interactions.filter((entry) => entry.trigger === "库存查询")).toHaveLength(1);
+    expect(today.interactions).not.toContainEqual(
+      expect.objectContaining({ trigger: "库存查询", action: "navigate" })
+    );
+  });
+
   it("merges interaction state descriptions into Page Spec states", () => {
     const today = applySpecs(makeInput()).find((spec) => spec.meta.pageId === "today")!;
     expect(today.states.default?.description).toBe("门店顶栏; 库存快捷操作; 预约列表");
     expect(today.states.loading?.description).toBe("骨架屏");
     expect(today.states.empty?.description).toBe("今天没有预约");
     expect(today.states.error?.description).toBe("错误说明; 重试按钮");
+  });
+
+  it("merges disabled and success interaction states", () => {
+    const withExtraStates = {
+      ...interactionSpec,
+      pages: interactionSpec.pages.map((page) =>
+        page.id === "today"
+          ? {
+              ...page,
+              states: {
+                ...page.states,
+                disabled: ["无库存权限"],
+                success: ["预约已更新"],
+              },
+            }
+          : page
+      ),
+    };
+    const today = applySpecs(makeInput({ interactionSpec: withExtraStates })).find(
+      (spec) => spec.meta.pageId === "today"
+    )!;
+
+    expect(today.states.disabled).toEqual({
+      name: "disabled",
+      description: "无库存权限",
+    });
+    expect(today.states.success).toEqual({
+      name: "success",
+      description: "预约已更新",
+    });
   });
 
   it("attaches only the page's motion bindings and used presets", () => {

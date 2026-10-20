@@ -15,14 +15,15 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - `pnpm spec:engineer`: loads an M1 run and the project brief, writes
   `artifacts/page-spec/*.json` only when the gate passes, plus
   `findings/spec-engineer-gate.json`, `spec-engineer.json`, and run logs.
-- Deterministic gates: page/action/state/transition coverage, motion
-  preset/token checks, asset brief linkage, optional IA drift warnings.
+- Deterministic gates: page/action/state/transition coverage (including brief
+  pages absent from the interaction spec), motion preset/token checks, asset
+  brief linkage, optional IA drift warnings.
 - M1 artifact schemas exported from `@prd-ui/agents` for consumers.
 - Usage: `pipeline/docs/spec-engineer-v0.md`.
 
 ### Verification
 
-- `pnpm test`: **448 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
+- `pnpm test`: **453 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
 - employee-app Phase 1: `2 pages / 0 blockers`; standalone asset review:
   `13/13 passed`.
 - Real employee-app clean M1 run consumed: 2 enriched Page Specs,

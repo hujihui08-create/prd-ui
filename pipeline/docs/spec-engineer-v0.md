@@ -65,7 +65,7 @@ runs/<runId>/
 |---|---|---|
 | `SPEC_INPUT_INVALID` | blocker | M1 run 不可读/状态不允许/项目不一致/artifact 缺失或 schema 失败 |
 | `SPEC_SCHEMA` | blocker | 增强后的 Page Spec 不通过 `PageSpecSchema` |
-| `SPEC_PAGE_MISSING` | blocker | brief 页没有 Page Spec |
+| `SPEC_PAGE_MISSING` | blocker | brief 页没有 Page Spec，或没有出现在 interaction spec 中 |
 | `SPEC_PAGE_UNKNOWN` | blocker | Page Spec / interaction page 不在 brief |
 | `SPEC_ACTION_MISSING` | blocker | brief action 没有被 trigger 覆盖 |
 | `SPEC_STATE_MISSING` | blocker | interaction/required state 没进入 Page Spec |

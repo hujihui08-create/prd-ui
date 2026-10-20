@@ -155,6 +155,43 @@ describe("Spec Engineer gates", () => {
     expect(gate.issues.map((issue) => issue.code)).toContain("SPEC_IA_PAGE_MISSING");
   });
 
+  it("blocks a brief page that is missing from the interaction spec", () => {
+    const gate = gateFor({
+      interactionSpec: {
+        ...interactionSpec,
+        pages: interactionSpec.pages.filter((page) => page.id !== "inventory-query"),
+      },
+    });
+    expect(gate.passed).toBe(false);
+    expect(gate.issues).toContainEqual(
+      expect.objectContaining({
+        code: "SPEC_PAGE_MISSING",
+        severity: "blocker",
+        evidence: "inventory-query",
+      })
+    );
+  });
+
+  it("blocks an interaction page that is not in the brief", () => {
+    const gate = gateFor({
+      interactionSpec: {
+        ...interactionSpec,
+        pages: [
+          ...interactionSpec.pages,
+          { ...interactionSpec.pages[0]!, id: "extra-page" },
+        ],
+      },
+    });
+    expect(gate.passed).toBe(false);
+    expect(gate.issues).toContainEqual(
+      expect.objectContaining({
+        code: "SPEC_PAGE_UNKNOWN",
+        severity: "blocker",
+        evidence: "extra-page",
+      })
+    );
+  });
+
   it("reports a missing page spec and an unknown spec page", () => {
     const specs = applySpecs(makeInput());
     const missing = gateFor({

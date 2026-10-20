@@ -110,14 +110,16 @@ interface M1FixtureOptions {
   status?: "success" | "failed";
   omitMotion?: boolean;
   omitInteraction?: boolean;
+  project?: string;
 }
 
 async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
   const dir = await tempDir("prd-ui-spec-m1-");
+  const project = options.project ?? "employee-app";
   const state = {
     schemaVersion: "1.0",
     runId: "m1-run-test",
-    project: "employee-app",
+    project,
     stage: "done",
     status: options.status ?? "success",
     agents: {
@@ -139,7 +141,7 @@ async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
 
   const envelope = {
     schemaVersion: "1.0",
-    project: "employee-app",
+    project,
     generatedAt: now,
     model: "test-model",
     promptHash: "sha256:test",
@@ -318,6 +320,26 @@ describe("spec:engineer CLI", () => {
 
     expect(result.code).toBe(1);
     expect(result.stderr).toContain("status failed");
+  });
+
+  it("rejects an M1 run whose project does not match", async () => {
+    const agentRun = await makeM1Run({ project: "other-app" });
+    const runs = await tempDir("prd-ui-spec-out-");
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+    ]);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("does not match");
+    const runDir = await singleRunDir(runs);
+    await expect(
+      readFile(path.join(runDir, "artifacts", "page-spec", "today.json"), "utf8")
+    ).rejects.toThrow();
   });
 
   it("prints help and rejects a missing --agent-run", async () => {

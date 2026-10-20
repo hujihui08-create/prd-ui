@@ -64,6 +64,9 @@ export function runSpecEngineerGates(
   const briefPages = new Map(input.brief.ia.pages.map((page) => [page.id, page]));
   const briefIds = new Set(briefPages.keys());
   const specById = new Map(input.specs.map((spec) => [spec.meta.pageId, spec]));
+  const interactionPageIds = new Set(
+    input.interactionSpec.pages.map((page) => page.id)
+  );
 
   // Schema integrity: the output must always be a valid Page Spec.
   for (const spec of input.specs) {
@@ -85,6 +88,16 @@ export function runSpecEngineerGates(
     if (!specById.has(page.id)) {
       issues.push(
         issue("SPEC_PAGE_MISSING", "blocker", `brief page ${page.id} has no Page Spec`, page.id)
+      );
+    }
+    if (!interactionPageIds.has(page.id)) {
+      issues.push(
+        issue(
+          "SPEC_PAGE_MISSING",
+          "blocker",
+          `brief page ${page.id} is missing from the interaction spec`,
+          page.id
+        )
       );
     }
   }
