@@ -24,6 +24,32 @@ const ReqIdSchema = z.custom<ReqId>(
   "invalid requirement id"
 );
 
+const PageMotionPresetSchema = z
+  .object({
+    durationMs: z.number().int().positive(),
+    easing: z.string().min(1),
+    staggerMs: z.number().int().nonnegative().optional(),
+    distance: z.string().min(1).optional(),
+  })
+  .strict();
+
+const PageMotionSchema = z
+  .object({
+    presets: z.record(z.string().min(1), PageMotionPresetSchema),
+    bindings: z.array(
+      z
+        .object({
+          nodeId: z.string().min(1).optional(),
+          preset: z.string().min(1),
+        })
+        .strict()
+    ),
+    reducedMotion: z
+      .object({ fallback: z.enum(["none", "fade", "instant"]) })
+      .strict(),
+  })
+  .strict();
+
 const SpecNodeSchema: z.ZodType<SpecNode> = z.lazy(() =>
   z
     .object({
@@ -63,6 +89,21 @@ export interface Interaction {
   action: string;
   target?: string;
   reqRef?: ReqId;
+  /** M1 interaction trigger node id, carried for replay/location. */
+  nodeId?: string;
+}
+
+export interface PageMotionPreset {
+  durationMs: number;
+  easing: string;
+  staggerMs?: number;
+  distance?: string;
+}
+
+export interface PageMotion {
+  presets: Record<string, PageMotionPreset>;
+  bindings: Array<{ nodeId?: string; preset: string }>;
+  reducedMotion: { fallback: "none" | "fade" | "instant" };
 }
 
 export interface PageTraceability {
@@ -88,6 +129,8 @@ export interface PageSpec {
   layout: SpecNode;
   states: Record<string, PageState>;
   interactions: Interaction[];
+  /** Optional; carried for Phase 2 renderer/Figma consumers. */
+  motion?: PageMotion;
   traceability: PageTraceability;
 }
 
@@ -138,9 +181,11 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
           action: z.string().min(1),
           target: z.string().optional(),
           reqRef: ReqIdSchema.optional(),
+          nodeId: z.string().min(1).optional(),
         })
         .strict()
     ),
+    motion: PageMotionSchema.optional(),
     traceability: z
       .object({
         reqMap: z.record(z.string(), z.array(z.string())),

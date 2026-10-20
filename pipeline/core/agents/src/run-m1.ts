@@ -9,10 +9,7 @@ import {
   type UiBrief,
 } from "@prd-ui/contracts";
 import {
-  AgentRoleSchema,
   AgentRunnerError,
-  ArtifactEnvelopeSchema,
-  GateResultSchema,
   buildGateRepairPrompt,
   type AgentArtifactStorePort,
   type AgentResult,
@@ -22,6 +19,15 @@ import {
   type AgentValidation,
   type GateResult,
 } from "./contracts.js";
+import {
+  AgentGateArtifactSchema,
+  IaFindingsArtifactSchema,
+  IaMapArtifactSchema,
+  IaProposedArtifactSchema,
+  InteractionSpecArtifactSchema,
+  MotionSpecArtifactSchema,
+  VisualStyleArtifactSchema,
+} from "./artifacts.js";
 import {
   readOptionalText,
   writeAgentEvidence,
@@ -34,24 +40,18 @@ import { runIaGate } from "./gates/ia.js";
 import { runInteractionGate } from "./gates/interaction.js";
 import { runVisualStyleGate } from "./gates/visual-style.js";
 import {
-  IaFindingsSchema,
-  IaMapSchema,
   IaOutputSchema,
-  IaProposedSchema,
   buildIaPrompt,
   type IaMap,
   type IaOutput,
 } from "./roles/ia.js";
 import {
   InteractionOutputSchema,
-  InteractionSpecSchema,
-  MotionSpecSchema,
   buildInteractionPrompt,
   type InteractionOutput,
 } from "./roles/interaction.js";
 import {
   VisualStyleOutputSchema,
-  VisualStyleSpecSchema,
   buildVisualStylePrompt,
   type VisualStyleOutput,
 } from "./roles/visual-style.js";
@@ -63,21 +63,6 @@ import {
   type M1RunState,
   type M1Status,
 } from "./state.js";
-
-const IaMapArtifactSchema = ArtifactEnvelopeSchema.extend(IaMapSchema.shape);
-const IaFindingsArtifactSchema = ArtifactEnvelopeSchema.extend(IaFindingsSchema.shape);
-const IaProposedArtifactSchema = ArtifactEnvelopeSchema.extend(IaProposedSchema.shape);
-const InteractionSpecArtifactSchema = ArtifactEnvelopeSchema.extend(
-  InteractionSpecSchema.shape
-);
-const MotionSpecArtifactSchema = ArtifactEnvelopeSchema.extend(MotionSpecSchema.shape);
-const VisualStyleArtifactSchema = ArtifactEnvelopeSchema.extend(
-  VisualStyleSpecSchema.shape
-);
-const AgentGateArtifactSchema = ArtifactEnvelopeSchema.extend({
-  role: AgentRoleSchema,
-  gate: GateResultSchema,
-});
 
 export interface M1Ports {
   store: AgentArtifactStorePort;

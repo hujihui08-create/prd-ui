@@ -404,4 +404,27 @@ describe("contracts", () => {
       admin: "orders-list",
     });
   });
+
+  it("accepts interaction node ids and page motion", () => {
+    const spec = {
+      ...minimalPageSpec,
+      interactions: [
+        {
+          trigger: "库存查询",
+          action: "打开库存查询页",
+          target: "/inventory",
+          nodeId: "quick-inventory",
+        },
+      ],
+      motion: {
+        presets: { "page-enter": { durationMs: 200, easing: "ease-out" } },
+        bindings: [{ nodeId: "quick-inventory", preset: "page-enter" }],
+        reducedMotion: { fallback: "fade" },
+      },
+    };
+    const parsed = PageSpecSchema.parse(spec);
+    expect(parsed.interactions[0]?.nodeId).toBe("quick-inventory");
+    expect(parsed.motion?.bindings[0]?.preset).toBe("page-enter");
+    expect(PageSpecSchema.parse(minimalPageSpec)).not.toHaveProperty("motion");
+  });
 });
