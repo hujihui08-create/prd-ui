@@ -113,12 +113,8 @@ export async function writeAgentEvidence(
     for (const dir of [base, attemptDir]) {
       await store.writeJson(`${dir}/output.json`, redactValue(result.output));
       await store.writeJson(`${dir}/raw.json`, redactValue(raw));
-      if (result.stdout !== undefined) {
-        await store.writeText(`${dir}/stdout.txt`, redactSecrets(result.stdout));
-      }
-      if (result.stderr !== undefined) {
-        await store.writeText(`${dir}/stderr.txt`, redactSecrets(result.stderr));
-      }
+      await store.writeText(`${dir}/stdout.txt`, redactSecrets(result.stdout ?? ""));
+      await store.writeText(`${dir}/stderr.txt`, redactSecrets(result.stderr ?? ""));
       await store.writeText(
         `${dir}/session.json`,
         `${JSON.stringify(
@@ -156,9 +152,13 @@ export async function writeAgentEvidence(
       );
       if (error.stdout !== undefined) {
         await store.writeText(`${dir}/stdout.txt`, redactSecrets(error.stdout));
+      } else {
+        await store.writeText(`${dir}/stdout.txt`, "");
       }
       if (error.stderr !== undefined) {
         await store.writeText(`${dir}/stderr.txt`, redactSecrets(error.stderr));
+      } else {
+        await store.writeText(`${dir}/stderr.txt`, "");
       }
     }
   }
@@ -167,6 +167,7 @@ export async function writeAgentEvidence(
 export interface HistoryEntry {
   phase: EvidencePhase;
   attempt: number;
+  timestamp: string;
   usage?: unknown;
   usageComplete?: boolean;
   costCny?: number;

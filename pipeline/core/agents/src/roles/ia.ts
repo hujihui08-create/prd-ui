@@ -105,10 +105,27 @@ export interface IaPromptInput {
 
 /** IA sees product/IA/traceability, never assets, Page Spec details, or visual direction. */
 export function buildIaPrompt(input: IaPromptInput): string {
+  // Strip page content (appointments, products, copy) and page-spec fields:
+  // IA needs structure, not presentation data. This keeps the prompt focused
+  // and leaves output budget for the findings.
+  const pages = input.brief.ia.pages.map((page) => ({
+    id: page.id,
+    name: page.name,
+    purpose: page.purpose,
+    route: page.route,
+    roles: page.roles,
+    requiredStates: page.requiredStates,
+    reqRefs: page.reqRefs,
+    ...(page.actions === undefined ? {} : { actions: page.actions }),
+  }));
   const briefView = {
     meta: input.brief.meta,
     product: input.brief.product,
-    ia: input.brief.ia,
+    ia: {
+      pages,
+      navigation: input.brief.ia.navigation,
+      flows: input.brief.ia.flows,
+    },
     traceability: input.brief.traceability,
     openQuestions: input.brief.openQuestions,
     assumptions: input.brief.assumptions,
@@ -118,6 +135,7 @@ export function buildIaPrompt(input: IaPromptInput): string {
     "You are the IA (Information Architecture) Agent for a PRD → UI pipeline.",
     "Your job is to decide whether the PRD's pages, hierarchy, navigation, flows, roles, and naming are sound.",
     "You produce an IA map, findings, an optional proposed patch, and a human-readable review.",
+    "Be concise: do the analysis once, then return the JSON. Do not restate the PRD.",
     "",
     "## Hard boundaries",
     "- You must not design layout, colors, components, typography, illustrations, or page specs.",

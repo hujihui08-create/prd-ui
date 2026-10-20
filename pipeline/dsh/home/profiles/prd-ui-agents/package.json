@@ -10,8 +10,7 @@
     "profile": {
       "bundles": [
         "@deepseek-ai/dsh-base",
-        "@deepseek-ai/dsh-headless",
-        "@deepseek-ai/dsh-llm-pi-ai"
+        "@deepseek-ai/dsh-headless"
       ]
     }
   }

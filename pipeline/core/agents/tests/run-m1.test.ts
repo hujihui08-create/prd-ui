@@ -221,6 +221,8 @@ describe("runM1", () => {
     expect(result.state.status).toBe("failed");
     expect(result.state.gates.ia).toBe("failed");
     expect(result.state.agents.ia.status).toBe("failed");
+    expect(result.state.agents.interaction.status).toBe("skipped");
+    expect(result.state.agents["visual-style"].status).toBe("skipped");
     expect(scripted.interaction.calls).toHaveLength(0);
     expect(scripted["visual-style"].calls).toHaveLength(0);
     expect(store.files.has("artifacts/interaction-spec.json")).toBe(false);
@@ -309,6 +311,19 @@ describe("runM1", () => {
     expect(result.state.agents["visual-style"].status).toBe("budget_exceeded");
     expect(scripted.interaction.calls).toHaveLength(0);
     expect(scripted["visual-style"].calls).toHaveLength(0);
+  });
+
+  it("enforces a lower per-agent cap", async () => {
+    const store = new MemoryStore();
+    const scripted = runners({ ia: [ok(iaOutput)] });
+
+    const { result } = await run(store, scripted, {
+      agentMaxCostCny: { ia: 0.001 },
+    });
+
+    expect(result.state.status).toBe("budget_exceeded");
+    expect(result.state.agents.ia.status).toBe("budget_exceeded");
+    expect(scripted.interaction.calls).toHaveLength(0);
   });
 
   it("fails closed on incomplete usage, and allows it explicitly", async () => {

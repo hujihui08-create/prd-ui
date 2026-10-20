@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
+import { AssetBriefSchema } from "@prd-ui/asset-review";
 import { main, parseArgs } from "../src/agent-cli.js";
 
 const pipelineRoot = path.resolve(
@@ -173,6 +174,15 @@ describe("agent:run CLI", () => {
     expect(summary.signoff).toEqual({ ia: true, visualStyle: true });
     expect(summary.usageComplete).toBe(true);
     expect(summary.costCny).toBeGreaterThan(0);
+
+    // The M1 acceptance criterion: asset briefs are directly consumable by M0.
+    const receipt = JSON.parse(
+      await readFile(
+        path.join(runDir, "artifacts", "asset-briefs", "receipt.json"),
+        "utf8"
+      )
+    ) as unknown;
+    expect(() => AssetBriefSchema.parse(receipt)).not.toThrow();
   });
 
   it("emits exactly one JSON object in --json mode", async () => {

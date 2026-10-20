@@ -1,7 +1,7 @@
 # M1 Agent 层设计（IA / Interaction / Visual Style）
 
 - 日期：2026-10-20
-- 状态：Draft for review
+- 状态：Implemented (2026-10-20)
 - 输入：M0.5 资产评审硬化完成（350 tests、真实 dsh 13/13、usage/cost、PNG 输入、raw evidence、共享脱敏）
 - 关联：
   - `docs/superpowers/specs/2026-10-20-agent-organization.md`
@@ -423,17 +423,17 @@ Interaction Gate   Visual Style Gate
 
 ## 9. 验收标准
 
-- [ ] `agent:run` 能对现有 employee-app sample 产出 IA/Interaction/Visual 三类 artifacts。
-- [ ] 所有 artifacts 通过严格 schema；带 `schemaVersion`/`project`/`generatedAt`/`model`/`promptHash`。
-- [ ] IA blocker/waiver 路由正确；`signoff/ia.md` 缺失时 run 为 `awaiting_signoff`。
-- [ ] Interaction gate 覆盖 action/reaction、状态矩阵、motion token、reducedMotion。
-- [ ] Visual Style gate 覆盖 palette/typography/assetStrategy；asset briefs 可被资产评审读取。
-- [ ] 预算、usage、重试、失败隔离、schema repair 有测试。
-- [ ] `usageComplete=false` 有预算时 fail closed；`--allow-unknown-cost` 可显式继续。
-- [ ] 日志/raw/stdout/`--json` 无 key；共享脱敏。
-- [ ] M1 不修改 Page Spec/HTML；phase1 与 asset review 回归不退化。
-- [ ] `pnpm test` ≥350；`pnpm test:dsh` pass；真实 dsh 手工回归有记录。
-- [ ] 客户模块、Figma、M2 供应商不在 M1 验收范围。
+- [x] `agent:run` 能对现有 employee-app sample 产出 IA/Interaction/Visual 三类 artifacts。
+- [x] 所有 artifacts 通过严格 schema；带 `schemaVersion`/`project`/`generatedAt`/`model`/`promptHash`（`asset-briefs/*` 为兼容 M0 保持纯 `AssetBrief`，envelope 在 `visual-style.json`/`session.json`）。
+- [x] IA blocker/waiver 路由正确；`signoff/ia.md` 缺失时 run 为 `awaiting_signoff`。
+- [x] Interaction gate 覆盖 action/reaction、状态矩阵、motion token、reducedMotion。
+- [x] Visual Style gate 覆盖 palette/typography/assetStrategy；asset briefs 可被资产评审读取。
+- [x] 预算、usage、重试、失败隔离、schema repair 有测试。
+- [x] `usageComplete=false` 有预算时 fail closed；`--allow-unknown-cost` 可显式继续。
+- [x] 日志/raw/stdout/`--json` 无 key；共享脱敏。
+- [x] M1 不修改 Page Spec/HTML；phase1 与 asset review 回归不退化。
+- [x] `pnpm test` ≥350；`pnpm test:dsh` pass；真实 dsh 手工回归有记录。
+- [x] 客户模块、Figma、M2 供应商不在 M1 验收范围。
 
 ## 10. 非目标
 
@@ -484,3 +484,23 @@ Interaction Gate   Visual Style Gate
 - `docs/superpowers/specs/2026-10-19-prd-to-ui-pipeline-design.md` — Phase 2/3 与数据契约。
 - `docs/superpowers/specs/2026-10-20-asset-source-fallback-policy.md` — 资产 brief/来源/评审。
 - `pipeline/dsh/README.md` — dsh profile、`--json -`、usage。
+- `pipeline/docs/agent-m1.md` — 实现后的使用说明、产物、签核、退出码。
+
+## 14. 验收记录（2026-10-20）
+
+- 实现：`core/agents`（契约/role schemas/prompts/gates/`runM1`）、`agent:run` CLI、
+  ScriptedAgentRunner、DshAgentRunner、`prd-ui-agents` dsh profile、employee-app
+  M1 sample inputs 与 fixtures。
+- 测试：`pnpm test` **406 passed**（原 350）；`pnpm test:dsh` **2 passed**（asset review
+  + M1 IA，真实 pinned dsh + 本地 mock）；`pnpm typecheck` clean。
+- 回归：employee-app `Phase 1A OK: 2 pages, 0 blockers`；standalone asset review
+  `13 assets / 13 passed`。
+- 真实 dsh（`deepseek-flash`）：三 Agent 各 1 次调用，无 schema repair、无门禁修复；
+  `status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，
+  10 个 asset briefs，**¥0.2081**，`usageComplete=true`。另一次只用
+  `--allow-unreviewed` 的 run 按设计停在 `awaiting_signoff`（¥0.2756）。
+- IA 在 employee-app 切片上发现 3 个真实 blocker（3 个死 Tab、brief 缺少库存入口、
+  库管无落地页）；真实 run 用开发 waiver 继续以验证 Interaction/Visual。这些是
+  切片本身待修的问题，不是门禁误报。
+- 已知边界：Interaction spec 尚未被 Page Spec 消费；没有签核 UI；`--allow-unreviewed`
+  永不产生 `success`；asset briefs 为兼容 M0 不带 envelope。

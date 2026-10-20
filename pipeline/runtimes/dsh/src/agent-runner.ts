@@ -132,7 +132,7 @@ export class DshAgentRunner implements AgentRunnerPort {
     this.model = options.model ?? "unknown";
   }
 
-  private call(task: string, runDir: string): Promise<DshTaskResult> {
+  private call(task: string, runDir: string, timeoutMs?: number): Promise<DshTaskResult> {
     return runDshTask({
       task,
       dshHome: this.options.dshHome,
@@ -140,9 +140,9 @@ export class DshAgentRunner implements AgentRunnerPort {
       dshBin: this.options.dshBin,
       cwd: this.options.cwd,
       runDir,
-      ...(this.options.timeoutMs === undefined
+      ...(this.options.timeoutMs === undefined && timeoutMs === undefined
         ? {}
-        : { timeoutMs: this.options.timeoutMs }),
+        : { timeoutMs: this.options.timeoutMs ?? timeoutMs }),
       ...(this.options.runner === undefined ? {} : { runner: this.options.runner }),
     });
   }
@@ -156,7 +156,7 @@ export class DshAgentRunner implements AgentRunnerPort {
 
     let first: DshTaskResult;
     try {
-      first = await this.call(base, task.runDir);
+      first = await this.call(base, task.runDir, task.timeoutMs);
     } catch (error) {
       throw mapDshError(error);
     }
@@ -203,7 +203,7 @@ export class DshAgentRunner implements AgentRunnerPort {
     const repairPrompt = `${base}\n\nYour previous response was invalid: ${firstError}\nReturn ONLY one JSON object that conforms to the schema. Do not add extra keys.`;
     let repair: DshTaskResult;
     try {
-      repair = await this.call(repairPrompt, task.runDir);
+      repair = await this.call(repairPrompt, task.runDir, task.timeoutMs);
     } catch (error) {
       const mapped = mapDshError(error);
       throw new AgentRunnerError(mapped.code, mapped.message, {

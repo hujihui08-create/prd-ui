@@ -506,6 +506,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
         history[role].push({
           phase,
           attempt,
+          timestamp: clock.now().toISOString(),
           usage: result.usage ?? null,
           usageComplete: result.usageComplete ?? false,
           ...(budgetActive && result.usage !== undefined
@@ -575,6 +576,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
         history[role].push({
           phase,
           attempt,
+          timestamp: clock.now().toISOString(),
           usage: accounting.usage ?? null,
           usageComplete: accounting.usageComplete ?? false,
           ...(budgetActive && accounting.usage !== undefined
@@ -638,6 +640,15 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
   const runInteraction = designRoles.includes("interaction");
   const runVisual = designRoles.includes("visual-style");
 
+  const skipDesign = (): void => {
+    if (state.agents.interaction.status !== "skipped") {
+      setAgent("interaction", { status: "skipped" });
+    }
+    if (state.agents["visual-style"].status !== "skipped") {
+      setAgent("visual-style", { status: "skipped" });
+    }
+  };
+
   await writeState();
   await logEvent({ type: "run_started", project: input.project });
 
@@ -685,6 +696,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
     if (error instanceof StopRun) {
       return finish(error.reason, error.reason);
     }
+    skipDesign();
     return finish("failed", errorMessage(error));
   }
 
@@ -725,6 +737,8 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
   });
 
   if (!iaGate.passed) {
+    skipDesign();
+    await writeState();
     return finish("failed", "IA_GATE_FAILED");
   }
 

@@ -1,20 +1,48 @@
 # Project-local dsh profile
 
-This directory holds the pinned DeepSeek Harness profile used by `asset:review --runtime dsh`.
+This directory holds the pinned DeepSeek Harness profiles used by
+`asset:review --runtime dsh` and `agent:run --runtime dsh`.
 It never modifies `~/.dsh`; the CLI is pointed at this home with `DSH_HOME`.
 
 ## Layout
 
 ```text
 dsh/
-  home/                                 # DSH_HOME (profile definition is committed)
+  home/                                 # DSH_HOME (profile definitions are committed)
     profiles/prd-ui-assets/
       package.json                      # pinned bundles + @prd-ui/runtime-dsh
       cordis.yml                        # []
       cordis.patch.yml                  # vision provider, default model, asset plugin
+    profiles/prd-ui-agents/
+      package.json                      # base + headless + pi-ai; no project plugin
+      cordis.yml                        # []
+      cordis.patch.yml                  # vision provider, default model, 32768 maxTokens
 ```
 
 `node_modules/`, `.credentials.yaml`, `.env`, and logs inside `home/` are gitignored.
+
+## M1 agent profile
+
+`prd-ui-agents` is the profile used by `agent:run --runtime dsh`. It mounts
+only `@deepseek-ai/dsh-base`, `@deepseek-ai/dsh-headless`, and
+`@deepseek-ai/dsh-llm-pi-ai`; it does **not** mount the asset-review tool
+plugin, so IA / Interaction / Visual Style agents get no project tools.
+`maxTokens` is 32768 because `deepseek-flash` can spend the full 8K budget on
+reasoning before emitting JSON. The agent runner still uses `--json -` with the
+task on stdin and reads `final.text` plus `status(step_end)` usage.
+
+```bash
+cd pipeline
+set -a; . ./.env; set +a
+DSH_HOME="$PWD/dsh/home" pnpm agent:run \
+  --project samples/projects/employee-app/project.yaml \
+  --runtime dsh \
+  --runs /tmp/m1-agent-dsh
+```
+
+The three-agent smoke run on 2026-10-20 used one call per role, no schema
+repair, and cost **¥0.2081** (`usageComplete=true`); see
+[`../docs/agent-m1.md`](../docs/agent-m1.md) for the per-role token breakdown.
 
 ## Install
 

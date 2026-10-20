@@ -3,6 +3,59 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — M1 agent layer (implemented)
+
+### Added
+
+- `core/agents`: runtime-neutral IA / Interaction / Visual Style contracts,
+  strict role schemas, prompt builders, deterministic gates, `M1RunState`, and
+  the `runM1` orchestrator. IA runs first; Interaction and Visual Style run in
+  parallel with failure isolation.
+- `pnpm agent:run` (`runtimes/standalone`): project/PRD/brief intake, scripted
+  fixtures for offline runs, real dsh runner, `--only-role`, `--json`,
+  `--max-cost-cny`, `--allow-unknown-cost`, `--allow-unreviewed`, and signoff
+  file copying.
+- `prd-ui-agents` dsh profile (base + headless + pi-ai, no tool plugin) and
+  `DshAgentRunner`: one call per attempt, `--json -` stdin, `final.text` output,
+  `step_end` usage, one schema repair with merged usage.
+- Human signoff contract: `signoff/ia.md` / `signoff/visual-style.md` with a
+  `<!-- signoff {...} -->` block; IA waivers require owner/reason/expiry.
+- Employee-app M1 sample inputs: `samples/projects/employee-app/prd.md`,
+  `samples/agents/m1/{ia,interaction,visual-style}.json`.
+- Artifacts: `ia-map`, `ia-findings`, `ia-proposed`, `interaction-spec`,
+  `motion-spec`, `visual-style`, `asset-briefs/*`, gate findings, agent
+  evidence, `state.json`, and `agent-run.json`.
+- Shared `usage`/`pricing`/`redact`/`asset-brief` contracts moved into
+  `core/contracts` so `core/agents` does not depend on `core/asset-review`;
+  asset-review re-exports them unchanged.
+- `ProjectConfigSchema` accepts optional `prd`.
+
+### Verification
+
+- `pnpm test`: 406 tests (was 350).
+- `pnpm typecheck`: clean.
+- `pnpm test:dsh`: 2 tests (asset review + M1 IA) through the real pinned dsh
+  CLI with a local mock; no key or external network.
+- `pnpm phase1:verify --project samples/projects/employee-app/project.yaml`:
+  `2 pages / 0 blockers`.
+- `pnpm asset:review --assets samples/assets/m0 --runtime standalone`:
+  `13 assets / 13 passed`.
+- Real `deepseek-flash`: three agents, one call each, no repair;
+  `status=success`, `gates={ia:waived, interaction:passed, visualStyle:passed}`,
+  10 asset briefs, **¥0.2081**, `usageComplete=true` (10 CNY cap). The same
+  slice without signoffs stops at `awaiting_signoff` (¥0.2756).
+- The IA agent found three real blockers in the employee-app slice (three dead
+  tabs, missing inventory entry, warehouse dead-end). The real run used a
+  development waiver to exercise Interaction/Visual; the blockers remain
+  tracked slice issues.
+
+### Limits
+
+- No Page Spec/HTML/renderer changes; interaction spec consumption is Phase 2.
+- No signoff UI; `--allow-unreviewed` never produces `success`.
+- PRD Reviewer/UI Briefer/Spec Engineer, Figma/M3, and M2 suppliers remain out
+  of scope.
+
 ## 2026-10-20 — M1 agent layer spec (draft, not implemented)
 
 - Added the M1 design spec for the IA / Interaction Design / Visual Style
@@ -10,7 +63,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   orchestrator gates, budgets, human signoffs, and test matrix.
 - Scope follows the core-runtime M1 definition; customer vertical slice,
   PRD Reviewer/UI Briefer, Figma/M3, and M2 suppliers are out of scope.
-- Status: draft for review; no runtime behavior changed.
+- Status: superseded by the implemented entry above.
 - Spec: `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`
 
 ## 2026-10-20 — M0.5 asset review hardening (H1–H15, implemented)
