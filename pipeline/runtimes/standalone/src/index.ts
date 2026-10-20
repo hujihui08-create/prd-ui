@@ -9,3 +9,8 @@ export {
   parseArgs as parseAgentArgs,
   USAGE as AGENT_USAGE,
 } from "./agent-cli.js";
+export {
+  main as specMain,
+  parseArgs as parseSpecArgs,
+  USAGE as SPEC_USAGE,
+} from "./spec-cli.js";

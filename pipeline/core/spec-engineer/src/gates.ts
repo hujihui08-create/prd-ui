@@ -130,19 +130,6 @@ export function runSpecEngineerGates(
         );
       }
     }
-    const actions = new Set(page.actions ?? []);
-    for (const interaction of spec.interactions) {
-      if (interaction.nodeId !== undefined && !actions.has(interaction.trigger)) {
-        issues.push(
-          issue(
-            "SPEC_ACTION_ORPHAN",
-            "warning",
-            `page ${page.id} trigger ${interaction.trigger} is not a brief action`,
-            interaction.nodeId
-          )
-        );
-      }
-    }
   }
 
   // State coverage.

@@ -10,11 +10,13 @@
   "dependencies": {
     "@prd-ui/agents": "workspace:*",
     "@prd-ui/asset-review": "workspace:*",
+    "@prd-ui/compiler": "workspace:*",
     "@prd-ui/contracts": "workspace:*",
     "@prd-ui/design-system": "workspace:*",
     "@prd-ui/orchestrator": "workspace:*",
     "@prd-ui/renderer-html": "workspace:*",
     "@prd-ui/runtime-dsh": "workspace:*",
+    "@prd-ui/spec-engineer": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
     "yaml": "^2.9.1"
   }

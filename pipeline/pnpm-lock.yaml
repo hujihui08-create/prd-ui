@@ -183,6 +183,9 @@ importers:
       '@prd-ui/asset-review':
         specifier: workspace:*
         version: link:../../core/asset-review
+      '@prd-ui/compiler':
+        specifier: workspace:*
+        version: link:../../core/compiler
       '@prd-ui/contracts':
         specifier: workspace:*
         version: link:../../core/contracts
@@ -198,6 +201,9 @@ importers:
       '@prd-ui/runtime-dsh':
         specifier: workspace:*
         version: link:../dsh
+      '@prd-ui/spec-engineer':
+        specifier: workspace:*
+        version: link:../../core/spec-engineer
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2

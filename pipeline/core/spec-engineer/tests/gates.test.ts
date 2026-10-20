@@ -155,21 +155,8 @@ describe("Spec Engineer gates", () => {
     expect(gate.issues.map((issue) => issue.code)).toContain("SPEC_IA_PAGE_MISSING");
   });
 
-  it("warns on an orphan trigger and reports a missing page spec", () => {
-    const specs = applySpecs(makeInput()).map((spec) =>
-      spec.meta.pageId === "today"
-        ? {
-            ...spec,
-            interactions: [
-              ...spec.interactions,
-              { trigger: "删除", action: "删除产品", nodeId: "delete-product" },
-            ],
-          }
-        : spec
-    );
-    const orphan = gateFor({ specs });
-    expect(orphan.issues.map((issue) => issue.code)).toContain("SPEC_ACTION_ORPHAN");
-
+  it("reports a missing page spec and an unknown spec page", () => {
+    const specs = applySpecs(makeInput());
     const missing = gateFor({
       specs: specs.filter((spec) => spec.meta.pageId !== "inventory-query"),
     });
