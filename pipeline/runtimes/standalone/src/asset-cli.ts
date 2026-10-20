@@ -53,7 +53,7 @@ Options:
   --max-review-cost-cny <n>  Global review cost cap in CNY (default: 10 for dsh)
   --allow-unknown-cost       Continue when review usage is incomplete
   --pricing <path>           Pricing file (default: <assets>/pricing.json or pipeline/pricing.json)
-  --json                     Print one JSON summary to stdout (human lines go to stderr)
+  --json                     Print one JSON summary to stdout; suppress the human summary
   -h, --help                 Print this help and exit`;
 
 export interface AssetCliOptions {
@@ -317,9 +317,9 @@ export function createLogger(store: ArtifactStorePort) {
 
 /**
  * Stable machine-readable summary. Every documented key is always present;
- * unavailable values are `null` so consumers can rely on the shape. The
- * human-readable lines are written to stderr when `--json` is set, so stdout
- * stays one parseable JSON document.
+ * unavailable values are `null` so consumers can rely on the shape. In
+ * `--json` mode the human summary is suppressed entirely, so stdout is exactly
+ * one JSON object (help and argument errors are outside this contract).
  */
 function jsonSummary(input: {
   runDir: string | null;
@@ -365,7 +365,6 @@ export async function main(
     return 0;
   }
 
-  const human = options.json ? io.stderr : io.stdout;
   let runDir: string | undefined;
 
   try {
@@ -478,7 +477,7 @@ export async function main(
     if (options.json) {
       io.stdout(JSON.stringify(jsonSummary({ runDir, result })));
     } else {
-      human(
+      io.stdout(
         `Asset review ${result.passed ? "OK" : "FAILED"}: ${result.summary.total} assets, ${
           result.summary.passed
         } passed, ${result.summary.retried} retried, ${result.summary.unresolved} unresolved, ${
@@ -486,13 +485,13 @@ export async function main(
         } degraded`
       );
       if (result.summary.renderWarnings !== undefined) {
-        human(`Render warnings: ${result.summary.renderWarnings}`);
+        io.stdout(`Render warnings: ${result.summary.renderWarnings}`);
       }
       const reviewCostCny =
         result.summary.reviewCostCny === undefined
           ? "unavailable"
           : result.summary.reviewCostCny.toFixed(4);
-      human(
+      io.stdout(
         `Review cost: reviewCostCny=${reviewCostCny} usageSource=${
           result.usageSource ?? "unavailable"
         } usageComplete=${result.usageComplete ?? false}`
@@ -502,18 +501,19 @@ export async function main(
           .flatMap((attempt) => attempt.issues)
           .slice(0, 3)
           .join("; ");
-        human(`- ${record.assetId}: ${reasons || "unresolved"}`);
+        io.stdout(`- ${record.assetId}: ${reasons || "unresolved"}`);
       }
-      human(`Run: ${runDir}`);
+      io.stdout(`Run: ${runDir}`);
     }
-    if (result.error) io.stderr(result.error);
+    if (result.error !== undefined && !options.json) io.stderr(result.error);
     return result.passed ? 0 : 1;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (options.json) {
       io.stdout(JSON.stringify(jsonSummary({ runDir: runDir ?? null, error: message })));
+    } else {
+      io.stderr(`Asset review FAILED: ${message}`);
     }
-    io.stderr(`Asset review FAILED: ${message}`);
     return 1;
   }
 }

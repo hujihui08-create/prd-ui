@@ -34,7 +34,7 @@ pnpm asset:review \
   --runtime standalone \
   --runs /tmp/m0-runs
 
-# 机器可读输出：stdout 只有一个 JSON 文档，人类可读行改走 stderr
+# 机器可读输出：stdout 只有一个 JSON 文档，人类可读摘要被抑制
 pnpm asset:review \
   --project samples/projects/employee-app/project.yaml \
   --assets samples/assets/m0 \
@@ -109,7 +109,7 @@ jq '.usageSource, .usageComplete, .batchGates' "$RUN/manifest.review.json"
 - `1`：有 `unresolved`、`reviewer_error`、`configuration_error`、usage 不完整（`REVIEW_USAGE_INCOMPLETE`）或预算超限。
 - `2`：CLI 参数错误。
 
-`--json` 时 stdout 始终只输出一个 JSON 对象，包含 `runDir`、`summary`、`assets`、`batchGates`、`error`、`reviewCostCny`、`usageSource`、`usageComplete`（不可用值为 `null`，`--dry-run` 时额外带 `preflight`）；人类可读行写到 stderr。
+`--json` 只适用于 review/preflight 运行：此时 stdout 恰好输出一个 JSON 对象，包含 `runDir`、`summary`、`assets`、`batchGates`、`error`、`reviewCostCny`、`usageSource`、`usageComplete`（不可用值为 `null`，`--dry-run` 时额外带 `preflight`）；人类可读的 summary 与失败提示被抑制，失败信息只放在 JSON 的 `error` 字段。`--help` 和参数错误**不在**该契约内：`--json --help` 仍打印 usage，未知/缺值参数仍只写 stderr 并以 exit 2 退出。
 
 ## Fixtures
 
@@ -130,7 +130,7 @@ jq '.usageSource, .usageComplete, .batchGates' "$RUN/manifest.review.json"
 | `--allow-unknown-cost` | usage 不完整时继续，而不是 fail closed |
 | `--fail-fast` | 第一个 reviewer 错误即停止批次（默认继续其它资产） |
 | `--pricing <path>` | 价格文件；默认 `<assets>/pricing.json` 或 `pipeline/pricing.json` |
-| `--json` | stdout 输出单个 JSON summary，人类可读行改走 stderr |
+| `--json` | review/preflight 运行在 stdout 输出单个 JSON summary，并抑制人类可读 summary（`--help`/参数错误除外） |
 | `--profile` | 设计 profile；默认取项目唯一的 manifest profile |
 
 ## 当前限制

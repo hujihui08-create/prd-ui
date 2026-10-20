@@ -12,10 +12,12 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   asserts exit 0, a passed asset, `dsh/` evidence, and
   `summary.usageComplete === true`. It needs no real key or external network;
   the default `pnpm test` excludes it.
-- `asset:review --json`: one machine-readable JSON summary on stdout
-  (`runDir`, `summary`, `assets`, `batchGates`, `error`, `reviewCostCny`,
-  `usageSource`, `usageComplete`; unavailable values are `null`). Human lines
-  move to stderr so stdout stays parseable.
+- `asset:review --json`: for review/preflight runs, exactly one machine-readable
+  JSON summary on stdout (`runDir`, `summary`, `assets`, `batchGates`, `error`,
+  `reviewCostCny`, `usageSource`, `usageComplete`; unavailable values are
+  `null`). The human summary is suppressed in both stdout and stderr, so stdout
+  stays one parseable JSON document. `--help` and argument errors are outside
+  this contract.
 - Set-level icon/illustration gates; `--only` records `PARTIAL_REVIEW` instead
   of claiming set consistency.
 - 2x PNG evidence (`candidate.png` 48x48 for M0 icons), raw reviewer evidence
@@ -38,7 +40,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 336 tests passed (offline; dsh mock integration excluded).
+- `pnpm test`: 338 tests passed (offline; dsh mock integration excluded).
 - `pnpm test:dsh`: 1 passed (real pinned dsh 0.2.1-rc.2 + local mock).
 - `pnpm typecheck`: clean.
 - `pnpm phase1:verify`: `2 pages, 0 blockers`.

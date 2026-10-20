@@ -117,8 +117,9 @@ state machine still owns retries, source fallback, budgets, and the manifest.
 dsh only reviews one candidate per attempt. Evidence is written under
 `runs/<runId>/dsh/<assetId>-<source>-<attempt>/` (prompt, stdout, stderr,
 session metadata, `review.raw.json`, and `error.json` on failure). The canonical
-record remains `asset-review.json`; `--json` prints one machine-readable summary
-to stdout.
+record remains `asset-review.json`; `--json` prints exactly one machine-readable
+summary to stdout for review/preflight runs and suppresses the human summary
+(help and argument errors are outside that contract).
 
 ## Current limitations
 

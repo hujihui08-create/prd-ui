@@ -109,7 +109,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 测试与验收
 
-- `pnpm test`：336 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：338 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：1 test（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。

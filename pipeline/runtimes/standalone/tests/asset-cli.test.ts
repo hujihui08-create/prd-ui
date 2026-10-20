@@ -643,7 +643,62 @@ describe("asset:review CLI", () => {
     expect(summary.reviewCostCny).toBeNull();
     expect(summary.usageSource).toBe("unavailable");
     expect(summary.usageComplete).toBe(false);
-    expect(result.stderr).not.toContain("Asset review OK");
+    expect(result.stdout).not.toContain("Asset review OK");
+    expect(result.stderr).toBe("");
+  });
+
+  it("emits the preflight payload with --dry-run --json and suppresses the human summary", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--dry-run",
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout.trim().split("\n")).toHaveLength(1);
+
+    const summary = JSON.parse(result.stdout) as {
+      runDir: string;
+      summary: unknown;
+      assets: unknown[];
+      batchGates: unknown;
+      error: unknown;
+      reviewCostCny: unknown;
+      usageSource: unknown;
+      usageComplete: unknown;
+      preflight: { passed: boolean; items: Array<{ assetId: string; passed: boolean }> };
+    };
+    expect(summary.runDir).toBe(await onlyRun(runs));
+    expect(summary.summary).toBeNull();
+    expect(summary.assets).toEqual([]);
+    expect(summary.batchGates).toBeNull();
+    expect(summary.error).toBeNull();
+    expect(summary.reviewCostCny).toBeNull();
+    expect(summary.usageSource).toBeNull();
+    expect(summary.usageComplete).toBeNull();
+    expect(summary.preflight.passed).toBe(true);
+    expect(summary.preflight.items).toHaveLength(1);
+    expect(summary.preflight.items[0]).toMatchObject({ assetId: "icon-home", passed: true });
+    expect(result.stderr).toBe("");
+  });
+
+  it("keeps help and argument errors outside the JSON contract", async () => {
+    const help = await runCli(["--json", "--help"]);
+    expect(help.code).toBe(0);
+    expect(help.stdout).toContain("pnpm asset:review");
+    expect(help.stdout).not.toContain('"runDir"');
+
+    const usageError = await runCli(["--json", "--nope"]);
+    expect(usageError.code).toBe(2);
+    expect(usageError.stdout).toBe("");
+    expect(usageError.stderr).toContain("unknown argument");
   });
 
   it("keeps the JSON summary machine-readable when the run fails", async () => {
@@ -676,6 +731,8 @@ describe("asset:review CLI", () => {
     expect(summary.error).toBe("REVIEW_USAGE_INCOMPLETE");
     expect(summary.reviewCostCny).toBeNull();
     expect(summary.usageComplete).toBe(false);
+    expect(result.stdout).not.toContain("Asset review FAILED");
+    expect(result.stderr).toBe("");
   });
 });
 
