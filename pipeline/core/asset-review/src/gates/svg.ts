@@ -112,14 +112,18 @@ export function isUrlColor(value: string): boolean {
 }
 
 /**
- * `url(...)` may only point inside the same document (`url(#id)`). Anything
- * else is an external resource and bypasses the "no external refs" gate.
+ * `url(...)` may only point inside the same document (`url(#id)`). Scan every
+ * occurrence, not just a whole-attribute token: SVG paint fallbacks such as
+ * `fill="url(https://evil.test/p.svg#p) #2563EB"` are valid syntax and would
+ * otherwise hide the external reference.
  */
 export function isExternalUrlReference(value: string): boolean {
-  const match = /^url\(\s*([\s\S]*?)\s*\)\s*$/i.exec(value.trim());
-  if (!match) return false;
-  const target = match[1]!.replace(/^(['"])([\s\S]*)\1$/, "$2").trim();
-  return !target.startsWith("#");
+  const references = /url\(\s*(?:(['"])([\s\S]*?)\1|([^)]*?))\s*\)/gi;
+  for (const match of value.matchAll(references)) {
+    const target = (match[2] ?? match[3] ?? "").trim();
+    if (!target.startsWith("#")) return true;
+  }
+  return false;
 }
 
 export function collectColorValues(parsed: ParsedSvg): Array<{ value: string; element: Element }> {
@@ -163,6 +167,7 @@ export function allProcessingInstructions(parsed: ParsedSvg): ProcessingInstruct
 
 const ANIMATION_ELEMENTS = new Set([
   "animate",
+  "animatecolor",
   "animatetransform",
   "animatemotion",
   "set",

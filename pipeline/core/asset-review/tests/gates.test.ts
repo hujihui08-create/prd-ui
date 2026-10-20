@@ -76,6 +76,7 @@ describe("icon gates", () => {
       '<animate attributeName="fill" values="#ff0000;#00ff00" dur="1s"/>',
       '<animateTransform attributeName="transform" type="rotate" from="0" to="90" dur="1s"/>',
       '<animateMotion path="M0 0 L10 0" dur="1s"/>',
+      '<animateColor attributeName="fill" from="#ff0000" to="#00ff00" dur="1s"/>',
       '<set attributeName="stroke" to="#ff0000"/>',
       '<discard begin="0s"/>',
     ];
@@ -191,9 +192,20 @@ describe("illustration gates", () => {
     }
   });
 
-  it("allows fragment url() paint references", () => {
-    const svg = validIllustration.replace('fill="#2563EB"', 'fill="url(#grad)"');
+  it("rejects an external url() hidden behind a paint fallback", () => {
+    const svg = validIllustration.replace(
+      'fill="#2563EB"',
+      'fill="url(https://evil.test/p.svg#p) #2563EB"'
+    );
     const result = checkIllustration(svg, illustrationBrief);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "SVG_EXTERNAL_REF")).toBe(true);
+  });
+
+  it("allows fragment url() paint references", () => {
+    const svg = validIllustration.replace('fill="#2563EB"', 'fill="url(#gradient)"');
+    const result = checkIllustration(svg, illustrationBrief);
+    expect(result.passed).toBe(true);
     expect(result.issues.some((i) => i.code === "SVG_EXTERNAL_REF")).toBe(false);
   });
 
