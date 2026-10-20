@@ -281,6 +281,79 @@ describe("runM1", () => {
     expect(result.state.signoff).toEqual({ ia: false, visualStyle: false });
   });
 
+  it("records stage progression and the complete evidence set", async () => {
+    const store = new MemoryStore();
+    store.files.set("signoff/ia.md", signoff());
+    store.files.set("signoff/visual-style.md", signoff());
+    const scripted = runners({ ia: [ok(iaOutput)] });
+
+    const { result, logs } = await run(store, scripted);
+
+    const stages = logs
+      .filter((event) => event.type === "state")
+      .map((event) => event.stage as string);
+    const unique = stages.filter(
+      (stage, index) => index === 0 || stage !== stages[index - 1]
+    );
+    expect(unique).toEqual([
+      "init",
+      "ia",
+      "ia_gate",
+      "design",
+      "design_gate",
+      "signoff",
+      "done",
+    ]);
+    expect(result.state.stage).toBe("done");
+
+    for (const role of ["ia", "interaction", "visual-style"] as const) {
+      for (const file of [
+        "prompt.md",
+        "output.json",
+        "raw.json",
+        "stdout.txt",
+        "stderr.txt",
+        "session.json",
+        "history.json",
+        "attempts/01/prompt.md",
+      ]) {
+        expect(store.files.has(`agents/${role}/${file}`), `${role}/${file}`).toBe(
+          true
+        );
+      }
+    }
+
+    for (const path of [
+      "artifacts/ia-map.json",
+      "artifacts/ia-findings.json",
+      "artifacts/ia-proposed.json",
+      "artifacts/interaction-spec.json",
+      "artifacts/motion-spec.json",
+      "artifacts/visual-style.json",
+    ]) {
+      const artifact = store.json<Record<string, unknown>>(path);
+      expect(artifact, path).toMatchObject({
+        schemaVersion: "1.0",
+        project: "employee-app",
+        model: "scripted-model",
+      });
+      expect(typeof artifact.generatedAt, path).toBe("string");
+      expect(String(artifact.promptHash), path).toMatch(/^sha256:/);
+    }
+
+    for (const path of [
+      "findings/ia-gate.json",
+      "findings/interaction-gate.json",
+      "findings/visual-style-gate.json",
+    ]) {
+      expect(store.json<Record<string, unknown>>(path)).toMatchObject({
+        schemaVersion: "1.0",
+        role: expect.any(String),
+        gate: expect.objectContaining({ passed: true }),
+      });
+    }
+  });
+
   it("runs interaction and visual style concurrently after IA", async () => {
     const store = new MemoryStore();
     store.files.set("signoff/ia.md", signoff());

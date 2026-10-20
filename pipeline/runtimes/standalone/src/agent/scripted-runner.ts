@@ -54,7 +54,15 @@ export class ScriptedAgentRunner implements AgentRunnerPort {
 
     const index = this.counts[task.role];
     this.counts[task.role] += 1;
-    const entry = Array.isArray(script) ? script[index] : index === 0 ? script : undefined;
+    const isArray = Array.isArray(script);
+    // A single success fixture is one-shot (a second call means the test
+    // expected a gate repair and must provide an array). A single error
+    // fixture is a persistent failure and repeats across retries.
+    const entry = isArray
+      ? script[index]
+      : index === 0 || script.error !== undefined
+        ? script
+        : undefined;
     if (entry === undefined) {
       throw new AgentRunnerError(
         "AGENT_UNAVAILABLE",

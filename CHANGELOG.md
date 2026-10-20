@@ -32,7 +32,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 408 tests (was 350).
+- `pnpm test`: 421 tests (was 350).
 - `pnpm typecheck`: clean.
 - `pnpm test:dsh`: 2 tests (asset review + M1 IA) through the real pinned dsh
   CLI with a local mock; no key or external network.
@@ -44,6 +44,12 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `status=success`, `gates={ia:waived, interaction:passed, visualStyle:passed}`,
   10 asset briefs, **¥0.2081**, `usageComplete=true` (10 CNY cap). The same
   slice without signoffs stops at `awaiting_signoff` (¥0.2756).
+- Real dsh asset review after the shared-contract refactor:
+  `13 assets / 13 passed`, ¥0.3541, `usageComplete=true`.
+- `pipeline/docs/agent-m1-uat.md` maps T-M1-01..20 to automated tests and real
+  runs; edge coverage includes stage progression, full evidence files,
+  per-agent budgets, CLI partial/budget/usage-incomplete paths, malformed
+  signoffs, JSON redaction, and concurrent store writes.
 - The IA agent found three real blockers in the employee-app slice (three dead
   tabs, missing inventory entry, warehouse dead-end). The real run used a
   development waiver to exercise Interaction/Visual; the blockers remain

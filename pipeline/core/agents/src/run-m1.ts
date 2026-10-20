@@ -243,6 +243,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
     const queued = writeChain.then(() => store.writeJson("state.json", snapshot));
     writeChain = queued.catch(() => undefined);
     await queued;
+    await logEvent({ type: "state", stage: snapshot.stage, status: snapshot.status });
   };
 
   const finish = async (

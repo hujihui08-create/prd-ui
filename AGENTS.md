@@ -49,7 +49,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 408 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 421 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -124,6 +124,7 @@ real dsh `deepseek-flash` `13 assets / 13 passed` with
 - `docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` — current core/runtime design.
 - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md` — M1 agent layer contracts, gates, budgets, signoffs.
 - `pipeline/docs/agent-m1.md` — M1 usage, artifacts, signoff format, exit codes.
+- `pipeline/docs/agent-m1-uat.md` — M1 T-M1-01..20 matrix and real-run evidence.
 - `pipeline/docs/asset-review-m0.md` — asset-review usage, artifacts, exit codes.
 - `docs/superpowers/specs/2026-10-20-asset-source-fallback-policy.md` — source chain, verdict schema, hard gates vs soft scores.
 - `docs/superpowers/specs/2026-10-20-agent-organization.md` — IA/Interaction/Visual Style roles.

@@ -39,4 +39,23 @@ describe("FileArtifactStore", () => {
     await expect(store.writeText("../escape.txt", "x")).rejects.toThrow(/escapes/);
     await expect(store.appendText("../escape.txt", "x")).rejects.toThrow(/escapes/);
   });
+
+  it("reports existence without throwing on a missing file", async () => {
+    const store = new FileArtifactStore(await tempDir());
+    expect(await store.exists("missing.json")).toBe(false);
+    await store.writeJson("present.json", { ok: true });
+    expect(await store.exists("present.json")).toBe(true);
+  });
+
+  it("survives concurrent writes to the same path", async () => {
+    const store = new FileArtifactStore(await tempDir());
+    await Promise.all(
+      Array.from({ length: 20 }, (_, index) =>
+        store.writeJson("state.json", { index })
+      )
+    );
+    const raw = await store.readText("state.json");
+    expect(() => JSON.parse(raw)).not.toThrow();
+    expect(JSON.parse(raw)).toHaveProperty("index");
+  });
 });

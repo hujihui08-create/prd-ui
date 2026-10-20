@@ -119,6 +119,36 @@ describe("IA gate", () => {
     });
     expect(tabs.issues.map((issue) => issue.code)).toContain("IA_TAB_OVERFLOW");
   });
+
+  it("reports unknown pages, parents, flow steps, and cross-links", () => {
+    const result = runIaGate({
+      map: {
+        ...ia.map,
+        pages: [
+          ...ia.map.pages,
+          {
+            id: "extra",
+            name: "Extra",
+            parentId: "missing-parent",
+            level: 1,
+            roles: ["beautician"],
+            entryPoints: [],
+          },
+        ],
+        flows: [{ id: "broken", steps: ["today", "missing-page"], status: "broken" }],
+        crossLinks: [{ from: "today", to: "missing-page", kind: "link" }],
+      },
+      findings: ia.findings,
+      brief: employeeBrief,
+      now,
+    });
+    const codes = result.issues.map((issue) => issue.code);
+    expect(codes).toContain("IA_PAGE_UNKNOWN");
+    expect(codes).toContain("IA_PARENT_UNKNOWN");
+    expect(codes).toContain("IA_FLOW_STEP_UNKNOWN");
+    expect(codes).toContain("IA_CROSSLINK_UNKNOWN");
+    expect(result.passed).toBe(false);
+  });
 });
 
 describe("signoff parsing", () => {
@@ -227,6 +257,28 @@ describe("interaction gate", () => {
     });
     expect(result.issues.map((issue) => issue.code)).toContain("INTERACTION_FOCUS_EMPTY");
   });
+
+  it("requires a state explicitly named by the brief", () => {
+    const brief = {
+      ...employeeBrief,
+      ia: {
+        ...employeeBrief.ia,
+        pages: [
+          {
+            ...employeeBrief.ia.pages[0]!,
+            requiredStates: ["default", "empty", "loading", "error", "disabled"],
+          },
+          employeeBrief.ia.pages[1]!,
+        ],
+      },
+    };
+    const result = runInteractionGate({
+      interactionSpec: interaction.interactionSpec,
+      motionSpec: interaction.motionSpec,
+      brief,
+    });
+    expect(result.issues.map((issue) => issue.code)).toContain("INTERACTION_STATE_MISSING");
+  });
 });
 
 describe("visual style gate", () => {
@@ -310,5 +362,43 @@ describe("visual style gate", () => {
     });
     expect(extra.passed).toBe(true);
     expect(extra.issues.map((issue) => issue.code)).toContain("ASSET_BRIEF_EXTRA");
+  });
+
+  it("checks the image strategy against the source chain", () => {
+    const brief = {
+      ...employeeBrief,
+      assets: { ...employeeBrief.assets, images: ["empty-state"] },
+    };
+    const imageBrief = {
+      ...visual.assetBriefs[0]!,
+      id: "empty-state",
+      kind: "poster" as const,
+      format: "png" as const,
+      size: { width: 600, height: 400 },
+      sourceChain: ["upload" as const],
+    };
+    const style = {
+      ...visual.visualStyle,
+      assetStrategy: { ...visual.visualStyle.assetStrategy, images: "upload" as const },
+    };
+
+    const pass = runVisualStyleGate({
+      visualStyle: style,
+      assetBriefs: [...visual.assetBriefs, imageBrief],
+      brief,
+    });
+    expect(pass.passed).toBe(true);
+
+    const fail = runVisualStyleGate({
+      visualStyle: style,
+      assetBriefs: [
+        ...visual.assetBriefs,
+        { ...imageBrief, sourceChain: ["ai-raster" as const] },
+      ],
+      brief,
+    });
+    expect(fail.issues.map((issue) => issue.code)).toContain(
+      "ASSET_SOURCE_STRATEGY_MISMATCH"
+    );
   });
 });
