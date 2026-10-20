@@ -32,9 +32,12 @@ The profile bundles are pinned to `0.2.1-rc.2` as well.
 
 The Asset Reviewer needs a vision-capable model. `@deepseek-ai/dsh-llm-deepseek`
 is text-only and rejects image blocks, so the profile uses
-`@deepseek-ai/dsh-llm-pi-ai` with an OpenAI-compatible route.
+`@deepseek-ai/dsh-llm-pi-ai` with DeepSeek's OpenAI-compatible endpoint. The
+default is `https://api.deepseek.com/v1` + `deepseek-flash`; there is no
+OpenAI default and no provider fallback.
 
-Copy the template and fill in a key:
+`.env` is not loaded automatically. Copy the template, fill in a key, and
+export the variables:
 
 ```bash
 cd pipeline
@@ -43,7 +46,7 @@ cp .env.example .env
 # PRD_UI_VISION_API_KEY=...
 # PRD_UI_VISION_BASE_URL=https://api.deepseek.com/v1
 # PRD_UI_VISION_MODEL=deepseek-flash
-set -a; source .env; set +a
+set -a; . ./.env; set +a
 ```
 
 The profile's `cordis.patch.yml` reads `PRD_UI_VISION_BASE_URL` and
@@ -58,8 +61,11 @@ You can also export the variables in the shell; inherited environment wins over
 
 ## Smoke test
 
+The smoke test needs the same provider variables; export them first:
+
 ```bash
 cd pipeline
+set -a; . ./.env; set +a
 DSH_HOME="$PWD/dsh/home" \
   ./node_modules/.bin/dsh --profile prd-ui-assets \
   "Return the JSON {\"ok\":true} and nothing else."
@@ -70,9 +76,23 @@ Without a key the profile loads and the plugin activates, then fails with
 "wired but unconfigured" state. With a key, the command prints the model's final
 message and exits 0.
 
+## Mock integration test
+
+`pnpm test:dsh` (from `pipeline/`) starts a local OpenAI-compatible mock HTTP
+server and runs `asset:review --only icon-home --runtime dsh` through the real
+pinned CLI/profile. It asserts exit 0, a passed asset, `dsh/` evidence, and
+`summary.usageComplete === true`; no real key or external network is used.
+
+- The mock must return non-zero `prompt_tokens_details.cached_tokens`: dsh omits
+  `cacheReadTokens` when it is zero, and the adapter then reports usage as
+  incomplete.
+- A missing `node_modules/.bin/dsh` fails the test with an install hint; only
+  `SKIP_DSH=1` skips it.
+- `pnpm test` excludes this file so the default suite stays offline.
+
 The full `asset:review --runtime dsh` path was verified twice: first against a
-local mock OpenAI-compatible endpoint, then against the real DeepSeek API with
-`deepseek-flash`. Both runs passed all 13 M0 assets. The real 13-asset run used
+local mock endpoint, then against the real DeepSeek API with `deepseek-flash`.
+Both runs passed all 13 M0 assets. The real 13-asset run used
 79,607 input + 30,043 output + 727,552 cache-read tokens; estimated
 **¥0.463 peak / ¥0.232 off-peak**. Including the probe and a failed/rerun pass,
 total estimated spend was **≈¥0.78**, below the 10 CNY stop line. The key lives
@@ -82,24 +102,30 @@ only in the gitignored `pipeline/.env`.
 
 ```bash
 cd pipeline
-pnpm asset:review \
-  --project samples/projects/employee-app/project.yaml \
-  --assets samples/assets/m0 \
-  --runtime dsh \
-  --runs /tmp/m0-runs-dsh
+set -a; . ./.env; set +a
+DSH_HOME="$PWD/dsh/home" \
+  pnpm asset:review \
+    --project samples/projects/employee-app/project.yaml \
+    --assets samples/assets/m0 \
+    --runtime dsh \
+    --runs /tmp/m0-runs-dsh
 ```
 
-The core state machine still owns retries, source fallback, budgets, and the
-manifest. dsh only reviews one candidate per attempt. Evidence is written under
+`--runtime dsh` defaults to `--max-review-cost-cny 10`; a run that exceeds it,
+or whose usage is incomplete without `--allow-unknown-cost`, exits 1. The core
+state machine still owns retries, source fallback, budgets, and the manifest.
+dsh only reviews one candidate per attempt. Evidence is written under
 `runs/<runId>/dsh/<assetId>-<source>-<attempt>/` (prompt, stdout, stderr,
-session metadata). The canonical record remains `asset-review.json`.
+session metadata, `review.raw.json`, and `error.json` on failure). The canonical
+record remains `asset-review.json`; `--json` prints one machine-readable summary
+to stdout.
 
 ## Current limitations
 
 - Headless one-shot only; no dsh desktop UX adaptation.
 - The task prompt carries the review rubric; the `preset/asset-reviewer` skill is
   the reusable form for later.
-- A vision key is required for a real run; `--runtime standalone` with the
-  scripted reviewer is the keyless CI path.
+- A vision key is required for a real run; `pnpm test:dsh` (local mock) and
+  `--runtime standalone` with the scripted reviewer are the keyless paths.
 - dsh is still a release candidate; the CLI and bundles are pinned, and `@next`
   is not used.

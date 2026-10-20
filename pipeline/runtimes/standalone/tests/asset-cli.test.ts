@@ -103,6 +103,7 @@ describe("asset:review CLI", () => {
     expect(result.stdout).toContain("pnpm asset:review");
     expect(result.stdout).toContain("--fail-fast");
     expect(result.stdout).toContain("--max-review-cost-cny");
+    expect(result.stdout).toContain("--json");
   });
 
   it("rejects an unknown argument with exit 2", async () => {
@@ -600,6 +601,82 @@ describe("asset:review CLI", () => {
       "Review cost: reviewCostCny=unavailable usageSource=unavailable usageComplete=false"
     );
   });
+
+  it("prints one parseable JSON summary on stdout with --json", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout.trim().split("\n")).toHaveLength(1);
+
+    const summary = JSON.parse(result.stdout) as {
+      runDir: string;
+      summary: { total: number; passed: number };
+      assets: Array<{ assetId: string; status: string }>;
+      batchGates: unknown;
+      error: unknown;
+      reviewCostCny: unknown;
+      usageSource: unknown;
+      usageComplete: unknown;
+    };
+    expect(summary.runDir).toBe(await onlyRun(runs));
+    expect(summary.summary).toMatchObject({ total: 1, passed: 1 });
+    expect(summary.assets).toHaveLength(1);
+    expect(summary.assets[0]).toMatchObject({ assetId: "icon-home", status: "passed" });
+    expect(summary.batchGates).toEqual({
+      skipped: true,
+      reason: "PARTIAL_REVIEW",
+      scope: ["icon-home"],
+    });
+    expect(summary.error).toBeNull();
+    expect(summary.reviewCostCny).toBeNull();
+    expect(summary.usageSource).toBe("unavailable");
+    expect(summary.usageComplete).toBe(false);
+    expect(result.stderr).not.toContain("Asset review OK");
+  });
+
+  it("keeps the JSON summary machine-readable when the run fails", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--max-review-cost-cny",
+      "0.1",
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stdout.trim().split("\n")).toHaveLength(1);
+
+    const summary = JSON.parse(result.stdout) as {
+      runDir: string;
+      summary: { total: number; passed: number };
+      error: string;
+      reviewCostCny: unknown;
+      usageComplete: unknown;
+    };
+    expect(summary.runDir).toBe(await onlyRun(runs));
+    expect(summary.summary).toMatchObject({ total: 1, passed: 1 });
+    expect(summary.error).toBe("REVIEW_USAGE_INCOMPLETE");
+    expect(summary.reviewCostCny).toBeNull();
+    expect(summary.usageComplete).toBe(false);
+  });
 });
 
 describe("createLogger", () => {
@@ -675,6 +752,22 @@ describe("parseArgs", () => {
     expect(parseArgs(["--runtime", "dsh", "--allow-unknown-cost"]).allowUnknownCost).toBe(
       true
     );
+  });
+
+  it("parses --json", () => {
+    expect(parseArgs([]).json).toBe(false);
+    expect(parseArgs(["--json"]).json).toBe(true);
+  });
+});
+
+describe("package exports", () => {
+  it("exports the asset CLI entry points without clobbering the phase1 ones", async () => {
+    const module = await import("../src/index.js");
+    expect(typeof module.assetMain).toBe("function");
+    expect(typeof module.parseAssetArgs).toBe("function");
+    expect(module.ASSET_USAGE).toContain("--json");
+    expect(typeof module.phase1Main).toBe("function");
+    expect(typeof module.parseArgs).toBe("function");
   });
 });
 

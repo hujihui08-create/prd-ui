@@ -3,13 +3,81 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
-## 2026-10-20 — Asset review hardening docs (draft, not implemented)
+## 2026-10-20 — M0.5 asset review hardening (H1–H15, implemented)
+
+### Added
+
+- `pnpm test:dsh`: a local OpenAI-compatible mock HTTP server plus the real
+  pinned dsh CLI/profile runs `asset:review --only icon-home --runtime dsh` and
+  asserts exit 0, a passed asset, `dsh/` evidence, and
+  `summary.usageComplete === true`. It needs no real key or external network;
+  the default `pnpm test` excludes it.
+- `asset:review --json`: one machine-readable JSON summary on stdout
+  (`runDir`, `summary`, `assets`, `batchGates`, `error`, `reviewCostCny`,
+  `usageSource`, `usageComplete`; unavailable values are `null`). Human lines
+  move to stderr so stdout stays parseable.
+- Set-level icon/illustration gates; `--only` records `PARTIAL_REVIEW` instead
+  of claiming set consistency.
+- 2x PNG evidence (`candidate.png` 48x48 for M0 icons), raw reviewer evidence
+  (`review.raw.json`), one schema repair, `manifest.review.json`, append-only
+  `log.ndjson`, and usage/cost capture with a default 10 CNY dsh review cap.
+- `--max-review-cost-cny`, `--allow-unknown-cost`, and `--fail-fast` CLI flags.
+- Standalone asset CLI exports (`assetMain`, `parseAssetArgs`, `ASSET_USAGE`)
+  and a comment on `normalizeSvg` clarifying it is XML re-serialization, not
+  design normalization.
+
+### Changed
+
+- Strict `style.json`/`source-policy.json`/`pricing.json` validation fails fast
+  with the offending path; provider base URL and model are required, with
+  DeepSeek `deepseek-flash` as the documented default and no OpenAI fallback.
+- Reviewer errors are isolated per asset; set-gate failures no longer swallow
+  the reviewer's error.
+- `normalizeSvg` and redaction behavior are documented; `.env` is explicitly
+  not auto-loaded (`set -a; . ./.env; set +a`).
+
+### Verification
+
+- `pnpm test`: 336 tests passed (offline; dsh mock integration excluded).
+- `pnpm test:dsh`: 1 passed (real pinned dsh 0.2.1-rc.2 + local mock).
+- `pnpm typecheck`: clean.
+- `pnpm phase1:verify`: `2 pages, 0 blockers`.
+- `pnpm asset:review --assets samples/assets/m0 --runtime standalone`:
+  `13 assets, 13 passed`.
+- `pnpm asset:review --assets samples/assets/m0-scenarios --runtime standalone`:
+  `1 passed, 1 unresolved`, exit 1 as designed.
+- dsh mock run: `1 assets, 1 passed`, `usageSource=json-events`,
+  `usageComplete=true`, review cost below the 10 CNY cap.
+
+### Commit trail
+
+| Commit | Change |
+|---|---|
+| `b872535` | fix: keep redacted json parseable |
+| `5c363be` | fix: complete raw review evidence and shared redaction |
+| `a40d948` | feat: append logs, keep raw reviews and repair once |
+| `fa0f62f` | fix: do not swallow reviewer errors in render fallback |
+| `baf252a` | feat: add png evidence and manifest review sidecar |
+| `53f70cc` | fix: correct repair usage accounting and preserve reviewer errors |
+| `6e86702` | feat: capture usage/cost and stream dsh tasks over json stdin |
+| `869dd3e` | fix: fail fast on invalid config and missing provider env |
+| `3f3f508` | fix: isolate reviewer errors per asset |
+| `beae2f2` | fix: preserve reviewer errors when set gates fail |
+| `2861701` | feat: wire icon and illustration set-level gates |
+| `4d261e0` | fix: reject inline styles and transforms in asset gates |
+
+## 2026-10-20 — Asset review hardening docs
 
 - Added the M0.5 hardening spec, test plan, and implementation checklist for
   H1–H15 (gate integrity, set-level gates, reviewer isolation, config/provider
   strictness, cost guard, image input, stdin, append log, raw output, schema
   repair, manifest sidecar, illustration set, dsh mock integration, DX).
-- Status: draft for review; no runtime behavior changed.
+- Reviewed on 2026-10-20: resolved the dsh `--json`/stdin/usage shape, corrected
+  the H3 control flow, moved H7 rendering to standalone, added H5 validation for
+  the standalone model reviewer, defined usage-complete fail-closed behavior,
+  and made `--only` skip set gates with an explicit `PARTIAL_REVIEW` record.
+- Status: implemented in the M0.5 hardening section above; the docs record the
+  approved design, test plan, and checklist.
 - Spec: `docs/superpowers/specs/2026-10-20-asset-review-hardening-design.md`
 - Tests: `docs/superpowers/specs/2026-10-20-asset-review-hardening-test-plan.md`
 - Checklist: `docs/superpowers/plans/2026-10-20-asset-review-hardening.md`
@@ -85,10 +153,9 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - A real vision key is configured only in the local, gitignored
   `pipeline/.env`; it is not committed. Without it the pipeline fails with
   `MISSING_CREDENTIAL` instead of faking a pass.
-- Model cost is not yet written into `asset-review.json`; the real run's cost was
-  estimated externally from dsh session `usage` at DeepSeek Flash peak pricing
-  (USD converted at 7.2). Add a usage/cost capture task before relying on
-  per-run cost audits.
+- Model cost was not yet written into `asset-review.json`; that gap was closed by
+  the M0.5 usage/cost capture section above (the original estimate came from dsh
+  session `usage` at DeepSeek Flash peak pricing, USD converted at 7.2).
 - M0 only connects the A library; B/C adapter interfaces and state-machine
   branches exist, but real suppliers/accounts/licensing are M2.
 - IA/Interaction/Visual Style agents are M1; Figma, screenshot diff, recording,

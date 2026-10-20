@@ -23,6 +23,12 @@ export function parseSvg(svg: string): ParsedSvg | null {
   }
 }
 
+/**
+ * Re-serialize the SVG document through the XML parser. This is XML
+ * normalization only (well-formedness, namespace/attribute serialization); it
+ * does not simplify paths, snap geometry, or change design tokens. Design
+ * normalization stays a reviewer/gate concern (T-H15-03).
+ */
 export function normalizeSvg(svg: string): string {
   const parsed = parseSvg(svg);
   if (!parsed) {

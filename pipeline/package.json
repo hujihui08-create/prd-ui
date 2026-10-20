@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
+    "test:dsh": "vitest run --config vitest.dsh.config.ts",
     "typecheck": "pnpm -r typecheck",
     "phase1:verify": "tsx runtimes/standalone/src/phase1-cli.ts",
     "render:html": "tsx runtimes/standalone/src/render-html-cli.ts",

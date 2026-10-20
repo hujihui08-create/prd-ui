@@ -18,6 +18,7 @@ import {
   type AssetBrief,
   type ArtifactStorePort,
   type AssetReviewerPort,
+  type AssetReviewRun,
   type ReviewPricing,
   type SourcePolicy,
   type VisualStyle,
@@ -52,6 +53,7 @@ Options:
   --max-review-cost-cny <n>  Global review cost cap in CNY (default: 10 for dsh)
   --allow-unknown-cost       Continue when review usage is incomplete
   --pricing <path>           Pricing file (default: <assets>/pricing.json or pipeline/pricing.json)
+  --json                     Print one JSON summary to stdout (human lines go to stderr)
   -h, --help                 Print this help and exit`;
 
 export interface AssetCliOptions {
@@ -69,6 +71,7 @@ export interface AssetCliOptions {
   maxReviewCostCny?: number;
   allowUnknownCost: boolean;
   pricingPath?: string;
+  json: boolean;
   help: boolean;
 }
 
@@ -101,6 +104,7 @@ export function parseArgs(argv: string[]): AssetCliOptions {
     dryRun: false,
     failFast: false,
     allowUnknownCost: false,
+    json: false,
     help: false,
   };
 
@@ -169,6 +173,9 @@ export function parseArgs(argv: string[]): AssetCliOptions {
         break;
       case "--pricing":
         options.pricingPath = path.resolve(value());
+        break;
+      case "--json":
+        options.json = true;
         break;
       default:
         throw new AssetCliUsageError(`unknown argument: ${argument}`);
@@ -308,6 +315,32 @@ export function createLogger(store: ArtifactStorePort) {
   };
 }
 
+/**
+ * Stable machine-readable summary. Every documented key is always present;
+ * unavailable values are `null` so consumers can rely on the shape. The
+ * human-readable lines are written to stderr when `--json` is set, so stdout
+ * stays one parseable JSON document.
+ */
+function jsonSummary(input: {
+  runDir: string | null;
+  result?: AssetReviewRun;
+  error?: string | null;
+  preflight?: unknown;
+}): Record<string, unknown> {
+  const result = input.result;
+  return {
+    runDir: input.runDir,
+    summary: result?.summary ?? null,
+    assets: result?.assets ?? [],
+    batchGates: result?.batchGates ?? null,
+    error: result?.error ?? input.error ?? null,
+    reviewCostCny: result?.summary.reviewCostCny ?? null,
+    usageSource: result?.usageSource ?? null,
+    usageComplete: result?.usageComplete ?? null,
+    ...(input.preflight === undefined ? {} : { preflight: input.preflight }),
+  };
+}
+
 export async function main(
   argv: string[],
   io: { stdout: (line: string) => void; stderr: (line: string) => void } = {
@@ -332,6 +365,9 @@ export async function main(
     return 0;
   }
 
+  const human = options.json ? io.stderr : io.stdout;
+  let runDir: string | undefined;
+
   try {
     const { config } = loadProjectConfig(options.projectPath);
     const profile =
@@ -346,7 +382,7 @@ export async function main(
     }
 
     const runId = createRunId();
-    const runDir = path.join(options.runsDir, runId);
+    runDir = path.join(options.runsDir, runId);
     const store = new FileArtifactStore(runDir);
     const libraryDir = path.join(options.assetsDir, "library");
     const producer = new LibrarySourceAdapter({
@@ -366,6 +402,18 @@ export async function main(
         runDir,
       });
       await store.writeJson("preflight.json", result);
+      if (options.json) {
+        io.stdout(
+          JSON.stringify(
+            jsonSummary({
+              runDir,
+              error: result.passed ? null : "PREFLIGHT_FAILED",
+              preflight: result,
+            })
+          )
+        );
+        return result.passed ? 0 : 1;
+      }
       io.stdout(
         `Asset preflight ${result.passed ? "OK" : "FAILED"}: ${result.items.length} assets, ${
           result.items.filter((item) => item.passed).length
@@ -427,37 +475,44 @@ export async function main(
     await store.writeJson("manifest.json", validatedManifest);
     await store.writeJson("manifest.review.json", manifestReview);
 
-    io.stdout(
-      `Asset review ${result.passed ? "OK" : "FAILED"}: ${result.summary.total} assets, ${
-        result.summary.passed
-      } passed, ${result.summary.retried} retried, ${result.summary.unresolved} unresolved, ${
-        result.summary.degraded
-      } degraded`
-    );
-    if (result.summary.renderWarnings !== undefined) {
-      io.stdout(`Render warnings: ${result.summary.renderWarnings}`);
+    if (options.json) {
+      io.stdout(JSON.stringify(jsonSummary({ runDir, result })));
+    } else {
+      human(
+        `Asset review ${result.passed ? "OK" : "FAILED"}: ${result.summary.total} assets, ${
+          result.summary.passed
+        } passed, ${result.summary.retried} retried, ${result.summary.unresolved} unresolved, ${
+          result.summary.degraded
+        } degraded`
+      );
+      if (result.summary.renderWarnings !== undefined) {
+        human(`Render warnings: ${result.summary.renderWarnings}`);
+      }
+      const reviewCostCny =
+        result.summary.reviewCostCny === undefined
+          ? "unavailable"
+          : result.summary.reviewCostCny.toFixed(4);
+      human(
+        `Review cost: reviewCostCny=${reviewCostCny} usageSource=${
+          result.usageSource ?? "unavailable"
+        } usageComplete=${result.usageComplete ?? false}`
+      );
+      for (const record of result.assets.filter((asset) => asset.status !== "passed").slice(0, 10)) {
+        const reasons = record.attempts
+          .flatMap((attempt) => attempt.issues)
+          .slice(0, 3)
+          .join("; ");
+        human(`- ${record.assetId}: ${reasons || "unresolved"}`);
+      }
+      human(`Run: ${runDir}`);
     }
-    const reviewCostCny =
-      result.summary.reviewCostCny === undefined
-        ? "unavailable"
-        : result.summary.reviewCostCny.toFixed(4);
-    io.stdout(
-      `Review cost: reviewCostCny=${reviewCostCny} usageSource=${
-        result.usageSource ?? "unavailable"
-      } usageComplete=${result.usageComplete ?? false}`
-    );
-    for (const record of result.assets.filter((asset) => asset.status !== "passed").slice(0, 10)) {
-      const reasons = record.attempts
-        .flatMap((attempt) => attempt.issues)
-        .slice(0, 3)
-        .join("; ");
-      io.stdout(`- ${record.assetId}: ${reasons || "unresolved"}`);
-    }
-    io.stdout(`Run: ${runDir}`);
     if (result.error) io.stderr(result.error);
     return result.passed ? 0 : 1;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    if (options.json) {
+      io.stdout(JSON.stringify(jsonSummary({ runDir: runDir ?? null, error: message })));
+    }
     io.stderr(`Asset review FAILED: ${message}`);
     return 1;
   }
