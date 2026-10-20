@@ -239,6 +239,32 @@ describe("runAssetReview", () => {
     expect(result.error).toBe("ICON_SET_INCONSISTENT");
     expect(result.passed).toBe(false);
   });
+
+  it("preserves reviewer errors when set gates also fail", async () => {
+    const store = new MemoryStore();
+    const secondBrief: AssetBrief = {
+      ...iconBrief,
+      id: "icon-search",
+      constraints: { ...iconBrief.constraints, strokeWidth: 2 },
+    };
+    const failingBrief: AssetBrief = { ...iconBrief, id: "icon-alert" };
+    const reviewer = reviewerWith({ "icon-alert/library/1": new Error("model down") });
+    const customPorts: AssetReviewPorts = {
+      ...ports(store, reviewer),
+      producer: producerWith(store, (id) =>
+        id === "icon-search" ? validIcon.replace('stroke-width="1.5"', 'stroke-width="2"') : validIcon
+      ),
+    };
+
+    const result = await run(store, reviewer, {
+      briefs: [iconBrief, secondBrief, failingBrief],
+      ports: customPorts,
+    });
+
+    expect(result.batchGates?.iconSet?.passed).toBe(false);
+    expect(result.error).toContain("REVIEWER_ERROR");
+    expect(result.passed).toBe(false);
+  });
 });
 
 describe("buildReviewPrompt", () => {

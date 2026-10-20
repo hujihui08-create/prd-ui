@@ -398,7 +398,9 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
       : batchGates.illustrationSet?.passed === false
         ? "ILLUSTRATION_SET_INCONSISTENT"
         : undefined;
-  const error = setError ?? fatalError;
+  // A reviewer crash is operational and must not be masked by a set mismatch;
+  // icon-over-illustration precedence still applies within `setError`.
+  const error = fatalError ?? setError;
   const finishedAt = input.ports.clock.now().toISOString();
   const result: AssetReviewRunResult = {
     runId: input.runId,
