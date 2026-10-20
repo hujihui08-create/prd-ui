@@ -3,6 +3,17 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — Asset review hardening docs (draft, not implemented)
+
+- Added the M0.5 hardening spec, test plan, and implementation checklist for
+  H1–H15 (gate integrity, set-level gates, reviewer isolation, config/provider
+  strictness, cost guard, image input, stdin, append log, raw output, schema
+  repair, manifest sidecar, illustration set, dsh mock integration, DX).
+- Status: draft for review; no runtime behavior changed.
+- Spec: `docs/superpowers/specs/2026-10-20-asset-review-hardening-design.md`
+- Tests: `docs/superpowers/specs/2026-10-20-asset-review-hardening-test-plan.md`
+- Checklist: `docs/superpowers/plans/2026-10-20-asset-review-hardening.md`
+
 ## 2026-10-20 — Core + dual runtime + M0 asset review
 
 ### Added
