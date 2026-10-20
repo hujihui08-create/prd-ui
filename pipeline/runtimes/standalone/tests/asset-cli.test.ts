@@ -624,17 +624,38 @@ describe("createLogger", () => {
     };
     const logger = createLogger(store);
 
-    await logger.log({ type: "first", note: "token sk-abcdefgh12345678" });
+    await logger.log({
+      type: "first",
+      note: "token sk-abcdefgh12345678",
+      apiKey: "api-key-value",
+      token: "tok_live_123456",
+      secret: "s3cr3t-value",
+      authorization: "Bearer auth-token-value",
+    });
     await logger.log({ type: "second" });
 
     expect(appended).toHaveLength(2);
     expect(appended.every((line) => line.endsWith("\n"))).toBe(true);
     expect(appended[0]).toContain("sk-***");
     expect(appended[0]).not.toContain("sk-abcdefgh12345678");
+    for (const secret of [
+      "api-key-value",
+      "tok_live_123456",
+      "s3cr3t-value",
+      "auth-token-value",
+    ]) {
+      expect(appended[0]).not.toContain(secret);
+    }
     expect(appended.map((line) => (JSON.parse(line) as { type: string }).type)).toEqual([
       "first",
       "second",
     ]);
+    expect(JSON.parse(appended[0]!)).toMatchObject({
+      apiKey: "***",
+      token: "***",
+      secret: "***",
+      authorization: "***",
+    });
     expect(rewrites).toBe(0);
   });
 });

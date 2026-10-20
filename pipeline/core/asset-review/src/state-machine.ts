@@ -131,8 +131,9 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
   const maxMinutes = input.maxMinutes ?? input.policy.maxMinutes;
   const continueOnReviewerError = input.continueOnReviewerError ?? true;
   const maxReviewCostCny = input.maxReviewCostCny;
+  const reviewPricing = input.pricing;
   const allowUnknownCost = input.allowUnknownCost ?? false;
-  if (maxReviewCostCny !== undefined && input.pricing === undefined) {
+  if (maxReviewCostCny !== undefined && reviewPricing === undefined) {
     throw new Error("CONFIGURATION_ERROR: pricing is required when maxReviewCostCny is set");
   }
 
@@ -188,6 +189,21 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
       }
     }
   };
+
+  // Reviewers that can retry internally must not spend past the review budget.
+  // The first attempt's cost is the best available estimate for a repair;
+  // without usage or a budget the callback is omitted (or denies) rather than
+  // guessing zero.
+  const canRepair =
+    maxReviewCostCny === undefined || reviewPricing === undefined
+      ? undefined
+      : (firstUsage: ReviewUsage | undefined): boolean => {
+          if (firstUsage === undefined) return false;
+          return (
+            totalReviewCostCny + reviewCost(firstUsage, reviewPricing).cny <=
+            maxReviewCostCny
+          );
+        };
 
   for (const brief of selected) {
     if (costBudgetExceeded || usageIncomplete) {
@@ -403,6 +419,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
             hardGate: gate,
             assetText: normalized,
             runDir: input.runDir,
+            ...(canRepair === undefined ? {} : { canRepair }),
           });
         } catch (error) {
           recordReview(reviewAccountingFromError(error), attemptRecord, "partial-only");

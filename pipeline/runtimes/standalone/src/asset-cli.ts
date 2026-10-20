@@ -9,6 +9,7 @@ import {
   VisualStyleSchema,
   parsePricingConfig,
   preflightAssetBriefs,
+  redactSecrets,
   resolvePricing,
   runAssetReview,
   toAssetManifest,
@@ -277,10 +278,6 @@ async function createReviewer(assetsDir: string, options: AssetCliOptions): Prom
   }
 }
 
-function redact(line: string): string {
-  return line.replace(/sk-[A-Za-z0-9_-]{8,}/g, "sk-***");
-}
-
 interface SafeParser<T> {
   safeParse(
     value: unknown
@@ -303,7 +300,9 @@ export function assertContract<T>(
 export function createLogger(store: ArtifactStorePort) {
   return {
     async log(event: Record<string, unknown>): Promise<void> {
-      const line = redact(JSON.stringify({ ...event, timestamp: new Date().toISOString() }));
+      const line = redactSecrets(
+        JSON.stringify({ ...event, timestamp: new Date().toISOString() })
+      );
       await store.appendText("log.ndjson", `${line}\n`);
     },
   };

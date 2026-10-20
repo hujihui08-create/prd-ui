@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AssetReviewerInput } from "@prd-ui/asset-review";
 import {
   DshAssetReviewer,
@@ -118,11 +118,14 @@ describe("DshAssetReviewer", () => {
     const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
       raw: string;
       ignoredKeys: string[];
+      parsed: Record<string, unknown>;
       usageComplete: boolean;
       repairAttempted: boolean;
     };
     expect(raw.raw).toContain("reason_note");
     expect(raw.ignoredKeys).toEqual(["reason_note"]);
+    expect(raw.parsed).toEqual(verdict);
+    expect(JSON.stringify(raw.parsed)).not.toContain("reason_note");
     expect(raw.usageComplete).toBe(true);
     expect(raw.repairAttempted).toBe(false);
   });
@@ -132,6 +135,7 @@ describe("DshAssetReviewer", () => {
     temporaryDirs.push(runDir);
     let calls = 0;
     const captured: string[] = [];
+    const canRepair = vi.fn(() => true);
     const reviewer = reviewerWith(async (_command, _args, options) => {
       calls += 1;
       captured.push(options.stdin ?? "");
@@ -153,9 +157,16 @@ describe("DshAssetReviewer", () => {
       };
     });
 
-    const result = await reviewer.review({ ...input, runDir });
+    const result = await reviewer.review({ ...input, runDir, canRepair });
 
     expect(calls).toBe(2);
+    expect(canRepair).toHaveBeenCalledTimes(1);
+    expect(canRepair).toHaveBeenCalledWith({
+      inputTokens: 100,
+      outputTokens: 20,
+      cacheReadTokens: 0,
+      totalTokens: 120,
+    });
     expect(captured[1]).toContain("previous response");
     expect(result.verdict.verdict).toBe("pass");
     expect(result.repairAttempted).toBe(true);
@@ -170,6 +181,95 @@ describe("DshAssetReviewer", () => {
     const evidence = path.join(runDir, "dsh", "icon-home-library-1");
     expect((await stat(path.join(evidence, "repair-prompt.md"))).isFile()).toBe(true);
     expect((await stat(path.join(evidence, "first-stdout.txt"))).isFile()).toBe(true);
+  });
+
+  it("does not repair when the budget callback denies it", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    let calls = 0;
+    const canRepair = vi.fn(() => false);
+    const reviewer = reviewerWith(async () => {
+      calls += 1;
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
+          final('{"verdict":"pass"}')
+        ),
+        stderr: "",
+      };
+    });
+
+    await expect(
+      reviewer.review({ ...input, runDir, canRepair })
+    ).rejects.toMatchObject({
+      code: "DSH_INVALID_VERDICT",
+      usage: {
+        inputTokens: 100,
+        outputTokens: 20,
+        cacheReadTokens: 0,
+        totalTokens: 120,
+      },
+    });
+    expect(calls).toBe(1);
+    expect(canRepair).toHaveBeenCalledTimes(1);
+    expect(canRepair).toHaveBeenCalledWith({
+      inputTokens: 100,
+      outputTokens: 20,
+      cacheReadTokens: 0,
+      totalTokens: 120,
+    });
+
+    const evidence = path.join(runDir, "dsh", "icon-home-library-1");
+    const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
+      repairAttempted: boolean;
+    };
+    expect(raw.repairAttempted).toBe(false);
+    await expect(stat(path.join(evidence, "repair-prompt.md"))).rejects.toThrow();
+  });
+
+  it("redacts secrets from prompt, stdout, stderr and raw evidence", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    const secrets = [
+      "api-key-value",
+      "tok_live_123456",
+      "s3cr3t-value",
+      "auth-token-value",
+      "sk-abcdefgh12345678",
+    ];
+    const reviewer = reviewerWith(async () => ({
+      stdout: ndjson(
+        stepEnd({ inputTokens: 10, outputTokens: 5, totalTokens: 15, cacheReadTokens: 0 }),
+        final(
+          JSON.stringify({
+            ...verdict,
+            reason_note: "sk-abcdefgh12345678",
+            token: "tok_live_123456",
+            secret: "s3cr3t-value",
+          })
+        )
+      ),
+      stderr: "authorization: Bearer auth-token-value",
+    }));
+
+    const result = await reviewer.review({
+      ...input,
+      runDir,
+      assetText: '<svg data-api-key="api-key-value"/>',
+    });
+    expect(result.verdict.verdict).toBe("pass");
+
+    const evidence = path.join(runDir, "dsh", "icon-home-library-1");
+    for (const file of ["prompt.md", "stdout.txt", "stderr.txt", "review.raw.json"]) {
+      const content = await readFile(path.join(evidence, file), "utf8");
+      for (const secret of secrets) {
+        expect(content, `${file} leaks ${secret}`).not.toContain(secret);
+      }
+    }
+    const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
+      raw: string;
+    };
+    expect(raw.raw).toContain("sk-***");
   });
 
   it("throws with merged usage when the repair is also invalid", async () => {

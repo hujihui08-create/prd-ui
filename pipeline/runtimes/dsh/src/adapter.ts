@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildReviewPrompt,
+  redactSecrets,
   validateProviderEnv,
   type AssetReviewerInput,
   type AssetReviewerPort,
@@ -126,6 +127,14 @@ export class DshAssetReviewer implements AssetReviewerPort {
         throw error;
       }
       firstError = error;
+      if (input.canRepair !== undefined && !input.canRepair(error.usage)) {
+        await this.writeEvidence(input, task, {
+          firstError,
+          error: firstError,
+          repairAttempted: false,
+        });
+        throw firstError;
+      }
       repairTask = `${task}\n\nYour previous response was invalid: ${error.message}\nReturn ONLY one JSON object that conforms to the verdict schema. Do not add extra keys.`;
       try {
         result = await this.run(input, repairTask);
@@ -180,6 +189,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
       repairTask?: string;
       repairError?: DshError;
       error?: DshError;
+      repairAttempted?: boolean;
     }
   ): Promise<void> {
     const evidenceDir = path.join(
@@ -188,11 +198,19 @@ export class DshAssetReviewer implements AssetReviewerPort {
       `${input.candidate.assetId}-${input.candidate.source}-${input.candidate.attempt}`
     );
     await mkdir(evidenceDir, { recursive: true });
-    await writeFile(path.join(evidenceDir, "prompt.md"), task, "utf8");
+    await writeFile(path.join(evidenceDir, "prompt.md"), redactSecrets(task), "utf8");
 
     if (outcome.result !== undefined) {
-      await writeFile(path.join(evidenceDir, "stdout.txt"), outcome.result.stdout, "utf8");
-      await writeFile(path.join(evidenceDir, "stderr.txt"), outcome.result.stderr, "utf8");
+      await writeFile(
+        path.join(evidenceDir, "stdout.txt"),
+        redactSecrets(outcome.result.stdout),
+        "utf8"
+      );
+      await writeFile(
+        path.join(evidenceDir, "stderr.txt"),
+        redactSecrets(outcome.result.stderr),
+        "utf8"
+      );
       await writeFile(
         path.join(evidenceDir, "session.json"),
         `${JSON.stringify(outcome.result.session, null, 2)}\n`,
@@ -201,46 +219,51 @@ export class DshAssetReviewer implements AssetReviewerPort {
     }
 
     if (outcome.repairTask !== undefined) {
-      await writeFile(path.join(evidenceDir, "repair-prompt.md"), outcome.repairTask, "utf8");
+      await writeFile(
+        path.join(evidenceDir, "repair-prompt.md"),
+        redactSecrets(outcome.repairTask),
+        "utf8"
+      );
     }
     if (outcome.firstError !== undefined) {
       await writeFile(
         path.join(evidenceDir, "first-stdout.txt"),
-        outcome.firstError.stdout ?? "",
+        redactSecrets(outcome.firstError.stdout ?? ""),
         "utf8"
       );
       await writeFile(
         path.join(evidenceDir, "first-stderr.txt"),
-        outcome.firstError.stderr ?? "",
+        redactSecrets(outcome.firstError.stderr ?? ""),
         "utf8"
       );
     }
     if (outcome.result !== undefined && outcome.firstError !== undefined) {
       await writeFile(
         path.join(evidenceDir, "repair-stdout.txt"),
-        outcome.result.stdout,
+        redactSecrets(outcome.result.stdout),
         "utf8"
       );
       await writeFile(
         path.join(evidenceDir, "repair-stderr.txt"),
-        outcome.result.stderr,
+        redactSecrets(outcome.result.stderr),
         "utf8"
       );
     } else if (outcome.repairError !== undefined) {
       await writeFile(
         path.join(evidenceDir, "repair-stdout.txt"),
-        outcome.repairError.stdout ?? "",
+        redactSecrets(outcome.repairError.stdout ?? ""),
         "utf8"
       );
       await writeFile(
         path.join(evidenceDir, "repair-stderr.txt"),
-        outcome.repairError.stderr ?? "",
+        redactSecrets(outcome.repairError.stderr ?? ""),
         "utf8"
       );
     }
 
     const finalError = outcome.error;
-    const repairAttempted = outcome.firstError !== undefined;
+    const repairAttempted =
+      outcome.repairAttempted ?? outcome.firstError !== undefined;
     const raw = outcome.result?.raw ?? finalError?.raw ?? outcome.firstError?.raw ?? "";
     const ignoredKeys =
       outcome.result?.ignoredKeys ??
@@ -258,23 +281,30 @@ export class DshAssetReviewer implements AssetReviewerPort {
       : (finalError?.usageComplete ?? false);
     await writeFile(
       path.join(evidenceDir, "review.raw.json"),
-      `${JSON.stringify(
-        {
-          raw,
-          ignoredKeys,
-          ...(usage === undefined ? {} : { usage }),
-          usageComplete,
-          repairAttempted,
-        },
-        null,
-        2
+      `${redactSecrets(
+        JSON.stringify(
+          {
+            raw: redactSecrets(raw),
+            ignoredKeys,
+            ...(outcome.result === undefined
+              ? {}
+              : { parsed: outcome.result.verdict }),
+            ...(usage === undefined ? {} : { usage }),
+            usageComplete,
+            repairAttempted,
+          },
+          null,
+          2
+        )
       )}\n`,
       "utf8"
     );
     if (finalError !== undefined) {
       await writeFile(
         path.join(evidenceDir, "error.json"),
-        `${JSON.stringify({ code: finalError.code, message: finalError.message }, null, 2)}\n`,
+        `${redactSecrets(
+          JSON.stringify({ code: finalError.code, message: finalError.message }, null, 2)
+        )}\n`,
         "utf8"
       );
     }

@@ -384,6 +384,60 @@ describe("runAssetReview", () => {
     expect(() => AssetReviewRunSchema.parse(result)).not.toThrow();
   });
 
+  it("passes a canRepair callback that denies repairs beyond the remaining budget", async () => {
+    const store = new MemoryStore();
+    const decisions: Array<boolean | undefined> = [];
+    const reviewer: AssetReviewerPort = {
+      async review(input) {
+        decisions.push(input.canRepair?.(oneMillionInput));
+        return { verdict: passVerdict, usage: oneMillionInput, usageComplete: true };
+      },
+    };
+
+    const result = await run(store, reviewer, {
+      pricing,
+      maxReviewCostCny: 1,
+    });
+
+    expect(decisions).toEqual([false]);
+    expect(result.error).toBe("REVIEW_COST_BUDGET_EXCEEDED");
+  });
+
+  it("allows a repair that fits the remaining review budget", async () => {
+    const store = new MemoryStore();
+    const decisions: Array<boolean | undefined> = [];
+    const reviewer: AssetReviewerPort = {
+      async review(input) {
+        decisions.push(input.canRepair?.(oneMillionInput));
+        return { verdict: passVerdict, usage: oneMillionInput, usageComplete: true };
+      },
+    };
+
+    const result = await run(store, reviewer, {
+      pricing,
+      maxReviewCostCny: 10,
+    });
+
+    expect(decisions).toEqual([true]);
+    expect(result.error).toBeUndefined();
+    expect(result.passed).toBe(true);
+  });
+
+  it("does not pass canRepair when no review budget is set", async () => {
+    const store = new MemoryStore();
+    const callbacks: unknown[] = [];
+    const reviewer: AssetReviewerPort = {
+      async review(input) {
+        callbacks.push(input.canRepair);
+        return { verdict: passVerdict };
+      },
+    };
+
+    await run(store, reviewer, { pricing });
+
+    expect(callbacks).toEqual([undefined]);
+  });
+
   it("stops the batch when the review cost exceeds the CNY budget", async () => {
     const store = new MemoryStore();
     const result = await run(

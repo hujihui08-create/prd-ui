@@ -3,6 +3,7 @@ import type {
   AssetCandidate,
   HardGateResult,
   ReviewResult,
+  ReviewUsage,
   SourceId,
 } from "./contracts.js";
 import type { VisualStyle } from "./visual-style.js";
@@ -30,6 +31,12 @@ export interface AssetReviewerInput {
    * a reviewer that supports image input only receives the path.
    */
   candidateImagePath?: string;
+  /**
+   * Core supplies this only when a review cost budget is active. A reviewer
+   * that can retry internally (dsh schema repair) must skip the retry when
+   * the callback returns false.
+   */
+  canRepair?: (firstUsage: ReviewUsage | undefined) => boolean;
 }
 
 export interface AssetReviewerPort {
