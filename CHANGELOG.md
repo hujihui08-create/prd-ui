@@ -3,6 +3,16 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — M1 agent layer spec (draft, not implemented)
+
+- Added the M1 design spec for the IA / Interaction Design / Visual Style
+  agents: shared agent runner/ports, structured artifacts, deterministic
+  orchestrator gates, budgets, human signoffs, and test matrix.
+- Scope follows the core-runtime M1 definition; customer vertical slice,
+  PRD Reviewer/UI Briefer, Figma/M3, and M2 suppliers are out of scope.
+- Status: draft for review; no runtime behavior changed.
+- Spec: `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`
+
 ## 2026-10-20 — M0.5 asset review hardening (H1–H15, implemented)
 
 ### Added
