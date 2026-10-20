@@ -9,6 +9,9 @@ import {
   FindingSchema,
   RunStateSchema,
   ProjectConfigSchema,
+  AgentUsageSchema,
+  AssetBriefSchema,
+  parsePricingConfig,
   reqId,
   type PageSpec,
   type UiBrief,
@@ -335,5 +338,57 @@ describe("contracts", () => {
 
   it("builds requirement ids", () => {
     expect(reqId("order", 7)).toBe("REQ-ORDER-007");
+  });
+
+  it("accepts shared asset briefs with M1 visual hints", () => {
+    const brief = {
+      id: "icon-receipt",
+      kind: "icon",
+      scene: "开单快捷操作",
+      styleRef: "b-mobile-neutral",
+      size: { width: 24, height: 24 },
+      format: "svg",
+      constraints: { grid: 24, currentColor: true },
+      sourceChain: ["library", "ai-vector"],
+      visualRef: "filled line icon, rounded 2px stroke",
+      sourceHint: "lucide receipt",
+    };
+    expect(AssetBriefSchema.parse(brief).visualRef).toContain("filled");
+    expect(() =>
+      AssetBriefSchema.parse({ ...brief, unexpected: true })
+    ).toThrow();
+  });
+
+  it("rejects negative token usage and invalid pricing defaults", () => {
+    expect(() =>
+      AgentUsageSchema.parse({
+        inputTokens: -1,
+        outputTokens: 1,
+        cacheReadTokens: 0,
+      })
+    ).toThrow();
+    expect(() =>
+      parsePricingConfig({
+        default: "missing",
+        providers: {
+          deepseek: {
+            inputMissUsdPerMillion: 1,
+            inputCacheUsdPerMillion: 0.1,
+            outputUsdPerMillion: 2,
+            usdToCny: 7,
+          },
+        },
+      })
+    ).toThrow(/default provider/);
+  });
+
+  it("accepts an optional prd path in project config", () => {
+    const config = {
+      project: "employee-app",
+      brief: "ui-brief.json",
+      prd: "prd.md",
+      manifests: { "b-mobile": "asset-manifest.b-mobile.json" },
+    };
+    expect(ProjectConfigSchema.parse(config).prd).toBe("prd.md");
   });
 });
