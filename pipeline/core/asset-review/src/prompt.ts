@@ -71,6 +71,7 @@ export function buildReviewPrompt(input: ReviewPromptInput): string {
     "- verdict: pass | retry | fallback.",
     "- retry means the same source can fix it (prompt/scene/composition).",
     "- fallback means this source cannot satisfy the brief.",
+    "- Return exactly the schema keys; do not add annotations such as `reason_note`.",
     "",
     "Return ONLY one JSON object matching this JSON Schema; no markdown, no prose:",
     reviewVerdictJsonSchema(),

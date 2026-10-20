@@ -52,4 +52,23 @@ describe("asset review contracts", () => {
   it("validates the default source policy", () => {
     expect(SourcePolicySchema.parse(DEFAULT_SOURCE_POLICY)).toEqual(DEFAULT_SOURCE_POLICY);
   });
+
+  it("strips extra reviewer annotations instead of failing", () => {
+    const parsed = AssetReviewVerdictSchema.parse({
+      verdict: "pass",
+      hardIssues: [],
+      scores: {
+        brandFit: 5,
+        semantics: 5,
+        consistency: 5,
+        editability: 5,
+        composition: 5,
+      },
+      suggestedChanges: [],
+      reason: "ok",
+      reason_note: "model annotation",
+    });
+    expect(parsed.verdict).toBe("pass");
+    expect(parsed).not.toHaveProperty("reason_note");
+  });
 });

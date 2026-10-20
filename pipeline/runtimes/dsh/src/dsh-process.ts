@@ -131,7 +131,9 @@ export function extractVerdict(stdout: string): AssetReviewVerdict {
 
   throw new DshError(
     "DSH_INVALID_VERDICT",
-    `dsh did not return a valid asset verdict${lastError === undefined ? "" : `: ${String(lastError)}`}`
+    `dsh did not return a valid asset verdict${
+      lastError === undefined ? "" : `: ${String(lastError)}`
+    }; raw output: ${trimmed.length > 800 ? `${trimmed.slice(0, 800)}...` : trimmed}`
   );
 }
 

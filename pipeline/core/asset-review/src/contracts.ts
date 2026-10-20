@@ -98,23 +98,27 @@ export const HardGateResultSchema = z
   .strict();
 export type HardGateResult = z.infer<typeof HardGateResultSchema>;
 
-export const AssetReviewVerdictSchema = z
-  .object({
-    verdict: z.enum(["pass", "retry", "fallback"]),
-    hardIssues: z.array(z.string()),
-    scores: z
-      .object({
-        brandFit: ScoreSchema,
-        semantics: ScoreSchema,
-        consistency: ScoreSchema,
-        editability: ScoreSchema,
-        composition: ScoreSchema,
-      })
-      .strict(),
-    suggestedChanges: z.array(z.string()),
-    reason: z.string().min(1),
-  })
-  .strict();
+/**
+ * Reviewer output. Unknown annotation keys are stripped rather than rejected:
+ * models sometimes add a `reason_note`; that is harmless, while a missing or
+ * invalid required field still fails. Threshold enforcement happens in
+ * `validateVerdict`.
+ */
+export const AssetReviewVerdictSchema = z.object({
+  verdict: z.enum(["pass", "retry", "fallback"]),
+  hardIssues: z.array(z.string()),
+  scores: z
+    .object({
+      brandFit: ScoreSchema,
+      semantics: ScoreSchema,
+      consistency: ScoreSchema,
+      editability: ScoreSchema,
+      composition: ScoreSchema,
+    })
+    .strict(),
+  suggestedChanges: z.array(z.string()),
+  reason: z.string().min(1),
+});
 export type AssetReviewVerdict = z.infer<typeof AssetReviewVerdictSchema>;
 
 export const AttemptStatusSchema = z.enum([

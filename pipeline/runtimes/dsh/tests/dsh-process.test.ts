@@ -23,6 +23,12 @@ describe("extractVerdict", () => {
     expect(extractVerdict(JSON.stringify(verdict)).verdict).toBe("pass");
   });
 
+  it("strips an extra reason_note annotation", () => {
+    const parsed = extractVerdict(JSON.stringify({ ...verdict, reason_note: "extra" }));
+    expect(parsed.verdict).toBe("pass");
+    expect(parsed).not.toHaveProperty("reason_note");
+  });
+
   it("rejects invalid JSON", () => {
     expect(() => extractVerdict("not json")).toThrow(DshError);
   });
