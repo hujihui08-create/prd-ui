@@ -4,10 +4,10 @@
 - 工作目录：`/Users/jihui/Desktop/产品、ui`
 - 当前分支：`phase-1b-usability`
 - 当前 HEAD：以 `git log -1` 为准（M0 提交链见 `CHANGELOG.md`）
-- 状态：**checkpoint 已提交；core/runtimes 重排与 M0 asset review 已实现**；真实 dsh 视觉评审待 `PRD_UI_VISION_API_KEY`
-- 下一阶段：配置 vision key 跑通真实 dsh 评审；然后 M1 IA/Interaction/Visual Style
+- 状态：**checkpoint 已提交；core/runtimes 重排与 M0 asset review 已实现**；真实 DeepSeek Flash 13/13 通过，估算成本 <¥1
+- 下一阶段：M1 IA/Interaction/Visual Style；B/C 真实供应商在 M2
 
-> **2026-10-20 实施更新**：目录已重排为 `pipeline/core/*` + `pipeline/runtimes/*`；新增 `asset-review`、standalone/dsh runtime、`samples/assets/m0`、项目内 dsh profile。当前验证：231 tests、typecheck clean、`2 pages / 0 blockers`、`13 assets / 13 passed`；dsh profile 可加载、插件可激活，无 key 时报 `MISSING_CREDENTIAL`。详见 `README.md`、`pipeline/docs/asset-review-m0.md`、`CHANGELOG.md` 和 spec §15。
+> **2026-10-20 实施更新**：目录已重排为 `pipeline/core/*` + `pipeline/runtimes/*`；新增 `asset-review`、standalone/dsh runtime、`samples/assets/m0`、项目内 dsh profile。当前验证：233 tests、typecheck clean、`2 pages / 0 blockers`、standalone `13/13`、真实 `deepseek-flash` `13/13`（13 资产约 ¥0.46 峰值，累计约 ¥0.78，<10 元上限）。key 只在本地 `pipeline/.env`，不提交；无 key 时报 `MISSING_CREDENTIAL`。详见 `README.md`、`pipeline/docs/asset-review-m0.md`、`CHANGELOG.md` 和 spec §15。
 
 ---
 
@@ -298,16 +298,16 @@ dsh/
 
 1. 读 `README.md`、`CHANGELOG.md`、`docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` §15，以及三份 agent/资产设计文档。
 2. `git status`：checkpoint 与 M0 提交已完成；确认工作树干净。
-3. 配 `pipeline/.env` 的 `PRD_UI_VISION_API_KEY`，先跑 `--only icon-home --runtime dsh` 验证真实评审；没有 key 时预期 `MISSING_CREDENTIAL`。
-4. 再进 M1 IA/Interaction/Visual Style；B/C 真实供应商在 M2。
+3. 真实 dsh 已用 `deepseek-flash` 跑通 13/13；换环境时在 `pipeline/.env` 配 `PRD_UI_VISION_API_KEY` / base URL / model，先跑 `--only icon-home --runtime dsh`；无 key 时预期 `MISSING_CREDENTIAL`。
+4. 下一步 M1 IA/Interaction/Visual Style；B/C 真实供应商在 M2。
 
 ### 建议的新会话开场
 
 ```text
 请阅读 README.md、CHANGELOG.md 和 docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md §15。
-M0 已完成；先跑 pnpm test / pnpm phase1:verify / pnpm asset:review（standalone），
-再配置 PRD_UI_VISION_API_KEY 跑 --runtime dsh 的真实评审。
-先不要改 Page Spec/视觉基线。
+M0 已完成，真实 DeepSeek Flash 13/13；先跑 pnpm test / pnpm phase1:verify /
+pnpm asset:review（standalone），再按 README 配 key 跑 --runtime dsh。
+下一步 M1 IA/Interaction/Visual Style；先不要改 Page Spec/视觉基线。
 ```
 
 ---
