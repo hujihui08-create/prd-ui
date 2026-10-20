@@ -10,7 +10,7 @@
   "product": {
     "name": "员工端",
     "type": "b-end-mobile",
-    "goals": ["一线员工在手机完成接待、开单、回访、库存查询"],
+    "goals": ["一线员工在手机完成接待、回访、库存查询"],
     "users": ["美容师", "店长", "库管", "前台"],
     "roles": ["store_manager", "beautician", "front_desk", "warehouse"],
     "scope": ["今日", "库存查询"],
@@ -166,6 +166,10 @@
       {
         "id": "daily-workspace",
         "steps": ["today", "inventory-query"]
+      },
+      {
+        "id": "warehouse-landing",
+        "steps": ["inventory-query"]
       }
     ],
     "landingByRole": {

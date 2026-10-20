@@ -28,6 +28,11 @@
           "id": "daily-workspace",
           "steps": ["today", "inventory-query"],
           "status": "ok"
+        },
+        {
+          "id": "warehouse-landing",
+          "steps": ["inventory-query"],
+          "status": "ok"
         }
       ],
       "crossLinks": [

@@ -15,7 +15,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   are aligned with the fixed slice.
 - Real `deepseek-flash` IA now reports **0 blockers**; the final signed
   three-agent run is `success` with `gates={ia:passed, interaction:passed,
-  visualStyle:passed}`, 10 asset briefs, **¥0.2319**, `usageComplete=true`, and
+  visualStyle:passed}`, 10 asset briefs, **¥0.1973**, `usageComplete=true`, and
   no waiver.
 - `pnpm test`: 423 tests (was 421); Phase 1 remains `2 pages / 0 blockers`.
 

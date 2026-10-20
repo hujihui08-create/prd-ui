@@ -497,7 +497,7 @@ Interaction Gate   Visual Style Gate
   `13 assets / 13 passed`。
 - 真实 dsh（`deepseek-flash`）：三 Agent 各 1 次调用，无 schema repair、无门禁修复；
   `status=success`，`gates={ia:passed, interaction:passed, visualStyle:passed}`，
-  10 个 asset briefs，**¥0.2319**，`usageComplete=true`，无需 waiver。
+  10 个 asset briefs，**¥0.1973**，`usageComplete=true`，无需 waiver。
 - IA 初次发现 3 个切片 blocker（死 Tab、库存无入口、库管死路），随后又发现快捷入口
   权限错配；已通过 brief/PRD 修复（见 `pipeline/docs/agent-m1-uat.md` §4）。
   最终 IA-only run `IA gate=passed`、0 blockers。

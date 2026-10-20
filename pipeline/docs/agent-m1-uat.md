@@ -51,7 +51,7 @@
 set -a; . ./.env; set +a
 DSH_HOME="$PWD/dsh/home" pnpm agent:run \
   --project samples/projects/employee-app/project.yaml \
-  --runtime dsh --runs /tmp/slice-agent-dsh-clean \
+  --runtime dsh --runs /tmp/slice-final-clean \
   --signoff-ia /tmp/signoff-ia.md \
   --signoff-visual-style /tmp/signoff-visual.md
 ```
@@ -62,14 +62,14 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - 10 个 `asset-briefs/*.json`；`interaction-spec.pages=[today, inventory-query]`
 - 每角色 1 次调用，无 schema repair、无门禁修复、无 waiver
 
-最终 clean run（2026-10-20，run `run-2026-10-20T08-25-03-149Z`）：
+最终 clean run（2026-10-20，run `run-2026-10-20T08-32-30-102Z`）：
 
 | Agent | input | cache read | output | cost CNY |
 |---|---:|---:|---:|---:|
-| IA | 247 | 15,488 | 11,212 | 0.0981 |
-| Interaction | 10,486 | 5,760 | 7,288 | 0.0859 |
-| Visual Style | 6,970 | 6,016 | 3,781 | 0.0480 |
-| **合计** | | | | **0.2319** |
+| IA | 183 | 15,616 | 9,089 | 0.0796 |
+| Interaction | 10,337 | 6,016 | 5,875 | 0.0733 |
+| Visual Style | 7,302 | 5,760 | 3,280 | 0.0444 |
+| **合计** | | | | **0.1973** |
 
 `usageComplete=true`，低于 10 CNY 上限。
 
@@ -78,7 +78,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - 开发 waiver run：`gates.ia=waived`，`success`，¥0.2081 / ¥0.2487（两次）。
 - 无签核 run：`awaiting_signoff`，¥0.2756。
 - IA-only 无 waiver：`failed`，IA gate failed，3 个 blocker，¥0.0905。
-- 切片修复后 IA-only：`IA gate=passed`，0 blockers，`awaiting_signoff`，¥0.0718。
+- 切片修复后 IA-only：`IA gate=passed`，0 blockers，`awaiting_signoff`，¥0.0678。
 
 ## 4. employee-app 切片的 IA 发现与修复
 
@@ -92,9 +92,9 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 | 快捷入口权限不一致：beautician/front_desk 点库存会进无权限态 | 库存查询对全部门店角色只读开放 |
 | 无目标页的「开单」「预约」和消息入口 | 从 M1 actions/quickActions 移除；`hasMessage=false` |
 
-修复后最终真实 IA run（`run-2026-10-20T08-24-28-567Z`）：`IA gate=passed`，**0 blockers**，¥0.0718。最终三 Agent clean run：`success`，**¥0.2319**，不需要 waiver。
+修复后最终真实 IA run（`run-2026-10-20T08-31-57-872Z`）：`IA gate=passed`，**0 blockers**，¥0.0678。最终三 Agent clean run：`success`，**¥0.1973**，不需要 waiver。
 
-仍保留的 non-blocking findings（major/minor）作为后续切片输入：goal 文案仍提到开单、IA 未建模搜索框、部分空态、在途字段、角色落地 flow。M1 gate 不阻断这些项。
+仍保留的 non-blocking findings 作为后续切片输入：库存搜索未在 IA 层建模（1 个 major），以及在途字段、回程 flow、命名映射、空态文案、无权限状态位（5 个 minor）。M1 gate 不阻断这些项。
 
 ## 5. 未覆盖/后续
 

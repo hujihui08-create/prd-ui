@@ -56,7 +56,7 @@ real dsh `deepseek-flash` `13 assets / 13 passed` with
 `usageSource=json-events`, `usageComplete=true`, review cost ≈¥0.35
 (10 CNY default cap). M1 real dsh: three agents, `success`,
 `gates={ia:passed, interaction:passed, visualStyle:passed}`, 10 asset briefs,
-¥0.2319, `usageComplete=true`, no waiver. Earlier waived runs were ¥0.2081 /
+¥0.1973, `usageComplete=true`, no waiver. Earlier waived runs were ¥0.2081 /
 ¥0.2487; the employee-app slice IA blockers (dead tabs, missing inventory entry,
 warehouse dead-end, quick-action permission mismatch) are fixed.
 
