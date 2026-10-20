@@ -114,6 +114,8 @@ export class DshAssetReviewer implements AssetReviewerPort {
         result = await this.run(input, repairTask);
       } catch (repairError) {
         if (!(repairError instanceof DshError)) throw repairError;
+        // `merged.usage` already contains both attempts; evidence must use it
+        // as-is instead of merging the first attempt a second time.
         const merged = new DshError(repairError.code, repairError.message, {
           cause: repairError,
           usage: mergeUsage(firstError.usage, repairError.usage),
@@ -127,6 +129,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
         await this.writeEvidence(input, task, {
           firstError,
           repairTask,
+          repairError,
           error: merged,
         });
         throw merged;
@@ -158,6 +161,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
       result?: DshReviewResult;
       firstError?: DshError;
       repairTask?: string;
+      repairError?: DshError;
       error?: DshError;
     }
   ): Promise<void> {
@@ -205,6 +209,17 @@ export class DshAssetReviewer implements AssetReviewerPort {
         outcome.result.stderr,
         "utf8"
       );
+    } else if (outcome.repairError !== undefined) {
+      await writeFile(
+        path.join(evidenceDir, "repair-stdout.txt"),
+        outcome.repairError.stdout ?? "",
+        "utf8"
+      );
+      await writeFile(
+        path.join(evidenceDir, "repair-stderr.txt"),
+        outcome.repairError.stderr ?? "",
+        "utf8"
+      );
     }
 
     const finalError = outcome.error;
@@ -215,15 +230,15 @@ export class DshAssetReviewer implements AssetReviewerPort {
       finalError?.ignoredKeys ??
       outcome.firstError?.ignoredKeys ??
       [];
-    const usage = mergeUsage(
-      outcome.firstError?.usage,
-      outcome.result?.usage ?? finalError?.usage
-    );
+    const usage =
+      outcome.result !== undefined
+        ? mergeUsage(outcome.firstError?.usage, outcome.result.usage)
+        : (finalError?.usage ?? outcome.firstError?.usage);
     const usageComplete = outcome.result
       ? outcome.firstError === undefined
         ? outcome.result.usageComplete
         : outcome.firstError.usageComplete !== false && outcome.result.usageComplete
-      : false;
+      : (finalError?.usageComplete ?? false);
     await writeFile(
       path.join(evidenceDir, "review.raw.json"),
       `${JSON.stringify(

@@ -172,9 +172,9 @@ describe("DshAssetReviewer", () => {
       return {
         stdout: ndjson(
           stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120, cacheReadTokens: 0 }),
-          final('{"verdict":"pass"}')
+          final(`{"verdict":"pass","attempt":${calls}}`)
         ),
-        stderr: "",
+        stderr: `attempt ${calls}`,
       };
     });
 
@@ -189,6 +189,32 @@ describe("DshAssetReviewer", () => {
       usageComplete: true,
     });
     expect(calls).toBe(2);
+
+    const evidence = path.join(runDir, "dsh", "icon-home-library-1");
+    const raw = JSON.parse(await readFile(path.join(evidence, "review.raw.json"), "utf8")) as {
+      usage: unknown;
+      usageComplete: boolean;
+      repairAttempted: boolean;
+    };
+    expect(raw.usage).toEqual({
+      inputTokens: 200,
+      outputTokens: 40,
+      cacheReadTokens: 0,
+      totalTokens: 240,
+    });
+    expect(raw.usageComplete).toBe(true);
+    expect(raw.repairAttempted).toBe(true);
+    const finalText = (stdout: string): string => {
+      const line = stdout.trim().split("\n").at(-1)!;
+      return (JSON.parse(line) as { text: string }).text;
+    };
+    expect(
+      finalText(await readFile(path.join(evidence, "first-stdout.txt"), "utf8"))
+    ).toContain('"attempt":1');
+    expect(
+      finalText(await readFile(path.join(evidence, "repair-stdout.txt"), "utf8"))
+    ).toContain('"attempt":2');
+    expect(await readFile(path.join(evidence, "repair-stderr.txt"), "utf8")).toBe("attempt 2");
   });
 
   it("rejects missing provider env when constructed", () => {

@@ -153,7 +153,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
   const recordReview = (
     accounting: ReviewAccounting,
     attempt: AssetAttempt,
-    enforceCompleteness = true
+    completeness: "full" | "partial-only" = "full"
   ): void => {
     reviewCount += 1;
     if (accounting.usage !== undefined) {
@@ -172,15 +172,17 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     }
     if (accountIsIncomplete(accounting)) anyIncomplete = true;
     if (maxReviewCostCny !== undefined) {
+      // A completed review fails closed whenever usage is missing or
+      // incomplete. An errored review only fails closed on partial usage: a
+      // no-usage error is already a reviewer error (MISSING_CREDENTIAL etc.)
+      // and must not turn the batch into REVIEW_USAGE_INCOMPLETE.
+      const failsClosed =
+        completeness === "full"
+          ? accountIsIncomplete(accounting)
+          : accounting.usage !== undefined && accounting.usageComplete === false;
       if (totalReviewCostCny > maxReviewCostCny) {
         costBudgetExceeded = true;
-      } else if (
-        enforceCompleteness &&
-        accountIsIncomplete(accounting) &&
-        !allowUnknownCost
-      ) {
-        // A reviewer crash already fails the run with its own error; only a
-        // review that produced a verdict can trip the fail-closed cost guard.
+      } else if (failsClosed && !allowUnknownCost) {
         usageIncomplete = true;
       }
     }
@@ -402,7 +404,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
             runDir: input.runDir,
           });
         } catch (error) {
-          recordReview(reviewAccountingFromError(error), attemptRecord, false);
+          recordReview(reviewAccountingFromError(error), attemptRecord, "partial-only");
           attemptRecord.status = "reviewer_error";
           attemptRecord.issues = [`REVIEWER_ERROR: ${errorDetails(error)}`];
           attempts.push(attemptRecord);
@@ -560,13 +562,15 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
         : undefined;
   const reviewerError =
     reviewerErrors > 0 ? `REVIEWER_ERROR: ${reviewerErrors} asset(s)` : undefined;
-  // Usage/cost failures stop the batch and take precedence; otherwise a
-  // reviewer crash must not be masked by a set mismatch.
-  const error = usageIncomplete
+  const costError = usageIncomplete
     ? "REVIEW_USAGE_INCOMPLETE"
     : costBudgetExceeded
       ? "REVIEW_COST_BUDGET_EXCEEDED"
-      : (fatalError ?? reviewerError ?? setError);
+      : undefined;
+  // Error precedence keeps the root cause visible: a reviewer crash is never
+  // replaced by a cost/usage error, even though the cost guard still stopped
+  // the batch and forces `passed: false`.
+  const error = fatalError ?? reviewerError ?? costError ?? setError;
   const finishedAt = input.ports.clock.now().toISOString();
   const result: AssetReviewRunResult = {
     runId: input.runId,

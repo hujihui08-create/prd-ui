@@ -484,6 +484,88 @@ describe("runAssetReview", () => {
     expect(result.usageComplete).toBe(true);
   });
 
+  it("keeps REVIEWER_ERROR when errored usage exceeds the cost cap", async () => {
+    const store = new MemoryStore();
+    const error = Object.assign(new Error("invalid verdict"), {
+      code: "DSH_INVALID_VERDICT",
+      usage: oneMillionInput,
+      usageComplete: true,
+    });
+    const result = await run(
+      store,
+      reviewerWith({ "icon-home/library/1": error }),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 0.5,
+      }
+    );
+
+    expect(result.assets[0]!.attempts[0]!.status).toBe("reviewer_error");
+    expect(result.assets[1]!.attempts[0]!.status).toBe("budget_exceeded");
+    expect(result.summary.reviewCostCny).toBeCloseTo(2.16);
+    expect(result.error).toContain("REVIEWER_ERROR");
+    expect(result.error).not.toBe("REVIEW_COST_BUDGET_EXCEEDED");
+    expect(result.passed).toBe(false);
+  });
+
+  it("leaves a no-usage reviewer error as a reviewer error under a budget", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        { "icon-home/library/1": new Error("model down") },
+        {
+          verdict: passVerdict,
+          usage: { inputTokens: 10, outputTokens: 0, cacheReadTokens: 0 },
+          usageComplete: true,
+        }
+      ),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 10,
+      }
+    );
+
+    expect(result.assets[0]!.attempts[0]!.status).toBe("reviewer_error");
+    expect(result.assets[1]!.status).toBe("passed");
+    expect(result.error).toContain("REVIEWER_ERROR");
+    expect(result.error).not.toBe("REVIEW_USAGE_INCOMPLETE");
+    expect(result.passed).toBe(false);
+  });
+
+  it("fails closed when an errored review has partial usage", async () => {
+    const store = new MemoryStore();
+    const error = Object.assign(new Error("invalid verdict"), {
+      code: "DSH_INVALID_VERDICT",
+      usage: { inputTokens: 100, outputTokens: 20, cacheReadTokens: 0 },
+      usageComplete: false,
+    });
+    const result = await run(
+      store,
+      reviewerWith(
+        { "icon-home/library/1": error },
+        {
+          verdict: passVerdict,
+          usage: { inputTokens: 10, outputTokens: 0, cacheReadTokens: 0 },
+          usageComplete: true,
+        }
+      ),
+      {
+        briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+        pricing,
+        maxReviewCostCny: 10,
+      }
+    );
+
+    expect(result.assets[0]!.attempts[0]!.status).toBe("reviewer_error");
+    expect(result.assets[1]!.status).toBe("unresolved");
+    expect(result.assets[1]!.attempts[0]!.status).toBe("usage_incomplete");
+    expect(result.error).toContain("REVIEWER_ERROR");
+    expect(result.passed).toBe(false);
+  });
+
   it("does not invent zero cost when usage is unavailable", async () => {
     const store = new MemoryStore();
     const result = await run(store, reviewerWith(), { pricing });
