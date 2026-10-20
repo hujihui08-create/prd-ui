@@ -152,6 +152,16 @@ export function checkSvgSafety(parsed: ParsedSvg, options: { allowText: boolean 
           issues.push(issue("SVG_EXTERNAL_REF", "SVG references an external resource.", value));
         }
       }
+      if (attributeName === "style") {
+        issues.push(
+          issue("SVG_INLINE_STYLE", "SVG uses an inline style; convert it to presentation attributes.", elementName(element))
+        );
+      }
+      if (attributeName === "transform") {
+        issues.push(
+          issue("SVG_TRANSFORM", "SVG uses a transform; flatten it before review.", value)
+        );
+      }
       if (value.toLowerCase().includes("javascript:")) {
         issues.push(issue("SVG_SCRIPT", "SVG attribute contains javascript:.", value));
       }

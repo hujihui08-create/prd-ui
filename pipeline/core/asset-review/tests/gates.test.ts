@@ -58,6 +58,18 @@ describe("icon gates", () => {
     expect(checkIcon(withImage, iconBrief).issues.some((i) => i.code === "SVG_IMAGE")).toBe(true);
   });
 
+  it("rejects an inline style on an icon", () => {
+    const svg = validIcon.replace("<path", '<path style="fill:#ff0000"');
+    const result = checkIcon(svg, iconBrief);
+    expect(result.passed).toBe(false);
+    expect(result.issues.map((i) => i.code)).toContain("SVG_INLINE_STYLE");
+  });
+
+  it("rejects transform on an icon", () => {
+    const svg = validIcon.replace("<path", '<path transform="translate(100 0)"');
+    expect(checkIcon(svg, iconBrief).issues.some((i) => i.code === "SVG_TRANSFORM")).toBe(true);
+  });
+
   it("rejects wrong grid and stroke width", () => {
     expect(checkIcon(validIcon.replace("0 0 24 24", "0 0 20 20"), iconBrief).issues.some((i) => i.code === "ICON_GRID")).toBe(true);
     expect(checkIcon(validIcon.replace('stroke-width="1.5"', 'stroke-width="2"'), iconBrief).issues.some((i) => i.code === "ICON_STROKE_WIDTH")).toBe(true);
@@ -89,6 +101,11 @@ describe("illustration gates", () => {
   it("rejects a color outside the palette", () => {
     const svg = validIllustration.replace('fill="#2563EB"', 'fill="#FF00AA"');
     expect(checkIllustration(svg, illustrationBrief).issues.some((i) => i.code === "ILLUSTRATION_PALETTE")).toBe(true);
+  });
+
+  it("rejects transform on an illustration", () => {
+    const svg = validIllustration.replace("<rect", '<rect transform="translate(200 0)"');
+    expect(checkIllustration(svg, illustrationBrief).issues.some((i) => i.code === "SVG_TRANSFORM")).toBe(true);
   });
 
   it("rejects a canvas below 96x72", () => {
