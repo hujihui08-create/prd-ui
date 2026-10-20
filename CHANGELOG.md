@@ -42,7 +42,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 231 tests passed.
+- `pnpm test`: 233 tests passed.
 - `pnpm typecheck`: clean.
 - `pnpm phase1:verify --project samples/projects/employee-app/project.yaml`:
   `2 pages, 0 blockers`.
@@ -58,13 +58,26 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `--only icon-home` passed, then all 13 assets passed (`13 assets, 13 passed`);
   one chat-completions request per asset, model `mock-vision`, dsh evidence under
   `runs/<id>/dsh/`.
+- dsh end-to-end against the **real DeepSeek API** with `deepseek-flash`:
+  `--only icon-home` passed, then all 13 assets passed (`13 assets, 13 passed`),
+  scores 4–5, no degraded/unresolved. Session usage for the 13-asset run:
+  79,607 input + 30,043 output + 727,552 cache-read tokens; estimated
+  **¥0.463 peak / ¥0.232 off-peak**. Including the probe, a partially failed
+  run, and the final rerun, total estimated spend was **≈¥0.78 peak**, below the
+  10 CNY stop line.
+- The reviewer occasionally emitted an extra `reason_note` key; core now strips
+  unknown annotation keys instead of failing the asset, while still enforcing
+  required fields and score thresholds.
 
 ### Known blockers / deferred
 
-- A real vision provider key was **not** configured in this environment. The dsh
-  runtime itself was verified end-to-end with a local mock OpenAI-compatible
-  endpoint (13/13 passed); real model quality/cost is not measured. Without a
-  key the pipeline fails with `MISSING_CREDENTIAL` instead of faking a pass.
+- A real vision key is configured only in the local, gitignored
+  `pipeline/.env`; it is not committed. Without it the pipeline fails with
+  `MISSING_CREDENTIAL` instead of faking a pass.
+- Model cost is not yet written into `asset-review.json`; the real run's cost was
+  estimated externally from dsh session `usage` at DeepSeek Flash peak pricing
+  (USD converted at 7.2). Add a usage/cost capture task before relying on
+  per-run cost audits.
 - M0 only connects the A library; B/C adapter interfaces and state-machine
   branches exist, but real suppliers/accounts/licensing are M2.
 - IA/Interaction/Visual Style agents are M1; Figma, screenshot diff, recording,
@@ -76,6 +89,9 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 | Commit | Change |
 |---|---|
+| `612e6c9` | tolerate reviewer annotation keys + surface dsh output |
+| `cd666c8` | dsh mock end-to-end verification docs |
+| `464d1d9` | M0 implementation docs, conformance, changelog |
 | `884e8d7` | b-mobile employee-app slice + HTML renderer |
 | `e6569a8` | Phase 1C / agent organization / asset policy docs |
 | `88efc68` | Buguxinsheng app icon pack |

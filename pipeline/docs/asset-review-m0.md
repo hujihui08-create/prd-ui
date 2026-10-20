@@ -55,7 +55,7 @@ DSH_HOME="$PWD/dsh/home" \
 
 先用 `--only icon-home` 验证 key 和 profile，再跑全部资产。
 
-本地已用 mock OpenAI-compatible endpoint 跑通 dsh 端到端（1 个图标 smoke + 13 个资产全通过）；真实 provider 的视觉质量/成本仍需配置 key 后测量。
+已用真实 `deepseek-flash` 跑通 dsh 端到端（1 个图标 smoke + 13 个资产全通过）。13 个资产本轮 usage：79,607 input + 30,043 output + 727,552 cache read；估算 ¥0.463 峰值 / ¥0.232 低谷，累计探针/重跑约 ¥0.78，低于 10 元上限。key 只在本地 `pipeline/.env`，不提交。
 
 ## 结果
 

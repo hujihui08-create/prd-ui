@@ -26,8 +26,8 @@ pnpm phase1:verify --project samples/projects/employee-app/project.yaml --runs /
 pnpm asset:review --project samples/projects/employee-app/project.yaml --assets samples/assets/m0 --runtime standalone --runs /tmp/m0-runs
 ```
 
-Current expected evidence: 231 tests, typecheck clean, `2 pages / 0 blockers`,
-`13 assets / 13 passed`.
+Current expected evidence: 233 tests, typecheck clean, `2 pages / 0 blockers`,
+`13 assets / 13 passed` (standalone and real dsh with `deepseek-flash`).
 
 ## Rules
 

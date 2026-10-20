@@ -914,7 +914,7 @@ find "$RUN/assets/attempts" -maxdepth 3 -type f | sort
 
 ## 15. Implementation status（2026-10-20）
 
-M0 已实现并完成本地验证；真实 dsh 视觉评审仍阻塞在 vision key。
+M0 已实现并完成本地 + 真实模型（DeepSeek Flash）验证。
 
 ### 15.1 已完成
 
@@ -930,7 +930,7 @@ M0 已实现并完成本地验证；真实 dsh 视觉评审仍阻塞在 vision k
 
 | 检查 | 结果 |
 |---|---|
-| `pnpm test` | 231 passed |
+| `pnpm test` | 233 passed |
 | `pnpm typecheck` | clean |
 | `pnpm phase1:verify`（employee-app） | `2 pages, 0 blockers` |
 | `pnpm asset:review --assets samples/assets/m0 --runtime standalone` | `13 assets, 13 passed` |
@@ -938,10 +938,12 @@ M0 已实现并完成本地验证；真实 dsh 视觉评审仍阻塞在 vision k
 | standalone vs dsh-like conformance | 相同 decision trace；确定性资产 byte-identical |
 | dsh profile spike | profile 加载、插件激活；无 key 时报 `MISSING_CREDENTIAL: PRD_UI_VISION_API_KEY` |
 | dsh end-to-end（本地 mock OpenAI-compatible endpoint） | `--only icon-home` 通过；13 个资产 `13 passed`；每个资产一次 chat-completions 请求；证据在 `runs/<id>/dsh/` |
+| dsh end-to-end（真实 DeepSeek Flash） | `--only icon-home` 通过；13 个资产 `13 passed`；scores 4–5；13 个资产 usage 79,607 input + 30,043 output + 727,552 cache read；估算 ¥0.463 峰值 / ¥0.232 低谷；累计探针+重跑约 ¥0.78，<10 元上限 |
+| reviewer 额外字段兼容 | 模型偶发 `reason_note`；core 现在剥离未知注解字段，仍强制必填字段和评分阈值 |
 
 ### 15.3 当前阻塞 / 后续
 
-- 真实 dsh 评审需要用户配置 `PRD_UI_VISION_API_KEY`（及 base URL/model）；未配置时不会伪造 pass。dsh 运行时已用本地 mock OpenAI-compatible endpoint 跑通 13 资产，但真实模型质量/成本尚未测量。
+- 真实 dsh 评审已完成：本地 `.env` 配置 `PRD_UI_VISION_API_KEY` + `https://api.deepseek.com/v1` + `deepseek-flash`；key 不提交。模型成本目前从 dsh 会话 usage 外部核算，尚未写入 `asset-review.json`。
 - B/C 真实供应商、IA/Interaction/Visual Style Agent、Figma、截图 diff、录屏/trace 仍按 §1.4 的 M1–M3 顺序。
 - dsh 仍是 rc；CLI 与 bundle 版本锁定，`@next` 不作为默认依赖。
 

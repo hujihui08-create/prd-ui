@@ -66,9 +66,13 @@ Without a key the profile loads and the plugin activates, then fails with
 "wired but unconfigured" state. With a key, the command prints the model's final
 message and exits 0.
 
-The full `asset:review --runtime dsh` path was also verified against a local
-mock OpenAI-compatible endpoint: one icon smoke passed, then all 13 M0 assets
-passed. A real provider key is still required to measure visual quality/cost.
+The full `asset:review --runtime dsh` path was verified twice: first against a
+local mock OpenAI-compatible endpoint, then against the real DeepSeek API with
+`deepseek-flash`. Both runs passed all 13 M0 assets. The real 13-asset run used
+79,607 input + 30,043 output + 727,552 cache-read tokens; estimated
+**¥0.463 peak / ¥0.232 off-peak**. Including the probe and a failed/rerun pass,
+total estimated spend was **≈¥0.78**, below the 10 CNY stop line. The key lives
+only in the gitignored `pipeline/.env`.
 
 ## Run asset review
 

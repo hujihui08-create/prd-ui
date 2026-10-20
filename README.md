@@ -99,14 +99,15 @@ DSH_HOME="$PWD/dsh/home" \
 
 profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipeline/dsh/README.md)。
 
-> 本地已用 mock OpenAI-compatible endpoint 跑通 dsh 端到端（13/13 passed）；真实 provider 的视觉质量/成本仍需配置 key 后测量。
+> 已用真实 `deepseek-flash` 跑通 dsh 端到端：13/13 passed。本轮 13 个资产约 **¥0.46**（按峰值价估算），加上探针/重跑累计约 **¥0.78**，低于 10 元上限。key 只写在本地 `pipeline/.env`，不提交。模型成本目前从 dsh 会话 usage 外部核算，尚未写入 `asset-review.json`。
 
 ## 测试与验收
 
-- `pnpm test`：231 tests（core + standalone + dsh adapter conformance）。
+- `pnpm test`：233 tests（core + standalone + dsh adapter conformance）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。
-- `pnpm asset:review ... --assets samples/assets/m0`：`13 assets / 13 passed`。
+- `pnpm asset:review ... --assets samples/assets/m0 --runtime standalone`：`13 assets / 13 passed`。
+- `pnpm asset:review ... --assets samples/assets/m0 --runtime dsh`（真实 `deepseek-flash`）：`13 assets / 13 passed`。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 
@@ -124,7 +125,8 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 当前限制
 
-- 真实 dsh 评审需要 `PRD_UI_VISION_API_KEY`；未配置时 profile 能加载、插件能激活，但 review 会以 `MISSING_CREDENTIAL` 失败，不会伪造 pass。
+- dsh 的 key 只在本地 `pipeline/.env`，不提交；换环境需要重新配置。未配置时 profile 能加载、插件能激活，但 review 会以 `MISSING_CREDENTIAL` 失败，不会伪造 pass。
+- 模型成本目前从 dsh 会话 usage 外部核算，尚未进入 `asset-review.json` 的 `costUsd` 字段。
 - M0 只接 A 库真实文件；B/C 的 adapter 接口和状态机已实现，真实供应商在 M2。
 - 不实现 IA / Interaction / Visual Style Agent（M1）；不做 Figma、截图 diff、录屏/trace（M3）。
 - 插画 fixture 是 test-fixture，不是最终品牌资产。
