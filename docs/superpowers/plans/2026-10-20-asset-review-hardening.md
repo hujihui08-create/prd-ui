@@ -2,32 +2,47 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** Ready for implementation (spec updated 2026-10-20). Do not start coding until the spec is approved.
+
+**Review decisions applied:**
+- D1: dsh uses `--json -`; verdict from `final.text`, usage from `status(step_end)`.
+- D2: usage-complete fail-closed; usage is captured even on invalid verdict / partial exit.
+- D3: H7 renders in standalone; dsh only receives the PNG path.
+- D4: provider validation covers both dsh and standalone model reviewer.
+- D5: H3 uses a per-asset `reviewerFailed` flag; no source switch.
+- D6: `--only` skips set gates; `checkIconSet` uses all-element signatures.
+- D7: new fields update strict Zod schemas; outputs self-validate before write.
+
 **Goal:** Close the hard-gate bypasses, wire set-level gates, isolate reviewer errors, enforce configuration and cost limits, and make the dsh review path reproducible in CI with a mock endpoint.
 
 **Architecture:** Keep one core (`pipeline/core/asset-review`) and two adapters (`runtime-standalone`, `runtime-dsh`). The core owns gates, batch gates, review-result accounting, and the state machine. The adapters own rendering, dsh subprocesses, usage parsing, and evidence files. `runs/<runId>/` remains canonical.
 
-**Tech Stack:** TypeScript strict, Zod 4, Vitest 5, pnpm workspace, `@xmldom/xmldom`, `@resvg/resvg-js` (image input), dsh `0.2.1-rc.2`, Node 24.
+**Tech Stack:** TypeScript strict, Zod 4, Vitest 5, pnpm workspace, `@xmldom/xmldom`, `@resvg/resvg-js` (standalone image input only), dsh `0.2.1-rc.2`, Node 24.
 
 ## Global Constraints
 
 - Preserve `phase1:verify` = `2 pages / 0 blockers` and existing `pnpm test` behavior.
 - Core must not import `@deepseek-ai/*`, `node:child_process`, `node:fs`, or `@resvg/resvg-js`.
+- `@resvg/resvg-js` is imported only by the standalone runtime, never by the dsh adapter or plugin bundle.
 - No secret in git, logs, prompts, `manifest.json`, or `asset-review.json`.
 - Default `pnpm test` must not call the real dsh CLI or network.
-- `--runtime dsh` defaults to a 10 CNY review-cost cap; do not silently exceed it.
+- dsh transport is always `--profile <name> --json -` with the task on stdin; no session-log fallback.
+- `--runtime dsh` defaults to a 10 CNY review-cost cap; usage-incomplete runs fail closed unless `--allow-unknown-cost`.
+- `--only` is a partial review: skip set gates and record `PARTIAL_REVIEW`.
 - Keep `AssetReviewVerdictSchema` tolerant of extra annotation keys (strip, don't fail).
+- New fields must update the corresponding strict Zod schemas; validate outputs before writing.
 - No new runtime/version; no second business-logic implementation.
 - Local commits only; no push.
 
 ## Checklist Summary
 
 - [ ] Task 1: H1 — reject inline `style` and `transform`
-- [ ] Task 2: H2 + H13 — icon/illustration set-level gates
+- [ ] Task 2: H2 + H13 — icon/illustration set-level gates, all-element signatures, `--only` scope
 - [ ] Task 3: H3 — reviewer error isolation + `--fail-fast`
-- [ ] Task 4: H4 + H5 — strict config + provider fail-fast + docs
-- [ ] Task 5: H6 + H15 — usage/cost capture + 10 CNY guard + pricing
-- [ ] Task 6: H7 + H12 — PNG image input + `manifest.review.json`
-- [ ] Task 7: H8/H9/H10/H11 — stdin, append log, raw output, schema repair
+- [ ] Task 4: H4 + H5 — strict config + provider fail-fast (dsh + model reviewer) + docs
+- [ ] Task 5: H6 + H8 + H15 — usage/cost + 10 CNY guard + `--json` stdin transport + pricing
+- [ ] Task 6: H7 + H12 — PNG image input (standalone rendering) + `manifest.review.json`
+- [ ] Task 7: H9 + H10 + H11 — append log, raw output, schema repair
 - [ ] Task 8: H14 + H15 — dsh mock integration + `--json`/DX
 - [ ] Final: full regression + real dsh run + docs/changelog
 
@@ -134,11 +149,15 @@ git commit -m "fix: reject inline styles and transforms in asset gates"
 export interface BatchGateResult {
   iconSet?: HardGateResult;
   illustrationSet?: HardGateResult;
+  skipped?: boolean;
+  reason?: "PARTIAL_REVIEW";
+  scope?: string[];
 }
 
 export interface RunBatchGatesInput {
   records: AssetReviewRecord[];
   store: ArtifactStorePort;
+  only?: string[];
 }
 
 export async function runBatchGates(input: RunBatchGatesInput): Promise<BatchGateResult>;
@@ -164,7 +183,12 @@ expect(result.iconSet?.passed).toBe(false);
 expect(result.iconSet?.issues.some((i) => i.code === "ICON_SET_INCONSISTENT")).toBe(true);
 ```
 
-Also assert `assets/icon-set.json` is written.
+Also add:
+- **child-level signature**: two icons with identical root attributes but different `<path stroke-width>` must fail.
+- **`--only`**: `runBatchGates({ records, store, only: ["icon-home"] })` returns `skipped: true` and `reason: "PARTIAL_REVIEW"`.
+- **both sets fail**: `error` prefers `ICON_SET_INCONSISTENT` while `illustrationSet` remains in `batchGates`.
+
+Also assert `assets/icon-set.json` is written for a normal run.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -174,32 +198,46 @@ pnpm vitest run core/asset-review/tests/batch-gates.test.ts
 
 Expected: module not found / no set gate.
 
-- [ ] **Step 3: Implement `runBatchGates`**
+- [ ] **Step 3: Implement `runBatchGates` and the icon signature**
 
-- Collect passed records by kind.
-- For each icon: read `record.frozen.path` via `store.readText`.
-- Call `checkIconSet`.
-- For illustrations: call `checkIllustrationSet` with briefs.
-- Write `assets/icon-set.json` and `assets/illustration-set.json`.
-- Return `BatchGateResult`.
+- `checkIconSet` collects a signature from **all elements** (e.g. a stable set of `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `fill` values), not just `parsed.root`. Root-level equality alone must not pass.
+- `runBatchGates`:
+  - If `only` is non-empty: write `assets/batch-gates.json` with `{ skipped: true, reason: "PARTIAL_REVIEW", scope: only }` and return `{ skipped: true, reason: "PARTIAL_REVIEW", scope: only }`.
+  - Otherwise collect passed records by kind.
+  - For each icon: read `record.frozen.path` via `store.readText`.
+  - Call `checkIconSet`.
+  - For illustrations: call `checkIllustrationSet` with briefs.
+  - Write `assets/icon-set.json` and `assets/illustration-set.json`.
+  - Return `BatchGateResult`.
 
 - [ ] **Step 4: Wire into the state machine**
 
 After all assets are processed and before writing `asset-review.json`:
 
 ```ts
-const batchGates = await runBatchGates({ records, store: input.ports.store });
+const batchGates = await runBatchGates({
+  records,
+  store: input.ports.store,
+  ...(input.only === undefined ? {} : { only: input.only }),
+});
 const setFailed =
   batchGates.iconSet?.passed === false ||
   batchGates.illustrationSet?.passed === false;
+const setError =
+  batchGates.iconSet?.passed === false
+    ? "ICON_SET_INCONSISTENT"
+    : batchGates.illustrationSet?.passed === false
+      ? "ILLUSTRATION_SET_INCONSISTENT"
+      : undefined;
 const result = {
   // ...
   batchGates,
   passed: summary.unresolved === 0 && summary.total > 0 && !fatalError && !setFailed,
-  ...(batchGates.iconSet?.passed === false ? { error: "ICON_SET_INCONSISTENT" } : {}),
-  ...(batchGates.illustrationSet?.passed === false ? { error: "ILLUSTRATION_SET_INCONSISTENT" } : {}),
+  ...(setError === undefined ? {} : { error: setError }),
 };
 ```
+
+Add a state-machine test with two inconsistent icon records: `batchGates.iconSet.passed === false`, `error === "ICON_SET_INCONSISTENT"`, `passed === false`.
 
 - [ ] **Step 5: Wire into `manifest.complete`**
 
@@ -217,6 +255,8 @@ await store.writeJson("manifest.json", { ...manifest, complete });
 - [ ] **Step 6: Add CLI integration test**
 
 Create a temp assets dir with two inconsistent icons (copy `home.svg`, change `stroke-width`), run `asset:review --assets <temp> --runtime standalone`, assert exit 1 and `manifest.complete === false`.
+
+Add a second case: `--only icon-home` on the same fixtures must succeed (set gate skipped) and write `assets/batch-gates.json` with `reason: "PARTIAL_REVIEW"`.
 
 - [ ] **Step 7: Run tests + full suite**
 
@@ -273,6 +313,8 @@ expect(result.summary.reviewerErrors).toBe(1);
 expect(result.passed).toBe(false);
 ```
 
+Also add a **no source switch** case: `sourceChain: ["library", "ai-vector"]`, reviewer throws on `library`; assert `ai-vector` producer/reviewer was never called.
+
 Fail-fast:
 
 ```ts
@@ -289,19 +331,28 @@ Expected: current code aborts and marks both unresolved; `reviewerErrors` missin
 
 - [ ] **Step 3: Implement**
 
-- Replace `fatalError` reviewer branch with:
+- Add a **per-asset** `reviewerFailed` flag. On reviewer error:
   ```ts
   reviewerErrors += 1;
-  // record attempt; unresolved for this asset
+  attemptRecord.status = "reviewer_error";
+  attempts.push(attemptRecord);
+  reviewerFailed = true;
   if (!input.continueOnReviewerError) {
     fatalError = `REVIEWER_ERROR: ${errorDetails(error)}`;
-    break;
   }
-  break; // next source/asset; do not switch source
+  break; // exit the attempt loop
+  ```
+- The source loop must also exit on `reviewerFailed || fatalError`; do **not** try the next source:
+  ```ts
+  for (const source of brief.sourceChain) {
+    if (final !== undefined || fatalError !== undefined || reviewerFailed || budgetExceeded) break;
+    // ...
+  }
   ```
 - Add `reviewerErrors` to summary.
 - At the end: `error = fatalError ?? (reviewerErrors > 0 ? \`REVIEWER_ERROR: ${reviewerErrors} asset(s)\` : undefined)`.
 - Keep `passed=false` when `reviewerErrors > 0`.
+- Do not use a bare `break; // next source` — it falls through to the next source.
 
 - [ ] **Step 4: Add CLI `--fail-fast`**
 
@@ -330,11 +381,13 @@ git commit -m "fix: isolate reviewer errors per asset"
 - Modify: `pipeline/runtimes/standalone/src/asset-cli.ts`
 - Create: `pipeline/core/asset-review/src/visual-style.ts` (or add `VisualStyleSchema` to contracts)
 - Modify: `pipeline/runtimes/dsh/src/adapter.ts` (provider env validation)
+- Modify: `pipeline/runtimes/standalone/src/asset/model-reviewer.ts` (remove OpenAI defaults; validate env)
 - Modify: `pipeline/.env.example`
 - Modify: `pipeline/dsh/home/profiles/prd-ui-assets/cordis.patch.yml`
 - Modify: `pipeline/dsh/README.md`
 - Modify: `README.md`
 - Test: `pipeline/runtimes/standalone/tests/asset-cli.test.ts`
+- Test: `pipeline/runtimes/standalone/tests/model-reviewer.test.ts`
 - Test: `pipeline/runtimes/dsh/tests/adapter.test.ts`
 
 **Interfaces:**
@@ -373,18 +426,28 @@ async function readOptionalJson(file: string): Promise<unknown | undefined> {
 
 - [ ] **Step 3: Provider fail-fast**
 
-Add to `DshAssetReviewer.review` before building the task:
+Add a shared `validateProviderEnv(env)` helper and call it:
+- In the CLI when `--runtime dsh` or `--reviewer model` is selected, before constructing the reviewer, so failure happens at startup, not on the first asset.
+- In `modelReviewerFromEnv` for the standalone model reviewer.
+- Do **not** require provider env for the scripted reviewer; it is the keyless CI path.
 
 ```ts
-if (!process.env.PRD_UI_VISION_BASE_URL || !process.env.PRD_UI_VISION_MODEL) {
-  throw new Error("CONFIGURATION_ERROR: PRD_UI_VISION_BASE_URL and PRD_UI_VISION_MODEL are required");
+export function validateProviderEnv(env: NodeJS.ProcessEnv = process.env): void {
+  const missing = ["PRD_UI_VISION_BASE_URL", "PRD_UI_VISION_MODEL"].filter(
+    (name) => !env[name]
+  );
+  if (missing.length > 0) {
+    throw new Error(`CONFIGURATION_ERROR: missing ${missing.join(", ")}`);
+  }
 }
 ```
 
-Better: inject env through options for tests:
+Inject env through options for tests:
 ```ts
 constructor(options: DshAssetReviewerOptions & { env?: NodeJS.ProcessEnv })
 ```
+
+Remove the `?? "https://api.openai.com/v1"` / `?? "gpt-4o-mini"` defaults from `modelReviewerFromEnv`. Keep `PRD_UI_VISION_API_KEY` missing as `CONFIGURATION_ERROR` for the model reviewer and `MISSING_CREDENTIAL` inside dsh.
 
 - [ ] **Step 4: Update docs/config**
 
@@ -403,7 +466,7 @@ Update `README.md`/`pipeline/dsh/README.md` examples.
 
 ```bash
 pnpm vitest run runtimes/standalone/tests/asset-cli.test.ts runtimes/dsh/tests/adapter.test.ts
-grep -R "api.openai.com\|gpt-4o-mini" pipeline/.env.example pipeline/dsh/home/profiles README.md pipeline/dsh/README.md
+grep -R "api.openai.com\|gpt-4o-mini" pipeline/.env.example pipeline/dsh/home/profiles README.md pipeline/dsh/README.md pipeline/runtimes/standalone/src/asset/model-reviewer.ts
 ```
 
 Expected: no stale OpenAI defaults.
@@ -417,36 +480,40 @@ git commit -m "fix: fail fast on invalid config and missing provider env"
 
 ---
 
-### Task 5: H6 + H15 — usage/cost capture and 10 CNY guard
+### Task 5: H6 + H8 + H15 — usage/cost, `--json` stdin transport, 10 CNY guard, pricing
 
 **Files:**
-- Modify: `pipeline/core/asset-review/src/contracts.ts` (`ReviewUsage`, attempt/summary fields)
+- Modify: `pipeline/core/asset-review/src/contracts.ts` (`ReviewUsage`, `ReviewResult`, attempt/summary/run fields and schemas)
 - Modify: `pipeline/core/asset-review/src/ports.ts` (`review` returns `ReviewResult`)
 - Create: `pipeline/core/asset-review/src/pricing.ts`
 - Create: `pipeline/pricing.json`
-- Modify: `pipeline/core/asset-review/src/state-machine.ts` (accumulate/guard)
+- Modify: `pipeline/core/asset-review/src/state-machine.ts` (accumulate/guard/usage completeness)
 - Modify: `pipeline/runtimes/standalone/src/asset/scripted-reviewer.ts` (return `{ verdict }`)
 - Modify: `pipeline/runtimes/standalone/src/asset/model-reviewer.ts` (return `{ verdict, usage? }`)
-- Modify: `pipeline/runtimes/dsh/src/adapter.ts` (usage/raw/repair later)
-- Modify: `pipeline/runtimes/dsh/src/dsh-process.ts` (parse `--json` usage; see Task 7 for stdin)
-- Modify: `pipeline/runtimes/standalone/src/asset-cli.ts` (`--max-review-cost-cny`, pricing load, summary)
+- Modify: `pipeline/runtimes/dsh/src/adapter.ts` (usage/raw/repair)
+- Modify: `pipeline/runtimes/dsh/src/dsh-process.ts` (`--json -`, stdin, usage parsing, partial output)
+- Modify: `pipeline/runtimes/standalone/src/asset-cli.ts` (`--max-review-cost-cny`, `--allow-unknown-cost`, pricing load, summary)
 - Test: `pipeline/core/asset-review/tests/pricing.test.ts`
 - Test: `pipeline/core/asset-review/tests/state-machine.test.ts`
 - Test: `pipeline/runtimes/dsh/tests/dsh-process.test.ts`
-- Update all `AssetReviewerPort` fakes in tests.
+- Update all `AssetReviewerPort` / `CommandRunner` fakes in tests.
 
 **Interfaces:**
 
 ```ts
 export interface ReviewUsage {
-  inputTokens: number;
+  inputTokens: number;      // cache-miss input
   outputTokens: number;
   cacheReadTokens: number;
+  totalTokens?: number;
+  cacheWriteTokens?: number;
+  reasoningTokens?: number;
 }
 
 export interface ReviewResult {
   verdict: AssetReviewVerdict;
   usage?: ReviewUsage;
+  usageComplete?: boolean;
   raw?: string;
   ignoredKeys?: string[];
   repairAttempted?: boolean;
@@ -462,20 +529,31 @@ export interface ReviewPricing {
   outputUsdPerMillion: number;
   usdToCny: number;
 }
+
+export type CommandRunner = (
+  command: string,
+  args: string[],
+  options: { cwd: string; env: NodeJS.ProcessEnv; timeoutMs: number; stdin?: string }
+) => Promise<CommandResult>;
 ```
 
 - [ ] **Step 1: Write failing pricing/cost tests**
 
-`pricing.test.ts`: parse `pipeline/pricing.json`; compute 1M input + 1M output for deepseek-flash → USD 1.5, CNY 10.8 (at 7.2).
+`pricing.test.ts`: parse `pipeline/pricing.json`; compute 1M input + 1M output for deepseek-flash → USD 1.5, CNY 10.8 (at 7.2). Also test a malformed pricing file → `INVALID_PRICING`.
 
-`state-machine.test.ts`: fake reviewer returns `{ verdict: pass, usage: { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 0 } }`; assert attempt/summary cost fields. With `maxReviewCostCny: 0.5` and two assets, second is unresolved with `budget_exceeded`, error `REVIEW_COST_BUDGET_EXCEEDED`.
+`state-machine.test.ts`: fake reviewer returns `{ verdict: pass, usage: { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 0 }, usageComplete: true }`; assert attempt/summary cost fields. With `maxReviewCostCny: 0.5` and two assets, second is unresolved with `budget_exceeded`, error `REVIEW_COST_BUDGET_EXCEEDED`.
+
+Add:
+- `usageComplete: false` + `maxReviewCostCny` → `REVIEW_USAGE_INCOMPLETE`; `allowUnknownCost: true` continues.
+- invalid verdict path carries usage into the error; repair merges both attempts.
+- `dsh-process.test.ts` parses `status(step_end).usage` and `final.text`; args include `--json -`; stdin contains the task.
 
 - [ ] **Step 2: Update the reviewer port and all implementations**
 
 - `ScriptedReviewer.review` → `{ verdict }`.
-- `DshAssetReviewer.review` → `{ verdict, usage, raw, ignoredKeys }`.
-- `ModelReviewer.review` → `{ verdict, usage? }` (read `payload.usage.prompt_tokens/completion_tokens`).
-- Update `state-machine` to use `result.verdict` and record `result.usage`.
+- `DshAssetReviewer.review` → `{ verdict, usage, usageComplete, raw, ignoredKeys, repairAttempted }`.
+- `ModelReviewer.review` → `{ verdict, usage?, usageComplete? }` (read `payload.usage.prompt_tokens/completion_tokens`).
+- Update `state-machine` to use `result.verdict`, record `result.usage`, and honor `result.usageComplete`.
 - Update test fakes in `state-machine.test.ts`, `conformance.test.ts`, `adapter.test.ts`, `model-reviewer.test.ts`.
 
 - [ ] **Step 3: Implement cost calculation**
@@ -492,7 +570,7 @@ export function reviewCost(usage: ReviewUsage, pricing: ReviewPricing): { usd: n
 
 - [ ] **Step 4: Add the guard**
 
-In `runAssetReview`, keep `reviewCostCny` across assets. After each review:
+In `runAssetReview`, keep `totalReviewCostCny` across assets (do not reset per asset). After each review:
 ```ts
 totalReviewCostCny += cost.cny;
 if (maxReviewCostCny !== undefined && totalReviewCostCny > maxReviewCostCny) {
@@ -500,25 +578,47 @@ if (maxReviewCostCny !== undefined && totalReviewCostCny > maxReviewCostCny) {
   costBudgetExceeded = true;
   break;
 }
+if (maxReviewCostCny !== undefined && result.usageComplete === false && !allowUnknownCost) {
+  usageIncomplete = true;
+  break;
+}
 ```
-At the top of the asset loop, if `costBudgetExceeded`, push unresolved records with `BUDGET_EXCEEDED`.
-At the end, `error = "REVIEW_COST_BUDGET_EXCEEDED"`, `passed=false`.
+At the top of the asset loop, if `costBudgetExceeded` or `usageIncomplete`, push unresolved records with `budget_exceeded` / `usage_incomplete`.
+At the end, `error = usageIncomplete ? "REVIEW_USAGE_INCOMPLETE" : "REVIEW_COST_BUDGET_EXCEEDED"`, `passed=false`.
+Keep the existing per-asset producer `maxCostUsd` logic untouched; it is a separate budget.
 
 - [ ] **Step 5: CLI + pricing config**
 
-- Load `pipeline/pricing.json` (or `assetsDir/pricing.json` override).
+- Load `pipeline/pricing.json` (or `assetsDir/pricing.json` override); validate with `ReviewPricingSchema` and fail with `INVALID_PRICING` on malformed input.
 - `--max-review-cost-cny <n>`; default 10 for `--runtime dsh`, undefined for standalone scripted.
-- Print `reviewCostCny` in the summary.
+- `--allow-unknown-cost` bypasses `REVIEW_USAGE_INCOMPLETE` when usage is incomplete.
+- Print `reviewCostCny` / `usageSource` / `usageComplete` in the summary.
 - `--pricing <path>` optional.
+- Update `AssetAttemptSchema`, `AssetReviewSummarySchema`, `AssetReviewRunSchema` with the new optional fields; validate the run result with `AssetReviewRunSchema` before writing.
+- Keep `--budget-usd` documented as per-asset producer budget, separate from the global review budget.
 
-- [ ] **Step 6: dsh usage parsing**
+- [ ] **Step 6: dsh `--json -` parsing and stdin**
 
-Use `dsh --profile <name> --json` and parse NDJSON:
-- Find events containing `usage`; dedupe by step id or usage JSON.
-- Sum `inputTokens`, `outputTokens`, `cacheReadTokens`.
-- If no usage, set `usageSource: "unavailable"` and log a warning; do not fabricate zero cost.
+Replace `execFile` with `spawn`; write `stdin` when provided; keep timeout/SIGTERM and capture partial stdout/stderr.
 
-Exact event shape is a spike; add a fixture in `dsh-process.test.ts` once observed. The stdin transport is Task 7.
+Command:
+```ts
+const args = ["--profile", profile, "--json", "-"];
+```
+
+Parse NDJSON:
+- `status` with `phase: "step_end"` and `usage` → accumulate `inputTokens`, `outputTokens`, `cacheReadTokens`; ignore `totalTokens` for billing.
+- `final.text` → verdict source (lossless; `text` events are capped at 8KB).
+- If any `step_end` lacks `usage`, or the process exits nonzero and partial output cannot be parsed → `usageComplete = false`.
+- If no events at all → `usageSource = "unavailable"`, `usageComplete = false`; do not fabricate zero cost.
+- On `DSH_INVALID_VERDICT`, attach the parsed usage/raw/ignoredKeys to `DshError` so the repair attempt can merge them. Add optional `usage`, `usageComplete`, `raw`, and `ignoredKeys` fields to `DshError`.
+- No session-log fallback in M0.5.
+
+Real event fixture:
+```jsonl
+{"type":"status","phase":"step_end","turn":1,"step":1,"usage":{"inputTokens":100,"outputTokens":20,"totalTokens":120,"cacheReadTokens":0}}
+{"type":"final","text":"{\"verdict\":\"pass\",...}"}
+```
 
 - [ ] **Step 7: Run tests**
 
@@ -533,24 +633,25 @@ pnpm typecheck
 
 ```bash
 git add pipeline/core/asset-review pipeline/runtimes pipeline/pricing.json
-git commit -m "feat: capture reviewer usage/cost and enforce cny budget"
+git commit -m "feat: capture usage/cost and stream dsh tasks over json stdin"
 ```
 
 ---
 
-### Task 6: H7 + H12 — PNG image input and manifest review sidecar
+### Task 6: H7 + H12 — PNG image input (standalone rendering) and manifest review sidecar
 
 **Files:**
-- Create: `pipeline/runtimes/rendering/src/render-svg.ts` (or `runtimes/standalone/src/asset/render-svg.ts`)
-- Create: `pipeline/runtimes/rendering/package.json`, `tsconfig.json`
-- Modify: `pipeline/runtimes/dsh/package.json` (add `@prd-ui/rendering`, `@resvg/resvg-js`)
-- Modify: `pipeline/runtimes/standalone/package.json` (add `@prd-ui/rendering`)
-- Modify: `pipeline/runtimes/dsh/src/adapter.ts`
+- Create: `pipeline/runtimes/standalone/src/asset/render-svg.ts` (or a `runtimes/rendering` package imported only by standalone)
+- Modify: `pipeline/runtimes/standalone/package.json` (add `@resvg/resvg-js`; do **not** add it to `runtimes/dsh`)
+- Modify: `pipeline/core/asset-review/src/ports.ts` (`candidateImagePath?` on `AssetReviewerInput`)
+- Modify: `pipeline/runtimes/standalone/src/asset-cli.ts` (render before review)
+- Modify: `pipeline/runtimes/dsh/src/adapter.ts` (reference the path; no resvg import)
 - Modify: `pipeline/core/asset-review/src/manifest.ts` (sidecar builder)
 - Modify: `pipeline/runtimes/standalone/src/asset-cli.ts` (write sidecar)
 - Test: `pipeline/runtimes/standalone/tests/render.test.ts`
 - Test: `pipeline/runtimes/dsh/tests/adapter.test.ts`
 - Test: `pipeline/core/asset-review/tests/manifest.test.ts`
+- Build assertion: `runtimes/dsh/dist/plugin.js` does not contain `@resvg`
 
 **Interfaces:**
 
@@ -564,20 +665,30 @@ Render `validIllustration` at scale 2; assert PNG dimensions 240×160 (parse PNG
 
 - [ ] **Step 2: Implement render**
 
-Use `@resvg/resvg-js`:
+Use `@resvg/resvg-js` in the standalone runtime only:
 ```ts
 const resvg = new Resvg(svg, { fitTo: { mode: "zoom", value: scale } });
 return resvg.render().asPng();
 ```
-Write to `assets/attempts/<id>/<source>-<n>/candidate.png`.
+Write to `assets/attempts/<id>/<source>-<n>/candidate.png`. The dsh adapter receives only the path.
 
-- [ ] **Step 3: Include in dsh task**
+- [ ] **Step 3: Include in dsh task without bundling resvg**
+
+`standalone` CLI:
+- Render before calling the reviewer.
+- Write `assets/attempts/<id>/<source>-<n>/candidate.png` (2x).
+- Pass `candidateImagePath` through `AssetReviewerInput`.
 
 `DshAssetReviewer.review`:
-- Render before `runDshReview`.
-- Write PNG.
-- Task adds: `A rendered PNG is at ${pngPath}. Use read_image before scoring.`
-- If render fails: log `RENDER_WARNING`, continue with SVG text.
+- Do **not** import `@resvg/resvg-js` or any rendering module.
+- Add to the task: `A rendered PNG is at ${candidateImagePath}. Use read_image before scoring.`
+- If rendering failed and no path is provided: log `RENDER_WARNING`, continue with SVG text.
+
+Build assertion:
+```bash
+pnpm --filter @prd-ui/runtime-dsh build
+grep -c "@resvg" runtimes/dsh/dist/plugin.js  # expect 0
+```
 
 - [ ] **Step 4: Manifest sidecar**
 
@@ -596,11 +707,18 @@ export interface ManifestReview {
     fallbackReason?: string;
     review?: AssetReviewRecord["review"];
   }>;
-  batchGates?: BatchGateResult;
+  batchGates?: {
+    iconSetPassed?: boolean;
+    illustrationSetPassed?: boolean;
+    skipped?: boolean;
+    reason?: "PARTIAL_REVIEW";
+  };
+  usageSource?: "json-events" | "unavailable";
+  usageComplete?: boolean;
   complete: boolean;
 }
 ```
-CLI writes `manifest.review.json`.
+CLI writes `manifest.review.json`; include `usageSource` and `usageComplete` from the run result. Validate `manifest.json` with `AssetManifestSchema` and `asset-review.json` with `AssetReviewRunSchema` before writing; a failure exits with `CONTRACT_VIOLATION`.
 
 - [ ] **Step 5: Run tests**
 
@@ -621,16 +739,14 @@ git commit -m "feat: add png evidence and manifest review sidecar"
 
 ---
 
-### Task 7: H8 + H9 + H10 + H11 — stdin, append log, raw output, schema repair
+### Task 7: H9 + H10 + H11 — append log, raw output, schema repair
 
 **Files:**
 - Modify: `pipeline/core/asset-review/src/ports.ts` (`appendText`)
 - Modify: `pipeline/runtimes/standalone/src/asset/artifact-store.ts`
 - Modify: `pipeline/runtimes/standalone/src/asset-cli.ts` (logger)
-- Modify: `pipeline/runtimes/dsh/src/dsh-process.ts` (spawn + stdin)
 - Modify: `pipeline/runtimes/dsh/src/adapter.ts` (raw, repair)
 - Test: `pipeline/runtimes/standalone/tests/artifact-store.test.ts`
-- Test: `pipeline/runtimes/dsh/tests/dsh-process.test.ts`
 - Test: `pipeline/runtimes/dsh/tests/adapter.test.ts`
 - Update `MemoryStore` fakes in `state-machine.test.ts`/`preflight.test.ts` with `appendText`.
 
@@ -641,23 +757,15 @@ interface ArtifactStorePort {
   // existing...
   appendText(path: string, value: string): Promise<void>;
 }
-
-interface CommandRunner {
-  (command: string, args: string[], options: {
-    cwd: string;
-    env: NodeJS.ProcessEnv;
-    timeoutMs: number;
-    stdin?: string;
-  }): Promise<CommandResult>;
-}
 ```
+
+`CommandRunner.stdin` is defined in Task 5 (H8), not here.
 
 - [ ] **Step 1: Write failing tests**
 
 - Append: two `appendText` calls → both lines present.
-- stdin: fake runner captures args `["--profile","prd-ui-assets","-"]` and `stdin` containing the task.
-- raw: fake runner returns a verdict with `reason_note`; assert `review.raw.json` and `ignoredKeys`.
-- repair: fake runner returns invalid first, valid second; assert `repairAttempted=true` and two calls.
+- raw: fake runner returns a verdict with `reason_note`; assert `review.raw.json`、`ignoredKeys`、usage 和 `repairAttempted`.
+- repair: fake runner returns invalid first, valid second; assert `repairAttempted=true`、两次调用、usage 相加。
 
 - [ ] **Step 2: Implement append**
 
@@ -675,17 +783,7 @@ await store.appendText("log.ndjson", `${redact(JSON.stringify(event))}\n`);
 ```
 Remove the in-memory `lines` array.
 
-- [ ] **Step 3: Implement stdin runner**
-
-Use `node:child_process.spawn`:
-```ts
-const child = spawn(command, args, { cwd, env });
-if (options.stdin !== undefined) child.stdin.end(options.stdin);
-collect stdout/stderr; timeout kill with SIGTERM; resolve on close.
-```
-`runDshReview` uses args `["--profile", profile, "-"]` and `stdin: task`.
-
-- [ ] **Step 4: Raw output**
+- [ ] **Step 3: Raw output**
 
 `DshAssetReviewer` writes:
 ```ts
@@ -702,7 +800,7 @@ const known = new Set(["verdict","hardIssues","scores","suggestedChanges","reaso
 const ignoredKeys = Object.keys(parsed).filter((key) => !known.has(key));
 ```
 
-- [ ] **Step 5: Schema repair**
+- [ ] **Step 4: Schema repair**
 
 In `DshAssetReviewer.review`:
 ```ts
@@ -711,14 +809,14 @@ try {
 } catch (error) {
   if (error instanceof DshError && error.code === "DSH_INVALID_VERDICT") {
     const repairTask = `${task}\n\nPrevious answer was rejected:\n${error.message}\nReturn ONLY a valid JSON verdict; no extra keys.`;
-    return await this.runOnce(repairTask, { repairAttempted: true });
+    return await this.runOnce(repairTask, { repairAttempted: true, priorUsage: error.usage });
   }
   throw error;
 }
 ```
-`runOnce` merges usage across attempts.
+`runOnce` merges usage across attempts, including the invalid first attempt. Do not issue a repair when the cost budget is already exhausted.
 
-- [ ] **Step 6: Run tests**
+- [ ] **Step 5: Run tests**
 
 ```bash
 pnpm vitest run runtimes/standalone/tests/artifact-store.test.ts
@@ -727,11 +825,11 @@ pnpm test
 pnpm typecheck
 ```
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add pipeline/core/asset-review/src/ports.ts pipeline/runtimes
-git commit -m "feat: stream dsh tasks, append logs, keep raw reviews and repair once"
+git commit -m "feat: append logs, keep raw reviews and repair once"
 ```
 
 ---
@@ -752,8 +850,8 @@ git commit -m "feat: stream dsh tasks, append logs, keep raw reviews and repair 
 - Start an HTTP server on an ephemeral port returning a valid verdict.
 - Env: `DSH_HOME=pipeline/dsh/home`, `PRD_UI_VISION_API_KEY=mock`, `BASE_URL=http://127.0.0.1:<port>/v1`, `MODEL=mock-vision`.
 - Run `asset:review --only icon-home --runtime dsh --runs <temp>` via `execFile`.
-- Assert exit 0, `asset-review.json` pass, `dsh/` evidence.
-- `describe.skipIf(!existsSync(dshBin))`.
+- Assert exit 0, `asset-review.json` pass, `dsh/` evidence, and `summary.usageComplete === true`.
+- If `node_modules/.bin/dsh` is missing, **fail with an install hint**; only `SKIP_DSH=1` skips. Do not silently `describe.skip`.
 
 - [ ] **Step 2: Add `test:dsh` script**
 
@@ -765,7 +863,7 @@ git commit -m "feat: stream dsh tasks, append logs, keep raw reviews and repair 
 
 - [ ] **Step 3: Add `--json` output**
 
-`asset:review` prints a JSON summary with `runDir`, `summary`, `assets`, `batchGates`, `error` when `--json`.
+`asset:review` prints a JSON summary with `runDir`, `summary`, `assets`, `batchGates`, `error`, `reviewCostCny`, `usageSource`, `usageComplete` when `--json`.
 
 - [ ] **Step 4: Export asset CLI**
 
@@ -776,10 +874,12 @@ export { main as assetMain, parseArgs as parseAssetArgs, USAGE as ASSET_USAGE } 
 
 - [ ] **Step 5: Docs**
 
-- `README.md`: hardening status, test counts, cost guard.
-- `pipeline/docs/asset-review-m0.md`: `--max-review-cost-cny`, `--fail-fast`, `--json`, `test:dsh`.
+- `README.md`: hardening status, test counts, cost guard, DeepSeek defaults.
+- `pipeline/docs/asset-review-m0.md`: `--max-review-cost-cny`, `--allow-unknown-cost`, `--fail-fast`, `--json`, `test:dsh`; state that `.env` is **not** auto-loaded and show `set -a; . ./.env; set +a`.
+- `pipeline/dsh/README.md`: DeepSeek defaults; no OpenAI fallback.
 - `CHANGELOG.md`: new entries + commit trail.
 - `normalizeSvg`: add a comment/alias clarifying it is XML re-serialization, not design normalization (T-H15-03).
+- `redact`: cover key/token/secret fields, not just `sk-` (T-H15-04).
 
 - [ ] **Step 6: Run full regression**
 
@@ -790,8 +890,13 @@ pnpm typecheck
 pnpm phase1:verify --project samples/projects/employee-app/project.yaml --runs /tmp/final-phase1
 pnpm asset:review --assets samples/assets/m0 --runtime standalone --runs /tmp/final-m0
 pnpm asset:review --assets samples/assets/m0-scenarios --runtime standalone --runs /tmp/final-scenarios
+pnpm --filter @prd-ui/runtime-dsh build
+grep -c "@resvg" runtimes/dsh/dist/plugin.js   # expect 0
 pnpm test:dsh
+grep -R "api.openai.com\|gpt-4o-mini" README.md pipeline/.env.example pipeline/dsh pipeline/runtimes/standalone/src/asset/model-reviewer.ts   # expect no hits
 ```
+
+Expected: new test count >233; 13/13; scenarios 1 passed/1 unresolved; `pnpm test:dsh` pass; no `@resvg` in the dsh bundle; no OpenAI defaults.
 
 - [ ] **Step 7: Real dsh regression (manual, key required)**
 
@@ -802,7 +907,7 @@ DSH_HOME="$PWD/dsh/home" pnpm asset:review \
   --assets samples/assets/m0 --runtime dsh --runs /tmp/final-real-dsh
 ```
 
-Expected: 13/13, `summary.reviewCostCny` ≤10, no key in artifacts.
+Expected: 13/13, `summary.reviewCostCny` ≤10, `summary.usageComplete === true`, no key in artifacts.
 
 - [ ] **Step 8: Commit**
 
@@ -815,8 +920,9 @@ git commit -m "test: add dsh mock integration and hardening docs"
 
 ## Self-Review
 
-- **Spec coverage:** H1 (Task 1), H2/H13 (Task 2), H3 (Task 3), H4/H5 (Task 4), H6/H15 (Task 5), H7/H12 (Task 6), H8/H9/H10/H11 (Task 7), H14/H15 (Task 8).
-- **Type consistency:** `ReviewResult`, `ReviewUsage`, `ReviewPricing`, `BatchGateResult`, `AssetReviewerPort.review`, `appendText`, `runDshReview.stdin` are used consistently across tasks.
-- **Breaking-change inventory:** every `AssetReviewerPort` fake and every `ArtifactStorePort` fake must be updated; `AssetReviewSummary` new fields are optional for old run files.
+- **Spec coverage:** H1 (Task 1), H2/H13 (Task 2), H3 (Task 3), H4/H5 (Task 4), H6/H8/H15 (Task 5), H7/H12 (Task 6), H9/H10/H11 (Task 7), H14/H15 (Task 8).
+- **Review decisions:** D1 `--json -` (Task 5), D2 usage fail-closed (Task 5), D3 H7 standalone rendering (Task 6), D4 provider validation (Task 4), D5 per-asset reviewer flag (Task 3), D6 `--only` + all-element signatures (Task 2), D7 schema self-validation (Tasks 5/6).
+- **Type consistency:** `ReviewResult`, `ReviewUsage`, `ReviewPricing`, `BatchGateResult`, `AssetReviewerPort.review`, `appendText`, `CommandRunner.stdin` are used consistently across tasks.
+- **Breaking-change inventory:** every `AssetReviewerPort` fake, every `ArtifactStorePort` fake, and every `CommandRunner` fake must be updated; `AssetReviewSummary`/`AssetReviewRun` new fields are optional for old run files.
 - **No placeholders:** each task lists files, interfaces, failing test, implementation, verification command, and commit.
 - **Not implemented yet:** this plan is a document; do not start coding until approved.

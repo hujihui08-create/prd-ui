@@ -2,7 +2,7 @@
 
 - 日期：2026-10-20
 - 对应 spec：`docs/superpowers/specs/2026-10-20-asset-review-hardening-design.md`
-- 状态：Draft for review；未实现
+- 状态：Ready for implementation；未实现（2026-10-20 评审后更新）
 - 原则：每个 H 需求至少一个失败测试；先写测试再实现；默认 `pnpm test` 不访问真实 dsh/网络。
 
 ## 0. 测试分层
@@ -14,6 +14,8 @@
 | dsh contract | `pnpm test` | dsh-process/plugin/adapter 用 fake runner | 否 |
 | dsh mock integration | `pnpm test:dsh` | 真实 dsh CLI + profile + 本地 mock HTTP | 否（mock key） |
 | Real dsh manual | `pnpm asset:review --runtime dsh` | 真实 DeepSeek Flash | 是，需人工确认 ≤10 元 |
+
+dsh 是 devDependency；`pnpm test:dsh` 在 dsh 缺失时失败并提示安装，只有显式 `SKIP_DSH=1` 才跳过。
 
 ## 1. 测试矩阵
 
@@ -27,6 +29,9 @@
 | T-H2-02 | H2 icon set 文件 | integration | `runtimes/standalone/tests/asset-cli.test.ts` | `assets/icon-set.json` 存在且 passed=false |
 | T-H2-03 | H2 manifest incomplete | integration | 同上 | set gate 失败时 `manifest.complete=false` |
 | T-H2-04 | H2 现有 10 图标 | integration | 现有 m0 run | icon set passed，run exit 0 |
+| T-H2-05 | H2 `--only` 跳过 set gate | integration | `runtimes/standalone/tests/asset-cli.test.ts` | `--only icon-home` 不执行 set gates，写 `PARTIAL_REVIEW` |
+| T-H2-06 | H2 子元素签名 | unit | `core/asset-review/tests/gates.test.ts` | 根元素一致、子元素 `stroke-width` 不一致 → `ICON_SET_INCONSISTENT` |
+| T-H2-07 | H2 双 set gate 失败 | unit | `state-machine.test.ts` | icon + illustration 都失败时 `error` 优先 `ICON_SET_INCONSISTENT`，两项结果都保留 |
 | T-H3-01 | H3 默认继续 | unit | `core/asset-review/tests/state-machine.test.ts` | 第一个 reviewer throw、第二个 pass → 1 unresolved + 1 passed, run failed |
 | T-H3-02 | H3 fail-fast | unit | 同上 | `continueOnReviewerError=false` → 第二个不调用 reviewer |
 | T-H3-03 | H3 summary | unit | 同上 | `summary.reviewerErrors=1` |
@@ -37,34 +42,40 @@
 | T-H5-01 | H5 missing base/model | unit | `runtimes/dsh/tests/adapter.test.ts` | `CONFIGURATION_ERROR`，列出变量名 |
 | T-H5-02 | H5 dsh profile 无 OpenAI fallback | doc/unit | `pipeline/dsh/home/profiles/prd-ui-assets/cordis.patch.yml` | 不含 `api.openai.com` / `gpt-4o-mini` |
 | T-H5-03 | H5 .env.example | doc | `pipeline/.env.example` | 含 `api.deepseek.com/v1` + `deepseek-flash` |
+| T-H5-04 | H5 standalone model reviewer | unit | `runtimes/standalone/tests/model-reviewer.test.ts` | base/model 缺失 → `CONFIGURATION_ERROR`，不再默认 OpenAI |
+| T-H5-05 | H5 无残留 OpenAI 默认 | doc | `README.md` / `pipeline/dsh/README.md` / `model-reviewer.ts` | `grep` 无 `api.openai.com` / `gpt-4o-mini` |
 | T-H6-01 | H6 usage 汇总 | unit | `core/asset-review/tests/state-machine.test.ts` | fake reviewer usage → attempt/summary 字段正确 |
 | T-H6-02 | H6 cost 计算 | unit | `core/asset-review/tests/pricing.test.ts` | 已知 tokens → 已知 USD/CNY |
 | T-H6-03 | H6 预算停止 | unit | `state-machine.test.ts` | 超过 `maxReviewCostCny` → 剩余 unresolved，error=REVIEW_COST_BUDGET_EXCEEDED |
 | T-H6-04 | H6 dsh usage 解析 | unit | `runtimes/dsh/tests/dsh-process.test.ts` | NDJSON usage → ReviewUsage |
-| T-H6-05 | H6 usage 缺失 | unit | 同上 | `usageSource="unavailable"` + warning，不伪造 0 |
-| T-H6-06 | H6 真实/mock run 记录 | integration | `test:dsh` | `asset-review.json` 含 usage/cost |
+| T-H6-05 | H6 usage 缺失/不完整 | unit | 同上 | `usageComplete=false` + warning，不伪造 0 |
+| T-H6-06 | H6 真实/mock run 记录 | integration | `test:dsh` | `asset-review.json` 含 usage/cost 和 `usageComplete` |
+| T-H6-07 | H6 无效 verdict 的 usage | unit | `runtimes/dsh/tests/dsh-process.test.ts` | 无效 verdict 的 `DshError` 携带 usage；repair 合并两次 |
+| T-H6-08 | H6 usage 不完整 fail closed | unit | `state-machine.test.ts` | 设置 `maxReviewCostCny` 且 `usageComplete=false` → `REVIEW_USAGE_INCOMPLETE`；`allowUnknownCost=true` 才继续 |
 | T-H7-01 | H7 SVG→PNG | unit | `runtimes/standalone/tests/render.test.ts` | 120×80 SVG → 240×160 PNG |
 | T-H7-02 | H7 prompt 引用 PNG | unit | `runtimes/dsh/tests/adapter.test.ts` | task 含 `candidate.png` 路径 |
 | T-H7-03 | H7 渲染失败降级 | unit | 同上 | `RENDER_WARNING`，仍调用 dsh |
-| T-H8-01 | H8 stdin | unit | `runtimes/dsh/tests/dsh-process.test.ts` | args 含 `-`，stdin 是完整 task |
+| T-H7-04 | H7 dsh bundle 无 resvg | build/doc | `runtimes/dsh/dist/plugin.js` | bundle 不含 `@resvg`；adapter 只引用 PNG 路径 |
+| T-H8-01 | H8 stdin | unit | `runtimes/dsh/tests/dsh-process.test.ts` | args 为 `["--profile","prd-ui-assets","--json","-"]`，stdin 是完整 task |
 | T-H8-02 | H8 真实 dsh 回归 | manual/test:dsh | `pnpm test:dsh` | 1 图标 pass |
 | T-H9-01 | H9 append | unit | `runtimes/standalone/tests/artifact-store.test.ts` | append 两行，旧内容保留 |
 | T-H9-02 | H9 CLI log | integration | `asset-cli.test.ts` | `log.ndjson` 行数 = 事件数，无全量重写 |
-| T-H10-01 | H10 raw output | unit | `runtimes/dsh/tests/adapter.test.ts` | `review.raw.json` 含 `reason_note` |
+| T-H10-01 | H10 raw output | unit | `runtimes/dsh/tests/adapter.test.ts` | `review.raw.json` 含 `reason_note`、usage、`repairAttempted` |
 | T-H10-02 | H10 ignoredKeys | unit | 同上 | `ignoredKeys=["reason_note"]` |
 | T-H11-01 | H11 repair 成功 | unit | `runtimes/dsh/tests/adapter.test.ts` | 第一次 invalid、第二次 valid → pass，`repairAttempted=true` |
 | T-H11-02 | H11 repair 失败 | unit | 同上 | 两次 invalid → `reviewer_error` |
 | T-H11-03 | H11 usage 合并 | unit | 同上 | 两次 usage 相加 |
-| T-H12-01 | H12 sidecar | unit | `core/asset-review/tests/manifest.test.ts` | degraded/unresolved/review 出现在 `manifest.review.json` |
+| T-H12-01 | H12 sidecar | unit | `core/asset-review/tests/manifest.test.ts` | degraded/unresolved/review、set gate、`usageSource`/`usageComplete` 出现在 `manifest.review.json` |
 | T-H12-02 | H12 manifest 不变 | unit | 同上 | `manifest.json` 仍通过 `AssetManifestSchema` |
 | T-H13-01 | H13 插画 set 通过 | unit | `core/asset-review/tests/gates.test.ts` | 同 style/palette/size → pass |
 | T-H13-02 | H13 palette 不一致 | unit | 同上 | `ILLUSTRATION_SET_INCONSISTENT` |
 | T-H13-03 | H13 run 接线 | integration | `asset-cli.test.ts` | `illustration-set.json` 写入，run 失败 |
 | T-H14-01 | H14 dsh mock | integration | `runtimes/dsh/tests/dsh-integration.test.ts` | exit 0，1 asset pass |
-| T-H14-02 | H14 无 dsh skip | integration | 同上 | dsh 不存在时 skip，不 fail |
+| T-H14-02 | H14 无 dsh 失败 | integration | 同上 | dsh 不存在时 fail 并提示安装；`SKIP_DSH=1` 才跳过 |
 | T-H15-01 | H15 pricing | unit | `pricing.test.ts` | 默认 deepseek-flash 价格可解析 |
 | T-H15-02 | H15 --json | integration | `asset-cli.test.ts` | stdout 是合法 JSON summary |
 | T-H15-03 | H15 normalize 命名 | doc | `gates/svg.ts` | 注释明确 XML re-serialization |
+| T-H15-04 | H15 脱敏 | unit | `runtimes/standalone/tests/asset-cli.test.ts` | key/token/secret 字段在日志和 raw sidecar 中被脱敏 |
 
 ## 2. 详细用例
 
@@ -98,6 +109,11 @@ Assert:
 - `store.files.has("assets/icon-set.json")`
 - `result.passed === false`
 
+Additional cases:
+- **子元素签名**：两个图标根元素完全一致，只有子 `<path stroke-width>` 不同 → 仍失败。
+- **`--only`**：`batchGates.skipped === true`、`reason === "PARTIAL_REVIEW"`，不写 icon-set/illustration-set 结论。
+- **双 set gate 失败**：`error` 优先 `ICON_SET_INCONSISTENT`，`batchGates.illustrationSet` 仍在结果里。
+
 CLI:
 - run with a temp fixture containing inconsistent icons; assert exit 1 and `manifest.complete === false`.
 
@@ -114,6 +130,7 @@ const reviewer = {
 ```
 - default: first unresolved, second passed; `summary.reviewerErrors=1`; `passed=false`.
 - fail-fast: second `attempts[0].status === "reviewer_error"` and reviewer call count = 1.
+- **不切 source**：brief 的 `sourceChain` 为 `["library","ai-vector"]`，reviewer 在 `library` 抛错；断言 producer/reviewer 没有尝试 `ai-vector`。
 
 ### T-H4 · Config strictness
 
@@ -128,6 +145,8 @@ Temp assets dir:
 `new DshAssetReviewer({ baseUrl: "", model: "", ... })` or a `validateProviderEnv` function:
 - missing `PRD_UI_VISION_BASE_URL` / `PRD_UI_VISION_MODEL` → throw `CONFIGURATION_ERROR` with both names.
 - `.env.example` snapshot test: read file, assert DeepSeek URL/model, no `api.openai.com`.
+- `modelReviewerFromEnv` with missing base/model → `CONFIGURATION_ERROR`；不再默认 OpenAI。
+- `grep` README / dsh README / cordis patch / model-reviewer，断言没有 `api.openai.com` / `gpt-4o-mini`。
 
 ### T-H6 · Usage/cost
 
@@ -138,18 +157,22 @@ const usage = { inputTokens: 1_000_000, outputTokens: 1_000_000, cacheReadTokens
 ```
 - fake reviewer returns usage; assert attempt/summary fields.
 - `maxReviewCostCny: 0.5` with two assets; after first review cost 0.54 → stop, second unresolved, error `REVIEW_COST_BUDGET_EXCEEDED`.
-- dsh NDJSON fixture:
+- dsh NDJSON fixture（真实 shape）:
   ```jsonl
-  {"type":"step/end","data":{"usage":{"inputTokens":100,"outputTokens":20,"cacheReadTokens":0}}}
+  {"type":"status","phase":"step_end","turn":1,"step":1,"usage":{"inputTokens":100,"outputTokens":20,"totalTokens":120,"cacheReadTokens":0}}
+  {"type":"final","text":"{\"verdict\":\"pass\",...}"}
   ```
-  assert `ReviewUsage`.
-- missing usage → `usageSource="unavailable"` and a warning event.
+  assert `ReviewUsage`；`final.text` 用于 verdict。
+- missing usage → `usageComplete=false`、`usageSource="unavailable"`，不伪造 0。
+- **invalid verdict**：第一次输出无效但事件里有 usage；`DshError` 携带 usage，repair 合并两次。
+- **fail closed**：`usageComplete=false` 且设置 `maxReviewCostCny` → `REVIEW_USAGE_INCOMPLETE`；`allowUnknownCost: true` 才继续。
 
 ### T-H7 · Image input
 
 - `renderSvgToPng(validIllustration, { scale: 2 })` returns PNG with width 240, height 160 (use `@resvg` or parse PNG header).
 - `DshAssetReviewer` with fake runner: task includes `candidate.png`; fake runner captures stdin/task.
 - `renderSvgToPng` throws → adapter logs `RENDER_WARNING` and still calls runner.
+- **bundle**：构建 `runtimes/dsh/dist/plugin.js` 后 grep，断言不含 `@resvg`；渲染只由 standalone 引入。
 
 ### T-H8 · stdin
 
@@ -161,7 +184,7 @@ const runner = async (_cmd, args, options) => {
   return { stdout: JSON.stringify(passVerdict), stderr: "" };
 };
 await runDshReview({ task: "review this", ..., runner });
-expect(captured.args).toEqual(["--profile", "prd-ui-assets", "-"]);
+expect(captured.args).toEqual(["--profile", "prd-ui-assets", "--json", "-"]);
 expect(captured.stdin).toContain("review this");
 ```
 
@@ -175,6 +198,7 @@ CLI run with `--only icon-home` → `log.ndjson` has at least `asset_started`, `
 Fake runner returns `{...passVerdict, reason_note:"extra"}`.
 - `review.raw.json` exists; `raw` contains `reason_note`; `ignoredKeys` includes `reason_note`.
 - `review.json` does not contain `reason_note`.
+- raw sidecar 同时包含 `usage`、`usageComplete`、`repairAttempted`，并经过脱敏。
 
 ### T-H11 · schema repair
 
@@ -182,6 +206,7 @@ Fake runner sequence:
 1. `{"verdict":"pass"}` (missing scores) → invalid.
 2. valid pass.
 Assert `review` returns pass, `repairAttempted=true`, usage summed, runner called twice.
+第一次无效输出携带 usage；第二次 usage 与它相加，不能只记第二次。
 Second test: both invalid → throws `DSH_INVALID_VERDICT`; no third call.
 
 ### T-H12 · manifest sidecar
@@ -190,8 +215,9 @@ Second test: both invalid → throws `DSH_INVALID_VERDICT`; no third call.
 - one passed/degraded record,
 - one unresolved record,
 - `batchGates.iconSet.passed=false`.
-Assert sidecar assets include `degraded:true`, `status:"unresolved"`, `batchGates.iconSetPassed=false`, `complete=false`.
+Assert sidecar assets include `degraded:true`, `status:"unresolved"`, `batchGates.iconSetPassed=false`, `usageSource`, `usageComplete`, `complete=false`.
 Assert `manifest.json` still parses with `AssetManifestSchema`.
+Assert `asset-review.json` parses with `AssetReviewRunSchema`；新增字段漏进 schema 时测试失败。
 
 ### T-H13 · illustration set
 
@@ -206,35 +232,40 @@ CLI integration uses a temp fixture; assert `illustration-set.json` and run fail
 - Env: `DSH_HOME=pipeline/dsh/home`, `PRD_UI_VISION_API_KEY=mock`, `BASE_URL=http://127.0.0.1:<port>/v1`, `MODEL=mock-vision`.
 - Run `asset:review --only icon-home --runtime dsh --runs <temp>`.
 - Assert exit 0, `asset-review.json` passed, `dsh/icon-home-library-1/stdout.txt` exists.
-- If `pipeline/node_modules/.bin/dsh` missing → `describe.skip`.
+- If `pipeline/node_modules/.bin/dsh` missing → fail with an install hint; only `SKIP_DSH=1` skips.
 
 ### T-H15 · DX
 
 - `pricing.json` parse and default key.
-- `--json`: stdout parseable; includes `summary`, `runDir`, `assets`.
+- `--json`: stdout parseable; includes `summary`, `runDir`, `assets`, `batchGates`, `reviewCostCny`, `usageSource`, `usageComplete`.
 - `normalizeSvg` comment/test: input/output still parse; docs mention XML re-serialization.
+- 脱敏：`PRD_UI_VISION_API_KEY`、`token`、`secret` 字段不出现在 `log.ndjson` / `review.raw.json`。
 
 ## 3. 回归测试
 
-- `pnpm test` ≥233 passed。
+- `pnpm test` ≥233 passed，且新增 T-H 用例全部计入；具体数量在实现后写回 CHANGELOG / AGENTS.md。
 - `pnpm typecheck` clean。
 - `pnpm phase1:verify --project samples/projects/employee-app/project.yaml` → `2 pages, 0 blockers`。
 - `pnpm asset:review --assets samples/assets/m0 --runtime standalone` → `13/13`。
 - `pnpm asset:review --assets samples/assets/m0-scenarios --runtime standalone` → `1 passed, 1 unresolved`，exit 1。
-- `pnpm asset:review --assets samples/assets/m0 --runtime dsh`（真实 key，人工）→ `13/13`，usage/cost 写入，≤10 元。
+- `pnpm test:dsh` → mock 1 资产通过；不消耗真实 key；dsh 缺失时 fail。
+- `pnpm asset:review --assets samples/assets/m0 --runtime dsh`（真实 key，人工）→ `13/13`，usage/cost 写入，`usageComplete=true`，≤10 元。
+- `grep -R "api.openai.com\|gpt-4o-mini"` 在代码和文档中无命中（历史 CHANGELOG 除外）。
 - `git grep` 无 key；`git status` clean。
 
 ## 4. Manual real-dsh checklist
 
-- [ ] 配 `pipeline/.env`（DeepSeek 默认）。
-- [ ] `--only icon-home` 先跑，确认 verdict 和 usage。
+- [ ] 配 `pipeline/.env`（DeepSeek 默认），并显式 `set -a; . ./.env; set +a`。
+- [ ] `--only icon-home` 先跑，确认 verdict、`usageComplete=true`、usage/cost 写入。
 - [ ] 跑全部 13 个，确认 `summary.reviewCostCny` ≤10。
-- [ ] 检查 `runs/<id>/dsh/*/review.raw.json` 和 `candidate.png`。
-- [ ] 检查 `manifest.review.json` 的 degraded/unresolved/set gate。
+- [ ] 检查 `runs/<id>/dsh/*/review.raw.json`、`candidate.png` 和 `usage`。
+- [ ] 检查 `manifest.review.json` 的 degraded/unresolved/set gate、`usageSource`、`usageComplete`。
+- [ ] 检查 `asset-review.json` 通过 `AssetReviewRunSchema`，且没有 key/token 泄露。
 - [ ] 若成本接近 10 元，停止并记录。
 
 ## 5. 退出标准
 
-- 所有 T-H1..T-H14 通过；T-H15 至少 pricing/--json 通过。
+- 所有 T-H1..T-H14 通过；T-H15 至少 pricing/`--json`/脱敏通过。
 - 默认 `pnpm test` 不依赖网络/真实 key。
-- 真实 dsh 回归有记录；key 不进入 git。
+- `pnpm test:dsh` 可复现 dsh 路径；dsh 缺失时 fail 而不是静默 skip。
+- 真实 dsh 回归有记录，`usageComplete=true`，key 不进入 git。

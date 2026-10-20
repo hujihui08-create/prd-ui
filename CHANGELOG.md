@@ -20,9 +20,10 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   this contract.
 - Set-level icon/illustration gates; `--only` records `PARTIAL_REVIEW` instead
   of claiming set consistency.
-- 2x PNG evidence (`candidate.png` 48x48 for M0 icons), raw reviewer evidence
-  (`review.raw.json`), one schema repair, `manifest.review.json`, append-only
-  `log.ndjson`, and usage/cost capture with a default 10 CNY dsh review cap.
+- 2x PNG evidence (`candidate.png` 48x48 for 24px icons, 240x160 for 120x80
+  illustrations), raw reviewer evidence (`review.raw.json`), one schema repair,
+  `manifest.review.json`, append-only `log.ndjson`, and usage/cost capture with
+  a default 10 CNY dsh review cap.
 - `--max-review-cost-cny`, `--allow-unknown-cost`, and `--fail-fast` CLI flags.
 - Standalone asset CLI exports (`assetMain`, `parseAssetArgs`, `ASSET_USAGE`)
   and a comment on `normalizeSvg` clarifying it is XML re-serialization, not
@@ -37,6 +38,9 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   the reviewer's error.
 - `normalizeSvg` and redaction behavior are documented; `.env` is explicitly
   not auto-loaded (`set -a; . ./.env; set +a`).
+- The image-aware review initially rejected `illus-empty-inventory` as reading
+  like a bar chart; the fixture was redesigned as a shelf with empty dashed
+  compartments, after which all 13 real-dsh assets passed.
 
 ### Verification
 
@@ -50,11 +54,19 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `1 passed, 1 unresolved`, exit 1 as designed.
 - dsh mock run: `1 assets, 1 passed`, `usageSource=json-events`,
   `usageComplete=true`, review cost below the 10 CNY cap.
+- Real dsh `deepseek-flash` full run: `13 assets, 13 passed`, `1 retried`,
+  `usageSource=json-events`, `usageComplete=true`, review cost ¥0.3379
+  (10 CNY default cap). 14 `candidate.png` evidence files and 14 `read_image`
+  calls; no key material in the run directory; both set gates passed and
+  `manifest.json` / `manifest.review.json` report `complete: true`.
 
 ### Commit trail
 
 | Commit | Change |
 |---|---|
+| `049ee19` | fix: make empty inventory fixture read as an empty shelf |
+| `2fb1d5b` | docs: align asset review json contract |
+| `f6d9f06` | test: add dsh mock integration and hardening docs |
 | `b872535` | fix: keep redacted json parseable |
 | `5c363be` | fix: complete raw review evidence and shared redaction |
 | `a40d948` | feat: append logs, keep raw reviews and repair once |
