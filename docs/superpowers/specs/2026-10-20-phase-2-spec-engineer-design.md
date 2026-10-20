@@ -1,7 +1,7 @@
 # Phase 2 · Spec Engineer v0 设计（消费 M1 设计与资产输入）
 
 - 日期：2026-10-20
-- 状态：Draft for review
+- 状态：Implemented (2026-10-20)
 - 输入：M1 Agent 层完成（`agent:run`、IA/Interaction/Visual artifacts、423 tests、真实 dsh clean run ¥0.1973）
 - 关联：
   - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`
@@ -212,6 +212,7 @@ interface SpecEngineerSummary {
 3. **替换 base interactions**：用上述集合替换 compiler 生成的 `{trigger: action, action: "navigate"}`。base action 覆盖由 gate `SPEC_ACTION_MISSING` 保证。
 4. **去重**：按 `JSON.stringify({trigger, action, target, nodeId})` 去重，保留首次出现；顺序为 transitions 后 triggers。
 5. 不在 trigger 上强行推导 `target`：trigger.reaction 是 prose，不做字符串匹配；导航语义只来自 transitions。
+6. trigger 数量可以多于 brief `actions`：M1 interaction spec 会建模 tab、刷新、筛选、错误重试等系统交互；gate 只要求 brief actions 被覆盖，不把额外 trigger 当作 orphan。
 
 ### 5.3 States
 
@@ -282,7 +283,6 @@ interface SpecEngineerSummary {
 | `SPEC_PAGE_MISSING` | blocker | brief 页面在 interaction spec 中缺失 |
 | `SPEC_PAGE_UNKNOWN` | blocker | interaction spec 有 brief 外页面 |
 | `SPEC_ACTION_MISSING` | blocker | brief page action 没有被任何 trigger 覆盖 |
-| `SPEC_ACTION_ORPHAN` | warning | trigger action 不在 brief page actions 中 |
 | `SPEC_STATE_MISSING` | blocker | interaction state key 没有进入 Page Spec states（映射后不应出现） |
 | `SPEC_STATE_UNMAPPED` | warning | base state 没有 interaction 描述 |
 | `SPEC_TRANSITION_PAGE_UNKNOWN` | blocker | transition from/to 不是 brief 页面 |
@@ -364,14 +364,14 @@ pnpm spec:engineer \
 
 ## 9. 验收标准
 
-- [ ] `pnpm spec:engineer` 能消费一个 employee-app M1 run，产出 2 个增强 Page Spec。
-- [ ] 每个 brief action 在 Page Spec 中有 trigger/action；每个 interaction state 进入 Page Spec。
-- [ ] Page Spec 的 `motion` 只引用 M1 token；preset/binding/page 校验通过。
-- [ ] Page Spec 引用的 asset 都有 brief；未用 brief 记 warning。
-- [ ] 同一输入 byte-identical；`spec-engineer.json`/gate findings 齐全。
-- [ ] 现有 Phase 1 `2 pages / 0 blockers`、renderer、asset review、M1 回归不退化。
-- [ ] `pnpm test` ≥423；`pnpm test:dsh` 2 passed；typecheck clean。
-- [ ] 不修改 UI Brief、不调用模型、不做 Figma/Studio。
+- [x] `pnpm spec:engineer` 能消费一个 employee-app M1 run，产出 2 个增强 Page Spec。
+- [x] 每个 brief action 在 Page Spec 中有 trigger/action；每个 interaction state 进入 Page Spec。
+- [x] Page Spec 的 `motion` 只引用 M1 token；preset/binding/page 校验通过。
+- [x] Page Spec 引用的 asset 都有 brief；未用 brief 记 warning。
+- [x] 同一输入 byte-identical；`spec-engineer.json`/gate findings 齐全。
+- [x] 现有 Phase 1 `2 pages / 0 blockers`、renderer、asset review、M1 回归不退化。
+- [x] `pnpm test` ≥423；`pnpm test:dsh` 2 passed；typecheck clean。
+- [x] 不修改 UI Brief、不调用模型、不做 Figma/Studio。
 
 ## 10. 实施顺序
 
@@ -411,3 +411,12 @@ pnpm spec:engineer \
 - `pipeline/core/contracts/src/page-spec.ts` — Page Spec 契约。
 - `pipeline/core/compiler/src/compile-page-spec.ts` — base Page Spec 生成。
 - `pipeline/core/validators/src/semantic.ts` — 现有语义门禁。
+
+## 13. 验收记录（2026-10-20）
+
+- 实现：`core/spec-engineer`（apply/gates/run）、`PageSpec.interactions[].nodeId`、`PageSpec.motion`、agents artifact schema 导出、`pnpm spec:engineer`、`pipeline/docs/spec-engineer-v0.md`。
+- 测试：`pnpm test` **448 passed**（原 423）；`pnpm test:dsh` **2 passed**；`pnpm typecheck` clean。
+- 回归：employee-app Phase 1 `2 pages / 0 blockers`；standalone asset review `13/13`；renderer HTML 不变；M1 回归不退化。
+- 真实 employee-app clean M1 run 被消费：2 个增强 Page Spec；每页 10 条 interactions；states 覆盖 default/empty/loading/error/disabled/success；两页都有 motion；**0 blockers**；28 warnings（19 个 `SPEC_MOTION_NODE_UNRESOLVED`、9 个 `SPEC_ASSET_UNUSED`）；`assets.referenced=["inventory"]`，`missing=[]`。
+- 实现中修正：移除 `SPEC_ACTION_ORPHAN` warning。M1 interaction spec 会合法地包含 tab/刷新/筛选/错误重试等系统 trigger；gate 只要求 brief actions 被覆盖，不把额外 trigger 当 orphan。
+- 已知 v0 限制：motion 未动画到 HTML；未解析 nodeId 只记 warning；不做 Spec Repair；6 条 M1 非阻断 findings 不在范围。

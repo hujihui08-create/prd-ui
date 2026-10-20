@@ -59,12 +59,12 @@ package.json                             # spec:engineer script
 - Produces: `Interaction.nodeId?: string`, `PageMotion`, `PageMotionPreset`, `PageSpec.motion?`.
 - Produces: `IaMapArtifactSchema`, `IaFindingsArtifactSchema`, `IaProposedArtifactSchema`, `InteractionSpecArtifactSchema`, `MotionSpecArtifactSchema`, `VisualStyleArtifactSchema`, `AgentGateArtifactSchema` from `@prd-ui/agents`.
 
-- [ ] **Step 1: Add failing contract tests** for a Page Spec with `interactions[].nodeId` and `motion`, and for the old spec without `motion`.
-- [ ] **Step 2: Run `pnpm exec vitest run core/contracts/tests/contracts.test.ts`** — expect failure on unknown `motion`/`nodeId`.
-- [ ] **Step 3: Add the fields to the interfaces and Zod schemas** (`motion` strict, optional; `nodeId` optional).
-- [ ] **Step 4: Move the artifact schema constants from `run-m1.ts` to `artifacts.ts`; export from index; import in `run-m1.ts`.**
-- [ ] **Step 5: Run contracts + agents tests and typecheck.**
-- [ ] **Step 6: Commit `feat(contracts): add Page Spec motion and artifact schemas`.**
+- [x] **Step 1: Add failing contract tests** for a Page Spec with `interactions[].nodeId` and `motion`, and for the old spec without `motion`.
+- [x] **Step 2: Run `pnpm exec vitest run core/contracts/tests/contracts.test.ts`** — expect failure on unknown `motion`/`nodeId`.
+- [x] **Step 3: Add the fields to the interfaces and Zod schemas** (`motion` strict, optional; `nodeId` optional).
+- [x] **Step 4: Move the artifact schema constants from `run-m1.ts` to `artifacts.ts`; export from index; import in `run-m1.ts`.**
+- [x] **Step 5: Run contracts + agents tests and typecheck.**
+- [x] **Step 6: Commit `feat(contracts): add Page Spec motion and artifact schemas`.**
 
 ### Task 2: `core/spec-engineer` scaffold and apply mapping
 
@@ -80,11 +80,11 @@ package.json                             # spec:engineer script
 - `SpecEngineerResult { specs, gate, summary }`.
 - `applySpecs(input): PageSpec[]`; `collectAssetReferences(specs): AssetReference[]`.
 
-- [ ] **Step 1: Write failing tests** for: transition → navigate interaction; trigger → reaction/nodeId; base interactions replaced; states merged; motion filtered/resolved; designDefaults; asset references.
-- [ ] **Step 2: Run `pnpm exec vitest run core/spec-engineer/tests/apply.test.ts`** — fail.
-- [ ] **Step 3: Implement `apply.ts`** with deterministic ordering and no mutation of the input.
-- [ ] **Step 4: Run tests + typecheck.**
-- [ ] **Step 5: Commit `feat(spec-engineer): map M1 interactions, states, motion, assets`.**
+- [x] **Step 1: Write failing tests** for: transition → navigate interaction; trigger → reaction/nodeId; base interactions replaced; states merged; motion filtered/resolved; designDefaults; asset references.
+- [x] **Step 2: Run `pnpm exec vitest run core/spec-engineer/tests/apply.test.ts`** — fail.
+- [x] **Step 3: Implement `apply.ts`** with deterministic ordering and no mutation of the input.
+- [x] **Step 4: Run tests + typecheck.**
+- [x] **Step 5: Commit `feat(spec-engineer): map M1 interactions, states, motion, assets`.**
 
 ### Task 3: Deterministic gates
 
@@ -96,11 +96,11 @@ package.json                             # spec:engineer script
 - `runSpecEngineerGates({ brief, specs, interactionSpec, motionSpec, iaMap?, assetBriefs? }): SpecEngineerGate`.
 - Codes from the spec §6.
 
-- [ ] **Step 1: Write failing tests** for page/action/state/transition/motion/asset/IA gates; warnings for unused assets and unresolved motion nodeIds.
-- [ ] **Step 2: Run the focused test** — fail.
-- [ ] **Step 3: Implement gates** using `PageSpecSchema.safeParse` for `SPEC_SCHEMA` and layout traversal for node ids.
-- [ ] **Step 4: Run tests + typecheck.**
-- [ ] **Step 5: Commit `feat(spec-engineer): add deterministic gates`.**
+- [x] **Step 1: Write failing tests** for page/action/state/transition/motion/asset/IA gates; warnings for unused assets and unresolved motion nodeIds.
+- [x] **Step 2: Run the focused test** — fail.
+- [x] **Step 3: Implement gates** using `PageSpecSchema.safeParse` for `SPEC_SCHEMA` and layout traversal for node ids.
+- [x] **Step 4: Run tests + typecheck.**
+- [x] **Step 5: Commit `feat(spec-engineer): add deterministic gates`.**
 
 ### Task 4: `runSpecEngineer` and summary
 
@@ -113,10 +113,10 @@ package.json                             # spec:engineer script
 - `runSpecEngineer(input): Promise<SpecEngineerResult>`.
 - `SpecEngineerSummarySchema` includes `runId`, `project`, `agentRunId?`, `generatedAt`, `pages`, `motionPages`, `assets`, `gate`, `passed`, `error?`.
 
-- [ ] **Step 1: Write failing tests** for a full result, `SPEC_SCHEMA` failure, and byte-identical output across two runs.
-- [ ] **Step 2: Implement** apply → gates → summary; return specs even on gate failure so callers can inspect, but the CLI will not write them.
-- [ ] **Step 3: Run tests + typecheck.**
-- [ ] **Step 4: Commit `feat(spec-engineer): add run orchestration and summary`.**
+- [x] **Step 1: Write failing tests** for a full result, `SPEC_SCHEMA` failure, and byte-identical output across two runs.
+- [x] **Step 2: Implement** apply → gates → summary; return specs even on gate failure so callers can inspect, but the CLI will not write them.
+- [x] **Step 3: Run tests + typecheck.**
+- [x] **Step 4: Commit `feat(spec-engineer): add run orchestration and summary`.**
 
 ### Task 5: `pnpm spec:engineer` CLI
 
@@ -133,11 +133,11 @@ package.json                             # spec:engineer script
 - Loads `interaction-spec.json`, `motion-spec.json`, optional `ia-map.json`, optional `asset-briefs/*.json`.
 - Writes `artifacts/page-spec/*.json` only when the gate passes; always writes `findings/spec-engineer-gate.json` and `spec-engineer.json`.
 
-- [ ] **Step 1: Write failing CLI tests** using a temporary fixture M1 run: success path, `--json` one object, missing artifact -> exit 1, state failed -> exit 1, page specs absent on gate failure.
-- [ ] **Step 2: Implement the CLI** with `compileProject`, project/brief loading, envelope checks, and redacted summary.
-- [ ] **Step 3: Add the `spec:engineer` script and exports.**
-- [ ] **Step 4: Run focused tests + typecheck.**
-- [ ] **Step 5: Commit `feat(spec-engineer): add spec:engineer CLI`.**
+- [x] **Step 1: Write failing CLI tests** using a temporary fixture M1 run: success path, `--json` one object, missing artifact -> exit 1, state failed -> exit 1, page specs absent on gate failure.
+- [x] **Step 2: Implement the CLI** with `compileProject`, project/brief loading, envelope checks, and redacted summary.
+- [x] **Step 3: Add the `spec:engineer` script and exports.**
+- [x] **Step 4: Run focused tests + typecheck.**
+- [x] **Step 5: Commit `feat(spec-engineer): add spec:engineer CLI`.**
 
 ### Task 6: Regression, real run, docs
 
@@ -146,12 +146,12 @@ package.json                             # spec:engineer script
 - Modify: `README.md`, `AGENTS.md`, `CHANGELOG.md`
 - Test: full suite + real employee M1 run.
 
-- [ ] **Step 1: Run `pnpm test`, `pnpm typecheck`, `pnpm test:dsh`, phase1 `2/0`, standalone asset review `13/13`.**
-- [ ] **Step 2: Run `pnpm spec:engineer --project samples/projects/employee-app/project.yaml --agent-run /tmp/slice-final-clean/<runId> --runs /tmp/spec-engineer-runs`; confirm gate pass and 2 page specs.**
-- [ ] **Step 3: Inspect the enriched Page Specs** for interactions/states/motion/assets; verify `spec-engineer.json` assets warnings are expected.
-- [ ] **Step 4: Write `pipeline/docs/spec-engineer-v0.md`** (usage, artifacts, gates, exit codes, v0 limits).
-- [ ] **Step 5: Update README/AGENTS/CHANGELOG.**
-- [ ] **Step 6: Commit `docs: record Spec Engineer v0 implementation`.**
+- [x] **Step 1: Run `pnpm test`, `pnpm typecheck`, `pnpm test:dsh`, phase1 `2/0`, standalone asset review `13/13`.**
+- [x] **Step 2: Run `pnpm spec:engineer --project samples/projects/employee-app/project.yaml --agent-run /tmp/slice-final-clean/<runId> --runs /tmp/spec-engineer-runs`; confirm gate pass and 2 page specs.**
+- [x] **Step 3: Inspect the enriched Page Specs** for interactions/states/motion/assets; verify `spec-engineer.json` assets warnings are expected.
+- [x] **Step 4: Write `pipeline/docs/spec-engineer-v0.md`** (usage, artifacts, gates, exit codes, v0 limits).
+- [x] **Step 5: Update README/AGENTS/CHANGELOG.**
+- [x] **Step 6: Commit `docs: record Spec Engineer v0 implementation`.**
 
 ## Self-Review
 

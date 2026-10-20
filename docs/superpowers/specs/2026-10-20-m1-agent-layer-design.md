@@ -501,5 +501,5 @@ Interaction Gate   Visual Style Gate
 - IA 初次发现 3 个切片 blocker（死 Tab、库存无入口、库管死路），随后又发现快捷入口
   权限错配；已通过 brief/PRD 修复（见 `pipeline/docs/agent-m1-uat.md` §4）。
   最终 IA-only run `IA gate=passed`、0 blockers。
-- 已知边界：Interaction spec 尚未被 Page Spec 消费；没有签核 UI；`--allow-unreviewed`
+- 已知边界：Spec Engineer v0 已消费 interaction/motion/asset 到 Page Spec，但 motion 尚未动画到 HTML；没有签核 UI；`--allow-unreviewed`
   永不产生 `success`；asset briefs 为兼容 M0 不带 envelope。

@@ -8,6 +8,7 @@
 - **M0 资产评审**：10 个 Lucide 图标 + 3 个 test-fixture 插画走 A 库，经过规范化、硬门禁、独立 reviewer、重试/切源/预算/审计，产出 `asset-review.json` 和 `manifest.json`。
 - **硬化（M0.5）**：H1–H15 已实现——全元素 SVG 门禁、图标/插画 set 级一致性门禁、reviewer 错误隔离、严格配置/provider 校验、dsh usage 成本核算与 10 元全局护栏、2x PNG 证据、`--json -` stdin 传输、append-only `log.ndjson`、raw review sidecar、一次 schema 修复、`manifest.review.json` 与统一脱敏。
 - **M1 Agent 层**：IA / Interaction / Visual Style 三个只读 Agent，共享 `AgentRunnerPort`，确定性门禁、预算、重试、失败隔离、证据与人工 signoff；`pnpm agent:run` 可离线（scripted fixtures）或走真实 dsh。产物是 `ia-map` / `interaction-spec` / `motion-spec` / `visual-style` / `asset-briefs`，不修改 Page Spec、HTML 或 renderer。
+- **Spec Engineer v0**：确定性 mapper，把 M1 的 interaction/motion/asset artifacts 写进 Page Spec；新增可选 `interactions[].nodeId` 与 `motion`，输出 gate/summary。motion 已携带、尚未动画到 HTML。
 - **双运行时**：同一 core 状态机；`standalone` 用 scripted reviewer 跑 CI，`dsh` 用 headless + vision 模型跑真实评审。默认 provider 是 DeepSeek（`deepseek-flash`），没有 OpenAI fallback。
 - **dsh 适配**：项目内 pinned profile（`@deepseek-ai/dsh@0.2.1-rc.2`），插件可加载；真实评审需要配置 vision key。
 
@@ -57,6 +58,12 @@ pnpm agent:run \
   --project samples/projects/employee-app/project.yaml \
   --runs /tmp/m1-agent-runs \
   --allow-unreviewed
+
+# Spec Engineer v0：消费 M1 run，输出增强 Page Spec
+pnpm spec:engineer \
+  --project samples/projects/employee-app/project.yaml \
+  --agent-run /tmp/m1-agent-runs/<runId> \
+  --runs /tmp/spec-engineer-runs
 ```
 
 ## M1 Agent 层
@@ -99,6 +106,22 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - 产物布局、签核格式、门禁代码和退出码见 [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md)。
 
 > 真实 `deepseek-flash` 三 Agent 回归（clean run）：`status=success`，`gates={ia:passed, interaction:passed, visualStyle:passed}`，10 个 asset briefs，**¥0.1973**，`usageComplete=true`，不需要 waiver。employee-app 切片已按 IA 发现修复死 Tab、库存入口、库管落地和权限错配；早前带开发 waiver 的 run 为 ¥0.2081 / ¥0.2487。
+
+## Spec Engineer v0
+
+```bash
+cd pipeline
+pnpm spec:engineer \
+  --project samples/projects/employee-app/project.yaml \
+  --agent-run /tmp/m1-agent-runs/<runId> \
+  --runs /tmp/spec-engineer-runs
+```
+
+- 读取 M1 `state.json`（`success` / `awaiting_signoff` / `partial`）、`interaction-spec.json`、`motion-spec.json`、可选 `ia-map.json` 与 `asset-briefs/*`。
+- 输出 `artifacts/page-spec/*.json`（只有 gate 通过时）、`findings/spec-engineer-gate.json`、`spec-engineer.json`。
+- Page Spec 新增可选 `interactions[].nodeId` 与 `motion`；已有 Page Spec 不受影响。
+- 真实 employee-app clean M1 run：2 个 Page Spec，interactions 各 10 条，states 覆盖六种，motion 两页都有；**0 blockers**，28 warnings（19 个未解析 nodeId、9 个未用 asset brief，均为 v0 预期）。
+- 用法、映射、门禁和限制见 [`pipeline/docs/spec-engineer-v0.md`](pipeline/docs/spec-engineer-v0.md)。
 
 ## M0 资产评审
 
@@ -159,7 +182,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 测试与验收
 
-- `pnpm test`：423 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：448 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：2 tests（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；分别是 asset review 和 M1 IA；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。
@@ -167,6 +190,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - `pnpm asset:review ... --assets samples/assets/m0 --runtime dsh`（真实 `deepseek-flash`）：`13 assets / 13 passed`。
 - `pnpm agent:run ... --runtime standalone`：三个 Agent 产物齐全；缺签核时 `awaiting_signoff`，签核后 `success`。
 - `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.1973，`usageComplete=true`，无 waiver。
+- `pnpm spec:engineer --agent-run <clean M1 run>`：2 个增强 Page Spec，0 blockers，28 warnings（v0 预期）。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 
@@ -177,10 +201,12 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 | 当前设计 | [`docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md`](docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md) |
 | M1 Agent 设计 | [`docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`](docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md) |
 | Phase 2 Spec Engineer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md) |
+| Phase 2 Spec Engineer 计划 | [`docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md`](docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md) |
 | M1 实施计划 | [`docs/superpowers/plans/2026-10-20-m1-agent-layer.md`](docs/superpowers/plans/2026-10-20-m1-agent-layer.md) |
 | M0 使用说明 | [`pipeline/docs/asset-review-m0.md`](pipeline/docs/asset-review-m0.md) |
 | M1 使用说明 | [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md) |
 | M1 UAT 矩阵 | [`pipeline/docs/agent-m1-uat.md`](pipeline/docs/agent-m1-uat.md) |
+| Spec Engineer v0 使用说明 | [`pipeline/docs/spec-engineer-v0.md`](pipeline/docs/spec-engineer-v0.md) |
 | dsh profile / key | [`pipeline/dsh/README.md`](pipeline/dsh/README.md) |
 | 交接文档 | [`docs/handoffs/2026-10-20-prd-ui-agent-dsh-handoff.md`](docs/handoffs/2026-10-20-prd-ui-agent-dsh-handoff.md) |
 | 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) |
@@ -191,8 +217,8 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - dsh 的 key 只在本地 `pipeline/.env`，不提交；`.env` 不会自动加载，需要 `set -a; . ./.env; set +a`。换环境需要重新配置。未配置时 profile 能加载、插件能激活，但 review 会以 `MISSING_CREDENTIAL` 失败，不会伪造 pass。
 - `pnpm test:dsh` 需要 `node_modules/.bin/dsh`（`pnpm install` 后可用）；缺失时测试失败并提示安装，只有 `SKIP_DSH=1` 才跳过。
 - M0 只接 A 库真实文件；B/C 的 adapter 接口和状态机已实现，真实供应商在 M2。
-- M1 只产出 IA/Interaction/Visual spec 与 findings；不编译 Page Spec、不渲染 HTML、不跑资产评审，Interaction spec 尚未被 Page Spec 消费（Phase 2）。
+- M1 只产出 IA/Interaction/Visual spec 与 findings；Spec Engineer v0 已把 interaction/motion/asset 写进 Page Spec，但 motion 尚未动画到 HTML，未解析的 motion nodeId 只记 warning。
 - M1 没有签核 UI；CLI 只校验 `signoff/*.md` 的机器可读块。`--allow-unreviewed` 不会产生 `success`。
-- 不做 PRD Reviewer、UI Briefer、Spec Engineer；不做 Figma、截图 diff、录屏/trace（M3）。
+- Spec Engineer v0 是确定性 mapper，不做 Spec Repair；gate 失败只写 findings。不做 PRD Reviewer、UI Briefer；不做 Figma、截图 diff、录屏/trace（M3）。
 - 插画 fixture 是 test-fixture，不是最终品牌资产。
 - 不 push；本地 commit。

@@ -3,6 +3,43 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — Phase 2 Spec Engineer v0 (implemented)
+
+### Added
+
+- `core/spec-engineer`: deterministic mapper that applies M1 interaction,
+  motion, IA, and asset artifacts to Page Specs; no model calls.
+- Backward-compatible Page Spec extensions: optional
+  `interactions[].nodeId` and top-level `motion` (presets, page bindings,
+  reducedMotion).
+- `pnpm spec:engineer`: loads an M1 run and the project brief, writes
+  `artifacts/page-spec/*.json` only when the gate passes, plus
+  `findings/spec-engineer-gate.json`, `spec-engineer.json`, and run logs.
+- Deterministic gates: page/action/state/transition coverage, motion
+  preset/token checks, asset brief linkage, optional IA drift warnings.
+- M1 artifact schemas exported from `@prd-ui/agents` for consumers.
+- Usage: `pipeline/docs/spec-engineer-v0.md`.
+
+### Verification
+
+- `pnpm test`: **448 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
+- employee-app Phase 1: `2 pages / 0 blockers`; standalone asset review:
+  `13/13 passed`.
+- Real employee-app clean M1 run consumed: 2 enriched Page Specs,
+  10 interactions per page, six states
+  (default/empty/loading/error/disabled/success), motion on both pages,
+  **0 blockers**, 28 expected warnings (19 unresolved motion node ids,
+  9 unused asset briefs), `assets.missing=[]`.
+
+### Limits
+
+- Motion is carried in Page Spec but not yet animated by the HTML renderer
+  (v0.1).
+- Unresolved motion node ids are warnings until the compiler emits stable node
+  ids.
+- No Spec Repair, PRD Reviewer, or UI Briefer; the 6 non-blocking M1 slice
+  findings remain out of scope.
+
 ## 2026-10-20 — Phase 2 Spec Engineer v0 spec (draft)
 
 - Added the Phase 2 Spec Engineer v0 design: a deterministic mapper that
@@ -11,7 +48,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - Defines backward-compatible `PageSpec.interactions[].nodeId` and optional
   `PageSpec.motion`, deterministic gates, a `pnpm spec:engineer` CLI, and the
   T-P2-01..15 test matrix.
-- Status: draft for review; no runtime behavior changed.
+- Status: superseded by the implemented entry above.
 - Spec: `docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`
 
 ## 2026-10-20 — employee-app slice IA blockers fixed

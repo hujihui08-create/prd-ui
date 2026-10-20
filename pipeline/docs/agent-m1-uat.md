@@ -102,4 +102,4 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - 真实 dsh 的门禁修复没有诱发；scripted 测试覆盖 2 轮上限。
 - `asset-briefs/*` 已用 M0 `AssetBriefSchema` 解析通过；没有跑完整 M0 asset review，因为需要匹配的 library/style pack。
 - 没有浏览器/视觉评审 M1 产物（M3 Visual Critic 范围）。
-- Interaction spec 尚未被 Page Spec 消费（Phase 2）。
+- Spec Engineer v0 已消费 interaction/motion/asset 到 Page Spec；motion 尚未动画到 HTML。

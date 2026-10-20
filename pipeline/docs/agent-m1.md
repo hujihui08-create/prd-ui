@@ -172,7 +172,7 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
 ## 限制
 
 - M1 不编译 Page Spec、不渲染 HTML、不跑资产评审；`asset-briefs/*` 供 M0 流程或 Phase 2 消费。
-- Interaction spec / motion spec 尚未被 Page Spec 消费（Phase 2）。
+- Spec Engineer v0 已把 interaction/motion/asset 写进 Page Spec；motion 尚未动画到 HTML（v0.1）。
 - 没有签核 UI；CLI 只校验文件内容。
 - `--allow-unreviewed` 仅用于开发冒烟，不会产生 `success`。
 - `prd-ui-agents` profile 没有工具插件，但 dsh base 自身的能力边界不属于 M1 的沙箱范围。
