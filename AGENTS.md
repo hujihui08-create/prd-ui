@@ -124,6 +124,7 @@ warehouse dead-end, quick-action permission mismatch) are fixed.
 
 - `docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` — current core/runtime design.
 - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md` — M1 agent layer contracts, gates, budgets, signoffs.
+- `docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md` — Phase 2 Spec Engineer v0: consume M1 specs into Page Spec.
 - `pipeline/docs/agent-m1.md` — M1 usage, artifacts, signoff format, exit codes.
 - `pipeline/docs/agent-m1-uat.md` — M1 T-M1-01..20 matrix and real-run evidence.
 - `pipeline/docs/asset-review-m0.md` — asset-review usage, artifacts, exit codes.

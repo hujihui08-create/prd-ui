@@ -176,6 +176,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 |---|---|
 | 当前设计 | [`docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md`](docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md) |
 | M1 Agent 设计 | [`docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`](docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md) |
+| Phase 2 Spec Engineer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md) |
 | M1 实施计划 | [`docs/superpowers/plans/2026-10-20-m1-agent-layer.md`](docs/superpowers/plans/2026-10-20-m1-agent-layer.md) |
 | M0 使用说明 | [`pipeline/docs/asset-review-m0.md`](pipeline/docs/asset-review-m0.md) |
 | M1 使用说明 | [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md) |

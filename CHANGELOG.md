@@ -3,6 +3,17 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — Phase 2 Spec Engineer v0 spec (draft)
+
+- Added the Phase 2 Spec Engineer v0 design: a deterministic mapper that
+  consumes M1 interaction/motion/IA/asset artifacts and produces enriched Page
+  Specs with interactions, states, motion bindings, and asset references.
+- Defines backward-compatible `PageSpec.interactions[].nodeId` and optional
+  `PageSpec.motion`, deterministic gates, a `pnpm spec:engineer` CLI, and the
+  T-P2-01..15 test matrix.
+- Status: draft for review; no runtime behavior changed.
+- Spec: `docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`
+
 ## 2026-10-20 — employee-app slice IA blockers fixed
 
 - Added optional `ui-brief.ia.landingByRole` (role → page id) so a role can have
