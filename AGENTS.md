@@ -49,15 +49,16 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 421 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 423 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
 `usageSource=json-events`, `usageComplete=true`, review cost ≈¥0.35
 (10 CNY default cap). M1 real dsh: three agents, `success`,
-`gates={ia:waived, interaction:passed, visualStyle:passed}`, 10 asset briefs,
-¥0.2081, `usageComplete=true`; the same slice without signoffs stops at
-`awaiting_signoff` (¥0.2756). Final-code rerun: ¥0.2487.
+`gates={ia:passed, interaction:passed, visualStyle:passed}`, 10 asset briefs,
+¥0.2319, `usageComplete=true`, no waiver. Earlier waived runs were ¥0.2081 /
+¥0.2487; the employee-app slice IA blockers (dead tabs, missing inventory entry,
+warehouse dead-end, quick-action permission mismatch) are fixed.
 
 ## Architecture boundaries
 

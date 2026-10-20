@@ -125,6 +125,9 @@ export function buildIaPrompt(input: IaPromptInput): string {
       pages,
       navigation: input.brief.ia.navigation,
       flows: input.brief.ia.flows,
+      ...(input.brief.ia.landingByRole === undefined
+        ? {}
+        : { landingByRole: input.brief.ia.landingByRole }),
     },
     traceability: input.brief.traceability,
     openQuestions: input.brief.openQuestions,
@@ -162,6 +165,7 @@ export function buildIaPrompt(input: IaPromptInput): string {
     "## Output rules",
     "- Every page id in the UI Brief must appear exactly once in map.pages.",
     "- Flow steps, crossLinks, and parentId must reference existing page ids.",
+    "- If the brief declares landingByRole, treat the configured page as that role's valid entry point.",
     "- Finding ids must be unique (IA-001, IA-002, ...).",
     "- reviewMarkdown is a concise human summary with decisions still needed.",
     "",

@@ -107,6 +107,7 @@ export const archetypes: ArchetypeDef[] = [
       "Skeleton",
       "ErrorState",
       "Button",
+      "TabBar",
     ],
     requiredStates: ["default", "empty", "loading", "error"],
   },

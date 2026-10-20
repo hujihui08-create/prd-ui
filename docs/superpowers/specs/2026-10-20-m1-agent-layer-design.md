@@ -491,17 +491,15 @@ Interaction Gate   Visual Style Gate
 - 实现：`core/agents`（契约/role schemas/prompts/gates/`runM1`）、`agent:run` CLI、
   ScriptedAgentRunner、DshAgentRunner、`prd-ui-agents` dsh profile、employee-app
   M1 sample inputs 与 fixtures。
-- 测试：`pnpm test` **421 passed**（原 350）；`pnpm test:dsh` **2 passed**（asset review
+- 测试：`pnpm test` **423 passed**（原 350）；`pnpm test:dsh` **2 passed**（asset review
   + M1 IA，真实 pinned dsh + 本地 mock）；`pnpm typecheck` clean。
 - 回归：employee-app `Phase 1A OK: 2 pages, 0 blockers`；standalone asset review
   `13 assets / 13 passed`。
 - 真实 dsh（`deepseek-flash`）：三 Agent 各 1 次调用，无 schema repair、无门禁修复；
-  `status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，
-  10 个 asset briefs，**¥0.2487**（最终代码复跑；早前一次 ¥0.2081），
-  `usageComplete=true`。另一次只用
-  `--allow-unreviewed` 的 run 按设计停在 `awaiting_signoff`（¥0.2756）。
-- IA 在 employee-app 切片上发现 3 个真实 blocker（3 个死 Tab、brief 缺少库存入口、
-  库管无落地页）；真实 run 用开发 waiver 继续以验证 Interaction/Visual。这些是
-  切片本身待修的问题，不是门禁误报。
+  `status=success`，`gates={ia:passed, interaction:passed, visualStyle:passed}`，
+  10 个 asset briefs，**¥0.2319**，`usageComplete=true`，无需 waiver。
+- IA 初次发现 3 个切片 blocker（死 Tab、库存无入口、库管死路），随后又发现快捷入口
+  权限错配；已通过 brief/PRD 修复（见 `pipeline/docs/agent-m1-uat.md` §4）。
+  最终 IA-only run `IA gate=passed`、0 blockers。
 - 已知边界：Interaction spec 尚未被 Page Spec 消费；没有签核 UI；`--allow-unreviewed`
   永不产生 `success`；asset briefs 为兼容 M0 不带 envelope。

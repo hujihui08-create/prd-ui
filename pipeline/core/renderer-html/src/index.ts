@@ -102,6 +102,7 @@ function illustrationSvg(name: string): string {
 
 const tabIcons: Record<string, string> = {
   今日: "home",
+  库存查询: "inventory_2",
   客户: "person",
   工作台: "grid_view",
   我的: "settings",

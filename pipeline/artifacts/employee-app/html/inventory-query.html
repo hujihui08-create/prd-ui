@@ -182,8 +182,8 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
   <a href="?state=loading">加载</a>
   <a href="?state=error">失败</a>
 </nav>
-  <div class="app ">
-  <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">库存查询</h1></header>
+  <div class="app has-tabs">
+  
   <main class="app-scroll"><section class="section" style="padding:var(--space-4);gap:var(--space-2)"><div class="searchbar">
   <span class="material-symbols-rounded search-icon">search</span>
   <span class="search-placeholder">搜索产品名称 / 规格</span>
@@ -286,7 +286,13 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
   <div class="empty-desc">试试清空筛选或更换关键词</div>
   <div class="empty-actions"><button class="btn secondary" type="button">清空筛选</button></div>
 </div></section></main>
-  
+  <nav class="tabbar"><div class="tabbar-inner"><a class="tab " href="#">
+  <span class="material-symbols-rounded tab-icon">home</span>
+  <span class="tab-label">今日</span>
+</a><a class="tab active" href="#">
+  <span class="material-symbols-rounded tab-icon">inventory_2</span>
+  <span class="tab-label">库存查询</span>
+</a></div></nav>
   
   <div class="state-panel loading" aria-hidden="true">
     <div class="skeleton short"></div>

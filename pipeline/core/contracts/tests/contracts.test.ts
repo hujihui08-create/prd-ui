@@ -391,4 +391,17 @@ describe("contracts", () => {
     };
     expect(ProjectConfigSchema.parse(config).prd).toBe("prd.md");
   });
+
+  it("accepts role landing rules in a brief", () => {
+    const brief = {
+      ...minimalBrief,
+      ia: {
+        ...minimalBrief.ia,
+        landingByRole: { admin: "orders-list" },
+      },
+    };
+    expect(UiBriefSchema.parse(brief).ia.landingByRole).toEqual({
+      admin: "orders-list",
+    });
+  });
 });

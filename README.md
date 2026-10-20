@@ -98,7 +98,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 - `--allow-unreviewed` 只用于开发冒烟，最终状态必须是 `awaiting_signoff`，不会产生 `success`。
 - 产物布局、签核格式、门禁代码和退出码见 [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md)。
 
-> 真实 `deepseek-flash` 三 Agent 回归：`status=success`，`gates={ia:waived, interaction:passed, visualStyle:passed}`，10 个 asset briefs，**¥0.2487**（最终代码复跑；早前一次 ¥0.2081），`usageComplete=true`。同一切片只用 `--allow-unreviewed` 时按设计停在 `awaiting_signoff`（¥0.2756）。
+> 真实 `deepseek-flash` 三 Agent 回归（clean run）：`status=success`，`gates={ia:passed, interaction:passed, visualStyle:passed}`，10 个 asset briefs，**¥0.2319**，`usageComplete=true`，不需要 waiver。employee-app 切片已按 IA 发现修复死 Tab、库存入口、库管落地和权限错配；早前带开发 waiver 的 run 为 ¥0.2081 / ¥0.2487。
 
 ## M0 资产评审
 
@@ -159,14 +159,14 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 测试与验收
 
-- `pnpm test`：421 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：423 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：2 tests（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；分别是 asset review 和 M1 IA；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。
 - `pnpm asset:review ... --assets samples/assets/m0 --runtime standalone`：`13 assets / 13 passed`。
 - `pnpm asset:review ... --assets samples/assets/m0 --runtime dsh`（真实 `deepseek-flash`）：`13 assets / 13 passed`。
 - `pnpm agent:run ... --runtime standalone`：三个 Agent 产物齐全；缺签核时 `awaiting_signoff`，签核后 `success`。
-- `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.2487，`usageComplete=true`。
+- `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.2319，`usageComplete=true`，无 waiver。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 

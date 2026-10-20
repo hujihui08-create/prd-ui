@@ -74,6 +74,8 @@ export interface UiBrief {
     pages: UiBriefPage[];
     navigation: { primary: string[]; tabs?: string[] };
     flows: Array<{ id: string; steps: string[] }>;
+    /** Optional role -> page id landing rule, used by the M1 IA review. */
+    landingByRole?: Record<string, string>;
   };
   data: {
     entities: Array<{
@@ -216,6 +218,9 @@ export const UiBriefSchema = z
           })
           .strict(),
         flows: z.array(z.object({ id: z.string(), steps: z.array(z.string()) }).strict()),
+        landingByRole: z
+          .record(z.string().min(1), z.string().min(1))
+          .optional(),
       })
       .strict(),
     data: z

@@ -7,7 +7,7 @@
           "name": "今日",
           "route": "/today",
           "level": 1,
-          "roles": ["store_manager", "beautician", "front_desk"],
+          "roles": ["store_manager", "beautician", "front_desk", "warehouse"],
           "entryPoints": ["tab"]
         },
         {
@@ -15,13 +15,13 @@
           "name": "库存查询",
           "route": "/inventory",
           "level": 1,
-          "roles": ["store_manager", "warehouse"],
-          "entryPoints": ["quick-action"]
+          "roles": ["store_manager", "warehouse", "beautician", "front_desk"],
+          "entryPoints": ["tab", "role-landing"]
         }
       ],
       "navigation": {
-        "primary": ["今日", "客户", "工作台", "我的"],
-        "tabs": ["今日", "客户", "工作台", "我的"]
+        "primary": ["今日", "库存查询"],
+        "tabs": ["今日", "库存查询"]
       },
       "flows": [
         {
@@ -34,33 +34,15 @@
         { "from": "today", "to": "inventory-query", "kind": "quick-action" }
       ]
     },
-    "findings": {
-      "findings": [
-        {
-          "id": "IA-001",
-          "severity": "major",
-          "area": "scope",
-          "evidence": "navigation.tabs = 今日/客户/工作台/我的",
-          "issue": "首版只实现今日与库存查询；客户、工作台、我的没有落地页。",
-          "proposal": "保留四个 Tab 的视觉占位，并在 brief 中明确后三者属于后续切片。"
-        },
-        {
-          "id": "IA-002",
-          "severity": "minor",
-          "area": "navigation",
-          "evidence": "PRD 主流程：今日 -> 库存快捷入口 -> 库存查询",
-          "issue": "库存查询不是底部 Tab，入口应来自今日的快捷操作。",
-          "proposal": "将 inventory-query 的 entryPoints 改为 quick-action。"
-        }
-      ]
-    },
+    "findings": { "findings": [] },
     "proposed": {
       "notes": [
-        "客户、工作台、我的延后到后续切片。",
-        "库存查询从今日快捷入口进入，不占用底部 Tab。"
+        "M1 启用今日与库存查询两个 Tab；客户、工作台、我的延后。",
+        "两页对全部门店角色只读开放；库管登录后落地库存查询。",
+        "开单/预约在目标流程就绪前不作为可点击动作。"
       ]
     },
-    "reviewMarkdown": "# IA review\n\n- 两页主链路 today -> inventory-query 连续。\n- 导航包含三个未实现 Tab，记为 major，不阻断首版。\n- 建议把 inventory-query 的入口从 tab 改为 quick-action。"
+    "reviewMarkdown": "# IA review\n\n- 今日与库存查询均为底部 Tab，所有门店角色可读。\n- 库管登录后落地库存查询，不存在权限死路。\n- 开单/预约不在 M1 动作范围，避免无目标页的死链接。\n- 无 blocker。"
   },
   "usage": { "inputTokens": 4200, "outputTokens": 1800, "cacheReadTokens": 0 },
   "usageComplete": true

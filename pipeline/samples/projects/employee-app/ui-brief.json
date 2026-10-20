@@ -22,22 +22,21 @@
       {
         "id": "today",
         "name": "今日",
-        "purpose": "查看当天预约与待回访，快速开单或预约",
+        "purpose": "查看当天预约与待回访，查询库存",
         "archetype": "home",
         "target": "mobile",
         "profile": "b-mobile",
         "route": "/today",
-        "roles": ["store_manager", "beautician", "front_desk"],
+        "roles": ["store_manager", "beautician", "front_desk", "warehouse"],
         "requiredStates": ["default", "empty", "loading", "error"],
         "reqRefs": ["REQ-EMP-001"],
-        "actions": ["开单", "预约"],
+        "actions": ["库存查询"],
         "emptyTitle": "今天没有预约",
         "content": {
           "storeName": "星光店",
-          "hasMessage": true,
+          "hasMessage": false,
           "quickActions": [
-            { "label": "开单", "icon": "receipt", "tone": "neutral" },
-            { "label": "预约", "icon": "calendar", "tone": "neutral" }
+            { "label": "库存查询", "icon": "inventory", "tone": "inventory" }
           ],
           "appointments": [
             {
@@ -85,7 +84,7 @@
         "target": "mobile",
         "profile": "b-mobile",
         "route": "/inventory",
-        "roles": ["store_manager", "warehouse"],
+        "roles": ["store_manager", "warehouse", "beautician", "front_desk"],
         "requiredStates": ["default", "empty", "loading", "error"],
         "reqRefs": ["REQ-EMP-002"],
         "fields": ["当前库存", "可用库存"],
@@ -160,15 +159,18 @@
       }
     ],
     "navigation": {
-      "primary": ["今日", "客户", "工作台", "我的"],
-      "tabs": ["今日", "客户", "工作台", "我的"]
+      "primary": ["今日", "库存查询"],
+      "tabs": ["今日", "库存查询"]
     },
     "flows": [
       {
         "id": "daily-workspace",
         "steps": ["today", "inventory-query"]
       }
-    ]
+    ],
+    "landingByRole": {
+      "warehouse": "inventory-query"
+    }
   },
   "data": {
     "entities": [
@@ -210,6 +212,10 @@
     {
       "id": "A-001",
       "statement": "This project is a two-page vertical slice of the employee mini-program PRD; other modules are out of scope."
+    },
+    {
+      "id": "A-002",
+      "statement": "M1 启用今日与库存查询两个 Tab；库管登录后落地库存查询，两页对全部门店角色只读开放。"
     }
   ],
   "traceability": {

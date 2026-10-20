@@ -12,17 +12,16 @@
             }
           ],
           "triggers": [
-            { "nodeId": "quick-open-order", "action": "开单", "reaction": "打开开单流程首页" },
-            { "nodeId": "quick-appointment", "action": "预约", "reaction": "打开预约表单" },
+            { "nodeId": "quick-inventory", "action": "库存查询", "reaction": "打开库存查询页" },
             { "nodeId": "appointment-row", "action": "查看预约详情", "reaction": "展开预约详情浮层" }
           ],
           "states": {
-            "default": ["门店顶栏", "快捷操作", "我的预约列表", "待回访列表"],
+            "default": ["门店顶栏", "库存快捷操作", "我的预约列表", "待回访列表"],
             "loading": ["顶栏骨架", "快捷操作骨架", "列表骨架"],
             "empty": ["今天没有预约", "暂无待回访"],
             "error": ["错误说明", "重试按钮"]
           },
-          "focusOrder": ["quick-open-order", "quick-appointment", "appointments", "callbacks"],
+          "focusOrder": ["quick-inventory", "appointments", "callbacks"],
           "keyboard": [
             { "key": "Tab", "action": "按焦点顺序移动" },
             { "key": "Enter", "action": "触发当前操作" }
@@ -79,7 +78,7 @@
       },
       "reducedMotion": { "fallback": "fade" }
     },
-    "reviewMarkdown": "# Interaction review\n\n- 今日的两个主操作都有 reaction，状态矩阵覆盖 default/loading/empty/error。\n- 库存查询的搜索、筛选、预警开关都有明确反应。\n- 动效只使用 120/200/320ms token，并声明 reducedMotion=fade。\n- 首版没有破坏性操作，确认项为空。"
+    "reviewMarkdown": "# Interaction review\n\n- 今日的库存查询操作有明确 reaction，预约列表可展开详情；状态矩阵覆盖 default/loading/empty/error。\n- 库存查询的搜索、筛选、预警开关都有明确反应。\n- 动效只使用 120/200/320ms token，并声明 reducedMotion=fade。\n- 首版没有破坏性操作，确认项为空。"
   },
   "usage": { "inputTokens": 5200, "outputTokens": 2600, "cacheReadTokens": 0 },
   "usageComplete": true

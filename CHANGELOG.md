@@ -3,6 +3,22 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — employee-app slice IA blockers fixed
+
+- Added optional `ui-brief.ia.landingByRole` (role → page id) so a role can have
+  an explicit landing page; the M1 IA prompt surfaces it.
+- Fixed the employee-app slice from the real IA findings: navigation is now
+  `今日` + `库存查询` (both tabs reachable), 今日 has a 库存查询 quick action,
+  inventory is read-only for all store roles, warehouse lands on inventory, and
+  the unbacked 开单/预约 actions plus the orphan message entry are removed.
+- PRD, brief assumptions, scripted IA/interaction fixtures, and the UAT record
+  are aligned with the fixed slice.
+- Real `deepseek-flash` IA now reports **0 blockers**; the final signed
+  three-agent run is `success` with `gates={ia:passed, interaction:passed,
+  visualStyle:passed}`, 10 asset briefs, **¥0.2319**, `usageComplete=true`, and
+  no waiver.
+- `pnpm test`: 423 tests (was 421); Phase 1 remains `2 pages / 0 blockers`.
+
 ## 2026-10-20 — M1 agent layer (implemented)
 
 ### Added

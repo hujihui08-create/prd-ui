@@ -390,15 +390,18 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
     case "inventory-list": {
       const content = page.content ?? {};
       const products = content.products ?? [];
+      const activeTab = tabs.includes(page.name)
+        ? page.name
+        : (tabs[1] ?? tabs[0] ?? "");
 
       return {
         type: "MobileShell",
         props: {
           title: page.name,
           tabs,
-          showTabs: false,
-          back: true,
-          activeTab: tabs[0] ?? "",
+          showTabs: true,
+          back: false,
+          activeTab,
         },
         reqRef: page.reqRefs[0] as ReqId | undefined,
         slots: {
@@ -467,6 +470,9 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                 },
               ],
             },
+          ],
+          "bottom-nav": [
+            { type: "TabBar", props: { items: tabs, active: activeTab } },
           ],
         },
       };

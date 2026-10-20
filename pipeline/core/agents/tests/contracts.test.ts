@@ -104,4 +104,17 @@ describe("M1 role contracts", () => {
     expect(visualPrompt).toContain("exactly one brief for every id");
     expect(visualPrompt).toContain('"assetBriefs"');
   });
+
+  it("surfaces role landing rules in the IA prompt", () => {
+    const brief = {
+      ...employeeBrief,
+      ia: {
+        ...employeeBrief.ia,
+        landingByRole: { beautician: "inventory-query" },
+      },
+    };
+    const prompt = buildIaPrompt({ prdText: "PRD", brief });
+    expect(prompt).toContain("landingByRole");
+    expect(prompt).toContain("inventory-query");
+  });
 });
