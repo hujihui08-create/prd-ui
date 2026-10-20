@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { AssetBrief } from "../src/contracts.js";
 import { checkIcon, checkIconSet } from "../src/gates/icon.js";
 import { checkIllustration } from "../src/gates/illustration.js";
+import { checkIllustrationSet } from "../src/gates/illustration-set.js";
 import { normalizeSvg, parseSvg } from "../src/gates/svg.js";
 
 const iconBrief: AssetBrief = {
@@ -86,6 +87,13 @@ describe("icon gates", () => {
     const other = validIcon.replace("M3 9.5 12 3l9 6.5V21H3z", "M4 4h16v16H4z");
     expect(checkIconSet([{ id: "home", svg: validIcon }, { id: "search", svg: other }]).passed).toBe(true);
   });
+
+  it("rejects a child element that changes the signature", () => {
+    const other = validIcon.replace("<path", '<path stroke-width="2"');
+    const result = checkIconSet([{ id: "home", svg: validIcon }, { id: "search", svg: other }]);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "ICON_SET_INCONSISTENT")).toBe(true);
+  });
 });
 
 describe("illustration gates", () => {
@@ -116,6 +124,67 @@ describe("illustration gates", () => {
   it("rejects an element outside the safe area", () => {
     const svg = validIllustration.replace('x="20" y="20" width="80" height="40"', 'x="110" y="20" width="80" height="40"');
     expect(checkIllustration(svg, illustrationBrief).issues.some((i) => i.code === "ILLUSTRATION_SAFE_AREA")).toBe(true);
+  });
+});
+
+describe("illustration set gate", () => {
+  const secondBrief: AssetBrief = {
+    ...illustrationBrief,
+    id: "empty-search",
+    scene: "empty search",
+  };
+
+  it("passes illustrations with the same style, palette and viewBox", () => {
+    const result = checkIllustrationSet([
+      { id: "empty-inventory", svg: validIllustration, brief: illustrationBrief },
+      { id: "empty-search", svg: validIllustration, brief: secondBrief },
+    ]);
+    expect(result.passed).toBe(true);
+  });
+
+  it("treats a reordered palette as consistent", () => {
+    const reordered: AssetBrief = {
+      ...secondBrief,
+      constraints: { ...secondBrief.constraints, palette: ["#111827", "#E5E7EB", "#2563EB"] },
+    };
+    const result = checkIllustrationSet([
+      { id: "empty-inventory", svg: validIllustration, brief: illustrationBrief },
+      { id: "empty-search", svg: validIllustration, brief: reordered },
+    ]);
+    expect(result.passed).toBe(true);
+  });
+
+  it("rejects a mismatched palette", () => {
+    const otherBrief: AssetBrief = {
+      ...secondBrief,
+      constraints: { ...secondBrief.constraints, palette: ["#2563EB", "#E5E7EB", "#111827", "#F59E0B"] },
+    };
+    const result = checkIllustrationSet([
+      { id: "empty-inventory", svg: validIllustration, brief: illustrationBrief },
+      { id: "empty-search", svg: validIllustration, brief: otherBrief },
+    ]);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "ILLUSTRATION_SET_INCONSISTENT")).toBe(true);
+  });
+
+  it("rejects a mismatched styleRef", () => {
+    const otherBrief: AssetBrief = { ...secondBrief, styleRef: "c-desktop" };
+    const result = checkIllustrationSet([
+      { id: "empty-inventory", svg: validIllustration, brief: illustrationBrief },
+      { id: "empty-search", svg: validIllustration, brief: otherBrief },
+    ]);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "ILLUSTRATION_SET_INCONSISTENT")).toBe(true);
+  });
+
+  it("rejects a mismatched viewBox size", () => {
+    const wider = validIllustration.replace('viewBox="0 0 120 80"', 'viewBox="0 0 160 80"');
+    const result = checkIllustrationSet([
+      { id: "empty-inventory", svg: validIllustration, brief: illustrationBrief },
+      { id: "empty-search", svg: wider, brief: secondBrief },
+    ]);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "ILLUSTRATION_SET_INCONSISTENT")).toBe(true);
   });
 });
 

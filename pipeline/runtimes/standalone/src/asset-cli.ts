@@ -291,7 +291,11 @@ export async function main(
       ...(options.maxMinutes === undefined ? {} : { maxMinutes: options.maxMinutes }),
     });
     const manifest = toAssetManifest({ project: config.project, profile, records: result.assets });
-    await store.writeJson("manifest.json", manifest);
+    const complete =
+      manifest.complete &&
+      result.batchGates?.iconSet?.passed !== false &&
+      result.batchGates?.illustrationSet?.passed !== false;
+    await store.writeJson("manifest.json", { ...manifest, complete });
 
     io.stdout(
       `Asset review ${result.passed ? "OK" : "FAILED"}: ${result.summary.total} assets, ${

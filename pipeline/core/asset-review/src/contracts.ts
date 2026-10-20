@@ -98,6 +98,17 @@ export const HardGateResultSchema = z
   .strict();
 export type HardGateResult = z.infer<typeof HardGateResultSchema>;
 
+export const BatchGateResultSchema = z
+  .object({
+    iconSet: HardGateResultSchema.optional(),
+    illustrationSet: HardGateResultSchema.optional(),
+    skipped: z.boolean().optional(),
+    reason: z.literal("PARTIAL_REVIEW").optional(),
+    scope: z.array(z.string().min(1)).optional(),
+  })
+  .strict();
+export type BatchGateResult = z.infer<typeof BatchGateResultSchema>;
+
 /**
  * Reviewer output. Unknown annotation keys are stripped rather than rejected:
  * models sometimes add a `reason_note`; that is harmless, while a missing or
@@ -206,6 +217,7 @@ export const AssetReviewRunSchema = z
     finishedAt: z.string().min(1),
     assets: z.array(AssetReviewRecordSchema),
     summary: AssetReviewSummarySchema,
+    batchGates: BatchGateResultSchema.optional(),
     passed: z.boolean(),
     error: z.string().optional(),
   })

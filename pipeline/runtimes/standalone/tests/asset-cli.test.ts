@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +23,20 @@ async function tempRuns(): Promise<string> {
   const dir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-asset-runs-"));
   temporaryDirs.push(dir);
   return dir;
+}
+
+async function tempAssets(): Promise<string> {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-assets-"));
+  temporaryDirs.push(dir);
+  await cp(m0, dir, { recursive: true });
+  return dir;
+}
+
+async function breakIconSet(assetsDir: string): Promise<string> {
+  const search = path.join(assetsDir, "library", "icons", "search.svg");
+  const svg = await readFile(search, "utf8");
+  await writeFile(search, svg.replace('stroke-linecap="round"', 'stroke-linecap="square"'), "utf8");
+  return assetsDir;
 }
 
 afterEach(async () => {
@@ -100,6 +114,67 @@ describe("asset:review CLI", () => {
     expect((manifest.assets as unknown[]).length).toBe(13);
     const review = await readJson(path.join(runDir, "asset-review.json"));
     expect((review.summary as { passed: number }).passed).toBe(13);
+    expect(review.error).toBeUndefined();
+    const iconSet = await readJson(path.join(runDir, "assets", "icon-set.json"));
+    expect(iconSet.passed).toBe(true);
+    const illustrationSet = await readJson(path.join(runDir, "assets", "illustration-set.json"));
+    expect(illustrationSet.passed).toBe(true);
+  });
+
+  it("exits 1 and marks the manifest incomplete when the icon set disagrees", async () => {
+    const assets = await breakIconSet(await tempAssets());
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain("13 assets, 13 passed");
+    expect(result.stderr).toContain("ICON_SET_INCONSISTENT");
+
+    const runDir = await onlyRun(runs);
+    const manifest = await readJson(path.join(runDir, "manifest.json"));
+    expect(manifest.complete).toBe(false);
+    const iconSet = await readJson(path.join(runDir, "assets", "icon-set.json"));
+    expect(iconSet.passed).toBe(false);
+    const review = await readJson(path.join(runDir, "asset-review.json"));
+    expect(review.error).toBe("ICON_SET_INCONSISTENT");
+    expect(review.passed).toBe(false);
+  });
+
+  it("skips set gates for --only and records a partial review", async () => {
+    const assets = await breakIconSet(await tempAssets());
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await onlyRun(runs);
+    const batchGates = await readJson(path.join(runDir, "assets", "batch-gates.json"));
+    expect(batchGates).toEqual({
+      skipped: true,
+      reason: "PARTIAL_REVIEW",
+      scope: ["icon-home"],
+    });
+    await expect(stat(path.join(runDir, "assets", "icon-set.json"))).rejects.toThrow();
+    const manifest = await readJson(path.join(runDir, "manifest.json"));
+    expect(manifest.complete).toBe(true);
   });
 
   it("runs a single asset with --only", async () => {

@@ -12,6 +12,7 @@ import {
   type SourceTier,
   SourceTierBySource,
 } from "./contracts.js";
+import { runBatchGates } from "./batch-gates.js";
 import { runGate } from "./gate.js";
 import { normalizeSvg } from "./gates/svg.js";
 import type { AssetReviewPorts, VisualStyle } from "./ports.js";
@@ -377,6 +378,27 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     unresolved: records.filter((record) => record.status === "unresolved").length,
     degraded: records.filter((record) => record.degraded).length,
   };
+  const batchGates = await runBatchGates({
+    records,
+    store: input.ports.store,
+    ...(input.only === undefined ? {} : { only: input.only }),
+  });
+  if (batchGates.skipped) {
+    await input.ports.log.log({
+      type: "batch_gates_skipped",
+      reason: batchGates.reason,
+      scope: batchGates.scope,
+    });
+  }
+  const setFailed =
+    batchGates.iconSet?.passed === false || batchGates.illustrationSet?.passed === false;
+  const setError =
+    batchGates.iconSet?.passed === false
+      ? "ICON_SET_INCONSISTENT"
+      : batchGates.illustrationSet?.passed === false
+        ? "ILLUSTRATION_SET_INCONSISTENT"
+        : undefined;
+  const error = setError ?? fatalError;
   const finishedAt = input.ports.clock.now().toISOString();
   const result: AssetReviewRunResult = {
     runId: input.runId,
@@ -387,8 +409,13 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     finishedAt,
     assets: records,
     summary,
-    passed: summary.unresolved === 0 && summary.total > 0 && fatalError === undefined,
-    ...(fatalError === undefined ? {} : { error: fatalError }),
+    batchGates,
+    passed:
+      summary.unresolved === 0 &&
+      summary.total > 0 &&
+      fatalError === undefined &&
+      !setFailed,
+    ...(error === undefined ? {} : { error }),
   };
 
   await input.ports.store.writeJson("asset-review.json", result);

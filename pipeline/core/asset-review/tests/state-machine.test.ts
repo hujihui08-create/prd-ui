@@ -70,11 +70,14 @@ function tierOf(source: SourceId): SourceTier {
   return "C";
 }
 
-function producerWith(store: MemoryStore): AssetProducerPort {
+function producerWith(
+  store: MemoryStore,
+  svgFor: (id: string) => string = () => validIcon
+): AssetProducerPort {
   return {
     async produce({ brief, source, attempt }): Promise<AssetCandidate> {
       const path = `assets/attempts/${brief.id}/${source}-${attempt}/candidate.svg`;
-      await store.writeText(path, validIcon);
+      await store.writeText(path, svgFor(brief.id));
       return {
         assetId: brief.id,
         source,
@@ -213,6 +216,28 @@ describe("runAssetReview", () => {
     });
     expect(result.summary.total).toBe(1);
     expect(result.assets[0]!.assetId).toBe("icon-home");
+  });
+
+  it("fails the run when the icon set is inconsistent", async () => {
+    const store = new MemoryStore();
+    const secondBrief: AssetBrief = {
+      ...iconBrief,
+      id: "icon-search",
+      constraints: { ...iconBrief.constraints, strokeWidth: 2 },
+    };
+    const reviewer = reviewerWith();
+    const customPorts: AssetReviewPorts = {
+      ...ports(store, reviewer),
+      producer: producerWith(store, (id) =>
+        id === "icon-search" ? validIcon.replace('stroke-width="1.5"', 'stroke-width="2"') : validIcon
+      ),
+    };
+
+    const result = await run(store, reviewer, { briefs: [iconBrief, secondBrief], ports: customPorts });
+
+    expect(result.batchGates?.iconSet?.passed).toBe(false);
+    expect(result.error).toBe("ICON_SET_INCONSISTENT");
+    expect(result.passed).toBe(false);
   });
 });
 

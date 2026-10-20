@@ -73,15 +73,30 @@ export function checkIcon(svg: string, brief: AssetBrief): HardGateResult {
   return gateResult(issues);
 }
 
+const SIGNATURE_PROPERTIES = [
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "fill",
+] as const;
+
+type SignatureProperty = (typeof SIGNATURE_PROPERTIES)[number];
+
 /**
  * Set-level consistency. Call once for the icon collection after each icon
  * passes `checkIcon`; a mismatch is a blocker even when every icon is valid
  * on its own.
+ *
+ * The signature is the sorted set of declared values for each presentation
+ * property across *all* elements, not just the root. Equal roots are not
+ * enough: one child path with a different `stroke-width` must fail the set.
+ * Collecting a set (instead of a per-element list) keeps icons with different
+ * element counts consistent as long as they declare the same values.
  */
 export function checkIconSet(icons: Array<{ id: string; svg: string }>): HardGateResult {
   const issues: HardGateIssue[] = [];
-  const properties = ["stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "fill"];
-  const signatures: Array<{ id: string; values: Record<string, string> }> = [];
+  const signatures: Array<{ id: string; values: Record<SignatureProperty, string[]> }> = [];
 
   for (const icon of icons) {
     const parsed = parseSvg(icon.svg);
@@ -89,20 +104,26 @@ export function checkIconSet(icons: Array<{ id: string; svg: string }>): HardGat
       issues.push(issue("ICON_SET_INVALID", `Icon ${icon.id} is not a well-formed SVG.`, icon.id));
       continue;
     }
-    const values: Record<string, string> = {};
-    for (const property of properties) {
-      values[property] = attr(parsed.root, property) ?? "(absent)";
+    const values = {} as Record<SignatureProperty, string[]>;
+    for (const property of SIGNATURE_PROPERTIES) {
+      const declared = new Set<string>();
+      for (const element of allElements(parsed)) {
+        const value = attr(element, property);
+        if (value !== null) declared.add(value.toLowerCase());
+      }
+      values[property] = [...declared].sort();
     }
     signatures.push({ id: icon.id, values });
   }
 
-  for (const property of properties) {
+  for (const property of SIGNATURE_PROPERTIES) {
     const byValue = new Map<string, string[]>();
     for (const signature of signatures) {
-      const value = signature.values[property]!;
-      const ids = byValue.get(value);
+      const values = signature.values[property];
+      const key = values.length > 0 ? values.join(",") : "(absent)";
+      const ids = byValue.get(key);
       if (ids === undefined) {
-        byValue.set(value, [signature.id]);
+        byValue.set(key, [signature.id]);
       } else {
         ids.push(signature.id);
       }
