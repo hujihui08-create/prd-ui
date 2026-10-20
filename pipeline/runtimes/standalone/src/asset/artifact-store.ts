@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ArtifactStorePort } from "@prd-ui/asset-review";
 
@@ -28,6 +28,12 @@ export class FileArtifactStore implements ArtifactStorePort {
 
   async writeJson(relativePath: string, value: unknown): Promise<void> {
     await this.writeText(relativePath, `${JSON.stringify(value, null, 2)}\n`);
+  }
+
+  async appendText(relativePath: string, value: string): Promise<void> {
+    const absolute = this.resolve(relativePath);
+    await mkdir(path.dirname(absolute), { recursive: true });
+    await appendFile(absolute, value, "utf8");
   }
 
   async readText(relativePath: string): Promise<string> {

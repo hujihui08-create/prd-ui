@@ -5,8 +5,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
+import type { ArtifactStorePort } from "@prd-ui/asset-review";
 import { AssetManifestSchema } from "@prd-ui/contracts";
-import { assertContract, parseArgs } from "../src/asset-cli.js";
+import { assertContract, createLogger, parseArgs } from "../src/asset-cli.js";
 
 const execFileAsync = promisify(execFile);
 const pipelineRoot = path.resolve(
@@ -270,6 +271,41 @@ describe("asset:review CLI", () => {
     ]);
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("1 assets, 1 passed");
+  });
+
+  it("appends one log line per state-machine event", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await onlyRun(runs);
+    const log = await readFile(path.join(runDir, "log.ndjson"), "utf8");
+    expect(log.endsWith("\n")).toBe(true);
+    const types = log
+      .trimEnd()
+      .split("\n")
+      .map((line) => (JSON.parse(line) as { type: string }).type);
+    expect(types).toEqual([
+      "asset_started",
+      "source_selected",
+      "attempt_started",
+      "gate_result",
+      "review_result",
+      "asset_frozen",
+      "batch_gates_skipped",
+      "run_finished",
+    ]);
   });
 
   it("dry-run writes gates but no frozen assets", async () => {
@@ -563,6 +599,43 @@ describe("asset:review CLI", () => {
     expect(result.stdout).toContain(
       "Review cost: reviewCostCny=unavailable usageSource=unavailable usageComplete=false"
     );
+  });
+});
+
+describe("createLogger", () => {
+  it("appends one redacted JSON line per event and never rewrites the log", async () => {
+    const appended: string[] = [];
+    let rewrites = 0;
+    const store: ArtifactStorePort = {
+      async writeJson() {},
+      async writeText() {
+        rewrites += 1;
+      },
+      async appendText(path, value) {
+        expect(path).toBe("log.ndjson");
+        appended.push(value);
+      },
+      async readText() {
+        return "";
+      },
+      async hash() {
+        return "sha256:x";
+      },
+    };
+    const logger = createLogger(store);
+
+    await logger.log({ type: "first", note: "token sk-abcdefgh12345678" });
+    await logger.log({ type: "second" });
+
+    expect(appended).toHaveLength(2);
+    expect(appended.every((line) => line.endsWith("\n"))).toBe(true);
+    expect(appended[0]).toContain("sk-***");
+    expect(appended[0]).not.toContain("sk-abcdefgh12345678");
+    expect(appended.map((line) => (JSON.parse(line) as { type: string }).type)).toEqual([
+      "first",
+      "second",
+    ]);
+    expect(rewrites).toBe(0);
   });
 });
 

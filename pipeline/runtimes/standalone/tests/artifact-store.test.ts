@@ -27,8 +27,16 @@ describe("FileArtifactStore", () => {
     expect(await store.readText("assets/nested/b.json")).toContain('"ok": true');
   });
 
+  it("appends text without rewriting earlier lines", async () => {
+    const store = new FileArtifactStore(await tempDir());
+    await store.appendText("logs/run.ndjson", '{"event":1}\n');
+    await store.appendText("logs/run.ndjson", '{"event":2}\n');
+    expect(await store.readText("logs/run.ndjson")).toBe('{"event":1}\n{"event":2}\n');
+  });
+
   it("rejects paths outside the run directory", async () => {
     const store = new FileArtifactStore(await tempDir());
     await expect(store.writeText("../escape.txt", "x")).rejects.toThrow(/escapes/);
+    await expect(store.appendText("../escape.txt", "x")).rejects.toThrow(/escapes/);
   });
 });

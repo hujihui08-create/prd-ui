@@ -43,6 +43,7 @@ export interface AssetReviewerPort {
 export interface ArtifactStorePort {
   writeJson(path: string, value: unknown): Promise<void>;
   writeText(path: string, value: string): Promise<void>;
+  appendText(path: string, value: string): Promise<void>;
   readText(path: string): Promise<string>;
   hash(path: string): Promise<string>;
 }

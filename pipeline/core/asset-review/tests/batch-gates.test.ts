@@ -68,6 +68,10 @@ class MemoryStore implements ArtifactStorePort {
     this.files.set(path, value);
   }
 
+  async appendText(path: string, value: string): Promise<void> {
+    this.files.set(path, `${this.files.get(path) ?? ""}${value}`);
+  }
+
   async readText(path: string): Promise<string> {
     const value = this.files.get(path);
     if (value === undefined) throw new Error(`missing ${path}`);

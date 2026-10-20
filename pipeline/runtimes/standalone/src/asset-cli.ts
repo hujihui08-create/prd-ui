@@ -15,6 +15,7 @@ import {
   toManifestReview,
   validateProviderEnv,
   type AssetBrief,
+  type ArtifactStorePort,
   type AssetReviewerPort,
   type ReviewPricing,
   type SourcePolicy,
@@ -299,12 +300,11 @@ export function assertContract<T>(
   return parsed.data;
 }
 
-function createLogger(store: FileArtifactStore) {
-  const lines: string[] = [];
+export function createLogger(store: ArtifactStorePort) {
   return {
     async log(event: Record<string, unknown>): Promise<void> {
-      lines.push(redact(JSON.stringify({ ...event, timestamp: new Date().toISOString() })));
-      await store.writeText("log.ndjson", `${lines.join("\n")}\n`);
+      const line = redact(JSON.stringify({ ...event, timestamp: new Date().toISOString() }));
+      await store.appendText("log.ndjson", `${line}\n`);
     },
   };
 }
