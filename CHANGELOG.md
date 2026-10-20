@@ -42,9 +42,25 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   like a bar chart; the fixture was redesigned as a shelf with empty dashed
   compartments, after which all 13 real-dsh assets passed.
 
+### Fixed (final whole-branch review)
+
+- dsh `step_end.usage` no longer requires `cacheReadTokens`: absent cache fields
+  are treated as zero, and only a missing `usage` object marks usage
+  incomplete. The mock integration returns zero/absent cache fields and still
+  asserts `usageComplete=true`.
+- `--only` partial reviews now write `manifest.json` and
+  `manifest.review.json` with `complete: false` because set gates were skipped.
+- `review.json`, `asset-review.json`, and `--json` redact reviewer text with the
+  shared `redactValue` before writing/printing, so a provider-echoed key or
+  `Authorization:` header cannot reach canonical artifacts or CI logs.
+- SVG gates reject SMIL (`animate`, `animateTransform`, `animateMotion`, `set`,
+  `discard`), external processing instructions (`xml-stylesheet`), and
+  non-fragment `url(...)` references with blocker codes `SVG_ANIMATION`,
+  `SVG_PROCESSING_INSTRUCTION`, and `SVG_EXTERNAL_REF`.
+
 ### Verification
 
-- `pnpm test`: 338 tests passed (offline; dsh mock integration excluded).
+- `pnpm test`: 349 tests passed (offline; dsh mock integration excluded).
 - `pnpm test:dsh`: 1 passed (real pinned dsh 0.2.1-rc.2 + local mock).
 - `pnpm typecheck`: clean.
 - `pnpm phase1:verify`: `2 pages, 0 blockers`.
@@ -64,6 +80,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 | Commit | Change |
 |---|---|
+| `7c95cc1` | fix: close final asset review review findings |
 | `049ee19` | fix: make empty inventory fixture read as an empty shelf |
 | `2fb1d5b` | docs: align asset review json contract |
 | `f6d9f06` | test: add dsh mock integration and hardening docs |
