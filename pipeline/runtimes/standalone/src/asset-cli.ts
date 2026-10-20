@@ -328,7 +328,7 @@ function jsonSummary(input: {
   preflight?: unknown;
 }): Record<string, unknown> {
   const result = input.result;
-  return {
+  return redactValue({
     runDir: input.runDir,
     summary: result?.summary ?? null,
     assets: result?.assets ?? [],
@@ -338,7 +338,7 @@ function jsonSummary(input: {
     usageSource: result?.usageSource ?? null,
     usageComplete: result?.usageComplete ?? null,
     ...(input.preflight === undefined ? {} : { preflight: input.preflight }),
-  };
+  }) as Record<string, unknown>;
 }
 
 export async function main(
@@ -508,7 +508,9 @@ export async function main(
     if (result.error !== undefined && !options.json) io.stderr(result.error);
     return result.passed ? 0 : 1;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = redactValue(
+      error instanceof Error ? error.message : String(error)
+    ) as string;
     if (options.json) {
       io.stdout(JSON.stringify(jsonSummary({ runDir: runDir ?? null, error: message })));
     } else {

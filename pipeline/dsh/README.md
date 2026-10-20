@@ -83,9 +83,9 @@ server and runs `asset:review --only icon-home --runtime dsh` through the real
 pinned CLI/profile. It asserts exit 0, a passed asset, `dsh/` evidence, and
 `summary.usageComplete === true`; no real key or external network is used.
 
-- The mock must return non-zero `prompt_tokens_details.cached_tokens`: dsh omits
-  `cacheReadTokens` when it is zero, and the adapter then reports usage as
-  incomplete.
+- The mock may return zero or absent cache-read fields: the adapter treats a
+  missing `cacheReadTokens` as `0` and still reports `usageComplete === true`.
+  Only a completely missing `usage` object is incomplete.
 - A missing `node_modules/.bin/dsh` fails the test with an install hint; only
   `SKIP_DSH=1` skips it.
 - `pnpm test` excludes this file so the default suite stays offline.

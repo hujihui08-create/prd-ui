@@ -75,7 +75,7 @@ DSH_HOME="$PWD/dsh/home" \
 
 `pnpm test:dsh` 在本地启动 OpenAI-compatible mock HTTP server，用真实 pinned dsh CLI/profile 跑 `asset:review --only icon-home --runtime dsh`，断言 exit 0、资产 passed、`dsh/` 证据存在且 `summary.usageComplete === true`。它不使用真实 key，也不访问外网。
 
-- mock 必须在 `usage.prompt_tokens_details.cached_tokens` 中给出非零 cache-read；dsh 在 cache-read 为 0 时会省略 `cacheReadTokens`，适配器因此报告 usage 不完整。
+- mock 可以返回零或省略的 cache-read：适配器把缺失的 `cacheReadTokens` 视为 `0`，`usageComplete` 仍为 `true`；只有整个 `usage` 对象缺失才算不完整。
 - 缺少 `node_modules/.bin/dsh` 时测试失败并给出 `pnpm install` 提示；只有 `SKIP_DSH=1 pnpm test:dsh` 才跳过。
 - 该测试被默认 `vitest.config.ts` 排除，`pnpm test` 仍是纯 offline 单元测试。
 

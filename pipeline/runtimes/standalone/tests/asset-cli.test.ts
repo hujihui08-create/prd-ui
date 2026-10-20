@@ -197,7 +197,7 @@ describe("asset:review CLI", () => {
     const runDir = await onlyRun(runs);
     const sidecar = await readJson(path.join(runDir, "manifest.review.json"));
     expect(sidecar.batchGates).toEqual({ skipped: true, reason: "PARTIAL_REVIEW" });
-    expect(sidecar.complete).toBe(true);
+    expect(sidecar.complete).toBe(false);
   });
 
   it("exits 1 and marks the manifest incomplete when the icon set disagrees", async () => {
@@ -253,7 +253,7 @@ describe("asset:review CLI", () => {
     });
     await expect(stat(path.join(runDir, "assets", "icon-set.json"))).rejects.toThrow();
     const manifest = await readJson(path.join(runDir, "manifest.json"));
-    expect(manifest.complete).toBe(true);
+    expect(manifest.complete).toBe(false);
   });
 
   it("runs a single asset with --only", async () => {
@@ -645,6 +645,52 @@ describe("asset:review CLI", () => {
     expect(summary.usageComplete).toBe(false);
     expect(result.stdout).not.toContain("Asset review OK");
     expect(result.stderr).toBe("");
+  });
+
+  it("redacts reviewer text in review.json, asset-review.json and --json output", async () => {
+    const assets = await tempAssets();
+    const secret = "sk-liveCLI1234567890";
+    const scriptedPath = path.join(assets, "scripted-reviews.json");
+    const reviews = JSON.parse(await readFile(scriptedPath, "utf8")) as Record<
+      string,
+      Record<string, unknown>
+    >;
+    reviews["icon-home/library/1"]!.reason = `Authorization: Bearer ${secret}`;
+    await writeFile(scriptedPath, JSON.stringify(reviews), "utf8");
+
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).not.toContain(secret);
+    const summary = JSON.parse(result.stdout) as {
+      assets: Array<{ attempts: Array<{ review?: { reason: string } }> }>;
+    };
+    expect(summary.assets[0]!.attempts[0]!.review?.reason).toBe("Authorization: ***");
+
+    const runDir = await onlyRun(runs);
+    for (const relative of [
+      path.join("assets", "attempts", "icon-home", "library-1", "review.json"),
+      "asset-review.json",
+      "log.ndjson",
+    ]) {
+      const raw = await readFile(path.join(runDir, relative), "utf8");
+      expect(raw, relative).not.toContain(secret);
+      if (relative.endsWith(".json")) {
+        expect(() => JSON.parse(raw), relative).not.toThrow();
+      }
+    }
   });
 
   it("emits the preflight payload with --dry-run --json and suppresses the human summary", async () => {

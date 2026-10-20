@@ -230,6 +230,65 @@ describe("runAssetReview", () => {
     expect(result.assets[0]!.attempts.some((attempt) => attempt.status === "reviewer_error")).toBe(true);
   });
 
+  it("redacts credentials from review.json and asset-review.json", async () => {
+    const store = new MemoryStore();
+    const secret = "sk-liveREVIEW12345678";
+    const verdict: AssetReviewVerdict = {
+      ...passVerdict,
+      reason: `Authorization: Bearer ${secret}`,
+      suggestedChanges: [`rotate api_key=${secret}`],
+    };
+
+    const result = await run(store, reviewerWith({ "icon-home/library/1": verdict }));
+
+    expect(result.passed).toBe(true);
+    for (const path of [
+      "assets/attempts/icon-home/library-1/review.json",
+      "asset-review.json",
+    ]) {
+      const raw = store.files.get(path);
+      expect(raw, path).toBeDefined();
+      expect(raw, path).not.toContain(secret);
+      expect(() => JSON.parse(raw!), path).not.toThrow();
+    }
+    const review = JSON.parse(
+      store.files.get("assets/attempts/icon-home/library-1/review.json")!
+    ) as { reason: string; inconsistencies: unknown };
+    expect(review.reason).toBe("Authorization: ***");
+
+    const runRecord = JSON.parse(store.files.get("asset-review.json")!) as {
+      assets: Array<{
+        attempts: Array<{ review?: { reason: string } }>;
+      }>;
+    };
+    expect(runRecord.assets[0]!.attempts[0]!.review?.reason).toBe("Authorization: ***");
+  });
+
+  it("redacts a dsh-style reviewer error from the run record", async () => {
+    const store = new MemoryStore();
+    const secret = "sk-liveDSH1234567890";
+    const dshError = Object.assign(
+      new Error(`dsh exited with 401: Authorization: Bearer ${secret}`),
+      { code: "DSH_EXIT_NONZERO" }
+    );
+
+    const result = await run(store, reviewerWith({ "icon-home/library/1": dshError }));
+
+    expect(result.passed).toBe(false);
+    expect(result.error).toBe("REVIEWER_ERROR: 1 asset(s)");
+    expect(result.error).not.toContain(secret);
+    const issues = result.assets[0]!.attempts[0]!.issues.join("\n");
+    expect(issues).toContain("DSH_EXIT_NONZERO");
+    expect(issues).not.toContain(secret);
+    const raw = store.files.get("asset-review.json");
+    expect(raw).toBeDefined();
+    expect(raw).not.toContain(secret);
+    const runRecord = JSON.parse(raw!) as { error: string };
+    expect(runRecord.error).toBe("REVIEWER_ERROR: 1 asset(s)");
+    expect(raw!).toContain("DSH_EXIT_NONZERO");
+    expect(JSON.stringify(runRecord)).not.toContain(secret);
+  });
+
   it("continues to the next asset after a reviewer error", async () => {
     const store = new MemoryStore();
     const reviewer: AssetReviewerPort = {

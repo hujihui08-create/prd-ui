@@ -269,14 +269,12 @@ function parseStepUsage(raw: unknown): ReviewUsage | undefined {
   const candidate = raw as Record<string, unknown>;
   const inputTokens = countOf(candidate.inputTokens);
   const outputTokens = countOf(candidate.outputTokens);
-  const cacheReadTokens = countOf(candidate.cacheReadTokens);
-  if (
-    inputTokens === undefined ||
-    outputTokens === undefined ||
-    cacheReadTokens === undefined
-  ) {
+  if (inputTokens === undefined || outputTokens === undefined) {
     return undefined;
   }
+  // dsh omits `cacheReadTokens` when the call had no cache hit; absent means
+  // zero, not "usage unknown". A missing usage object still stays incomplete.
+  const cacheReadTokens = countOf(candidate.cacheReadTokens) ?? 0;
   const totalTokens = countOf(candidate.totalTokens);
   const cacheWriteTokens = countOf(candidate.cacheWriteTokens);
   const reasoningTokens = countOf(candidate.reasoningTokens);

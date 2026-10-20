@@ -137,7 +137,7 @@ describe("toManifestReview", () => {
     });
   });
 
-  it("summarizes a partial review as skipped but keeps complete for passing records", () => {
+  it("never marks a partial review complete", () => {
     const review = toManifestReview({
       project: "employee-app",
       profile: "b-mobile",
@@ -146,7 +146,7 @@ describe("toManifestReview", () => {
     });
 
     expect(review.batchGates).toEqual({ skipped: true, reason: "PARTIAL_REVIEW" });
-    expect(review.complete).toBe(true);
+    expect(review.complete).toBe(false);
     expect(review.usageSource).toBeUndefined();
     expect(review.usageComplete).toBeUndefined();
   });

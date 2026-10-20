@@ -43,10 +43,10 @@ interface MockServer {
 
 /**
  * Minimal OpenAI-compatible chat-completions endpoint. pi-ai always streams,
- * so the verdict is sent as an SSE chunk followed by a usage-only chunk.
- * `prompt_tokens_details.cached_tokens` is required: dsh omits
- * `cacheReadTokens` when it is zero, and the adapter then reports
- * `usageComplete=false`.
+ * so the verdict is sent as an SSE chunk followed by a usage-only chunk. The
+ * usage deliberately omits `prompt_tokens_details.cached_tokens`: dsh omits
+ * `cacheReadTokens` when there was no cache hit, and that must still count as
+ * complete usage.
  */
 function startMockServer(): Promise<MockServer> {
   const calls: MockCall[] = [];
@@ -99,7 +99,6 @@ function startMockServer(): Promise<MockServer> {
           prompt_tokens: 123,
           completion_tokens: 45,
           total_tokens: 168,
-          prompt_tokens_details: { cached_tokens: 80 },
         },
       });
       response.write("data: [DONE]\n\n");

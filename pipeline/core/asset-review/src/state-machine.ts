@@ -20,6 +20,7 @@ import { runGate } from "./gate.js";
 import { normalizeSvg } from "./gates/svg.js";
 import type { AssetReviewPorts } from "./ports.js";
 import { reviewCost, type ReviewPricing } from "./pricing.js";
+import { redactValue } from "./redact.js";
 import type { VisualStyle } from "./visual-style.js";
 import { validateVerdict } from "./verdict.js";
 
@@ -459,10 +460,15 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
         });
         attemptRecord.review = check.verdict;
         attemptRecord.issues = check.inconsistencies;
-        await input.ports.store.writeJson(attemptPath(brief.id, source, attempt, "review.json"), {
-          ...check.verdict,
-          inconsistencies: check.inconsistencies,
-        });
+        // Reviewer text can echo provider errors (keys, Authorization
+        // headers). Canonical evidence is redacted at the write boundary.
+        await input.ports.store.writeJson(
+          attemptPath(brief.id, source, attempt, "review.json"),
+          redactValue({
+            ...check.verdict,
+            inconsistencies: check.inconsistencies,
+          })
+        );
         await input.ports.log.log({
           type: "review_result",
           assetId: brief.id,
@@ -629,7 +635,11 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     ...(error === undefined ? {} : { error }),
   };
 
-  const validated = AssetReviewRunSchema.safeParse(result);
+  // `asset-review.json` (and the CLI `--json` payload derived from the
+  // returned run) is canonical: redact verdict reasons, attempt issues and
+  // `run.error` before schema validation so no reviewer text leaks a key.
+  const redactedResult = redactValue(result) as AssetReviewRunResult;
+  const validated = AssetReviewRunSchema.safeParse(redactedResult);
   if (!validated.success) {
     throw new Error(`CONTRACT_VIOLATION: asset-review.json: ${validated.error.message}`);
   }

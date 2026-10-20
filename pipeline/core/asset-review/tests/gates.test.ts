@@ -71,6 +71,47 @@ describe("icon gates", () => {
     expect(checkIcon(svg, iconBrief).issues.some((i) => i.code === "SVG_TRANSFORM")).toBe(true);
   });
 
+  it("rejects every SMIL animation element on an icon", () => {
+    const elements = [
+      '<animate attributeName="fill" values="#ff0000;#00ff00" dur="1s"/>',
+      '<animateTransform attributeName="transform" type="rotate" from="0" to="90" dur="1s"/>',
+      '<animateMotion path="M0 0 L10 0" dur="1s"/>',
+      '<set attributeName="stroke" to="#ff0000"/>',
+      '<discard begin="0s"/>',
+    ];
+    for (const element of elements) {
+      const svg = validIcon.replace("</svg>", `${element}</svg>`);
+      const result = checkIcon(svg, iconBrief);
+      expect(result.passed, element).toBe(false);
+      expect(
+        result.issues.some((issue) => issue.code === "SVG_ANIMATION"),
+        element
+      ).toBe(true);
+    }
+  });
+
+  it("rejects xml-stylesheet processing instructions on an icon", () => {
+    const svg = validIcon.replace(
+      "<path",
+      '<?xml-stylesheet href="https://evil.test/x.css" type="text/css"?><path'
+    );
+    const result = checkIcon(svg, iconBrief);
+    expect(result.passed).toBe(false);
+    expect(
+      result.issues.some((issue) => issue.code === "SVG_PROCESSING_INSTRUCTION")
+    ).toBe(true);
+  });
+
+  it("rejects external url() paint references on an icon", () => {
+    const svg = validIcon.replace(
+      "<path",
+      '<path fill="url(https://evil.test/p.svg#p)"'
+    );
+    const result = checkIcon(svg, iconBrief);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((issue) => issue.code === "SVG_EXTERNAL_REF")).toBe(true);
+  });
+
   it("rejects wrong grid and stroke width", () => {
     expect(checkIcon(validIcon.replace("0 0 24 24", "0 0 20 20"), iconBrief).issues.some((i) => i.code === "ICON_GRID")).toBe(true);
     expect(checkIcon(validIcon.replace('stroke-width="1.5"', 'stroke-width="2"'), iconBrief).issues.some((i) => i.code === "ICON_STROKE_WIDTH")).toBe(true);
@@ -114,6 +155,46 @@ describe("illustration gates", () => {
   it("rejects transform on an illustration", () => {
     const svg = validIllustration.replace("<rect", '<rect transform="translate(200 0)"');
     expect(checkIllustration(svg, illustrationBrief).issues.some((i) => i.code === "SVG_TRANSFORM")).toBe(true);
+  });
+
+  it("rejects SMIL animation on an illustration", () => {
+    const svg = validIllustration.replace(
+      "</svg>",
+      '<animateTransform attributeName="transform" type="rotate" from="0" to="90" dur="1s"/></svg>'
+    );
+    const result = checkIllustration(svg, illustrationBrief);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.code === "SVG_ANIMATION")).toBe(true);
+  });
+
+  it("rejects xml-stylesheet processing instructions on an illustration", () => {
+    const svg = validIllustration.replace(
+      "<rect",
+      '<?xml-stylesheet href="https://evil.test/x.css"?><rect'
+    );
+    const result = checkIllustration(svg, illustrationBrief);
+    expect(result.passed).toBe(false);
+    expect(
+      result.issues.some((i) => i.code === "SVG_PROCESSING_INSTRUCTION")
+    ).toBe(true);
+  });
+
+  it("rejects external and protocol-relative url() paint references", () => {
+    for (const url of ["url(https://evil.test/p.svg#p)", "url(//evil.test/p.svg#p)"]) {
+      const svg = validIllustration.replace('fill="#2563EB"', `fill="${url}"`);
+      const result = checkIllustration(svg, illustrationBrief);
+      expect(result.passed, url).toBe(false);
+      expect(
+        result.issues.some((i) => i.code === "SVG_EXTERNAL_REF"),
+        url
+      ).toBe(true);
+    }
+  });
+
+  it("allows fragment url() paint references", () => {
+    const svg = validIllustration.replace('fill="#2563EB"', 'fill="url(#grad)"');
+    const result = checkIllustration(svg, illustrationBrief);
+    expect(result.issues.some((i) => i.code === "SVG_EXTERNAL_REF")).toBe(false);
   });
 
   it("rejects a canvas below 96x72", () => {

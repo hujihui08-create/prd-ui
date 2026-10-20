@@ -103,6 +103,28 @@ describe("runDshReview", () => {
     expect(result.session.stdoutHash).toMatch(/^sha256:[a-f0-9]{64}$/);
   });
 
+  it("treats an absent cacheReadTokens as zero and keeps usage complete", async () => {
+    const runner: CommandRunner = async () => ({
+      stdout: ndjson(
+        stepEnd({ inputTokens: 100, outputTokens: 20, totalTokens: 120 }),
+        final(JSON.stringify(verdict))
+      ),
+      stderr: "",
+    });
+
+    const result = await runDshReview({ ...base, runner });
+
+    expect(result.verdict.verdict).toBe("pass");
+    expect(result.usage).toEqual({
+      inputTokens: 100,
+      outputTokens: 20,
+      cacheReadTokens: 0,
+      totalTokens: 120,
+    });
+    expect(result.usageComplete).toBe(true);
+    expect(result.usageSource).toBe("json-events");
+  });
+
   it("sums usage across step_end events and prefers final over capped text events", async () => {
     const runner: CommandRunner = async () => ({
       stdout: ndjson(

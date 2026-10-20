@@ -111,6 +111,17 @@ export function isUrlColor(value: string): boolean {
   return /^url\(/i.test(value.trim());
 }
 
+/**
+ * `url(...)` may only point inside the same document (`url(#id)`). Anything
+ * else is an external resource and bypasses the "no external refs" gate.
+ */
+export function isExternalUrlReference(value: string): boolean {
+  const match = /^url\(\s*([\s\S]*?)\s*\)\s*$/i.exec(value.trim());
+  if (!match) return false;
+  const target = match[1]!.replace(/^(['"])([\s\S]*)\1$/, "$2").trim();
+  return !target.startsWith("#");
+}
+
 export function collectColorValues(parsed: ParsedSvg): Array<{ value: string; element: Element }> {
   const colors: Array<{ value: string; element: Element }> = [];
   for (const element of allElements(parsed)) {
@@ -121,6 +132,42 @@ export function collectColorValues(parsed: ParsedSvg): Array<{ value: string; el
   }
   return colors;
 }
+
+interface ProcessingInstructionLike {
+  nodeName: string;
+  data?: string;
+}
+
+/** Processing instructions are not elements, so `allElements` never sees them. */
+export function allProcessingInstructions(parsed: ParsedSvg): ProcessingInstructionLike[] {
+  const found: ProcessingInstructionLike[] = [];
+  const visit = (node: Node): void => {
+    const children = node.childNodes;
+    for (let index = 0; index < children.length; index += 1) {
+      const child = children.item(index);
+      if (!child) continue;
+      if (child.nodeType === 7) {
+        found.push({
+          nodeName: child.nodeName,
+          ...((child as unknown as { data?: string }).data === undefined
+            ? {}
+            : { data: (child as unknown as { data?: string }).data }),
+        });
+      }
+      if (child.hasChildNodes()) visit(child);
+    }
+  };
+  visit(parsed.document);
+  return found;
+}
+
+const ANIMATION_ELEMENTS = new Set([
+  "animate",
+  "animatetransform",
+  "animatemotion",
+  "set",
+  "discard",
+]);
 
 /** Shared safety checks: no script, no external refs, no event handlers, no raster. */
 export function checkSvgSafety(parsed: ParsedSvg, options: { allowText: boolean }): HardGateIssue[] {
@@ -142,6 +189,15 @@ export function checkSvgSafety(parsed: ParsedSvg, options: { allowText: boolean 
     if (name === "style") {
       issues.push(issue("SVG_STYLE", "SVG contains an embedded <style> block.", "style"));
     }
+    if (ANIMATION_ELEMENTS.has(name)) {
+      issues.push(
+        issue(
+          "SVG_ANIMATION",
+          `SVG contains <${name}>; SMIL animation is not allowed.`,
+          name
+        )
+      );
+    }
 
     const attributes = element.attributes;
     for (let index = 0; index < attributes.length; index += 1) {
@@ -157,6 +213,9 @@ export function checkSvgSafety(parsed: ParsedSvg, options: { allowText: boolean 
         if (!value.startsWith("#")) {
           issues.push(issue("SVG_EXTERNAL_REF", "SVG references an external resource.", value));
         }
+      }
+      if (isUrlColor(value) && isExternalUrlReference(value)) {
+        issues.push(issue("SVG_EXTERNAL_REF", "SVG references an external resource.", value));
       }
       if (attributeName === "style") {
         issues.push(
@@ -174,6 +233,24 @@ export function checkSvgSafety(parsed: ParsedSvg, options: { allowText: boolean 
     }
   }
 
+  for (const instruction of allProcessingInstructions(parsed)) {
+    const target = instruction.nodeName.toLowerCase();
+    if (target === "xml") continue;
+    const data = (instruction.data ?? "").trim();
+    const external =
+      target === "xml-stylesheet" ||
+      /(?:href|src)\s*=\s*(?:"|')?(?!\s*#)/i.test(data);
+    if (external) {
+      issues.push(
+        issue(
+          "SVG_PROCESSING_INSTRUCTION",
+          `SVG contains a <?${target}?> processing instruction that can load external content.`,
+          target
+        )
+      );
+    }
+  }
+
   return issues;
 }
 
@@ -182,6 +259,10 @@ export function checkExternalColors(parsed: ParsedSvg, allowed: string[]): HardG
   const issues: HardGateIssue[] = [];
   for (const { value, element } of collectColorValues(parsed)) {
     const lowered = value.trim().toLowerCase();
+    if (isExternalUrlReference(lowered)) {
+      issues.push(issue("SVG_EXTERNAL_REF", "SVG references an external resource.", value));
+      continue;
+    }
     if (isNeutralColor(lowered) || isUrlColor(lowered)) continue;
     if (lowered.startsWith("var(")) {
       issues.push(issue("ILLUSTRATION_PALETTE", `Color ${value} must resolve through a palette token, not a CSS variable.`, elementName(element)));

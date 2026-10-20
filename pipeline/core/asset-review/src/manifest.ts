@@ -113,9 +113,12 @@ export function toManifestReview(input: ToManifestReviewInput): ManifestReview {
           ...(gates.reason === undefined ? {} : { reason: gates.reason }),
         };
 
+  // A `--only` run skips set gates, so it is a partial review by definition:
+  // never let a one-asset manifest claim the whole set is complete.
   const complete =
     assets.length > 0 &&
     assets.every((asset) => asset.status === "passed") &&
+    gates?.skipped !== true &&
     gates?.iconSet?.passed !== false &&
     gates?.illustrationSet?.passed !== false;
 
