@@ -2,7 +2,7 @@
 
 - 日期：2026-10-20
 - 对应 spec：`docs/superpowers/specs/2026-10-20-asset-review-hardening-design.md`
-- 状态：Ready for implementation；未实现（2026-10-20 评审后更新）
+- 状态：Implemented（2026-10-20）
 - 原则：每个 H 需求至少一个失败测试；先写测试再实现；默认 `pnpm test` 不访问真实 dsh/网络。
 
 ## 0. 测试分层

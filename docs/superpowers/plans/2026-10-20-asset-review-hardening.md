@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Ready for implementation (spec updated 2026-10-20). Do not start coding until the spec is approved.
+**Status:** Implemented (2026-10-20). Verification evidence and the commit trail are in `CHANGELOG.md`.
 
 **Review decisions applied:**
 - D1: dsh uses `--json -`; verdict from `final.text`, usage from `status(step_end)`.
@@ -36,15 +36,17 @@
 
 ## Checklist Summary
 
-- [ ] Task 1: H1 — reject inline `style` and `transform`
-- [ ] Task 2: H2 + H13 — icon/illustration set-level gates, all-element signatures, `--only` scope
-- [ ] Task 3: H3 — reviewer error isolation + `--fail-fast`
-- [ ] Task 4: H4 + H5 — strict config + provider fail-fast (dsh + model reviewer) + docs
-- [ ] Task 5: H6 + H8 + H15 — usage/cost + 10 CNY guard + `--json` stdin transport + pricing
-- [ ] Task 6: H7 + H12 — PNG image input (standalone rendering) + `manifest.review.json`
-- [ ] Task 7: H9 + H10 + H11 — append log, raw output, schema repair
-- [ ] Task 8: H14 + H15 — dsh mock integration + `--json`/DX
-- [ ] Final: full regression + real dsh run + docs/changelog
+- [x] Task 1: H1 — reject inline `style` and `transform`
+- [x] Task 2: H2 + H13 — icon/illustration set-level gates, all-element signatures, `--only` scope
+- [x] Task 3: H3 — reviewer error isolation + `--fail-fast`
+- [x] Task 4: H4 + H5 — strict config + provider fail-fast (dsh + model reviewer) + docs
+- [x] Task 5: H6 + H8 + H15 — usage/cost + 10 CNY guard + `--json` stdin transport + pricing
+- [x] Task 6: H7 + H12 — PNG image input (standalone rendering) + `manifest.review.json`
+- [x] Task 7: H9 + H10 + H11 — append log, raw output, schema repair
+- [x] Task 8: H14 + H15 — dsh mock integration + `--json`/DX
+- [x] Final: full regression + real dsh run + docs/changelog
+
+Detailed step checkboxes below are the historical TDD plan; implementation status and verification evidence are in `CHANGELOG.md`.
 
 ---
 
@@ -925,4 +927,4 @@ git commit -m "test: add dsh mock integration and hardening docs"
 - **Type consistency:** `ReviewResult`, `ReviewUsage`, `ReviewPricing`, `BatchGateResult`, `AssetReviewerPort.review`, `appendText`, `CommandRunner.stdin` are used consistently across tasks.
 - **Breaking-change inventory:** every `AssetReviewerPort` fake, every `ArtifactStorePort` fake, and every `CommandRunner` fake must be updated; `AssetReviewSummary`/`AssetReviewRun` new fields are optional for old run files.
 - **No placeholders:** each task lists files, interfaces, failing test, implementation, verification command, and commit.
-- **Not implemented yet:** this plan is a document; do not start coding until approved.
+- **Implemented:** see `CHANGELOG.md` for verification evidence, the commit trail, and the final whole-branch review fixes.

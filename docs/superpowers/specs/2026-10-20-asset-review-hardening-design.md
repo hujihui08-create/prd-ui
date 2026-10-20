@@ -1,7 +1,7 @@
 # Asset Review Hardening (M0.5) — Design Spec
 
 - 日期：2026-10-20（2026-10-20 实施评审后更新）
-- 状态：Ready for implementation；未实现
+- 状态：Implemented（2026-10-20）
 - 输入：真实 `deepseek-flash` 13/13、233 tests、M0 审计清单、2026-10-20 实施评审
 - 关联：
   - `docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md`

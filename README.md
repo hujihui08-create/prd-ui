@@ -105,11 +105,11 @@ DSH_HOME="$PWD/dsh/home" \
 
 profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipeline/dsh/README.md)。
 
-> 已用真实 `deepseek-flash` 跑通 dsh 端到端：13/13 passed，`summary.usageComplete = true`，`summary.reviewCostCny` 约 **¥0.46**（峰值价估算），加上探针/重跑累计约 **¥0.78**，低于 10 元上限。key 只写在本地 `pipeline/.env`，不提交。每次 review 的 usage/cost 已写入 `asset-review.json`；`pnpm test:dsh` 用本地 mock 服务器验证 dsh 链路，不需要真实 key。
+> 已用真实 `deepseek-flash` 跑通 dsh 端到端：13/13 passed，`summary.usageComplete = true`，`summary.reviewCostCny` 约 **¥0.35**（本次最终 run；多轮探针/重跑累计约 **¥1.1**，低于 10 元上限）。key 只写在本地 `pipeline/.env`，不提交。每次 review 的 usage/cost 已写入 `asset-review.json`；`pnpm test:dsh` 用本地 mock 服务器验证 dsh 链路，不需要真实 key。
 
 ## 测试与验收
 
-- `pnpm test`：338 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：350 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：1 test（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。

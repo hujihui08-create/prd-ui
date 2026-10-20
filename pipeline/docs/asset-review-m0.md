@@ -83,7 +83,7 @@ DSH_HOME="$PWD/dsh/home" \
 
 | 路径 | 内容 |
 |---|---|
-| `run.json` / `asset-review.json` | run 状态、summary（含 usage/cost）、每个资产每次 attempt 的 source/verdict/scores/issues/cost/timestamp、fallback/degraded |
+| `asset-review.json` | run 状态、summary（含 usage/cost）、每个资产每次 attempt 的 source/verdict/scores/issues/cost/timestamp、fallback/degraded |
 | `manifest.json` | 冻结后的资产清单；`complete: true` 才能交给 renderer |
 | `manifest.review.json` | 只读审计 sidecar：batch gates、review usage/source、degraded/unresolved |
 | `assets/briefs/<id>.json` | 实际使用的 brief |
@@ -109,7 +109,7 @@ jq '.usageSource, .usageComplete, .batchGates' "$RUN/manifest.review.json"
 - `1`：有 `unresolved`、`reviewer_error`、`configuration_error`、usage 不完整（`REVIEW_USAGE_INCOMPLETE`）或预算超限。
 - `2`：CLI 参数错误。
 
-`--json` 只适用于 review/preflight 运行：此时 stdout 恰好输出一个 JSON 对象，包含 `runDir`、`summary`、`assets`、`batchGates`、`error`、`reviewCostCny`、`usageSource`、`usageComplete`（不可用值为 `null`，`--dry-run` 时额外带 `preflight`）；人类可读的 summary 与失败提示被抑制，失败信息只放在 JSON 的 `error` 字段。`--help` 和参数错误**不在**该契约内：`--json --help` 仍打印 usage，未知/缺值参数仍只写 stderr 并以 exit 2 退出。
+`--json` 只适用于 review/preflight 运行：此时 stdout 恰好输出一个 JSON 对象，包含 `runDir`、`summary`、`assets`、`batchGates`、`error`、`reviewCostCny`、`usageSource`、`usageComplete`（不可用值为 `null`，`--dry-run` 时额外带 `preflight`）；人类可读的 summary 与失败提示被抑制。失败信息在 run-level 的 `error` 字段，或 asset-level 的 `assets[].attempts[].issues`（unresolved-only 运行时 `error` 可能为 `null`）。`--help` 和参数错误**不在**该契约内：`--json --help` 仍打印 usage，未知/缺值参数仍只写 stderr 并以 exit 2 退出。
 
 ## Fixtures
 

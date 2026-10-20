@@ -60,7 +60,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 349 tests passed (offline; dsh mock integration excluded).
+- `pnpm test`: 350 tests passed (offline; dsh mock integration excluded).
 - `pnpm test:dsh`: 1 passed (real pinned dsh 0.2.1-rc.2 + local mock).
 - `pnpm typecheck`: clean.
 - `pnpm phase1:verify`: `2 pages, 0 blockers`.
@@ -70,9 +70,9 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `1 passed, 1 unresolved`, exit 1 as designed.
 - dsh mock run: `1 assets, 1 passed`, `usageSource=json-events`,
   `usageComplete=true`, review cost below the 10 CNY cap.
-- Real dsh `deepseek-flash` full run: `13 assets, 13 passed`, `1 retried`,
-  `usageSource=json-events`, `usageComplete=true`, review cost ¥0.3379
-  (10 CNY default cap). 14 `candidate.png` evidence files and 14 `read_image`
+- Real dsh `deepseek-flash` full run: `13 assets, 13 passed`, `0 retried`,
+  `usageSource=json-events`, `usageComplete=true`, review cost ¥0.3467
+  (10 CNY default cap). 13 `candidate.png` evidence files and 13 `read_image`
   calls; no key material in the run directory; both set gates passed and
   `manifest.json` / `manifest.review.json` report `complete: true`.
 
@@ -80,6 +80,8 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 | Commit | Change |
 |---|---|
+| `53466c0` | fix: reject external url paint fallbacks |
+| `d8de24f` | docs: record final asset review fix |
 | `7c95cc1` | fix: close final asset review review findings |
 | `049ee19` | fix: make empty inventory fixture read as an empty shelf |
 | `2fb1d5b` | docs: align asset review json contract |
