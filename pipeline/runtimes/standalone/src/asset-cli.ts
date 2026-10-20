@@ -35,6 +35,7 @@ Options:
   --runs <dir>               Directory that receives run artifacts
   --only <assetId>           Run only one asset (repeatable)
   --dry-run                  Resolve brief/source/gate only; no reviewer, no freeze
+  --fail-fast                Stop the batch on the first reviewer error
   --budget-usd <n>           Per-asset cost cap
   --budget-minutes <n>       Per-asset time cap
   -h, --help                 Print this help and exit`;
@@ -48,6 +49,7 @@ export interface AssetCliOptions {
   profile?: string;
   only: string[];
   dryRun: boolean;
+  failFast: boolean;
   maxCostUsd?: number;
   maxMinutes?: number;
   help: boolean;
@@ -80,6 +82,7 @@ export function parseArgs(argv: string[]): AssetCliOptions {
     reviewer: "scripted",
     only: [],
     dryRun: false,
+    failFast: false,
     help: false,
   };
 
@@ -130,6 +133,9 @@ export function parseArgs(argv: string[]): AssetCliOptions {
         break;
       case "--dry-run":
         options.dryRun = true;
+        break;
+      case "--fail-fast":
+        options.failFast = true;
         break;
       case "--budget-usd":
         options.maxCostUsd = parseNumber(flag, value());
@@ -287,6 +293,7 @@ export async function main(
       policy,
       ports: { producer, reviewer, store, clock: { now: () => new Date() }, log: createLogger(store) },
       only: options.only,
+      continueOnReviewerError: !options.failFast,
       ...(options.maxCostUsd === undefined ? {} : { maxCostUsd: options.maxCostUsd }),
       ...(options.maxMinutes === undefined ? {} : { maxMinutes: options.maxMinutes }),
     });

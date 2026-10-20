@@ -203,6 +203,7 @@ export const AssetReviewSummarySchema = z
     retried: z.number().int().min(0),
     unresolved: z.number().int().min(0),
     degraded: z.number().int().min(0),
+    reviewerErrors: z.number().int().min(0).default(0),
   })
   .strict();
 export type AssetReviewSummary = z.infer<typeof AssetReviewSummarySchema>;

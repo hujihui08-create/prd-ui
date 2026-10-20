@@ -197,7 +197,7 @@ describe("runAssetReview", () => {
     expect(result.assets[0]!.attempts.some((attempt) => attempt.status === "budget_exceeded")).toBe(true);
   });
 
-  it("aborts on reviewer error without falling back", async () => {
+  it("does not fall back to the next source on reviewer error", async () => {
     const store = new MemoryStore();
     const brief = { ...iconBrief, sourceChain: ["library", "ai-vector"] as SourceId[] };
     const result = await run(store, reviewerWith({ "icon-home/library/1": new Error("model down") }), {
@@ -206,6 +206,77 @@ describe("runAssetReview", () => {
     expect(result.passed).toBe(false);
     expect(result.error).toContain("REVIEWER_ERROR");
     expect(result.assets[0]!.attempts.some((attempt) => attempt.status === "reviewer_error")).toBe(true);
+  });
+
+  it("continues to the next asset after a reviewer error", async () => {
+    const store = new MemoryStore();
+    const reviewer: AssetReviewerPort = {
+      async review({ brief }) {
+        if (brief.id === "icon-home") throw new Error("model down");
+        return passVerdict;
+      },
+    };
+    const result = await run(store, reviewer, {
+      briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+    });
+    expect(result.assets[0]!.status).toBe("unresolved");
+    expect(result.assets[1]!.status).toBe("passed");
+    expect(result.summary.reviewerErrors).toBe(1);
+    expect(result.error).toBe("REVIEWER_ERROR: 1 asset(s)");
+    expect(result.passed).toBe(false);
+  });
+
+  it("does not switch source when the reviewer errors", async () => {
+    const store = new MemoryStore();
+    const brief = { ...iconBrief, sourceChain: ["library", "ai-vector"] as SourceId[] };
+    const produced: SourceId[] = [];
+    const reviewed: SourceId[] = [];
+    const reviewer: AssetReviewerPort = {
+      async review({ candidate }) {
+        reviewed.push(candidate.source);
+        throw new Error("model down");
+      },
+    };
+    const basePorts = ports(store, reviewer);
+    const customPorts: AssetReviewPorts = {
+      ...basePorts,
+      producer: {
+        async produce(input) {
+          produced.push(input.source);
+          return basePorts.producer.produce(input);
+        },
+      },
+    };
+
+    const result = await run(store, reviewer, { briefs: [brief], ports: customPorts });
+
+    expect(produced).toEqual(["library"]);
+    expect(reviewed).toEqual(["library"]);
+    expect(result.assets[0]!.status).toBe("unresolved");
+    expect(result.assets[0]!.attempts).toHaveLength(1);
+    expect(result.assets[0]!.attempts[0]!.status).toBe("reviewer_error");
+  });
+
+  it("stops the batch on the first reviewer error when fail-fast is set", async () => {
+    const store = new MemoryStore();
+    let calls = 0;
+    const reviewer: AssetReviewerPort = {
+      async review() {
+        calls += 1;
+        throw new Error("down");
+      },
+    };
+    const result = await run(store, reviewer, {
+      briefs: [iconBrief, { ...iconBrief, id: "icon-search" }],
+      continueOnReviewerError: false,
+    });
+    expect(calls).toBe(1);
+    expect(result.assets[0]!.status).toBe("unresolved");
+    expect(result.assets[1]!.status).toBe("unresolved");
+    expect(result.assets[1]!.attempts[0]!.status).toBe("reviewer_error");
+    expect(result.summary.reviewerErrors).toBe(1);
+    expect(result.error).toBe("REVIEWER_ERROR: down");
+    expect(result.passed).toBe(false);
   });
 
   it("filters with --only", async () => {

@@ -85,6 +85,7 @@ describe("asset:review CLI", () => {
     const result = await runCli(["--help"]);
     expect(result.code).toBe(0);
     expect(result.stdout).toContain("pnpm asset:review");
+    expect(result.stdout).toContain("--fail-fast");
   });
 
   it("rejects an unknown argument with exit 2", async () => {
@@ -256,7 +257,7 @@ describe("asset:review CLI", () => {
     expect(result.stderr).toContain("PRD_UI_VISION_API_KEY");
   });
 
-  it("surfaces a missing vision credential without a fake pass", async () => {
+  it("fails fast and surfaces a missing vision credential without a fake pass", async () => {
     const runs = await tempRuns();
     const result = await runCli(
       [
@@ -266,6 +267,7 @@ describe("asset:review CLI", () => {
         m0,
         "--runtime",
         "dsh",
+        "--fail-fast",
         "--runs",
         runs,
       ],

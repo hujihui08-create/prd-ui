@@ -30,6 +30,7 @@ export interface RunAssetReviewInput {
   only?: string[];
   maxCostUsd?: number;
   maxMinutes?: number;
+  continueOnReviewerError?: boolean;
 }
 
 export type AssetReviewRunResult = AssetReviewRun;
@@ -68,9 +69,11 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     : input.briefs;
   const maxCostUsd = input.maxCostUsd ?? input.policy.maxCostUsd;
   const maxMinutes = input.maxMinutes ?? input.policy.maxMinutes;
+  const continueOnReviewerError = input.continueOnReviewerError ?? true;
 
   const records: AssetReviewRecord[] = [];
   let fatalError: string | undefined;
+  let reviewerErrors = 0;
 
   for (const brief of selected) {
     if (fatalError !== undefined) {
@@ -102,6 +105,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     let fallbackReason: string | undefined;
     let final: AssetReviewRecord | undefined;
     let budgetExceeded = false;
+    let reviewerFailed = false;
 
     await input.ports.log.log({
       type: "asset_started",
@@ -111,7 +115,14 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     });
 
     for (const source of brief.sourceChain) {
-      if (final !== undefined || fatalError !== undefined || budgetExceeded) break;
+      if (
+        final !== undefined ||
+        fatalError !== undefined ||
+        reviewerFailed ||
+        budgetExceeded
+      ) {
+        break;
+      }
       const sourceTier = SourceTierBySource[source];
 
       await input.ports.log.log({
@@ -263,7 +274,11 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
           attemptRecord.status = "reviewer_error";
           attemptRecord.issues = [`REVIEWER_ERROR: ${errorDetails(error)}`];
           attempts.push(attemptRecord);
-          fatalError = `REVIEWER_ERROR: ${errorDetails(error)}`;
+          reviewerErrors += 1;
+          reviewerFailed = true;
+          if (!continueOnReviewerError) {
+            fatalError = `REVIEWER_ERROR: ${errorDetails(error)}`;
+          }
           await input.ports.log.log({
             type: "reviewer_error",
             assetId: brief.id,
@@ -377,6 +392,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     retried: records.filter((record) => record.attempts.length > 1).length,
     unresolved: records.filter((record) => record.status === "unresolved").length,
     degraded: records.filter((record) => record.degraded).length,
+    reviewerErrors,
   };
   const batchGates = await runBatchGates({
     records,
@@ -398,9 +414,11 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
       : batchGates.illustrationSet?.passed === false
         ? "ILLUSTRATION_SET_INCONSISTENT"
         : undefined;
+  const reviewerError =
+    reviewerErrors > 0 ? `REVIEWER_ERROR: ${reviewerErrors} asset(s)` : undefined;
   // A reviewer crash is operational and must not be masked by a set mismatch;
   // icon-over-illustration precedence still applies within `setError`.
-  const error = fatalError ?? setError;
+  const error = fatalError ?? reviewerError ?? setError;
   const finishedAt = input.ports.clock.now().toISOString();
   const result: AssetReviewRunResult = {
     runId: input.runId,
@@ -416,6 +434,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
       summary.unresolved === 0 &&
       summary.total > 0 &&
       fatalError === undefined &&
+      reviewerErrors === 0 &&
       !setFailed,
     ...(error === undefined ? {} : { error }),
   };
