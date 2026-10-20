@@ -49,7 +49,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 406 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 408 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with

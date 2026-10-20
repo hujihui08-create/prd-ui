@@ -123,7 +123,7 @@ function runners(input: {
 
 async function run(
   store: MemoryStore,
-  scripted: ReturnType<typeof runners>,
+  scripted: Record<AgentRole, AgentRunnerPort>,
   overrides: Partial<RunM1Input> = {}
 ) {
   const logs: Array<Record<string, unknown>> = [];
@@ -279,6 +279,46 @@ describe("runM1", () => {
     expect(scripted["visual-style"].calls).toHaveLength(1);
     expect(store.files.has("artifacts/visual-style.json")).toBe(true);
     expect(result.state.signoff).toEqual({ ia: false, visualStyle: false });
+  });
+
+  it("runs interaction and visual style concurrently after IA", async () => {
+    const store = new MemoryStore();
+    store.files.set("signoff/ia.md", signoff());
+    store.files.set("signoff/visual-style.md", signoff());
+
+    let designStarted = 0;
+    let release!: () => void;
+    const barrier = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const runner: AgentRunnerPort = {
+      name: "barrier",
+      model: "barrier-model",
+      async run(task) {
+        if (task.role === "ia") return ok(iaOutput);
+        designStarted += 1;
+        if (designStarted === 2) release();
+        await barrier;
+        return ok(task.role === "interaction" ? interactionOutput : visualOutput);
+      },
+    };
+
+    const { result } = await Promise.race([
+      run(store, {
+        ia: runner,
+        interaction: runner,
+        "visual-style": runner,
+      }),
+      new Promise<never>((_resolve, reject) => {
+        setTimeout(
+          () => reject(new Error("design agents did not run concurrently")),
+          2_000
+        );
+      }),
+    ]);
+
+    expect(designStarted).toBe(2);
+    expect(result.state.status).toBe("success");
   });
 
   it("isolates a design failure and keeps the other agent artifact", async () => {

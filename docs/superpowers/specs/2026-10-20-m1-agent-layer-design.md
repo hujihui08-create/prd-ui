@@ -491,7 +491,7 @@ Interaction Gate   Visual Style Gate
 - 实现：`core/agents`（契约/role schemas/prompts/gates/`runM1`）、`agent:run` CLI、
   ScriptedAgentRunner、DshAgentRunner、`prd-ui-agents` dsh profile、employee-app
   M1 sample inputs 与 fixtures。
-- 测试：`pnpm test` **406 passed**（原 350）；`pnpm test:dsh` **2 passed**（asset review
+- 测试：`pnpm test` **408 passed**（原 350）；`pnpm test:dsh` **2 passed**（asset review
   + M1 IA，真实 pinned dsh + 本地 mock）；`pnpm typecheck` clean。
 - 回归：employee-app `Phase 1A OK: 2 pages, 0 blockers`；standalone asset review
   `13 assets / 13 passed`。

@@ -32,7 +32,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 406 tests (was 350).
+- `pnpm test`: 408 tests (was 350).
 - `pnpm typecheck`: clean.
 - `pnpm test:dsh`: 2 tests (asset review + M1 IA) through the real pinned dsh
   CLI with a local mock; no key or external network.

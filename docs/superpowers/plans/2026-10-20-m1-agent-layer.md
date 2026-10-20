@@ -85,11 +85,11 @@ pipeline/docs/agent-m1.md
 - Produces: `AgentUsageSchema`/`AgentUsage`, `ReviewPricingSchema`/`PricingConfigSchema`, `parsePricingConfig`, `resolvePricing`, `reviewCost`, `redactSecrets`, `redactValue`, `AssetBriefSchema`/`AssetBrief`, `AssetKindSchema`, `SourceIdSchema`, `AssetConstraintsSchema`.
 - `ProjectConfigSchema` gains optional `prd: string`.
 
-- [ ] **Step 1:** Add a contracts test asserting `AssetBriefSchema` accepts a brief with optional `visualRef`/`sourceHint` and rejects unknown keys; assert `AgentUsageSchema` rejects negative tokens.
-- [ ] **Step 2:** Run `pnpm exec vitest run core/contracts/tests/contracts.test.ts` — expect failure (missing exports).
-- [ ] **Step 3:** Move the four modules into contracts; re-export from asset-review so existing imports are unchanged.
-- [ ] **Step 4:** Run the focused test + `pnpm typecheck`; existing asset-review tests must still pass.
-- [ ] **Step 5:** Commit `refactor: share usage, pricing, redaction, asset-brief contracts`.
+- [x] **Step 1:** Add a contracts test asserting `AssetBriefSchema` accepts a brief with optional `visualRef`/`sourceHint` and rejects unknown keys; assert `AgentUsageSchema` rejects negative tokens.
+- [x] **Step 2:** Run `pnpm exec vitest run core/contracts/tests/contracts.test.ts` — expect failure (missing exports).
+- [x] **Step 3:** Move the four modules into contracts; re-export from asset-review so existing imports are unchanged.
+- [x] **Step 4:** Run the focused test + `pnpm typecheck`; existing asset-review tests must still pass.
+- [x] **Step 5:** Commit `refactor: share usage, pricing, redaction, asset-brief contracts`.
 
 ### Task 2: `core/agents` contracts and role schemas
 
@@ -108,11 +108,11 @@ pipeline/docs/agent-m1.md
 - `InteractionOutputSchema = { interactionSpec, motionSpec, reviewMarkdown }` strict.
 - `VisualStyleOutputSchema = { visualStyle, assetBriefs }` strict.
 
-- [ ] **Step 1:** Write tests: valid fixture parses; unknown key rejects; IA output containing `visualStyle`/`pageSpec` rejects; interaction states require default/loading/empty/error; visual asset briefs must be valid `AssetBrief`.
-- [ ] **Step 2:** Run the focused test — fail.
-- [ ] **Step 3:** Implement the schemas exactly as the M1 spec §5.
-- [ ] **Step 4:** Run focused test + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add M1 contracts and role schemas`.
+- [x] **Step 1:** Write tests: valid fixture parses; unknown key rejects; IA output containing `visualStyle`/`pageSpec` rejects; interaction states require default/loading/empty/error; visual asset briefs must be valid `AssetBrief`.
+- [x] **Step 2:** Run the focused test — fail.
+- [x] **Step 3:** Implement the schemas exactly as the M1 spec §5.
+- [x] **Step 4:** Run focused test + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add M1 contracts and role schemas`.
 
 ### Task 3: IA gate + signoff contract
 
@@ -129,11 +129,11 @@ pipeline/docs/agent-m1.md
 - Blocker codes: `IA_SCHEMA`, `IA_DUPLICATE_PAGE`, `IA_PAGE_MISSING`, `IA_PAGE_UNKNOWN`, `IA_FLOW_STEP_UNKNOWN`, `IA_BLOCKER_UNWAIVED`, `IA_WAIVER_INVALID`, `IA_DUPLICATE_FINDING`.
 - Waived blocker still passes when the waiver is valid and unexpired; gate status is `waived`.
 
-- [ ] **Step 1:** Tests: clean map passes; unwaived blocker fails; valid waiver → `waived`; expired waiver → fails; missing brief page → fails; duplicate finding id → fails.
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add IA gate and signoff parsing`.
+- [x] **Step 1:** Tests: clean map passes; unwaived blocker fails; valid waiver → `waived`; expired waiver → fails; missing brief page → fails; duplicate finding id → fails.
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add IA gate and signoff parsing`.
 
 ### Task 4: Interaction gate
 
@@ -149,11 +149,11 @@ pipeline/docs/agent-m1.md
 - Motion preset easing must be a key or value in `tokens.easing`; `durationMs` must equal a `\d+ms` token value.
 - Reduced motion is schema-required; a missing fallback is a schema failure.
 
-- [ ] **Step 1:** Tests for each code above (one fixture per failure).
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add interaction and motion gate`.
+- [x] **Step 1:** Tests for each code above (one fixture per failure).
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add interaction and motion gate`.
 
 ### Task 5: Visual Style gate
 
@@ -168,11 +168,11 @@ pipeline/docs/agent-m1.md
 - Icon strategy `library|commission|ai-vector` must appear in the brief's `sourceChain`.
 - Extra briefs are warnings, not blockers.
 
-- [ ] **Step 1:** Tests for missing palette/typography/strategy, missing brief, kind mismatch, source mismatch, duplicate, extra warning.
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add visual style gate`.
+- [x] **Step 1:** Tests for missing palette/typography/strategy, missing brief, kind mismatch, source mismatch, duplicate, extra warning.
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add visual style gate`.
 
 ### Task 6: `runM1` orchestrator
 
@@ -187,11 +187,11 @@ pipeline/docs/agent-m1.md
 - `AgentArtifactStorePort` extends file ops with `exists(path)`.
 - Artifacts: `artifacts/ia-*.json|.md`, `artifacts/interaction-spec.json`, `artifacts/motion-spec.json`, `artifacts/interaction-review.md`, `artifacts/visual-style.json`, `artifacts/asset-briefs/<id>.json`; `agents/<role>/{prompt.md,output.json,raw.json,stdout.txt,stderr.txt,session.json,history.json}`; `findings/<role>-gate.json`; `signoff/`; `logs/agent.ndjson`; `state.json`.
 
-- [ ] **Step 1:** Build a `ScriptedAgentRunner` test double and tests for: IA first then design; full artifact set; `awaiting_signoff`; `--allow-unreviewed` still awaiting; IA blocker stops downstream; one agent failure leaves the other artifact intact (`partial`); budget exceeded marks remaining skipped; `usageComplete=false` fails closed; `--allow-unknown-cost` continues; retry max 3; gate repair max 2 rounds; repair usage merged; promptHash/model written; raw/log redacted.
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement the state machine and orchestrator.
-- [ ] **Step 4:** Run focused tests + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add runM1 orchestrator`.
+- [x] **Step 1:** Build a `ScriptedAgentRunner` test double and tests for: IA first then design; full artifact set; `awaiting_signoff`; `--allow-unreviewed` still awaiting; IA blocker stops downstream; one agent failure leaves the other artifact intact (`partial`); budget exceeded marks remaining skipped; `usageComplete=false` fails closed; `--allow-unknown-cost` continues; retry max 3; gate repair max 2 rounds; repair usage merged; promptHash/model written; raw/log redacted.
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement the state machine and orchestrator.
+- [x] **Step 4:** Run focused tests + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add runM1 orchestrator`.
 
 ### Task 7: Standalone scripted runner + agent CLI
 
@@ -207,11 +207,11 @@ pipeline/docs/agent-m1.md
 - Exit 0 only for `success`; 1 for `awaiting_signoff`/`partial`/`failed`; 2 for usage errors.
 - `--json` prints exactly one redacted object: `{ runDir, status, gates, agents, signoff, costCny, usageComplete, error }`.
 
-- [ ] **Step 1:** Tests: parse args; scripted run produces artifacts; missing fixture fails; `--allow-unreviewed` exits 1 with awaiting_signoff; malformed run config exits 2; `--json` is one parseable object; redaction.
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement and add `"agent:run": "tsx runtimes/standalone/src/agent-cli.ts"`.
-- [ ] **Step 4:** Run focused + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add agent:run CLI and scripted runner`.
+- [x] **Step 1:** Tests: parse args; scripted run produces artifacts; missing fixture fails; `--allow-unreviewed` exits 1 with awaiting_signoff; malformed run config exits 2; `--json` is one parseable object; redaction.
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement and add `"agent:run": "tsx runtimes/standalone/src/agent-cli.ts"`.
+- [x] **Step 4:** Run focused + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add agent:run CLI and scripted runner`.
 
 ### Task 8: Sample PRD + M1 fixtures
 
@@ -221,10 +221,10 @@ pipeline/docs/agent-m1.md
 
 **Interfaces:** fixtures are valid `IaOutput`, `InteractionOutput`, `VisualStyleOutput` for the employee-app brief. Visual briefs cover all 10 `brief.assets.icons`.
 
-- [ ] **Step 1:** Add the PRD summary (today + inventory scope, roles, navigation, states).
-- [ ] **Step 2:** Add fixtures; parse them with the role schemas in a test.
-- [ ] **Step 3:** Run `pnpm agent:run --project samples/projects/employee-app/project.yaml --fixtures samples/agents/m1 --runs /tmp/m1-agent-runs --allow-unreviewed` and confirm `awaiting_signoff`.
-- [ ] **Step 4:** Commit `feat(agents): add employee-app M1 sample inputs`.
+- [x] **Step 1:** Add the PRD summary (today + inventory scope, roles, navigation, states).
+- [x] **Step 2:** Add fixtures; parse them with the role schemas in a test.
+- [x] **Step 3:** Run `pnpm agent:run --project samples/projects/employee-app/project.yaml --fixtures samples/agents/m1 --runs /tmp/m1-agent-runs --allow-unreviewed` and confirm `awaiting_signoff`.
+- [x] **Step 4:** Commit `feat(agents): add employee-app M1 sample inputs`.
 
 ### Task 9: dsh generic task runner + agent runner
 
@@ -238,11 +238,11 @@ pipeline/docs/agent-m1.md
 - `DshAgentRunner implements AgentRunnerPort`; `name="dsh"`; `model = env.PRD_UI_VISION_MODEL`; parses `final.text`, validates via `task.validate`, one schema repair merged into usage, writes attempts evidence.
 - Default profile: `prd-ui-agents`; default home/bin/cwd mirror `defaultDshOptions`.
 
-- [ ] **Step 1:** Tests with a fake `CommandRunner`: stdin task, `--json -`, `final.text` JSON, `step_end` usage; invalid JSON → one repair; repair failure → `AgentRunnerError("AGENT_INVALID_OUTPUT")`; timeout maps to `AGENT_TIMEOUT`.
-- [ ] **Step 2:** Run — fail.
-- [ ] **Step 3:** Implement refactor + runner.
-- [ ] **Step 4:** Run focused + typecheck.
-- [ ] **Step 5:** Commit `feat(agents): add dsh agent runner`.
+- [x] **Step 1:** Tests with a fake `CommandRunner`: stdin task, `--json -`, `final.text` JSON, `step_end` usage; invalid JSON → one repair; repair failure → `AgentRunnerError("AGENT_INVALID_OUTPUT")`; timeout maps to `AGENT_TIMEOUT`.
+- [x] **Step 2:** Run — fail.
+- [x] **Step 3:** Implement refactor + runner.
+- [x] **Step 4:** Run focused + typecheck.
+- [x] **Step 5:** Commit `feat(agents): add dsh agent runner`.
 
 ### Task 10: dsh agent profile + mock integration
 
@@ -253,10 +253,10 @@ pipeline/docs/agent-m1.md
 
 **Interfaces:** the `prd-ui-agents` profile mounts only `@deepseek-ai/dsh-base`, `@deepseek-ai/dsh-headless`, and `@deepseek-ai/dsh-llm-pi-ai`; no asset-plugin tools.
 
-- [ ] **Step 1:** Add the profile.
-- [ ] **Step 2:** Add a mock HTTP + real pinned dsh test that runs `agent:run --runtime dsh --only-role ia --signoff-ia <fixture>` and asserts artifacts, `usageSource=json-events`, `usageComplete=true`, and no asset tools in the prompt.
-- [ ] **Step 3:** Run `pnpm install` if the workspace links the new profile, then `pnpm test:dsh`.
-- [ ] **Step 4:** Commit `feat(agents): add dsh agent profile and mock integration`.
+- [x] **Step 1:** Add the profile.
+- [x] **Step 2:** Add a mock HTTP + real pinned dsh test that runs `agent:run --runtime dsh --only-role ia --signoff-ia <fixture>` and asserts artifacts, `usageSource=json-events`, `usageComplete=true`, and no asset tools in the prompt.
+- [x] **Step 3:** Run `pnpm install` if the workspace links the new profile, then `pnpm test:dsh`.
+- [x] **Step 4:** Commit `feat(agents): add dsh agent profile and mock integration`.
 
 ### Task 11: Regression, docs, real dsh manual run
 
@@ -264,11 +264,11 @@ pipeline/docs/agent-m1.md
 - Create: `pipeline/docs/agent-m1.md`
 - Modify: `README.md`, `CHANGELOG.md`, `AGENTS.md` (commands/expected evidence), `pipeline/dsh/README.md`
 
-- [ ] **Step 1:** Run `pnpm test` (≥350 + new), `pnpm typecheck`, `pnpm test:dsh`.
-- [ ] **Step 2:** Run employee-app phase1 (`2 pages / 0 blockers`) and standalone asset review (`13/13`).
-- [ ] **Step 3:** If `pipeline/.env` exists, run the three agents through real dsh for employee-app, record model/usage/cost (≤10 CNY), and note `usageComplete`.
-- [ ] **Step 4:** Write `pipeline/docs/agent-m1.md` with usage, artifacts, signoff format, exit codes, and the real-run record; update README/CHANGELOG/AGENTS.
-- [ ] **Step 5:** Commit `docs: record M1 agent layer implementation`.
+- [x] **Step 1:** Run `pnpm test` (≥350 + new), `pnpm typecheck`, `pnpm test:dsh`.
+- [x] **Step 2:** Run employee-app phase1 (`2 pages / 0 blockers`) and standalone asset review (`13/13`).
+- [x] **Step 3:** If `pipeline/.env` exists, run the three agents through real dsh for employee-app, record model/usage/cost (≤10 CNY), and note `usageComplete`.
+- [x] **Step 4:** Write `pipeline/docs/agent-m1.md` with usage, artifacts, signoff format, exit codes, and the real-run record; update README/CHANGELOG/AGENTS.
+- [x] **Step 5:** Commit `docs: record M1 agent layer implementation`.
 
 ## Self-Review
 
