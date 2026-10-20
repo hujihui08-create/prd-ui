@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { AssetReviewerInput } from "@prd-ui/asset-review";
-import { ModelReviewer, type FetchLike } from "../src/asset/model-reviewer.js";
+import {
+  ModelReviewer,
+  modelReviewerFromEnv,
+  type FetchLike,
+} from "../src/asset/model-reviewer.js";
 
 const input: AssetReviewerInput = {
   brief: {
@@ -90,5 +94,42 @@ describe("ModelReviewer", () => {
       fetch: async () => response("not json"),
     });
     await expect(reviewer.review(input)).rejects.toThrow(/MODEL_INVALID_JSON/);
+  });
+});
+
+describe("modelReviewerFromEnv", () => {
+  it("requires a base URL and model", () => {
+    expect(() => modelReviewerFromEnv({ PRD_UI_VISION_API_KEY: "key" })).toThrow(
+      /CONFIGURATION_ERROR: missing PRD_UI_VISION_BASE_URL, PRD_UI_VISION_MODEL/
+    );
+  });
+
+  it("requires an API key", () => {
+    expect(() =>
+      modelReviewerFromEnv({
+        PRD_UI_VISION_BASE_URL: "https://example.test/v1",
+        PRD_UI_VISION_MODEL: "vision",
+      })
+    ).toThrow(/CONFIGURATION_ERROR: PRD_UI_VISION_API_KEY/);
+  });
+
+  it("uses the configured endpoint and model without fallback defaults", async () => {
+    const requests: Array<{ url: string; body: string }> = [];
+    const fetchImpl: FetchLike = async (url, init) => {
+      requests.push({ url, body: init.body });
+      return response(JSON.stringify(verdict));
+    };
+    const reviewer = modelReviewerFromEnv(
+      {
+        PRD_UI_VISION_API_KEY: "key",
+        PRD_UI_VISION_BASE_URL: "https://example.test/v1/",
+        PRD_UI_VISION_MODEL: "vision",
+      },
+      fetchImpl
+    );
+    await reviewer.review(input);
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.url).toBe("https://example.test/v1/chat/completions");
+    expect((JSON.parse(requests[0]!.body) as { model: string }).model).toBe("vision");
   });
 });

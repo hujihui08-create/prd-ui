@@ -80,14 +80,15 @@ pnpm asset:review \
 
 ## dsh 真实评审
 
-需要 vision 模型 key（DeepSeek text-only adapter 不支持图像）：
+需要 vision 模型 key（DeepSeek text-only adapter 不支持图像）。`PRD_UI_VISION_BASE_URL` 和 `PRD_UI_VISION_MODEL` 必须显式配置，缺失时 CLI 在启动阶段以 `CONFIGURATION_ERROR` 退出：
 
 ```bash
 cd pipeline
 cp .env.example .env
-# PRD_UI_VISION_API_KEY=...
-# PRD_UI_VISION_BASE_URL=https://api.openai.com/v1
-# PRD_UI_VISION_MODEL=gpt-4o-mini
+# edit .env and fill PRD_UI_VISION_API_KEY
+# PRD_UI_VISION_BASE_URL=https://api.deepseek.com/v1
+# PRD_UI_VISION_MODEL=deepseek-flash
+set -a; source .env; set +a
 
 DSH_HOME="$PWD/dsh/home" \
   pnpm asset:review \

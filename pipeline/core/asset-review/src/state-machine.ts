@@ -15,7 +15,8 @@ import {
 import { runBatchGates } from "./batch-gates.js";
 import { runGate } from "./gate.js";
 import { normalizeSvg } from "./gates/svg.js";
-import type { AssetReviewPorts, VisualStyle } from "./ports.js";
+import type { AssetReviewPorts } from "./ports.js";
+import type { VisualStyle } from "./visual-style.js";
 import { validateVerdict } from "./verdict.js";
 
 export interface RunAssetReviewInput {

@@ -1,6 +1,7 @@
 import {
   AssetReviewVerdictSchema,
   buildReviewPrompt,
+  validateProviderEnv,
   type AssetReviewVerdict,
 } from "@prd-ui/asset-review";
 import type { AssetReviewerInput, AssetReviewerPort } from "@prd-ui/asset-review";
@@ -112,14 +113,15 @@ export function modelReviewerFromEnv(
   env: NodeJS.ProcessEnv = process.env,
   fetchImpl?: FetchLike
 ): ModelReviewer {
+  validateProviderEnv(env);
   const apiKey = env.PRD_UI_VISION_API_KEY;
   if (!apiKey) {
     throw new Error("CONFIGURATION_ERROR: PRD_UI_VISION_API_KEY is not set");
   }
   return new ModelReviewer({
     apiKey,
-    baseUrl: env.PRD_UI_VISION_BASE_URL ?? "https://api.openai.com/v1",
-    model: env.PRD_UI_VISION_MODEL ?? "gpt-4o-mini",
+    baseUrl: env.PRD_UI_VISION_BASE_URL!,
+    model: env.PRD_UI_VISION_MODEL!,
     ...(fetchImpl === undefined ? {} : { fetch: fetchImpl }),
   });
 }

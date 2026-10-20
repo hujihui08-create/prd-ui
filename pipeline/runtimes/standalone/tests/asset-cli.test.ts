@@ -67,6 +67,19 @@ async function runCli(args: string[], env: NodeJS.ProcessEnv = process.env): Pro
   }
 }
 
+function withoutProviderEnv(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  const copy = { ...env };
+  delete copy.PRD_UI_VISION_BASE_URL;
+  delete copy.PRD_UI_VISION_MODEL;
+  delete copy.PRD_UI_VISION_API_KEY;
+  return copy;
+}
+
+const providerEnv: NodeJS.ProcessEnv = {
+  PRD_UI_VISION_BASE_URL: "https://example.test/v1",
+  PRD_UI_VISION_MODEL: "vision",
+};
+
 async function onlyRun(runsDir: string): Promise<string> {
   const { readdir } = await import("node:fs/promises");
   const entries = (await readdir(runsDir, { withFileTypes: true })).filter(
@@ -238,6 +251,119 @@ describe("asset:review CLI", () => {
     expect(assets.find((asset) => asset.assetId === "icon-retry")?.status).toBe("passed");
   });
 
+  it("fails on malformed style.json with INVALID_STYLE and the file path", async () => {
+    const assets = await tempAssets();
+    const stylePath = path.join(assets, "style.json");
+    await writeFile(stylePath, "{ bad json", "utf8");
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--dry-run",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("INVALID_STYLE");
+    expect(result.stderr).toContain(stylePath);
+  });
+
+  it("fails on a style.json with unknown fields", async () => {
+    const assets = await tempAssets();
+    const stylePath = path.join(assets, "style.json");
+    await writeFile(
+      stylePath,
+      JSON.stringify({ id: "b-mobile", unexpected: "strict schema must reject this" }),
+      "utf8"
+    );
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--dry-run",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("INVALID_STYLE");
+    expect(result.stderr).toContain(stylePath);
+  });
+
+  it("fails on an invalid source-policy.json with INVALID_SOURCE_POLICY", async () => {
+    const assets = await tempAssets();
+    const policyPath = path.join(assets, "source-policy.json");
+    await writeFile(policyPath, JSON.stringify({ chains: {} }), "utf8");
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--dry-run",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("INVALID_SOURCE_POLICY");
+    expect(result.stderr).toContain(policyPath);
+  });
+
+  it("uses default style and policy when config files are missing", async () => {
+    const assets = await tempAssets();
+    await rm(path.join(assets, "style.json"), { force: true });
+    await rm(path.join(assets, "source-policy.json"), { force: true });
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--dry-run",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Asset preflight OK: 13 assets");
+  });
+
+  it("runs the scripted reviewer without provider env", async () => {
+    const runs = await tempRuns();
+    const result = await runCli(
+      ["--project", projectPath, "--assets", m0, "--runtime", "standalone", "--runs", runs],
+      withoutProviderEnv()
+    );
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("13 assets, 13 passed");
+  });
+
+  it("fails fast when the dsh provider env is missing", async () => {
+    const runs = await tempRuns();
+    const result = await runCli(
+      ["--project", projectPath, "--assets", m0, "--runtime", "dsh", "--runs", runs],
+      withoutProviderEnv()
+    );
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("CONFIGURATION_ERROR");
+    expect(result.stderr).toContain("PRD_UI_VISION_BASE_URL");
+    expect(result.stderr).toContain("PRD_UI_VISION_MODEL");
+  });
+
+  it("fails fast when the model reviewer provider env is missing", async () => {
+    const runs = await tempRuns();
+    const result = await runCli(
+      ["--project", projectPath, "--assets", m0, "--reviewer", "model", "--runs", runs],
+      withoutProviderEnv()
+    );
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("CONFIGURATION_ERROR");
+    expect(result.stderr).toContain("PRD_UI_VISION_BASE_URL");
+    expect(result.stderr).toContain("PRD_UI_VISION_MODEL");
+  });
+
   it("fails fast when the model reviewer has no key", async () => {
     const runs = await tempRuns();
     const result = await runCli(
@@ -251,7 +377,7 @@ describe("asset:review CLI", () => {
         "--runs",
         runs,
       ],
-      { ...process.env, PRD_UI_VISION_API_KEY: "" }
+      { ...process.env, ...providerEnv, PRD_UI_VISION_API_KEY: "" }
     );
     expect(result.code).toBe(1);
     expect(result.stderr).toContain("PRD_UI_VISION_API_KEY");
@@ -271,7 +397,7 @@ describe("asset:review CLI", () => {
         "--runs",
         runs,
       ],
-      { ...process.env, PRD_UI_VISION_API_KEY: "" }
+      { ...process.env, ...providerEnv, PRD_UI_VISION_API_KEY: "" }
     );
     expect(result.code).toBe(1);
     expect(result.stderr).toMatch(/MISSING_CREDENTIAL|PRD_UI_VISION_API_KEY/);

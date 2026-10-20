@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildReviewPrompt,
+  validateProviderEnv,
   type AssetReviewVerdict,
   type AssetReviewerInput,
   type AssetReviewerPort,
@@ -23,6 +24,11 @@ export interface DshAssetReviewerOptions {
   runner?: CommandRunner;
 }
 
+/** Dsh-specific entry point; the provider contract is shared with standalone. */
+export function validateDshProviderEnv(env: NodeJS.ProcessEnv = process.env): void {
+  validateProviderEnv(env);
+}
+
 export function defaultDshOptions(): DshAssetReviewerOptions {
   return {
     dshHome: path.join(pipelineRoot, "dsh", "home"),
@@ -40,7 +46,8 @@ export function defaultDshOptions(): DshAssetReviewerOptions {
 export class DshAssetReviewer implements AssetReviewerPort {
   private readonly options: DshAssetReviewerOptions;
 
-  constructor(options: DshAssetReviewerOptions) {
+  constructor(options: DshAssetReviewerOptions & { env?: NodeJS.ProcessEnv }) {
+    validateDshProviderEnv(options.env ?? process.env);
     this.options = options;
   }
 
@@ -78,7 +85,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
 }
 
 export function createDshAssetReviewer(
-  overrides: Partial<DshAssetReviewerOptions> = {}
+  overrides: Partial<DshAssetReviewerOptions & { env?: NodeJS.ProcessEnv }> = {}
 ): DshAssetReviewer {
   return new DshAssetReviewer({ ...defaultDshOptions(), ...overrides });
 }

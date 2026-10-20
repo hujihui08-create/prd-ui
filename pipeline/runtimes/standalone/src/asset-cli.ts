@@ -5,9 +5,11 @@ import {
   AssetBriefSchema,
   DEFAULT_SOURCE_POLICY,
   SourcePolicySchema,
+  VisualStyleSchema,
   preflightAssetBriefs,
   runAssetReview,
   toAssetManifest,
+  validateProviderEnv,
   type AssetBrief,
   type AssetReviewerPort,
   type SourcePolicy,
@@ -163,25 +165,45 @@ async function loadBriefs(assetsDir: string): Promise<AssetBrief[]> {
   return briefs;
 }
 
-async function loadStyle(assetsDir: string): Promise<VisualStyle> {
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function readOptionalJson(file: string): Promise<unknown | undefined> {
   try {
-    const raw = JSON.parse(await readFile(path.join(assetsDir, "style.json"), "utf8")) as Partial<VisualStyle>;
-    return { id: raw.id ?? "b-mobile", ...raw };
-  } catch {
-    return { id: "b-mobile" };
+    return JSON.parse(await readFile(file, "utf8")) as unknown;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw new Error(`INVALID_JSON: ${file}: ${errorMessage(error)}`);
+  }
+}
+
+async function loadStyle(assetsDir: string): Promise<VisualStyle> {
+  const file = path.join(assetsDir, "style.json");
+  try {
+    const raw = await readOptionalJson(file);
+    if (raw === undefined) return { id: "b-mobile" };
+    return VisualStyleSchema.parse(raw);
+  } catch (error) {
+    throw new Error(`INVALID_STYLE: ${file}: ${errorMessage(error)}`);
   }
 }
 
 async function loadPolicy(assetsDir: string): Promise<SourcePolicy> {
+  const file = path.join(assetsDir, "source-policy.json");
   try {
-    const raw = JSON.parse(await readFile(path.join(assetsDir, "source-policy.json"), "utf8")) as unknown;
+    const raw = await readOptionalJson(file);
+    if (raw === undefined) return DEFAULT_SOURCE_POLICY;
     return SourcePolicySchema.parse(raw);
-  } catch {
-    return DEFAULT_SOURCE_POLICY;
+  } catch (error) {
+    throw new Error(`INVALID_SOURCE_POLICY: ${file}: ${errorMessage(error)}`);
   }
 }
 
 async function createReviewer(assetsDir: string, options: AssetCliOptions): Promise<AssetReviewerPort> {
+  if (options.runtime === "dsh" || options.reviewer === "model") {
+    validateProviderEnv();
+  }
   if (options.runtime === "dsh") {
     const { createDshAssetReviewer } = await import("@prd-ui/runtime-dsh/adapter");
     return createDshAssetReviewer();
@@ -260,6 +282,7 @@ export async function main(
       store,
     });
     const style = await loadStyle(options.assetsDir);
+    const policy = await loadPolicy(options.assetsDir);
 
     if (options.dryRun) {
       const result = await preflightAssetBriefs({
@@ -282,7 +305,6 @@ export async function main(
     }
 
     const reviewer = await createReviewer(options.assetsDir, options);
-    const policy = await loadPolicy(options.assetsDir);
     const result = await runAssetReview({
       runId,
       project: config.project,

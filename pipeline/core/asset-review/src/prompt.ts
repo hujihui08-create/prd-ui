@@ -5,7 +5,7 @@ import {
   type AssetCandidate,
   type HardGateResult,
 } from "./contracts.js";
-import type { VisualStyle } from "./ports.js";
+import type { VisualStyle } from "./visual-style.js";
 
 export interface ReviewPromptInput {
   brief: AssetBrief;

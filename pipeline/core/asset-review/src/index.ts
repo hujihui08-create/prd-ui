@@ -1,4 +1,6 @@
 export * from "./contracts.js";
+export * from "./visual-style.js";
+export * from "./provider-env.js";
 export * from "./verdict.js";
 export * from "./gates/index.js";
 export * from "./gate.js";

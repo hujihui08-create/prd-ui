@@ -41,13 +41,17 @@ cd pipeline
 cp .env.example .env
 # edit .env:
 # PRD_UI_VISION_API_KEY=...
-# PRD_UI_VISION_BASE_URL=https://api.openai.com/v1
-# PRD_UI_VISION_MODEL=gpt-4o-mini
+# PRD_UI_VISION_BASE_URL=https://api.deepseek.com/v1
+# PRD_UI_VISION_MODEL=deepseek-flash
+set -a; source .env; set +a
 ```
 
-The profile's `cordis.patch.yml` only references the key name
-(`apiKeyEnv: PRD_UI_VISION_API_KEY`); the value stays in the environment or
-`pipeline/.env`. Never commit `.env`.
+The profile's `cordis.patch.yml` reads `PRD_UI_VISION_BASE_URL` and
+`PRD_UI_VISION_MODEL` directly from the environment; there is no provider
+fallback. `apiKeyEnv: PRD_UI_VISION_API_KEY` names the key variable only; the
+value stays in the environment or `pipeline/.env`. `asset:review` fails at
+startup with `CONFIGURATION_ERROR` when the base URL or model is missing.
+Never commit `.env`.
 
 You can also export the variables in the shell; inherited environment wins over
 `$DSH_HOME/.credentials.yaml`.

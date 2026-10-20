@@ -5,14 +5,7 @@ import type {
   HardGateResult,
   SourceId,
 } from "./contracts.js";
-
-export interface VisualStyle {
-  id: string;
-  name?: string;
-  palette?: string[];
-  illustration?: string;
-  notes?: string;
-}
+import type { VisualStyle } from "./visual-style.js";
 
 export interface AssetProducerInput {
   brief: AssetBrief;

@@ -3,8 +3,13 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { AssetReviewerInput } from "@prd-ui/asset-review";
-import { DshAssetReviewer } from "../src/adapter.js";
+import { DshAssetReviewer, validateDshProviderEnv } from "../src/adapter.js";
 import type { CommandRunner } from "../src/dsh-process.js";
+
+const providerEnv: NodeJS.ProcessEnv = {
+  PRD_UI_VISION_BASE_URL: "https://example.test/v1",
+  PRD_UI_VISION_MODEL: "vision",
+};
 
 const verdict = {
   verdict: "pass",
@@ -60,6 +65,7 @@ describe("DshAssetReviewer", () => {
       dshBin: "/tmp/dsh",
       cwd: "/tmp",
       runner,
+      env: providerEnv,
     });
     const result = await reviewer.review({ ...input, runDir });
     expect(result.verdict).toBe("pass");
@@ -67,5 +73,27 @@ describe("DshAssetReviewer", () => {
     expect((await stat(path.join(evidence, "prompt.md"))).isFile()).toBe(true);
     expect(await readFile(path.join(evidence, "stdout.txt"), "utf8")).toContain('"verdict"');
     expect(await readFile(path.join(evidence, "session.json"), "utf8")).toContain("prd-ui-assets");
+  });
+
+  it("rejects missing provider env when constructed", () => {
+    expect(
+      () =>
+        new DshAssetReviewer({
+          dshHome: "/tmp/dsh-home",
+          profile: "prd-ui-assets",
+          dshBin: "/tmp/dsh",
+          cwd: "/tmp",
+          env: {},
+        })
+    ).toThrow(
+      /CONFIGURATION_ERROR: missing PRD_UI_VISION_BASE_URL, PRD_UI_VISION_MODEL/
+    );
+  });
+
+  it("lists only the missing provider variable", () => {
+    expect(() =>
+      validateDshProviderEnv({ PRD_UI_VISION_BASE_URL: "https://example.test/v1" })
+    ).toThrow(/CONFIGURATION_ERROR: missing PRD_UI_VISION_MODEL$/);
+    expect(() => validateDshProviderEnv(providerEnv)).not.toThrow();
   });
 });
