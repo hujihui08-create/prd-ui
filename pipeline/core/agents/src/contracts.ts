@@ -62,6 +62,19 @@ export interface AgentRunnerPort {
   run(task: AgentTask): Promise<AgentResult>;
 }
 
+/**
+ * Paths are relative to the run directory. The runtime adapter owns the
+ * filesystem; core only reads/writes through this port.
+ */
+export interface AgentArtifactStorePort {
+  writeJson(path: string, value: unknown): Promise<void>;
+  writeText(path: string, value: string): Promise<void>;
+  appendText(path: string, value: string): Promise<void>;
+  readText(path: string): Promise<string>;
+  exists(path: string): Promise<boolean>;
+  hash(path: string): Promise<string>;
+}
+
 export type AgentErrorCode =
   | "AGENT_TIMEOUT"
   | "AGENT_UNAVAILABLE"
