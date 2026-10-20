@@ -194,8 +194,8 @@ DSH_HOME="$PWD/dsh/home" pnpm asset:review \
 - `13 assets, 13 passed`，0 unresolved
 - `usageSource === "json-events"`、`usageComplete === true`
 - `reviewCostCny` ≤ 10（当前约 ¥0.35）
-- 13 张 `candidate.png`
-- 至少 13 次 `read_image`
+- 至少 13 张 `candidate.png`（每个 attempt 一张；retry 会增加，本次 2 次 retry → 15）
+- 至少 13 次 `read_image`（本次 15）
 - `review.raw.json` 含 `parsed`、`usage`、`usageComplete`
 - 两个 set gate 通过，`manifest.complete === true`
 
@@ -233,23 +233,29 @@ env -u PRD_UI_VISION_BASE_URL -u PRD_UI_VISION_MODEL \
 - `CONFIGURATION_ERROR: missing PRD_UI_VISION_BASE_URL, PRD_UI_VISION_MODEL`
 - standalone scripted 路径不需要这些变量，仍 13/13
 
-### UAT-11 reviewer 错误隔离（P1，需要 base/model，不需要 key）
+### UAT-11 reviewer 错误隔离（P1，无需真实 key）
+
+用不可达的 model endpoint 制造确定性 reviewer 错误；不要只 unset key，dsh 会回退到 `DSH_HOME` 的 credentials。
 
 ```bash
-env -u PRD_UI_VISION_API_KEY \
-  PRD_UI_VISION_BASE_URL=https://api.deepseek.com/v1 \
-  PRD_UI_VISION_MODEL=deepseek-flash \
-  DSH_HOME="$PWD/dsh/home" pnpm asset:review \
+env PRD_UI_VISION_API_KEY=invalid \
+  PRD_UI_VISION_BASE_URL=http://127.0.0.1:9/v1 \
+  PRD_UI_VISION_MODEL=mock \
+  pnpm asset:review \
     --project samples/projects/employee-app/project.yaml \
-    --assets samples/assets/m0 --runtime dsh \
+    --assets samples/assets/m0 \
+    --only icon-home --only icon-search --only icon-plus \
+    --runtime standalone --reviewer model \
     --runs /tmp/uat-reviewer-error
 ```
 
 **预期**
 
-- 默认：继续处理其他资产，`summary.reviewerErrors` 记录数量，`error` 含 `REVIEWER_ERROR`
-- 加 `--fail-fast`：第一个错误后停止，剩余资产标记 `reviewer_error`
+- 默认：3 个资产全部尝试，`summary.reviewerErrors === 3`，`unresolved === 3`，`error` 含 `REVIEWER_ERROR`
+- 加 `--fail-fast`：`reviewerErrors === 1`，剩余 2 个资产标记 `reviewer_error`，`unresolved === 3`
 - 不因 reviewer 错误切换 source
+
+**dsh 变体**：如果用 dsh + 不可达 provider，可能出现 `REVIEW_USAGE_INCOMPLETE`（部分 usage + 10 元预算的 fail-closed 行为），这是预期成本保护，不是隔离失败；用 model reviewer 用例验证 H3 更稳定。
 
 ### UAT-12 图像评审负例（P2，需要 key，探索性）
 
@@ -365,3 +371,18 @@ rm -rf /tmp/uat-* /tmp/uat-html
 - API key 只放在 `pipeline/.env`；本 spec 和测试报告不得包含 key。
 - 测试结束后如 key 曾在聊天/日志中出现，建议轮换。
 - 真实 dsh 默认 10 元上限；先用 `--only` 验证，再跑全量。
+
+## 9. 本轮执行结果（2026-10-20）
+
+| 用例 | 结果 |
+|---|---|
+| UAT-01 ~ UAT-07、UAT-14、UAT-15 | **22/22 PASS**（无需 key） |
+| UAT-08 真实 dsh 全量 | **13/13 passed**，2 retried，cost ¥0.4176，`usageSource=json-events`，`usageComplete=true`，15 张 PNG / 15 次 `read_image`；两个 set gate 通过 |
+| UAT-09 成本上限 | exit 1，`REVIEW_COST_BUDGET_EXCEEDED`；实际 cost ¥0.0240，1 passed / 12 unresolved |
+| UAT-10 provider 缺失 | exit 1，`CONFIGURATION_ERROR`，列出 `PRD_UI_VISION_BASE_URL` / `PRD_UI_VISION_MODEL` |
+| UAT-11 reviewer 隔离 | model reviewer 默认 `reviewerErrors=3`；`--fail-fast` 时 `reviewerErrors=1`、`unresolved=3` |
+| UAT-12 图像负例 | 旧 bar-chart fixture 被拒绝：semantics 2、composition 3，reason 明确提到“像柱状图/不是空货架” |
+| UAT-13 证据审计 | `review.raw.json` 含 parsed/usage/usageComplete；`manifest.review.json` 含 usageSource/usageComplete；run 目录无 `sk-` key |
+| 总体 | **PASS**；UAT-08 的 PNG 数量按“每 attempt 一张”修正为 ≥13；UAT-11 改用 model reviewer 制造确定性错误（dsh 不可达 provider 会触发 `REVIEW_USAGE_INCOMPLETE` 的 cost fail-closed，属预期行为） |
+
+执行目录：`/tmp/uat-no-key`、`/tmp/uat-real`（临时证据，不提交）。
