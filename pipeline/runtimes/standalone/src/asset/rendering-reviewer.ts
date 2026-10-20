@@ -47,11 +47,14 @@ export class RenderingReviewer implements AssetReviewerPort {
       const png = await render(input.assetText, { scale: this.options.scale ?? 2 });
       await mkdir(path.dirname(absolutePath), { recursive: true });
       await writeFile(absolutePath, png);
-      return await this.inner.review({ ...input, candidateImagePath: absolutePath });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return this.reviewWithoutImage(input, message);
     }
+
+    // Keep the reviewer call outside the render try: a reviewer failure must
+    // propagate unchanged instead of being retried as an SVG-only fallback.
+    return this.inner.review({ ...input, candidateImagePath: absolutePath });
   }
 
   private async reviewWithoutImage(

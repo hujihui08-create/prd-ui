@@ -143,6 +143,22 @@ describe("RenderingReviewer", () => {
     expect(result.verdict.verdict).toBe("pass");
   });
 
+  it("propagates inner reviewer errors without retrying as an SVG-only review", async () => {
+    const runDir = await tempDir();
+    const failure = new Error("DSH_TIMEOUT: dsh timed out");
+    let calls = 0;
+    const reviewer: AssetReviewerPort = {
+      async review(): Promise<ReviewResult> {
+        calls += 1;
+        throw failure;
+      },
+    };
+    const rendering = new RenderingReviewer(reviewer);
+
+    await expect(rendering.review({ ...input, runDir })).rejects.toBe(failure);
+    expect(calls).toBe(1);
+  });
+
   it("passes non-SVG candidates through without rendering", async () => {
     const runDir = await tempDir();
     const { reviewer, inputs } = recordingReviewer();
