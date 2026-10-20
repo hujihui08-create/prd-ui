@@ -28,6 +28,8 @@ export interface DshAssetReviewerOptions {
   cwd: string;
   timeoutMs?: number;
   runner?: CommandRunner;
+  /** Receives RENDER_WARNING when standalone could not provide a PNG. */
+  warn?: (message: string) => void;
 }
 
 /** Dsh-specific entry point; the provider contract is shared with standalone. */
@@ -79,7 +81,7 @@ export class DshAssetReviewer implements AssetReviewerPort {
 
   constructor(options: DshAssetReviewerOptions & { env?: NodeJS.ProcessEnv }) {
     validateDshProviderEnv(options.env ?? process.env);
-    this.options = options;
+    this.options = { warn: (message) => console.warn(message), ...options };
   }
 
   private run(input: AssetReviewerInput, task: string): Promise<DshReviewResult> {
@@ -97,7 +99,22 @@ export class DshAssetReviewer implements AssetReviewerPort {
 
   async review(input: AssetReviewerInput): Promise<ReviewResult> {
     const prompt = buildReviewPrompt(input);
-    const task = `${prompt}\n\nReturn ONLY the JSON verdict. The run directory is ${input.runDir}.`;
+    const imageInstruction =
+      input.candidateImagePath === undefined
+        ? undefined
+        : `A rendered PNG is at ${input.candidateImagePath}. Use read_image before scoring.`;
+    if (imageInstruction === undefined && input.candidate.file.format === "svg") {
+      this.options.warn?.(
+        `RENDER_WARNING: no rendered PNG for ${input.candidate.assetId}/${input.candidate.source}/${input.candidate.attempt}; continuing with SVG text`
+      );
+    }
+    const task = [
+      prompt,
+      imageInstruction,
+      `Return ONLY the JSON verdict. The run directory is ${input.runDir}.`,
+    ]
+      .filter((part): part is string => part !== undefined)
+      .join("\n\n");
     let firstError: DshError | undefined;
     let repairTask: string | undefined;
     let result: DshReviewResult;

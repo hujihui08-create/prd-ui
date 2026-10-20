@@ -149,6 +149,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
   let hasUsage = false;
   let reviewCount = 0;
   let anyIncomplete = false;
+  let renderWarnings = 0;
 
   const recordReview = (
     accounting: ReviewAccounting,
@@ -425,6 +426,17 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
 
         recordReview(reviewResult, attemptRecord);
 
+        if (reviewResult.renderWarning !== undefined) {
+          renderWarnings += 1;
+          await input.ports.log.log({
+            type: "render_warning",
+            assetId: brief.id,
+            source,
+            attempt,
+            warning: reviewResult.renderWarning,
+          });
+        }
+
         const check = validateVerdict(reviewResult.verdict, {
           brandCritical: brief.brandCritical ?? false,
         });
@@ -529,6 +541,7 @@ export async function runAssetReview(input: RunAssetReviewInput): Promise<AssetR
     unresolved: records.filter((record) => record.status === "unresolved").length,
     degraded: records.filter((record) => record.degraded).length,
     reviewerErrors,
+    ...(renderWarnings === 0 ? {} : { renderWarnings }),
     ...(hasUsage
       ? {
           reviewInputTokens,

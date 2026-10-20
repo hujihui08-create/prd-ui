@@ -25,6 +25,11 @@ export interface AssetReviewerInput {
   hardGate: HardGateResult;
   assetText: string;
   runDir: string;
+  /**
+   * Absolute path to a rendered PNG of the candidate. Standalone renders it;
+   * a reviewer that supports image input only receives the path.
+   */
+  candidateImagePath?: string;
 }
 
 export interface AssetReviewerPort {

@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   AssetBriefSchema,
+  AssetReviewRunSchema,
   DEFAULT_SOURCE_POLICY,
   SourcePolicySchema,
   VisualStyleSchema,
@@ -11,6 +12,7 @@ import {
   resolvePricing,
   runAssetReview,
   toAssetManifest,
+  toManifestReview,
   validateProviderEnv,
   type AssetBrief,
   type AssetReviewerPort,
@@ -18,10 +20,12 @@ import {
   type SourcePolicy,
   type VisualStyle,
 } from "@prd-ui/asset-review";
+import { AssetManifestSchema } from "@prd-ui/contracts";
 import { createRunId, loadProjectConfig } from "@prd-ui/orchestrator";
 import { FileArtifactStore } from "./asset/artifact-store.js";
 import { LibrarySourceAdapter, loadLibraryIndex } from "./asset/library-source.js";
 import { modelReviewerFromEnv } from "./asset/model-reviewer.js";
+import { RenderingReviewer } from "./asset/rendering-reviewer.js";
 import { ScriptedReviewer, loadScriptedReviews } from "./asset/scripted-reviewer.js";
 
 const pipelineRoot = path.resolve(
@@ -276,6 +280,25 @@ function redact(line: string): string {
   return line.replace(/sk-[A-Za-z0-9_-]{8,}/g, "sk-***");
 }
 
+interface SafeParser<T> {
+  safeParse(
+    value: unknown
+  ): { success: true; data: T } | { success: false; error: { message: string } };
+}
+
+/** Reject a contract violation at the CLI boundary instead of writing bad JSON. */
+export function assertContract<T>(
+  schema: SafeParser<T>,
+  value: unknown,
+  label: string
+): T {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) {
+    throw new Error(`CONTRACT_VIOLATION: ${label}: ${parsed.error.message}`);
+  }
+  return parsed.data;
+}
+
 function createLogger(store: FileArtifactStore) {
   const lines: string[] = [];
   return {
@@ -356,32 +379,54 @@ export async function main(
       return result.passed ? 0 : 1;
     }
 
-    const reviewer = await createReviewer(options.assetsDir, options);
-    const result = await runAssetReview({
-      runId,
+    const reviewer = new RenderingReviewer(await createReviewer(options.assetsDir, options));
+    // `asset-review.json` is validated by core before it is written; validate
+    // the returned run again so a runtime drift cannot reach the sidecar.
+    const result = assertContract(
+      AssetReviewRunSchema,
+      await runAssetReview({
+        runId,
+        project: config.project,
+        profile,
+        runDir,
+        briefs: selected,
+        style,
+        policy,
+        ports: {
+          producer,
+          reviewer,
+          store,
+          clock: { now: () => new Date() },
+          log: createLogger(store),
+        },
+        only: options.only,
+        continueOnReviewerError: !options.failFast,
+        pricing,
+        ...(options.maxCostUsd === undefined ? {} : { maxCostUsd: options.maxCostUsd }),
+        ...(options.maxMinutes === undefined ? {} : { maxMinutes: options.maxMinutes }),
+        ...(options.maxReviewCostCny === undefined
+          ? {}
+          : { maxReviewCostCny: options.maxReviewCostCny }),
+        allowUnknownCost: options.allowUnknownCost,
+      }),
+      "asset-review.json"
+    );
+    const manifest = toAssetManifest({ project: config.project, profile, records: result.assets });
+    const manifestReview = toManifestReview({
       project: config.project,
       profile,
-      runDir,
-      briefs: selected,
-      style,
-      policy,
-      ports: { producer, reviewer, store, clock: { now: () => new Date() }, log: createLogger(store) },
-      only: options.only,
-      continueOnReviewerError: !options.failFast,
-      pricing,
-      ...(options.maxCostUsd === undefined ? {} : { maxCostUsd: options.maxCostUsd }),
-      ...(options.maxMinutes === undefined ? {} : { maxMinutes: options.maxMinutes }),
-      ...(options.maxReviewCostCny === undefined
-        ? {}
-        : { maxReviewCostCny: options.maxReviewCostCny }),
-      allowUnknownCost: options.allowUnknownCost,
+      records: result.assets,
+      ...(result.batchGates === undefined ? {} : { batchGates: result.batchGates }),
+      ...(result.usageSource === undefined ? {} : { usageSource: result.usageSource }),
+      ...(result.usageComplete === undefined ? {} : { usageComplete: result.usageComplete }),
     });
-    const manifest = toAssetManifest({ project: config.project, profile, records: result.assets });
-    const complete =
-      manifest.complete &&
-      result.batchGates?.iconSet?.passed !== false &&
-      result.batchGates?.illustrationSet?.passed !== false;
-    await store.writeJson("manifest.json", { ...manifest, complete });
+    const validatedManifest = assertContract(
+      AssetManifestSchema,
+      { ...manifest, complete: manifestReview.complete },
+      "manifest.json"
+    );
+    await store.writeJson("manifest.json", validatedManifest);
+    await store.writeJson("manifest.review.json", manifestReview);
 
     io.stdout(
       `Asset review ${result.passed ? "OK" : "FAILED"}: ${result.summary.total} assets, ${
@@ -390,6 +435,9 @@ export async function main(
         result.summary.degraded
       } degraded`
     );
+    if (result.summary.renderWarnings !== undefined) {
+      io.stdout(`Render warnings: ${result.summary.renderWarnings}`);
+    }
     const reviewCostCny =
       result.summary.reviewCostCny === undefined
         ? "unavailable"

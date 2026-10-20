@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { AssetManifestSchema } from "@prd-ui/contracts";
 import type { AssetBrief, AssetReviewRecord } from "../src/contracts.js";
-import { toAssetManifest } from "../src/manifest.js";
+import { toAssetManifest, toManifestReview } from "../src/manifest.js";
 
 const brief: AssetBrief = {
   id: "icon-home",
@@ -69,5 +70,90 @@ describe("toAssetManifest", () => {
 
   it("is incomplete for an empty run", () => {
     expect(toAssetManifest({ project: "p", profile: "b", records: [] }).complete).toBe(false);
+  });
+
+  it("stays compatible with AssetManifestSchema", () => {
+    const manifest = toAssetManifest({
+      project: "employee-app",
+      profile: "b-mobile",
+      records: [passed("icon-home"), unresolved("icon-search")],
+    });
+    const parsed = AssetManifestSchema.safeParse({ ...manifest, complete: false });
+    expect(parsed.success).toBe(true);
+  });
+});
+
+describe("toManifestReview", () => {
+  it("surfaces degraded, unresolved, review, set gates and usage", () => {
+    const degraded: AssetReviewRecord = {
+      ...passed("icon-home"),
+      degraded: true,
+      degradedReason: "used source tier B instead of preferred A",
+      fallbackFrom: "A",
+      fallbackReason: "library missed",
+      review: { agent: "asset-reviewer", status: "not-required" },
+    };
+    const review = toManifestReview({
+      project: "employee-app",
+      profile: "b-mobile",
+      records: [degraded, unresolved("icon-search")],
+      batchGates: {
+        iconSet: {
+          passed: false,
+          issues: [
+            {
+              code: "ICON_SET_INCONSISTENT",
+              severity: "blocker",
+              message: "stroke widths differ",
+            },
+          ],
+        },
+        illustrationSet: { passed: true, issues: [] },
+      },
+      usageSource: "json-events",
+      usageComplete: true,
+    });
+
+    expect(review).toEqual({
+      project: "employee-app",
+      profile: "b-mobile",
+      assets: [
+        {
+          id: "icon-home",
+          status: "passed",
+          sourceTier: "A",
+          degraded: true,
+          degradedReason: "used source tier B instead of preferred A",
+          fallbackFrom: "A",
+          fallbackReason: "library missed",
+          review: { agent: "asset-reviewer", status: "not-required" },
+        },
+        { id: "icon-search", status: "unresolved", degraded: false },
+      ],
+      batchGates: { iconSetPassed: false, illustrationSetPassed: true },
+      usageSource: "json-events",
+      usageComplete: true,
+      complete: false,
+    });
+  });
+
+  it("summarizes a partial review as skipped but keeps complete for passing records", () => {
+    const review = toManifestReview({
+      project: "employee-app",
+      profile: "b-mobile",
+      records: [passed("icon-home")],
+      batchGates: { skipped: true, reason: "PARTIAL_REVIEW", scope: ["icon-home"] },
+    });
+
+    expect(review.batchGates).toEqual({ skipped: true, reason: "PARTIAL_REVIEW" });
+    expect(review.complete).toBe(true);
+    expect(review.usageSource).toBeUndefined();
+    expect(review.usageComplete).toBeUndefined();
+  });
+
+  it("omits batch gates when the run has none and stays incomplete for an empty run", () => {
+    const review = toManifestReview({ project: "p", profile: "b", records: [] });
+    expect(review.batchGates).toBeUndefined();
+    expect(review.complete).toBe(false);
   });
 });

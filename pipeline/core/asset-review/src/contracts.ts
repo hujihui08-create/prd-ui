@@ -156,6 +156,11 @@ export interface ReviewResult {
   raw?: string;
   ignoredKeys?: string[];
   repairAttempted?: boolean;
+  /**
+   * Set by a reviewer decorator when visual evidence could not be rendered.
+   * The review still runs on SVG text; core counts the warning in the summary.
+   */
+  renderWarning?: string;
 }
 export const AttemptStatusSchema = z.enum([
   "passed",
@@ -233,6 +238,7 @@ export const AssetReviewSummarySchema = z
     unresolved: z.number().int().min(0),
     degraded: z.number().int().min(0),
     reviewerErrors: z.number().int().min(0).default(0),
+    renderWarnings: z.number().int().min(0).optional(),
     reviewInputTokens: z.number().int().nonnegative().optional(),
     reviewOutputTokens: z.number().int().nonnegative().optional(),
     reviewCacheTokens: z.number().int().nonnegative().optional(),

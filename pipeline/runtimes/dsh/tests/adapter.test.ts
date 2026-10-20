@@ -3,7 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { AssetReviewerInput } from "@prd-ui/asset-review";
-import { DshAssetReviewer, validateDshProviderEnv } from "../src/adapter.js";
+import {
+  DshAssetReviewer,
+  validateDshProviderEnv,
+  type DshAssetReviewerOptions,
+} from "../src/adapter.js";
 import type { CommandRunner } from "../src/dsh-process.js";
 
 const providerEnv: NodeJS.ProcessEnv = {
@@ -63,14 +67,19 @@ afterEach(async () => {
   await Promise.all(temporaryDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-function reviewerWith(runner: CommandRunner): DshAssetReviewer {
+function reviewerWith(
+  runner: CommandRunner,
+  overrides: Partial<DshAssetReviewerOptions> = {}
+): DshAssetReviewer {
   return new DshAssetReviewer({
     dshHome: "/tmp/dsh-home",
     profile: "prd-ui-assets",
     dshBin: "/tmp/dsh",
     cwd: "/tmp",
     runner,
+    warn: () => {},
     env: providerEnv,
+    ...overrides,
   });
 }
 
@@ -215,6 +224,64 @@ describe("DshAssetReviewer", () => {
       finalText(await readFile(path.join(evidence, "repair-stdout.txt"), "utf8"))
     ).toContain('"attempt":2');
     expect(await readFile(path.join(evidence, "repair-stderr.txt"), "utf8")).toBe("attempt 2");
+  });
+
+  it("points the task at the rendered PNG without importing a renderer", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    const pngPath = path.join(
+      runDir,
+      "assets",
+      "attempts",
+      "icon-home",
+      "library-1",
+      "candidate.png"
+    );
+    const captured: string[] = [];
+    const reviewer = reviewerWith(async (_command, _args, options) => {
+      captured.push(options.stdin ?? "");
+      return {
+        stdout: ndjson(
+          stepEnd({ inputTokens: 10, outputTokens: 5, totalTokens: 15, cacheReadTokens: 0 }),
+          final(JSON.stringify(verdict))
+        ),
+        stderr: "",
+      };
+    });
+
+    await reviewer.review({ ...input, runDir, candidateImagePath: pngPath });
+
+    expect(captured[0]).toContain(
+      `A rendered PNG is at ${pngPath}. Use read_image before scoring.`
+    );
+    expect(captured[0]).toContain("## Asset source");
+  });
+
+  it("warns and continues with SVG text when no rendered PNG is available", async () => {
+    const runDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-dsh-"));
+    temporaryDirs.push(runDir);
+    const warnings: string[] = [];
+    const captured: string[] = [];
+    const reviewer = reviewerWith(
+      async (_command, _args, options) => {
+        captured.push(options.stdin ?? "");
+        return {
+          stdout: ndjson(
+            stepEnd({ inputTokens: 10, outputTokens: 5, totalTokens: 15, cacheReadTokens: 0 }),
+            final(JSON.stringify(verdict))
+          ),
+          stderr: "",
+        };
+      },
+      { warn: (message) => warnings.push(message) }
+    );
+
+    const result = await reviewer.review({ ...input, runDir });
+
+    expect(result.verdict.verdict).toBe("pass");
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain("RENDER_WARNING");
+    expect(captured[0]).not.toContain("Use read_image before scoring.");
   });
 
   it("rejects missing provider env when constructed", () => {

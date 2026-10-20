@@ -576,6 +576,27 @@ describe("runAssetReview", () => {
     expect(result.usageSource).toBe("unavailable");
     expect(result.usageComplete).toBe(false);
   });
+
+  it("counts render warnings in the summary without failing the run", async () => {
+    const store = new MemoryStore();
+    const result = await run(
+      store,
+      reviewerWith(
+        {},
+        { verdict: passVerdict, renderWarning: "RENDER_WARNING: rendering failed" }
+      )
+    );
+
+    expect(result.passed).toBe(true);
+    expect(result.summary.renderWarnings).toBe(1);
+  });
+
+  it("omits render warnings when every candidate rendered", async () => {
+    const store = new MemoryStore();
+    const result = await run(store, reviewerWith());
+
+    expect(result.summary.renderWarnings).toBeUndefined();
+  });
 });
 
 describe("buildReviewPrompt", () => {

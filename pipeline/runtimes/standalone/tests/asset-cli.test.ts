@@ -5,7 +5,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
-import { parseArgs } from "../src/asset-cli.js";
+import { AssetManifestSchema } from "@prd-ui/contracts";
+import { assertContract, parseArgs } from "../src/asset-cli.js";
 
 const execFileAsync = promisify(execFile);
 const pipelineRoot = path.resolve(
@@ -135,6 +136,66 @@ describe("asset:review CLI", () => {
     expect(iconSet.passed).toBe(true);
     const illustrationSet = await readJson(path.join(runDir, "assets", "illustration-set.json"));
     expect(illustrationSet.passed).toBe(true);
+  });
+
+  it("writes manifest.review.json and 2x PNG evidence for every SVG", async () => {
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await onlyRun(runs);
+    const sidecar = await readJson(path.join(runDir, "manifest.review.json"));
+    expect(sidecar).toMatchObject({
+      project: "employee-app",
+      profile: "b-mobile",
+      usageSource: "unavailable",
+      usageComplete: false,
+      complete: true,
+    });
+    expect((sidecar.assets as unknown[]).length).toBe(13);
+    expect(sidecar.batchGates).toEqual({
+      iconSetPassed: true,
+      illustrationSetPassed: true,
+    });
+
+    const png = await readFile(
+      path.join(runDir, "assets", "attempts", "icon-home", "library-1", "candidate.png")
+    );
+    expect(png.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(png.readUInt32BE(16)).toBe(48);
+    expect(png.readUInt32BE(20)).toBe(48);
+  });
+
+  it("records the skipped set gates in manifest.review.json for --only", async () => {
+    const assets = await breakIconSet(await tempAssets());
+    const runs = await tempRuns();
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      assets,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await onlyRun(runs);
+    const sidecar = await readJson(path.join(runDir, "manifest.review.json"));
+    expect(sidecar.batchGates).toEqual({ skipped: true, reason: "PARTIAL_REVIEW" });
+    expect(sidecar.complete).toBe(true);
   });
 
   it("exits 1 and marks the manifest incomplete when the icon set disagrees", async () => {
@@ -515,5 +576,24 @@ describe("parseArgs", () => {
     expect(parseArgs(["--runtime", "dsh", "--allow-unknown-cost"]).allowUnknownCost).toBe(
       true
     );
+  });
+});
+
+describe("assertContract", () => {
+  it("returns parsed data for a valid manifest", () => {
+    const manifest = {
+      project: "employee-app",
+      profile: "b-mobile",
+      assets: [],
+      placeholders: [],
+      complete: false,
+    };
+    expect(assertContract(AssetManifestSchema, manifest, "manifest.json")).toEqual(manifest);
+  });
+
+  it("throws CONTRACT_VIOLATION for an invalid manifest", () => {
+    expect(() =>
+      assertContract(AssetManifestSchema, { project: "", profile: "b" }, "manifest.json")
+    ).toThrow(/CONTRACT_VIOLATION: manifest\.json/);
   });
 });
