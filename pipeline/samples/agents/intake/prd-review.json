@@ -1,0 +1,344 @@
+{
+  "output": {
+    "findings": [],
+    "readiness": {
+      "status": "ready",
+      "blockers": 0,
+      "majors": 0,
+      "questions": 0,
+      "summary": "Sample PRD is UI-ready."
+    },
+    "extract": {
+      "pages": [
+        {
+          "id": "orders-overview",
+          "name": "订单概览",
+          "route": "/orders/overview",
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error"
+          ],
+          "target": "web",
+          "profile": "b-dense",
+          "purpose": "让运营人员在一屏内掌握订单规模、待处理量与异常情况，并快速进入近期订单。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "orders-list",
+          "name": "订单列表",
+          "route": "/orders",
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error"
+          ],
+          "target": "web",
+          "profile": "b-dense",
+          "purpose": "支持运营人员按状态、日期与关键字检索订单，并通过分页浏览和管理订单。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "order-detail",
+          "name": "订单详情",
+          "route": "/orders/:id",
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error"
+          ],
+          "target": "web",
+          "profile": "b-dense",
+          "purpose": "展示单个订单的关键字段与状态，并为运营人员提供编辑入口。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "order-form",
+          "name": "新建订单",
+          "route": "/orders/new",
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "target": "web",
+          "profile": "b-dense",
+          "purpose": "让运营人员填写客户、金额与初始状态并创建新订单。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "settings",
+          "name": "设置",
+          "route": "/settings",
+          "roles": [
+            "admin"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error"
+          ],
+          "target": "web",
+          "profile": "b-dense",
+          "purpose": "让管理员维护通知、语言与时区等系统偏好。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "home-feed",
+          "name": "首页",
+          "route": "/home",
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error"
+          ],
+          "target": "mobile",
+          "profile": "c-expressive",
+          "purpose": "为 C 端用户提供商品推荐信息流，并引导进入商品详情。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "item-detail",
+          "name": "商品详情",
+          "route": "/item/:id",
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error"
+          ],
+          "target": "mobile",
+          "profile": "c-expressive",
+          "purpose": "展示商品标题、价格与描述，引导 C 端用户立即购买。",
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "auth",
+          "name": "登录",
+          "route": "/auth",
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "target": "mobile",
+          "profile": "c-expressive",
+          "purpose": "提供邮箱与密码登录，区分 viewer 与 admin 的移动端访问权限。",
+          "sourceLocation": "PRD §3"
+        }
+      ],
+      "roles": [
+        {
+          "id": "admin",
+          "sourceLocation": "PRD §2"
+        },
+        {
+          "id": "operator",
+          "sourceLocation": "PRD §2"
+        },
+        {
+          "id": "viewer",
+          "sourceLocation": "PRD §2"
+        }
+      ],
+      "flows": [
+        {
+          "id": "orders-create",
+          "steps": [
+            "orders-list",
+            "order-form",
+            "order-detail"
+          ],
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "orders-review",
+          "steps": [
+            "orders-overview",
+            "orders-list",
+            "order-detail"
+          ],
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "settings-update",
+          "steps": [
+            "settings"
+          ],
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "mobile-purchase",
+          "steps": [
+            "home-feed",
+            "item-detail"
+          ],
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "mobile-login",
+          "steps": [
+            "auth",
+            "home-feed"
+          ],
+          "sourceLocation": "PRD §3"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Order",
+          "fields": [
+            {
+              "name": "orderNo",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "amount",
+              "type": "number",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "status",
+              "type": "enum",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "createdAt",
+              "type": "datetime",
+              "sourceLocation": "PRD §5"
+            }
+          ],
+          "sourceLocation": "PRD §5"
+        },
+        {
+          "name": "Customer",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "phone",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "email",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            }
+          ],
+          "sourceLocation": "PRD §5"
+        },
+        {
+          "name": "Settings",
+          "fields": [
+            {
+              "name": "notifications",
+              "type": "enum",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "language",
+              "type": "enum",
+              "sourceLocation": "PRD §5"
+            },
+            {
+              "name": "timezone",
+              "type": "string",
+              "sourceLocation": "PRD §5"
+            }
+          ],
+          "sourceLocation": "PRD §5"
+        }
+      ],
+      "acceptanceExamples": [
+        {
+          "pageId": "orders-overview",
+          "text": "订单概览 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "orders-list",
+          "text": "订单列表 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "order-detail",
+          "text": "订单详情 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "order-form",
+          "text": "新建订单 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "settings",
+          "text": "设置 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "home-feed",
+          "text": "首页 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "item-detail",
+          "text": "商品详情 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        },
+        {
+          "pageId": "auth",
+          "text": "登录 可渲染 default/error 状态",
+          "sourceLocation": "PRD §6"
+        }
+      ]
+    },
+    "reviewMarkdown": "PRD review: required sections present; no blocking findings."
+  },
+  "usage": {
+    "inputTokens": 1500,
+    "outputTokens": 700,
+    "cacheReadTokens": 0
+  },
+  "usageComplete": true
+}

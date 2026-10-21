@@ -1,0 +1,136 @@
+{
+  "output": {
+    "map": {
+      "pages": [
+        {
+          "id": "orders-overview",
+          "name": "订单概览",
+          "route": "/orders/overview",
+          "level": 1,
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "orders-list",
+          "name": "订单列表",
+          "route": "/orders",
+          "level": 1,
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "order-detail",
+          "name": "订单详情",
+          "route": "/orders/:id",
+          "level": 1,
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "order-form",
+          "name": "新建订单",
+          "route": "/orders/new",
+          "level": 1,
+          "roles": [
+            "admin",
+            "operator"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "settings",
+          "name": "设置",
+          "route": "/settings",
+          "level": 1,
+          "roles": [
+            "admin"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "home-feed",
+          "name": "首页",
+          "route": "/home",
+          "level": 1,
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "item-detail",
+          "name": "商品详情",
+          "route": "/item/:id",
+          "level": 1,
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        },
+        {
+          "id": "auth",
+          "name": "登录",
+          "route": "/auth",
+          "level": 1,
+          "roles": [
+            "viewer",
+            "admin"
+          ],
+          "entryPoints": [
+            "navigation"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "订单概览",
+          "订单列表",
+          "订单详情",
+          "新建订单",
+          "设置",
+          "首页",
+          "商品详情",
+          "登录"
+        ]
+      },
+      "flows": [],
+      "crossLinks": []
+    },
+    "findings": {
+      "findings": []
+    },
+    "proposed": {},
+    "reviewMarkdown": "IA map mirrors the sample PRD page inventory; no blocking IA issues."
+  },
+  "usage": {
+    "inputTokens": 1000,
+    "outputTokens": 500,
+    "cacheReadTokens": 0
+  },
+  "usageComplete": true
+}

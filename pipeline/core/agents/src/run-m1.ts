@@ -412,7 +412,13 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
     if (text === undefined) {
       return {
         exists: false,
-        parsed: { present: false, valid: false, waivers: [] },
+        parsed: {
+          present: false,
+          valid: false,
+          waivers: [],
+          answers: [],
+          approvals: [],
+        },
       };
     }
     return { exists: true, parsed: parseSignoffMarkdown(text) };

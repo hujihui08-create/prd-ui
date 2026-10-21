@@ -3,13 +3,29 @@ import type { GateIssue, GateResult } from "../contracts.js";
 import type { IaFindings, IaMap } from "../roles/ia.js";
 import { waiverIsCurrent, type IaWaiver } from "../signoff.js";
 
+/** Page/role scope the IA map must match. Intake has no signed brief yet. */
+export interface IaGateScope {
+  pages: Array<{ id: string; roles: string[] }>;
+  roles: string[];
+}
+
 export interface IaGateInput {
   map: IaMap;
   findings: IaFindings;
-  brief: UiBrief;
+  /** M1 path: derive the scope from a full brief. */
+  brief?: UiBrief;
+  /** Intake path: derive the scope from the signed PRD extract. */
+  scope?: IaGateScope;
   waivers?: IaWaiver[];
   /** ISO timestamp used for waiver expiry. */
   now: string;
+}
+
+export function scopeFromBrief(brief: UiBrief): IaGateScope {
+  return {
+    pages: brief.ia.pages.map((page) => ({ id: page.id, roles: page.roles })),
+    roles: brief.product.roles,
+  };
 }
 
 function blocker(code: string, message: string, evidence?: string): GateIssue {
@@ -37,7 +53,12 @@ function warning(code: string, message: string, evidence?: string): GateIssue {
  */
 export function runIaGate(input: IaGateInput): GateResult {
   const issues: GateIssue[] = [];
-  const briefPageIds = new Set(input.brief.ia.pages.map((page) => page.id));
+  const scope =
+    input.scope ?? (input.brief === undefined ? undefined : scopeFromBrief(input.brief));
+  if (scope === undefined) {
+    throw new Error("IA gate requires either brief or scope");
+  }
+  const scopePageIds = new Set(scope.pages.map((page) => page.id));
   const mapPageIds = new Set<string>();
 
   for (const page of input.map.pages) {
@@ -45,10 +66,10 @@ export function runIaGate(input: IaGateInput): GateResult {
       issues.push(blocker("IA_DUPLICATE_PAGE", `duplicate page id ${page.id}`, page.id));
     }
     mapPageIds.add(page.id);
-    if (!briefPageIds.has(page.id)) {
-      issues.push(blocker("IA_PAGE_UNKNOWN", `page ${page.id} is not in the UI brief`, page.id));
+    if (!scopePageIds.has(page.id)) {
+      issues.push(blocker("IA_PAGE_UNKNOWN", `page ${page.id} is not in the signed page scope`, page.id));
     }
-    const knownRoles = new Set(input.brief.product.roles);
+    const knownRoles = new Set(scope.roles);
     for (const role of page.roles) {
       if (!knownRoles.has(role)) {
         issues.push(
@@ -58,9 +79,9 @@ export function runIaGate(input: IaGateInput): GateResult {
     }
   }
 
-  for (const page of input.brief.ia.pages) {
+  for (const page of scope.pages) {
     if (!mapPageIds.has(page.id)) {
-      issues.push(blocker("IA_PAGE_MISSING", `IA map is missing brief page ${page.id}`, page.id));
+      issues.push(blocker("IA_PAGE_MISSING", `IA map is missing page ${page.id}`, page.id));
     }
   }
 

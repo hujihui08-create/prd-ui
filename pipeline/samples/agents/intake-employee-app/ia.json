@@ -1,0 +1,61 @@
+{
+  "output": {
+    "map": {
+      "pages": [
+        {
+          "id": "today",
+          "name": "今日",
+          "route": "/today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "tab"
+          ]
+        },
+        {
+          "id": "inventory-query",
+          "name": "库存查询",
+          "route": "/inventory",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "warehouse",
+            "beautician",
+            "front_desk"
+          ],
+          "entryPoints": [
+            "tab"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "今日",
+          "库存查询"
+        ],
+        "tabs": [
+          "今日",
+          "库存查询"
+        ]
+      },
+      "flows": [],
+      "crossLinks": []
+    },
+    "findings": {
+      "findings": []
+    },
+    "proposed": {},
+    "reviewMarkdown": "IA map mirrors the employee-app slice; no blocking IA issues."
+  },
+  "usage": {
+    "inputTokens": 1000,
+    "outputTokens": 500,
+    "cacheReadTokens": 0
+  },
+  "usageComplete": true
+}

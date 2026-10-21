@@ -99,7 +99,10 @@ export function toPromptJsonSchema(schema: z.ZodType): string {
 
 export interface IaPromptInput {
   prdText: string;
-  brief: UiBrief;
+  /** M1 path: a confirmed brief. */
+  brief?: UiBrief;
+  /** Intake path: project-level context when no brief exists yet. */
+  project?: { project: string; platforms?: string[] };
   existingIa?: unknown;
 }
 
@@ -108,31 +111,36 @@ export function buildIaPrompt(input: IaPromptInput): string {
   // Strip page content (appointments, products, copy) and page-spec fields:
   // IA needs structure, not presentation data. This keeps the prompt focused
   // and leaves output budget for the findings.
-  const pages = input.brief.ia.pages.map((page) => ({
-    id: page.id,
-    name: page.name,
-    purpose: page.purpose,
-    route: page.route,
-    roles: page.roles,
-    requiredStates: page.requiredStates,
-    reqRefs: page.reqRefs,
-    ...(page.actions === undefined ? {} : { actions: page.actions }),
-  }));
-  const briefView = {
-    meta: input.brief.meta,
-    product: input.brief.product,
-    ia: {
-      pages,
-      navigation: input.brief.ia.navigation,
-      flows: input.brief.ia.flows,
-      ...(input.brief.ia.landingByRole === undefined
-        ? {}
-        : { landingByRole: input.brief.ia.landingByRole }),
-    },
-    traceability: input.brief.traceability,
-    openQuestions: input.brief.openQuestions,
-    assumptions: input.brief.assumptions,
-  };
+  const briefView =
+    input.brief === undefined
+      ? undefined
+      : (() => {
+          const pages = input.brief.ia.pages.map((page) => ({
+            id: page.id,
+            name: page.name,
+            purpose: page.purpose,
+            route: page.route,
+            roles: page.roles,
+            requiredStates: page.requiredStates,
+            reqRefs: page.reqRefs,
+            ...(page.actions === undefined ? {} : { actions: page.actions }),
+          }));
+          return {
+            meta: input.brief.meta,
+            product: input.brief.product,
+            ia: {
+              pages,
+              navigation: input.brief.ia.navigation,
+              flows: input.brief.ia.flows,
+              ...(input.brief.ia.landingByRole === undefined
+                ? {}
+                : { landingByRole: input.brief.ia.landingByRole }),
+            },
+            traceability: input.brief.traceability,
+            openQuestions: input.brief.openQuestions,
+            assumptions: input.brief.assumptions,
+          };
+        })();
 
   return [
     "You are the IA (Information Architecture) Agent for a PRD → UI pipeline.",
@@ -156,16 +164,29 @@ export function buildIaPrompt(input: IaPromptInput): string {
     input.prdText,
     "```",
     "",
-    "## UI Brief (data)",
-    JSON.stringify(briefView, null, 2),
+    ...(briefView === undefined
+      ? [
+          "## Project (data)",
+          JSON.stringify(input.project ?? {}, null, 2),
+          "",
+          "There is no confirmed UI Brief yet. Derive the page set from the PRD's page inventory.",
+          "Every PRD page must appear exactly once in map.pages; do not invent pages.",
+          "Derive roles from the PRD role/permission section.",
+        ]
+      : [
+          "## UI Brief (data)",
+          JSON.stringify(briefView, null, 2),
+          "",
+          "## Brief-specific rules",
+          "- Every page id in the UI Brief must appear exactly once in map.pages.",
+          "- If the brief declares landingByRole, treat the configured page as that role's valid entry point.",
+        ]),
     "",
     "## Existing IA (data)",
-    JSON.stringify(input.existingIa ?? input.brief.ia, null, 2),
+    JSON.stringify(input.existingIa ?? input.brief?.ia ?? {}, null, 2),
     "",
     "## Output rules",
-    "- Every page id in the UI Brief must appear exactly once in map.pages.",
     "- Flow steps, crossLinks, and parentId must reference existing page ids.",
-    "- If the brief declares landingByRole, treat the configured page as that role's valid entry point.",
     "- Finding ids must be unique (IA-001, IA-002, ...).",
     "- reviewMarkdown is a concise human summary with decisions still needed.",
     "",

@@ -4,6 +4,8 @@ export * from "./page-spec.js";
 export * from "./profile.js";
 export * from "./catalog.js";
 export * from "./ui-brief.js";
+export * from "./prd-review.js";
+export * from "./brief-draft.js";
 export * from "./project-config.js";
 export * from "./asset-manifest.js";
 export * from "./asset-brief.js";

@@ -5,14 +5,14 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 ## Layout
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
-- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `agents`, `spec-engineer`.
-- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `spec:engineer`).
+- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `agents`, `spec-engineer`, `intake`.
+- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `spec:engineer`, `intake:run`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
-- `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
-- `pipeline/samples/` — `employee-app` (2-page mobile slice), `demo-crm`, M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), and M1 agent fixtures (`agents/m1`).
+- `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
+- `pipeline/samples/` — `employee-app` (2-page mobile slice), `demo-crm`, M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`).
 - `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
-- `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption.
+- `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption; `pipeline/docs/prd-review-briefer.md` — PRD review, UI Brief, signoffs, resume, publish.
 - `README.md` and `CHANGELOG.md` — project overview and change record.
 - `docs/superpowers/specs/` — design specs. `docs/superpowers/plans/` — historical plans; paths there are historical and should not be rewritten.
 
@@ -32,6 +32,8 @@ pnpm render:html --run /tmp/employee-app-runs/<runId> --out /tmp/employee-app-ht
 pnpm asset:review --project samples/projects/employee-app/project.yaml --assets samples/assets/m0 --runtime standalone --runs /tmp/m0-runs
 pnpm agent:run --project samples/projects/employee-app/project.yaml --runs /tmp/m1-agent-runs --allow-unreviewed
 pnpm spec:engineer --project samples/projects/employee-app/project.yaml --agent-run /tmp/m1-agent-runs/<runId> --runs /tmp/spec-engineer-runs
+pnpm intake:run --project samples/project.demo-orders.yaml --prd samples/sample-prd.md --runs /tmp/intake-runs --fixtures samples/agents/intake
+pnpm intake:run --project samples/projects/employee-app/project.yaml --prd samples/projects/employee-app/prd.md --fixtures samples/agents/intake-employee-app --runs /tmp/intake-employee
 
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
@@ -49,11 +51,14 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 - `spec:engineer` consumes an M1 run (`success`/`awaiting_signoff`/`partial`);
   it writes Page Specs only when the gate passes. Motion node ids are warnings
   in v0 because the compiler has no stable node ids.
+- `intake:run` produces PRD review + IA + UI Brief; PRD/IA and brief signoffs
+  are separate. It writes `ui-brief.json` only on `success`; use `--resume`
+  after signing. Brief signoff must carry the canonical `briefHash`.
 - `pnpm test:dsh` fails with an install hint if the pinned dsh binary is
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 453 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 479 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -64,7 +69,13 @@ real dsh `deepseek-flash` `13 assets / 13 passed` with
 ¥0.2487; the employee-app slice IA blockers (dead tabs, missing inventory entry,
 warehouse dead-end, quick-action permission mismatch) are fixed.
 Spec Engineer v0 on the clean M1 run: 2 Page Specs, 0 blockers, 28 expected
-warnings (19 unresolved motion node ids, 9 unused asset briefs).
+warnings (19 unresolved motion node ids, 9 unused asset briefs). Intake v0:
+8-page sample PRD review/brief passes all gates and publishes a signed
+`ui-brief.json`; employee-app 2-page fixture passes the brief gate and waits
+for signoff. Real dsh intake: 2-page employee-app completes (success + publish,
+¥0.6948); the 8-page sample uses the `prd-ui-intake` profile (65536 maxTokens),
+waives its real F-001/IA-001/IA-002 sample gaps, and completes with publish
+(¥0.90666). M1 keeps `prd-ui-agents` at 32768.
 
 ## Architecture boundaries
 
@@ -72,12 +83,15 @@ warnings (19 unresolved motion node ids, 9 unused asset briefs).
 - Dependency direction: `contracts` ← `design-system` ← `compiler` / `validators` /
   `renderer-html`; `orchestrator` composes them; `asset-review` and `agents`
   depend only on `contracts`; `spec-engineer` consumes `contracts` + `agents`
-  schemas, while the CLI uses `compiler` to build base Page Specs.
+  schemas, while the CLI uses `compiler` to build base Page Specs. `intake`
+  consumes `contracts` + `agents` ports/roles; the CLI owns the compiler
+  dry-run for the signed brief.
 - Runtime adapters implement core ports. The core state machine owns retries,
   source fallback, budgets, and manifest freezing; dsh reviews one candidate per
   attempt. Do not duplicate state-machine logic in an adapter. M1 `runM1` owns
-  agent retries, gate repair rounds, budgets, failure isolation, and signoffs;
-  `DshAgentRunner` owns one model call plus one schema repair.
+  design-agent retries, gate repair rounds, budgets, failure isolation, and
+  signoffs; `runIntake` owns PRD/IA/brief retries, gates, resume, and the two
+  human signoffs. `DshAgentRunner` owns one model call plus one schema repair.
 - New runtime-neutral behavior belongs in `core/`; file-system, model, and
   process wiring belongs in `runtimes/`.
 - `runtimes/dsh` is the only package that builds `dist/` (esbuild `prepare`);
@@ -132,6 +146,8 @@ warnings (19 unresolved motion node ids, 9 unused asset briefs).
 - `docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md` — current core/runtime design.
 - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md` — M1 agent layer contracts, gates, budgets, signoffs.
 - `docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md` — Phase 2 Spec Engineer v0: consume M1 specs into Page Spec.
+- `docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md` — Phase 2 front half: PRD Review + UI Briefer.
+- `pipeline/docs/prd-review-briefer.md` — intake usage, signoffs, resume, publish, gates.
 - `pipeline/docs/spec-engineer-v0.md` — Spec Engineer usage, mapping, gates, v0 limits.
 - `pipeline/docs/agent-m1.md` — M1 usage, artifacts, signoff format, exit codes.
 - `pipeline/docs/agent-m1-uat.md` — M1 T-M1-01..20 matrix and real-run evidence.

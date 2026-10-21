@@ -1,0 +1,140 @@
+{
+  "output": {
+    "findings": [],
+    "readiness": {
+      "status": "ready",
+      "blockers": 0,
+      "majors": 0,
+      "questions": 0,
+      "summary": "Employee-app slice PRD is UI-ready."
+    },
+    "extract": {
+      "pages": [
+        {
+          "id": "today",
+          "name": "今日",
+          "route": "/today",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error"
+          ],
+          "target": "mobile",
+          "profile": "b-mobile",
+          "purpose": "查看当天预约与待回访，查询库存",
+          "sourceLocation": "PRD §2"
+        },
+        {
+          "id": "inventory-query",
+          "name": "库存查询",
+          "route": "/inventory",
+          "roles": [
+            "store_manager",
+            "warehouse",
+            "beautician",
+            "front_desk"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error"
+          ],
+          "target": "mobile",
+          "profile": "b-mobile",
+          "purpose": "查看本店产品当前库存、可用库存与预警",
+          "sourceLocation": "PRD §2"
+        }
+      ],
+      "roles": [
+        {
+          "id": "store_manager",
+          "sourceLocation": "PRD §1"
+        },
+        {
+          "id": "beautician",
+          "sourceLocation": "PRD §1"
+        },
+        {
+          "id": "front_desk",
+          "sourceLocation": "PRD §1"
+        },
+        {
+          "id": "warehouse",
+          "sourceLocation": "PRD §1"
+        }
+      ],
+      "flows": [
+        {
+          "id": "daily-workspace",
+          "steps": [
+            "today",
+            "inventory-query"
+          ],
+          "sourceLocation": "PRD §3"
+        },
+        {
+          "id": "warehouse-landing",
+          "steps": [
+            "inventory-query"
+          ],
+          "sourceLocation": "PRD §3"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Product",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string",
+              "sourceLocation": "PRD §2"
+            },
+            {
+              "name": "spec",
+              "type": "string",
+              "sourceLocation": "PRD §2"
+            },
+            {
+              "name": "currentStock",
+              "type": "string",
+              "sourceLocation": "PRD §2"
+            },
+            {
+              "name": "availableStock",
+              "type": "string",
+              "sourceLocation": "PRD §2"
+            }
+          ],
+          "sourceLocation": "PRD §2"
+        }
+      ],
+      "acceptanceExamples": [
+        {
+          "pageId": "today",
+          "text": "今日 可渲染 default/empty/loading/error",
+          "sourceLocation": "PRD §4"
+        },
+        {
+          "pageId": "inventory-query",
+          "text": "库存查询 可渲染 default/empty/loading/error",
+          "sourceLocation": "PRD §4"
+        }
+      ]
+    },
+    "reviewMarkdown": "PRD review: two-page slice is complete; no blocking findings."
+  },
+  "usage": {
+    "inputTokens": 1000,
+    "outputTokens": 500,
+    "cacheReadTokens": 0
+  },
+  "usageComplete": true
+}

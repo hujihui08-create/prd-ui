@@ -4,10 +4,13 @@ import { z } from "zod";
 import { AgentUsageSchema } from "@prd-ui/contracts";
 import {
   AgentRunnerError,
+  INTAKE_ROLES,
   type AgentResult,
   type AgentRole,
   type AgentRunnerPort,
   type AgentTask,
+  type AgentTaskRole,
+  type IntakeRole,
 } from "@prd-ui/agents";
 
 export const ScriptedAgentFixtureSchema = z
@@ -33,14 +36,16 @@ export type ScriptedAgentScript =
 export class ScriptedAgentRunner implements AgentRunnerPort {
   readonly name = "scripted";
   readonly model = "scripted";
-  private readonly counts: Record<AgentRole, number> = {
+  private readonly counts: Record<AgentTaskRole, number> = {
     ia: 0,
     interaction: 0,
     "visual-style": 0,
+    "prd-review": 0,
+    "ui-briefer": 0,
   };
 
   constructor(
-    private readonly scripts: Partial<Record<AgentRole, ScriptedAgentScript>>
+    private readonly scripts: Partial<Record<AgentTaskRole, ScriptedAgentScript>>
   ) {}
 
   async run(task: AgentTask): Promise<AgentResult> {
@@ -88,11 +93,11 @@ export class ScriptedAgentRunner implements AgentRunnerPort {
   }
 }
 
-/** Load `<role>.json` fixtures from a directory. */
-export async function loadScriptedAgentFixtures(
-  dir: string
-): Promise<Record<AgentRole, ScriptedAgentFixture>> {
-  const roles: AgentRole[] = ["ia", "interaction", "visual-style"];
+/** Load `<role>.json` fixtures for an explicit role list. */
+export async function loadScriptedRoleFixtures<T extends AgentTaskRole>(
+  dir: string,
+  roles: readonly T[]
+): Promise<Record<T, ScriptedAgentFixture>> {
   const entries = await Promise.all(
     roles.map(async (role) => {
       const file = path.join(dir, `${role}.json`);
@@ -100,5 +105,20 @@ export async function loadScriptedAgentFixtures(
       return [role, ScriptedAgentFixtureSchema.parse(raw)] as const;
     })
   );
-  return Object.fromEntries(entries) as Record<AgentRole, ScriptedAgentFixture>;
+  return Object.fromEntries(entries) as Record<T, ScriptedAgentFixture>;
+}
+
+/** Load the M1 design-agent fixtures from a directory. */
+export async function loadScriptedAgentFixtures(
+  dir: string
+): Promise<Record<AgentRole, ScriptedAgentFixture>> {
+  const roles: AgentRole[] = ["ia", "interaction", "visual-style"];
+  return loadScriptedRoleFixtures(dir, roles);
+}
+
+/** Load the Phase 2 intake-agent fixtures from a directory. */
+export async function loadScriptedIntakeFixtures(
+  dir: string
+): Promise<Record<IntakeRole, ScriptedAgentFixture>> {
+  return loadScriptedRoleFixtures(dir, INTAKE_ROLES);
 }

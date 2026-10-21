@@ -1,0 +1,552 @@
+{
+  "output": {
+    "brief": {
+      "meta": {
+        "project": "demo-orders",
+        "version": "0.1.0",
+        "sourcePrdHash": "sha256:demo-prd",
+        "date": "2026-10-19",
+        "profile": "b-dense",
+        "platforms": [
+          "web",
+          "mobile"
+        ]
+      },
+      "product": {
+        "name": "订单管理",
+        "type": "B2B 运营后台 + C 端移动商城",
+        "goals": [
+          "运营人员可在 web 端完成订单概览、查询、查看与创建",
+          "C 端用户可在移动端浏览商品、查看详情并登录",
+          "8 个核心页面具备完整的状态定义",
+          "每条需求可追溯到页面与字段"
+        ],
+        "users": [
+          "运营专员",
+          "运营管理员",
+          "C 端消费者"
+        ],
+        "roles": [
+          "admin",
+          "operator",
+          "viewer"
+        ],
+        "scope": [
+          "订单概览仪表盘",
+          "订单列表检索与分页",
+          "订单详情查看",
+          "新建订单",
+          "系统设置",
+          "移动端首页信息流",
+          "移动端商品详情",
+          "移动端邮箱密码登录"
+        ],
+        "nonGoals": [
+          "支付与退款流程",
+          "库存与履约系统",
+          "多租户与权限配置后台",
+          "真实商品数据接入"
+        ],
+        "successMetrics": [
+          "8 个页面均通过 UiBriefSchema 校验",
+          "REQ-ORDER-001 至 REQ-ORDER-008 全部映射到页面，unmapped 为空",
+          "Phase 1 编译输出 8 份 Page Spec 且 0 blocker"
+        ]
+      },
+      "ia": {
+        "pages": [
+          {
+            "id": "orders-overview",
+            "name": "订单概览",
+            "purpose": "让运营人员在一屏内掌握订单规模、待处理量与异常情况，并快速进入近期订单。",
+            "archetype": "overview",
+            "target": "web",
+            "profile": "b-dense",
+            "route": "/orders/overview",
+            "roles": [
+              "admin",
+              "operator"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-001"
+            ],
+            "fields": [],
+            "actions": [],
+            "stats": [
+              {
+                "label": "今日订单",
+                "value": "128"
+              },
+              {
+                "label": "待处理",
+                "value": "12"
+              },
+              {
+                "label": "已完成",
+                "value": "96"
+              },
+              {
+                "label": "异常",
+                "value": "3"
+              }
+            ]
+          },
+          {
+            "id": "orders-list",
+            "name": "订单列表",
+            "purpose": "支持运营人员按状态、日期与关键字检索订单，并通过分页浏览和管理订单。",
+            "archetype": "list",
+            "target": "web",
+            "profile": "b-dense",
+            "route": "/orders",
+            "roles": [
+              "admin",
+              "operator"
+            ],
+            "requiredStates": [
+              "default",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-002"
+            ],
+            "fields": [
+              "orderNo",
+              "customer",
+              "amount",
+              "status",
+              "createdAt"
+            ],
+            "actions": [
+              "新建订单"
+            ],
+            "filterFields": [
+              "status",
+              "date",
+              "keyword"
+            ],
+            "emptyTitle": "暂无订单",
+            "emptyAssetRef": "empty-orders"
+          },
+          {
+            "id": "order-detail",
+            "name": "订单详情",
+            "purpose": "展示单个订单的关键字段与状态，并为运营人员提供编辑入口。",
+            "archetype": "detail",
+            "target": "web",
+            "profile": "b-dense",
+            "route": "/orders/:id",
+            "roles": [
+              "admin",
+              "operator"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-003"
+            ],
+            "fields": [
+              "orderNo",
+              "customer",
+              "amount",
+              "status",
+              "createdAt"
+            ],
+            "actions": [
+              "编辑订单"
+            ],
+            "summaryTitle": "订单摘要"
+          },
+          {
+            "id": "order-form",
+            "name": "新建订单",
+            "purpose": "让运营人员填写客户、金额与初始状态并创建新订单。",
+            "archetype": "form",
+            "target": "web",
+            "profile": "b-dense",
+            "route": "/orders/new",
+            "roles": [
+              "admin",
+              "operator"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error",
+              "disabled"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-004"
+            ],
+            "fields": [
+              "customer",
+              "amount",
+              "status"
+            ],
+            "actions": [
+              "保存",
+              "取消"
+            ]
+          },
+          {
+            "id": "settings",
+            "name": "设置",
+            "purpose": "让管理员维护通知、语言与时区等系统偏好。",
+            "archetype": "settings",
+            "target": "web",
+            "profile": "b-dense",
+            "route": "/settings",
+            "roles": [
+              "admin"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-005"
+            ],
+            "fields": [
+              "notifications",
+              "language",
+              "timezone"
+            ],
+            "actions": [
+              "保存设置"
+            ]
+          },
+          {
+            "id": "home-feed",
+            "name": "首页",
+            "purpose": "为 C 端用户提供商品推荐信息流，并引导进入商品详情。",
+            "archetype": "feed",
+            "target": "mobile",
+            "profile": "c-expressive",
+            "route": "/home",
+            "roles": [
+              "viewer",
+              "admin"
+            ],
+            "requiredStates": [
+              "default",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-006"
+            ],
+            "fields": [],
+            "actions": [],
+            "feedItems": [
+              {
+                "title": "周末去哪儿",
+                "body": "城市周边 5 个小众目的地"
+              },
+              {
+                "title": "新店开业",
+                "body": "手冲咖啡买一送一"
+              }
+            ],
+            "emptyAssetRef": "empty-feed"
+          },
+          {
+            "id": "item-detail",
+            "name": "商品详情",
+            "purpose": "展示商品标题、价格与描述，引导 C 端用户立即购买。",
+            "archetype": "detail",
+            "target": "mobile",
+            "profile": "c-expressive",
+            "route": "/item/:id",
+            "roles": [
+              "viewer",
+              "admin"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-007"
+            ],
+            "fields": [
+              "title",
+              "price",
+              "description"
+            ],
+            "actions": [
+              "立即购买"
+            ],
+            "summaryTitle": "商品摘要"
+          },
+          {
+            "id": "auth",
+            "name": "登录",
+            "purpose": "提供邮箱与密码登录，区分 viewer 与 admin 的移动端访问权限。",
+            "archetype": "auth",
+            "target": "mobile",
+            "profile": "c-expressive",
+            "route": "/auth",
+            "roles": [
+              "viewer",
+              "admin"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error",
+              "disabled"
+            ],
+            "reqRefs": [
+              "REQ-ORDER-008"
+            ],
+            "fields": [
+              "email",
+              "password"
+            ],
+            "actions": [
+              "登录"
+            ]
+          }
+        ],
+        "navigation": {
+          "primary": [
+            "概览",
+            "订单",
+            "客户",
+            "设置"
+          ],
+          "tabs": [
+            "推荐",
+            "关注",
+            "附近",
+            "我的"
+          ]
+        },
+        "flows": [
+          {
+            "id": "orders-create",
+            "steps": [
+              "orders-list",
+              "order-form",
+              "order-detail"
+            ]
+          },
+          {
+            "id": "orders-review",
+            "steps": [
+              "orders-overview",
+              "orders-list",
+              "order-detail"
+            ]
+          },
+          {
+            "id": "settings-update",
+            "steps": [
+              "settings"
+            ]
+          },
+          {
+            "id": "mobile-purchase",
+            "steps": [
+              "home-feed",
+              "item-detail"
+            ]
+          },
+          {
+            "id": "mobile-login",
+            "steps": [
+              "auth",
+              "home-feed"
+            ]
+          }
+        ]
+      },
+      "data": {
+        "entities": [
+          {
+            "name": "Order",
+            "fields": [
+              {
+                "name": "orderNo",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "customer",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "amount",
+                "type": "number",
+                "required": true
+              },
+              {
+                "name": "status",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "pending",
+                  "paid",
+                  "shipped",
+                  "completed",
+                  "cancelled"
+                ]
+              },
+              {
+                "name": "createdAt",
+                "type": "datetime",
+                "required": true
+              }
+            ]
+          },
+          {
+            "name": "Customer",
+            "fields": [
+              {
+                "name": "name",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "phone",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "email",
+                "type": "string",
+                "required": true
+              }
+            ]
+          },
+          {
+            "name": "Settings",
+            "fields": [
+              {
+                "name": "notifications",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "on",
+                  "off"
+                ]
+              },
+              {
+                "name": "language",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "zh-CN",
+                  "en-US"
+                ]
+              },
+              {
+                "name": "timezone",
+                "type": "string",
+                "required": true
+              }
+            ]
+          }
+        ]
+      },
+      "assets": {
+        "icons": [
+          "search",
+          "filter",
+          "plus",
+          "chevron",
+          "user",
+          "bell"
+        ],
+        "illustrations": [
+          "empty-orders",
+          "empty-feed"
+        ],
+        "images": []
+      },
+      "designDirection": {
+        "profile": "b-dense",
+        "density": "dense",
+        "tone": "neutral",
+        "motionLevel": "low"
+      },
+      "openQuestions": [
+        {
+          "id": "Q-001",
+          "question": "首页推荐信息流的默认排序策略（按热度或按时间）尚未确认，Phase 1 使用固定演示数据。",
+          "blocking": false
+        }
+      ],
+      "assumptions": [
+        {
+          "id": "A-001",
+          "statement": "订单金额以人民币（CNY）计，保留两位小数。"
+        },
+        {
+          "id": "A-002",
+          "statement": "Phase 1 仅包含登录，不包含注册、找回密码与第三方登录。"
+        },
+        {
+          "id": "A-003",
+          "statement": "商品详情字段由内容服务提供，Phase 1 不在订单数据模型中建模。"
+        },
+        {
+          "id": "A-004",
+          "statement": "Phase 1 的权限仅做页面级可见性控制，不细化到字段级。"
+        }
+      ],
+      "traceability": {
+        "reqMap": {
+          "REQ-ORDER-001": [
+            "orders-overview"
+          ],
+          "REQ-ORDER-002": [
+            "orders-list"
+          ],
+          "REQ-ORDER-003": [
+            "order-detail"
+          ],
+          "REQ-ORDER-004": [
+            "order-form"
+          ],
+          "REQ-ORDER-005": [
+            "settings"
+          ],
+          "REQ-ORDER-006": [
+            "home-feed"
+          ],
+          "REQ-ORDER-007": [
+            "item-detail"
+          ],
+          "REQ-ORDER-008": [
+            "auth"
+          ]
+        },
+        "unmapped": []
+      }
+    },
+    "questions": [],
+    "assumptions": [],
+    "reviewMarkdown": "UI Brief derived from the signed sample PRD."
+  },
+  "usage": {
+    "inputTokens": 2000,
+    "outputTokens": 1200,
+    "cacheReadTokens": 0
+  },
+  "usageComplete": true
+}

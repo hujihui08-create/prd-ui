@@ -10,6 +10,8 @@ import { z } from "zod";
  * ```
  *
  * The block is the audit record; free-form notes outside it are allowed.
+ * `answers`, `approvals`, and `briefHash` are optional extensions used by the
+ * Phase 2 intake gates; existing M1 signoffs remain valid.
  */
 export const IaWaiverSchema = z
   .object({
@@ -21,11 +23,37 @@ export const IaWaiverSchema = z
   .strict();
 export type IaWaiver = z.infer<typeof IaWaiverSchema>;
 
+export const SignoffAnswerSchema = z
+  .object({
+    questionId: z.string().min(1),
+    answer: z.string().min(1),
+    source: z.string().min(1).optional(),
+  })
+  .strict();
+export type SignoffAnswer = z.infer<typeof SignoffAnswerSchema>;
+
+export const SignoffApprovalSchema = z
+  .object({
+    owner: z.enum([
+      "product_owner",
+      "security_owner",
+      "data_owner",
+      "design_owner",
+    ]),
+    signer: z.string().min(1),
+    date: z.string().min(1).optional(),
+  })
+  .strict();
+export type SignoffApproval = z.infer<typeof SignoffApprovalSchema>;
+
 export const SignoffBlockSchema = z
   .object({
     signer: z.string().min(1),
     date: z.string().min(1),
     waivers: z.array(IaWaiverSchema).default([]),
+    answers: z.array(SignoffAnswerSchema).default([]),
+    approvals: z.array(SignoffApprovalSchema).default([]),
+    briefHash: z.string().min(1).optional(),
   })
   .strict();
 export type SignoffBlock = z.infer<typeof SignoffBlockSchema>;
@@ -38,6 +66,9 @@ export interface ParsedSignoff {
   signer?: string;
   date?: string;
   waivers: IaWaiver[];
+  answers: SignoffAnswer[];
+  approvals: SignoffApproval[];
+  briefHash?: string;
   error?: string;
 }
 
@@ -54,6 +85,8 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: false,
       valid: false,
       waivers: [],
+      answers: [],
+      approvals: [],
       error: "SIGNOFF_BLOCK_MISSING",
     };
   }
@@ -66,6 +99,8 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: true,
       valid: false,
       waivers: [],
+      answers: [],
+      approvals: [],
       error: "SIGNOFF_BLOCK_INVALID_JSON",
     };
   }
@@ -76,6 +111,8 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: true,
       valid: false,
       waivers: [],
+      answers: [],
+      approvals: [],
       error: `SIGNOFF_BLOCK_INVALID: ${parsed.error.message}`,
     };
   }
@@ -86,6 +123,11 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       signer: parsed.data.signer,
       date: parsed.data.date,
       waivers: parsed.data.waivers,
+      answers: parsed.data.answers,
+      approvals: parsed.data.approvals,
+      ...(parsed.data.briefHash === undefined
+        ? {}
+        : { briefHash: parsed.data.briefHash }),
       error: "SIGNOFF_DATE_INVALID",
     };
   }
@@ -96,6 +138,11 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
     signer: parsed.data.signer,
     date: parsed.data.date,
     waivers: parsed.data.waivers,
+    answers: parsed.data.answers,
+    approvals: parsed.data.approvals,
+    ...(parsed.data.briefHash === undefined
+      ? {}
+      : { briefHash: parsed.data.briefHash }),
   };
 }
 

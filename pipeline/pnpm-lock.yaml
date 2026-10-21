@@ -70,6 +70,18 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
+  core/intake:
+    dependencies:
+      '@prd-ui/agents':
+        specifier: workspace:*
+        version: link:../agents
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+
   core/orchestrator:
     dependencies:
       '@prd-ui/compiler':
@@ -159,6 +171,18 @@ importers:
         specifier: workspace:*
         version: link:../../../../runtimes/dsh
 
+  dsh/home/profiles/prd-ui-intake:
+    dependencies:
+      '@deepseek-ai/dsh-base':
+        specifier: 0.2.1-rc.2
+        version: 0.2.1-rc.2(0f4bdd72602584a4d03036b0ae449488)
+      '@deepseek-ai/dsh-headless':
+        specifier: 0.2.1-rc.2
+        version: 0.2.1-rc.2(@deepseek-ai/cordis-plugin-loader@1.0.6)(@deepseek-ai/cordis@4.0.5)(@deepseek-ai/dsh-agent-default-model@0.2.1-rc.2(52dc0ce73f9fcea2295f0e3ac3407da1))(@deepseek-ai/dsh-agent@0.2.1-rc.2(ba922ad4037e40def714bb7e19d35103))(@deepseek-ai/dsh-fs@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)(@deepseek-ai/dsh-brand@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5))(@deepseek-ai/dsh-llm@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5))(@deepseek-ai/dsh-sandbox@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)(@deepseek-ai/dsh-llm@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5))(@deepseek-ai/dsh-session@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)(@deepseek-ai/dsh-scope@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)))))(@deepseek-ai/dsh-llm@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5))(@deepseek-ai/dsh-session-query@0.2.1-rc.2(04928be9559d9c0a4ac6ca2eced8f337))(@deepseek-ai/dsh-session@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)(@deepseek-ai/dsh-scope@0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)))(@deepseek-ai/dsh-subagent@0.2.1-rc.2(35798409003075a790d2e345ef752118))
+      '@deepseek-ai/dsh-llm-pi-ai':
+        specifier: 0.2.1-rc.2
+        version: 0.2.1-rc.2(07a42147e1bc3e4c509868cb5a9bf9a7)
+
   runtimes/dsh:
     dependencies:
       '@prd-ui/agents':
@@ -192,6 +216,9 @@ importers:
       '@prd-ui/design-system':
         specifier: workspace:*
         version: link:../../core/design-system
+      '@prd-ui/intake':
+        specifier: workspace:*
+        version: link:../../core/intake
       '@prd-ui/orchestrator':
         specifier: workspace:*
         version: link:../../core/orchestrator

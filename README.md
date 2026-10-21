@@ -9,6 +9,7 @@
 - **硬化（M0.5）**：H1–H15 已实现——全元素 SVG 门禁、图标/插画 set 级一致性门禁、reviewer 错误隔离、严格配置/provider 校验、dsh usage 成本核算与 10 元全局护栏、2x PNG 证据、`--json -` stdin 传输、append-only `log.ndjson`、raw review sidecar、一次 schema 修复、`manifest.review.json` 与统一脱敏。
 - **M1 Agent 层**：IA / Interaction / Visual Style 三个只读 Agent，共享 `AgentRunnerPort`，确定性门禁、预算、重试、失败隔离、证据与人工 signoff；`pnpm agent:run` 可离线（scripted fixtures）或走真实 dsh。产物是 `ia-map` / `interaction-spec` / `motion-spec` / `visual-style` / `asset-briefs`，不修改 Page Spec、HTML 或 renderer。
 - **Spec Engineer v0**：确定性 mapper，把 M1 的 interaction/motion/asset artifacts 写进 Page Spec；新增可选 `interactions[].nodeId` 与 `motion`，输出 gate/summary。motion 已携带、尚未动画到 HTML。
+- **PRD Review + UI Briefer**：Phase 2 前半段。`pnpm intake:run` 读 PRD，做确定性 normalize、PRD Reviewer、IA review、UI Briefer；两道人工签核后才写 `ui-brief.json`，可 resume 和原子发布。
 - **双运行时**：同一 core 状态机；`standalone` 用 scripted reviewer 跑 CI，`dsh` 用 headless + vision 模型跑真实评审。默认 provider 是 DeepSeek（`deepseek-flash`），没有 OpenAI fallback。
 - **dsh 适配**：项目内 pinned profile（`@deepseek-ai/dsh@0.2.1-rc.2`），插件可加载；真实评审需要配置 vision key。
 
@@ -24,13 +25,16 @@ pipeline/
     renderer-html/
     orchestrator/
     asset-review/       # 契约、ports、状态机、硬门禁、verdict、manifest
-    agents/             # M1 IA/Interaction/Visual Style 契约、prompt、门禁、runM1
+    agents/             # M1 IA/Interaction/Visual Style + PRD review/Briefer 角色、prompt、门禁、runM1
+    spec-engineer/      # M1 artifacts → 增强 Page Spec
+    intake/             # PRD normalize、PRD/Brief gates、runIntake、resume
   runtimes/
-    standalone/         # phase1/render/asset/agent CLI + fs/library/scripted/model 适配
+    standalone/         # phase1/render/asset/agent/spec/intake CLI + fs/library/scripted/model 适配
     dsh/                # Cordis 插件、工具、headless adapter、agent runner
   dsh/                  # 项目内 dsh profile（prd-ui-assets / prd-ui-agents；不修改 ~/.dsh）
   samples/assets/m0/    # 10 图标 + 3 插画 + briefs + scripted reviews
   samples/agents/m1/    # employee-app 的 IA/Interaction/Visual scripted fixtures
+  samples/agents/intake/# demo-orders 8 页与 employee-app 2 页 intake fixtures
 ```
 
 - `core/` 不 import `@deepseek-ai/*`，也不 import `node:fs`/`node:child_process`。
@@ -64,6 +68,13 @@ pnpm spec:engineer \
   --project samples/projects/employee-app/project.yaml \
   --agent-run /tmp/m1-agent-runs/<runId> \
   --runs /tmp/spec-engineer-runs
+
+# PRD Review + UI Briefer：8 页 sample PRD 的离线路径
+pnpm intake:run \
+  --project samples/project.demo-orders.yaml \
+  --prd samples/sample-prd.md \
+  --runs /tmp/intake-runs \
+  --fixtures samples/agents/intake
 ```
 
 ## M1 Agent 层
@@ -122,6 +133,42 @@ pnpm spec:engineer \
 - Page Spec 新增可选 `interactions[].nodeId` 与 `motion`；已有 Page Spec 不受影响。
 - 真实 employee-app clean M1 run：2 个 Page Spec，interactions 各 10 条，states 覆盖六种，motion 两页都有；**0 blockers**，28 warnings（19 个未解析 nodeId、9 个未用 asset brief，均为 v0 预期）。
 - 用法、映射、门禁和限制见 [`pipeline/docs/spec-engineer-v0.md`](pipeline/docs/spec-engineer-v0.md)。
+
+## PRD Review + UI Briefer
+
+```bash
+cd pipeline
+
+# 1) PRD review + IA：无 blocker 时停在 awaiting_signoff
+pnpm intake:run \
+  --project samples/project.demo-orders.yaml \
+  --prd samples/sample-prd.md \
+  --runs /tmp/intake-runs \
+  --fixtures samples/agents/intake
+
+# 2) 带 PRD/IA 签核继续到 brief 草稿
+pnpm intake:run \
+  --project samples/project.demo-orders.yaml \
+  --prd samples/sample-prd.md \
+  --resume /tmp/intake-runs/<runId> \
+  --fixtures samples/agents/intake \
+  --signoff-prd-ia /tmp/signoff-prd-ia.md
+
+# 3) 带 brief 签核并发布（hash 从 awaiting summary 的 brief.hash 取）
+pnpm intake:run \
+  --project samples/project.demo-orders.yaml \
+  --prd samples/sample-prd.md \
+  --resume /tmp/intake-runs/<runId> \
+  --fixtures samples/agents/intake \
+  --signoff-prd-ia /tmp/signoff-prd-ia.md \
+  --signoff-brief /tmp/signoff-brief.md \
+  --publish-brief /tmp/demo-orders-ui-brief.json
+```
+
+- 8 页 sample PRD：2 次 reviewer + briefer，产出 8 页 `ui-brief.json`；brief gate 含 schema、页面/角色/状态/追溯、占位符、blocking questions 与 compiler dry-run。
+- employee-app 两页路径用 `samples/agents/intake-employee-app` fixtures；真实 dsh 2 页已跑通（success + publish，累计 ¥0.6948）。8 页真实 dsh 使用 `prd-ui-intake` profile（65536 maxTokens）也已跑通，sample findings 以 waiver 通过（累计 ¥0.90666）。
+- 只有 `success` 才写最终 `ui-brief.json`；`awaiting_signoff` / `blocked` 只写草稿与 findings。
+- 签核格式、resume、publish、门禁与限制见 [`pipeline/docs/prd-review-briefer.md`](pipeline/docs/prd-review-briefer.md)。
 
 ## M0 资产评审
 
@@ -182,7 +229,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 测试与验收
 
-- `pnpm test`：453 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：479 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：2 tests（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；分别是 asset review 和 M1 IA；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。
@@ -191,6 +238,8 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - `pnpm agent:run ... --runtime standalone`：三个 Agent 产物齐全；缺签核时 `awaiting_signoff`，签核后 `success`。
 - `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.1973，`usageComplete=true`，无 waiver。
 - `pnpm spec:engineer --agent-run <clean M1 run>`：2 个增强 Page Spec，0 blockers，28 warnings（v0 预期）。
+- `pnpm intake:run --project samples/project.demo-orders.yaml --prd samples/sample-prd.md`：8 页 PRD review/IA/brief；PRD/IA 与 brief 签核后 `success`，发布 8 页 `ui-brief.json`。
+- `pnpm intake:run --project samples/projects/employee-app/project.yaml --prd samples/projects/employee-app/prd.md`：2 页路径，brief gate 通过后等待签核。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 
@@ -201,12 +250,14 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 | 当前设计 | [`docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md`](docs/superpowers/specs/2026-10-20-core-runtime-m0-design.md) |
 | M1 Agent 设计 | [`docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`](docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md) |
 | Phase 2 Spec Engineer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md) |
+| Phase 2 PRD Review + UI Briefer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md) |
 | Phase 2 Spec Engineer 计划 | [`docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md`](docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md) |
 | M1 实施计划 | [`docs/superpowers/plans/2026-10-20-m1-agent-layer.md`](docs/superpowers/plans/2026-10-20-m1-agent-layer.md) |
 | M0 使用说明 | [`pipeline/docs/asset-review-m0.md`](pipeline/docs/asset-review-m0.md) |
 | M1 使用说明 | [`pipeline/docs/agent-m1.md`](pipeline/docs/agent-m1.md) |
 | M1 UAT 矩阵 | [`pipeline/docs/agent-m1-uat.md`](pipeline/docs/agent-m1-uat.md) |
 | Spec Engineer v0 使用说明 | [`pipeline/docs/spec-engineer-v0.md`](pipeline/docs/spec-engineer-v0.md) |
+| PRD Review + UI Briefer 使用说明 | [`pipeline/docs/prd-review-briefer.md`](pipeline/docs/prd-review-briefer.md) |
 | dsh profile / key | [`pipeline/dsh/README.md`](pipeline/dsh/README.md) |
 | 交接文档 | [`docs/handoffs/2026-10-20-prd-ui-agent-dsh-handoff.md`](docs/handoffs/2026-10-20-prd-ui-agent-dsh-handoff.md) |
 | 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) |

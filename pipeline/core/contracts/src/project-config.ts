@@ -5,6 +5,9 @@ export interface ProjectConfig {
   brief: string;
   /** Optional PRD text/summary consumed by the M1 IA Agent. */
   prd?: string;
+  /** Optional project-level defaults for intake; pages may override them. */
+  profile?: string;
+  platforms?: Array<"web" | "mobile">;
   manifests: Record<string, string>;
   runsDir?: string;
 }
@@ -18,6 +21,8 @@ export const ProjectConfigSchema = z
     project: z.string().min(1),
     brief: z.string().min(1),
     prd: z.string().min(1).optional(),
+    profile: z.string().min(1).optional(),
+    platforms: z.array(z.enum(["web", "mobile"])).min(1).optional(),
     manifests: z.record(z.string(), z.string().min(1)),
     runsDir: z.string().min(1).optional(),
   })

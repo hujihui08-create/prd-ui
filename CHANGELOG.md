@@ -3,6 +3,47 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-20 — Phase 2 PRD Review + UI Briefer (implemented)
+
+### Added
+
+- `core/intake`: deterministic PRD normalization/hash, PRD/IA/brief gates,
+  `runIntake`, resume, signoff/waiver/answer/approval handling, and a
+  compiler dry-run before brief signoff.
+- `core/contracts`: `NormalizedPrd`, PRD findings/extract/readiness, UI Brief
+  draft, and intake gate contracts; `ProjectConfig` gains optional
+  `profile`/`platforms`.
+- `core/agents`: `prd-review` and `ui-briefer` roles; IA gains a PRD-only input
+  path and is decoupled from `UiBrief` via `IaGateScope`.
+- `pnpm intake:run`: PRD review + IA + UI Briefer, two human signoffs,
+  `--resume`, `--publish-brief`, `--json`; usage is `awaiting_signoff` until
+  both signoffs are present.
+- Offline fixtures for the 8-page `demo-orders` PRD and the 2-page
+  `employee-app` slice.
+- Usage: `pipeline/docs/prd-review-briefer.md`.
+
+### Verification
+
+- `pnpm test`: **479 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
+- 8-page demo-orders: PRD/IA signoff -> 8-page brief -> brief-hash signoff ->
+  `success` + published `ui-brief.json`; scripted cost 0.045144 CNY,
+  `usageComplete=true`.
+- employee-app 2-page: brief gate passed, awaits signoff.
+- Regressions: phase1 `2 pages / 0 blockers`; standalone asset review `13/13`;
+  renderer HTML byte-identical; M1/Spec Engineer unchanged.
+
+### Limits
+
+- Real dsh: the 2-page employee-app intake completed (PRD review + IA + briefer,
+  success, published, ¥0.6948). The 8-page sample intake also completes with
+  the new `prd-ui-intake` profile (65536 maxTokens); its real F-001/IA-001/
+  IA-002 findings were waived as sample-PRD gaps, then the brief passed and was
+  published (¥0.90666). M1 keeps `prd-ui-agents` at 32768.
+- Full 8-page M1 + HTML rendering is the next stage.
+- `home`/`inventory-list` typed content remains employee-app-specific; other
+  page types use generic fields and unknown archetypes become blocking
+  questions.
+
 ## 2026-10-20 — Phase 2 Spec Engineer v0 (implemented)
 
 ### Added

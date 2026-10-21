@@ -6,6 +6,21 @@ export type AgentRole = z.infer<typeof AgentRoleSchema>;
 
 export const AGENT_ROLES: readonly AgentRole[] = ["ia", "interaction", "visual-style"];
 
+/** Phase 2 front-half roles; they reuse the same runner transport. */
+export const IntakeRoleSchema = z.enum(["prd-review", "ui-briefer"]);
+export type IntakeRole = z.infer<typeof IntakeRoleSchema>;
+
+export const INTAKE_ROLES: readonly IntakeRole[] = ["prd-review", "ui-briefer"];
+
+export const AgentTaskRoleSchema = z.enum([
+  "ia",
+  "interaction",
+  "visual-style",
+  "prd-review",
+  "ui-briefer",
+]);
+export type AgentTaskRole = z.infer<typeof AgentTaskRoleSchema>;
+
 export type AgentValidation =
   | { success: true; data: unknown }
   | { success: false; error: string };
@@ -15,7 +30,7 @@ export type AgentValidation =
  * adapter owns transport, JSON extraction, one schema repair, and evidence.
  */
 export interface AgentTask {
-  role: AgentRole;
+  role: AgentTaskRole;
   prompt: string;
   /** JSON Schema (or Zod schema) describing the expected output. */
   schema: unknown;

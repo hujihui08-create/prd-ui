@@ -2,7 +2,7 @@ import { redactSecrets, redactValue } from "@prd-ui/contracts";
 import type {
   AgentArtifactStorePort,
   AgentResult,
-  AgentRole,
+  AgentTaskRole,
   AgentRunnerError,
 } from "./contracts.js";
 
@@ -52,7 +52,7 @@ export async function readOptionalText(
 export type EvidencePhase = "initial" | "gate-repair";
 
 export interface EvidenceInput {
-  role: AgentRole;
+  role: AgentTaskRole;
   phase: EvidencePhase;
   attempt: number;
   prompt: string;
@@ -177,7 +177,7 @@ export interface HistoryEntry {
 
 export async function writeHistory(
   store: AgentArtifactStorePort,
-  role: AgentRole,
+  role: AgentTaskRole,
   history: HistoryEntry[]
 ): Promise<void> {
   await store.writeText(

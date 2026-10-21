@@ -1,7 +1,8 @@
 # Project-local dsh profile
 
 This directory holds the pinned DeepSeek Harness profiles used by
-`asset:review --runtime dsh` and `agent:run --runtime dsh`.
+`asset:review --runtime dsh`, `agent:run --runtime dsh`, and
+`intake:run --runtime dsh`.
 It never modifies `~/.dsh`; the CLI is pointed at this home with `DSH_HOME`.
 
 ## Layout
@@ -17,6 +18,10 @@ dsh/
       package.json                      # base + headless + pi-ai; no project plugin
       cordis.yml                        # []
       cordis.patch.yml                  # vision provider, default model, 32768 maxTokens
+    profiles/prd-ui-intake/
+      package.json                      # same bundles; no project plugin
+      cordis.yml                        # []
+      cordis.patch.yml                  # vision provider, default model, 65536 maxTokens
 ```
 
 `node_modules/`, `.credentials.yaml`, `.env`, and logs inside `home/` are gitignored.
@@ -43,6 +48,27 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 The three-agent smoke run on 2026-10-20 used one call per role, no schema
 repair, and cost **¥0.2081** (`usageComplete=true`); see
 [`../docs/agent-m1.md`](../docs/agent-m1.md) for the per-role token breakdown.
+
+## Intake profile
+
+`prd-ui-intake` is the profile used by `intake:run --runtime dsh`. It has the
+same provider/tool setup as `prd-ui-agents` but raises `maxTokens` to 65536:
+the 8-page sample PRD's review JSON exceeds 32768 output tokens. M1 stays on
+`prd-ui-agents` (32768).
+
+```bash
+cd pipeline
+set -a; . ./.env; set +a
+DSH_HOME="$PWD/dsh/home" pnpm intake:run \
+  --project samples/project.demo-orders.yaml \
+  --prd samples/sample-prd.md \
+  --runtime dsh \
+  --runs /tmp/intake-dsh
+```
+
+Real dsh results (2026-10-20): employee-app 2-page intake completed
+(`success`, ¥0.6948); 8-page sample intake completed with three explicit
+sample waivers (`success`, ¥0.90666), both `usageComplete=true`.
 
 ## Install
 

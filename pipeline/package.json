@@ -10,7 +10,8 @@
     "render:html": "tsx runtimes/standalone/src/render-html-cli.ts",
     "asset:review": "tsx runtimes/standalone/src/asset-cli.ts",
     "agent:run": "tsx runtimes/standalone/src/agent-cli.ts",
-    "spec:engineer": "tsx runtimes/standalone/src/spec-cli.ts"
+    "spec:engineer": "tsx runtimes/standalone/src/spec-cli.ts",
+    "intake:run": "tsx runtimes/standalone/src/intake-cli.ts"
   },
   "dependencies": {
     "zod": "^4.6.7"

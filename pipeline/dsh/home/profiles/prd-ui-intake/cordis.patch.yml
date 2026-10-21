@@ -1,0 +1,25 @@
+# Project-local dsh profile for the Phase 2 PRD Reviewer / UI Briefer.
+# The 8-page PRD review can exceed the M1 profile's 32k output cap, so this
+# profile raises maxTokens while keeping the same provider and no tools.
+
+- insert:
+    - id: llm-pi-ai
+      name: '@deepseek-ai/dsh-llm-pi-ai'
+      config:
+        providers:
+          prd-ui-vision:
+            displayName: PRD UI Vision
+            apiKeyEnv: PRD_UI_VISION_API_KEY
+            api: openai-completions
+            baseURL: !!js process.env.PRD_UI_VISION_BASE_URL
+            defaultInput: [text, image]
+            models:
+              - id: !!js process.env.PRD_UI_VISION_MODEL
+                name: PRD UI Vision
+                contextWindow: 128000
+                maxTokens: 65536
+
+- id: agent-default-model
+  config:
+    provider: prd-ui-vision
+    model: !!js process.env.PRD_UI_VISION_MODEL
