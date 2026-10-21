@@ -1,5 +1,21 @@
 import type { PageSpec, Profile, SpecNode } from "@prd-ui/contracts";
 
+export interface RenderOptions {
+  /** page id -> display name, used for navigation labels. */
+  pageNames?: Record<string, string>;
+}
+
+let renderPageNames: Record<string, string> = {};
+let renderProject = "PRD UI";
+let renderPageId = "";
+
+function pageLabel(id: string): string {
+  return (
+    renderPageNames[id] ??
+    id.replace(/[-_]/g, " ").replace(/\b[a-z]/g, (char) => char.toUpperCase())
+  );
+}
+
 function esc(value: unknown): string {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -45,6 +61,13 @@ const iconMap: Record<string, string> = {
   alert: "warning",
   error: "error",
   success: "check_circle",
+  "orders-overview": "dashboard",
+  "orders-list": "format_list_bulleted",
+  "order-detail": "receipt_long",
+  "order-form": "add_box",
+  "home-feed": "home",
+  "item-detail": "shopping_bag",
+  auth: "login",
 };
 
 function iconName(name: string): string {
@@ -106,6 +129,14 @@ const tabIcons: Record<string, string> = {
   客户: "person",
   工作台: "grid_view",
   我的: "settings",
+  "orders-overview": "dashboard",
+  "orders-list": "format_list_bulleted",
+  settings: "settings",
+  "home-feed": "home",
+  "order-detail": "receipt_long",
+  "order-form": "add_box",
+  auth: "login",
+  "item-detail": "shopping_bag",
 };
 
 function slot(node: SpecNode, name: string): SpecNode[] {
@@ -144,6 +175,36 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   const children = (node.children ?? []).map((child) => renderNode(child, profile, depth + 1)).join("");
 
   switch (node.type) {
+    case "PageShell": {
+      const title = str(props.title);
+      const nav = stringArray(props.nav);
+      const blocks = ["summary", "content", "groups", "fields", "actions"]
+        .map((name) => {
+          const children = slot(node, name);
+          if (children.length === 0) return "";
+          const rendered = children
+            .map((child) => renderNode(child, profile, depth + 1))
+            .join("");
+          return `<div class="page-slot page-slot-${name}">${rendered}</div>`;
+        })
+        .join("");
+      return `<div class="page-shell">
+  <aside class="page-sidebar">
+    <div class="page-brand">${esc(renderProject)}</div>
+    <nav class="page-nav">${nav
+      .map(
+        (id) =>
+          `<a class="page-nav-item${id === renderPageId ? " active" : ""}" href="#">${esc(pageLabel(id))}</a>`
+      )
+      .join("")}</nav>
+  </aside>
+  <div class="page-main">
+    <header class="page-header-web"><h1>${esc(title)}</h1></header>
+    <main class="page-body">${blocks}</main>
+    ${statePanels()}
+  </div>
+</div>`;
+    }
     case "MobileShell": {
       const title = str(props.title);
       const top = slot(node, "top-bar")
@@ -155,16 +216,39 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const nav = slot(node, "bottom-nav")
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
-      const showTabs = props.showTabs !== false;
+      const titleSlot = slot(node, "title")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const illustration = slot(node, "illustration")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const body = slot(node, "body")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const summary = slot(node, "summary")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const feed = slot(node, "feed")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const fields = slot(node, "fields")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const actions = slot(node, "actions")
+        .map((child) => renderNode(child, profile, depth + 1))
+        .join("");
+      const showTabs = props.showTabs !== false && nav.length > 0;
       const back = bool(props.back);
       const header =
         top ||
         (back
           ? `<header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">${esc(title)}</h1></header>`
-          : "");
+          : titleSlot.length === 0
+            ? `<header class="page-header"><h1 class="page-title">${esc(title)}</h1></header>`
+            : "");
       return `<div class="app ${showTabs ? "has-tabs" : ""}">
   ${header}
-  <main class="app-scroll">${content}</main>
+  <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${actions}${content}</main>
   ${showTabs ? `<nav class="tabbar">${nav}</nav>` : ""}
   ${statePanels()}
 </div>`;
@@ -184,11 +268,121 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
         .map(
           (item) => `<a class="tab ${item === active ? "active" : ""}" href="#">
   <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
-  <span class="tab-label">${esc(item)}</span>
+  <span class="tab-label">${esc(pageLabel(item))}</span>
 </a>`
         )
         .join("")}</div>`;
     }
+    case "BottomNav": {
+      const items = stringArray(props.items);
+      return `<div class="tabbar-inner">${items
+        .map(
+          (item) => `<a class="tab ${item === renderPageId ? "active" : ""}" href="#">
+  <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
+  <span class="tab-label">${esc(pageLabel(item))}</span>
+</a>`
+        )
+        .join("")}</div>`;
+    }
+    case "Stat": {
+      return `<div class="stat">
+  <span class="stat-label">${esc(props.label)}</span>
+  <strong class="stat-value">${esc(props.value)}</strong>
+</div>`;
+    }
+    case "List": {
+      if (Array.isArray(props.items)) {
+        return `<div class="list-text">${(props.items as unknown[])
+          .map((item) => `<div class="list-text-row">${esc(item)}</div>`)
+          .join("")}</div>`;
+      }
+      const count = Math.min(Math.max(Number(props.items) || 3, 1), 6);
+      return `<div class="list-placeholder">${Array.from(
+        { length: count },
+        () =>
+          `<div class="list-placeholder-row"><span class="skeleton-line wide"></span><span class="skeleton-line"></span><span class="skeleton-line short"></span></div>`
+      ).join("")}</div>`;
+    }
+    case "DataTable": {
+      const columns = stringArray(props.columns);
+      const columnLabels = stringArray(props.columnLabels);
+      const rows = Array.isArray(props.rows)
+        ? (props.rows as Array<Record<string, unknown>>)
+        : [];
+      return `<div class="table-wrap"><table class="data-table">
+  <thead><tr>${columns
+    .map((column, index) => `<th>${esc(columnLabels[index] ?? column)}</th>`)
+    .join("")}</tr></thead>
+  <tbody>${
+    rows.length > 0
+      ? rows
+          .map(
+            (row) =>
+              `<tr>${columns
+                .map((column) => `<td>${esc(row[column] ?? "")}</td>`)
+                .join("")}</tr>`
+          )
+          .join("")
+      : Array.from(
+          { length: 4 },
+          () =>
+            `<tr>${columns.map(() => `<td><span class="skeleton-line"></span></td>`).join("")}</tr>`
+        ).join("")
+  }</tbody>
+</table></div>`;
+    }
+    case "FilterBar": {
+      const fields = stringArray(props.fields);
+      const action = str(props.action);
+      return `<div class="filter-bar">
+  <div class="filter-chips">${fields
+    .map(
+      (field) =>
+        `<span class="filter-chip"><span class="filter-label">${esc(field)}</span><span class="filter-value">全部</span><span class="material-symbols-rounded filter-chevron">expand_more</span></span>`
+    )
+    .join("")}</div>
+  ${action ? `<button class="btn secondary" type="button">${esc(action)}</button>` : ""}
+</div>`;
+    }
+    case "Pagination":
+      return `<div class="pagination">
+  <span class="page-arrow">‹</span>
+  <span class="page-number active">1</span>
+  <span class="page-number">2</span>
+  <span class="page-number">3</span>
+  <span class="page-arrow">›</span>
+</div>`;
+    case "FormField": {
+      const label = str(props.label);
+      const required = bool(props.required);
+      const readOnly = bool(props.readOnly);
+      const value = str(props.value);
+      const hasChildren = children.length > 0;
+      return `<label class="form-field">
+  <span class="form-label">${esc(label)}${required ? `<span class="required">*</span>` : ""}</span>
+  ${hasChildren ? children : `<span class="${value ? "form-value" : "form-readonly"}">${value || (readOnly ? "—" : "")}</span>`}
+</label>`;
+    }
+    case "Input": {
+      const name = str(props.name);
+      const placeholder = str(props.placeholder);
+      const inputType = str(props.inputType) || "text";
+      const value = str(props.value);
+      return `<input class="input" name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${value ? ` value="${esc(value)}"` : ""} />`;
+    }
+    case "Select": {
+      const options = stringArray(props.options);
+      return `<select class="select">${options
+        .map((option) => `<option>${esc(option)}</option>`)
+        .join("")}</select>`;
+    }
+    case "FeedCard":
+      return `<article class="feed-card">
+  <h2 class="feed-title">${esc(props.title)}</h2>
+  <p class="feed-body">${esc(props.body)}</p>
+</article>`;
+    case "Image":
+      return `<div class="image-placeholder"><span class="material-symbols-rounded">image</span><span>${esc(props.assetRef ?? "image")}</span></div>`;
     case "Section": {
       const padding = str(props.padding);
       const gap = str(props.gap);
@@ -435,7 +629,7 @@ ${typeClasses(profile)}
 .row-subtitle{margin-top:2px;font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);font-weight:var(--type-body-sm-weight);color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-meta{display:flex;align-items:center;gap:2px;white-space:nowrap;font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);}
 .row-chevron{font-size:16px;color:var(--color-text-tertiary);}
-.badge{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius-sm);font-size:var(--type-label-strong-size);line-height:var(--type-label-strong-line);font-weight:var(--type-label-strong-weight);white-space:nowrap;}
+.badge{display:inline-flex;align-self:flex-start;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius-sm);font-size:var(--type-label-strong-size);line-height:var(--type-label-strong-line);font-weight:var(--type-label-strong-weight);white-space:nowrap;}
 .badge.tone-neutral{background:var(--color-surface-subtle);color:var(--color-text-secondary);}
 .badge.tone-success{background:color-mix(in srgb,var(--color-status-success) 12%,white);color:var(--color-status-success);}
 .badge.tone-warning{background:color-mix(in srgb,var(--color-status-warning) 12%,white);color:var(--color-status-warning);}
@@ -494,9 +688,68 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .error-desc{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);color:var(--color-text-secondary);}
 .btn{height:36px;padding:0 var(--space-4);border:0;border-radius:var(--radius-md);font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
 .btn.primary{background:var(--color-action-primary);color:var(--color-text-onAction);}
-.btn.secondary{background:var(--color-action-secondary);color:var(--color-text-primary);}
+.btn.secondary{background:#fff;border:1px solid #CBD5E1;color:var(--color-text-primary);}
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
-.state-switcher{position:fixed;left:calc(50% + 230px);top:24px;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:12px;background:#fff;box-shadow:0 4px 20px rgba(17,24,39,.12);font-size:12px;color:#6B7280;}
+.page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
+.page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
+.page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
+.page-nav{display:flex;flex-direction:column;gap:2px;}
+.page-nav-item{padding:9px 12px;border-radius:8px;color:#CBD5E1;font-size:14px;}
+.page-nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.page-nav-item.active{background:#2563EB;color:#fff;}
+.page-main{flex:1;min-width:0;position:relative;}
+.page-header-web{height:64px;padding:0 32px;display:flex;align-items:center;border-bottom:1px solid #E5E7EB;background:#fff;}
+.page-header-web h1{margin:0;font-size:20px;line-height:28px;font-weight:600;color:#111827;}
+.page-body{padding:24px 32px 48px;display:flex;flex-direction:column;gap:20px;max-width:1280px;}
+.page-slot{display:flex;flex-direction:column;gap:16px;}
+.page-slot-actions{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;}
+.page-slot-actions .btn{width:auto;}
+.page-slot-actions .section{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;}
+.page-shell .state-panel{left:0;right:0;top:64px;bottom:0;}
+.stat{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.stat-label{font-size:13px;line-height:18px;color:#64748B;}
+.stat-value{font-size:24px;line-height:32px;font-weight:600;color:#0F172A;}
+.list-placeholder{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
+.list-text{display:flex;flex-direction:column;gap:0;padding:4px 0;}
+.list-text-row{padding:10px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#334155;}
+.list-text-row:last-child{border-bottom:0;}
+.list-placeholder-row{display:grid;grid-template-columns:2fr 1fr 60px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9;}
+.skeleton-line{display:block;height:10px;border-radius:6px;background:#E7E9ED;}
+.skeleton-line.wide{width:80%;}
+.skeleton-line.short{width:60%;}
+.table-wrap{overflow:auto;background:#fff;border:1px solid #E5E7EB;border-radius:12px;}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{text-align:left;padding:12px 16px;background:#F8FAFC;color:#475569;font-weight:600;border-bottom:1px solid #E5E7EB;white-space:nowrap;}
+.data-table td{padding:14px 16px;border-bottom:1px solid #F1F5F9;}
+.data-table tr:last-child td{border-bottom:0;}
+.filter-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-chip{height:32px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;display:inline-flex;align-items:center;gap:6px;padding:0 10px;}
+.filter-label{font-size:12px;color:#64748B;}
+.filter-value{font-size:13px;color:#0F172A;}
+.filter-chevron{font-size:16px;color:#94A3B8;}
+.pagination{display:flex;align-items:center;gap:4px;justify-content:flex-end;}
+.page-number,.page-arrow{min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-size:13px;color:#475569;}
+.page-number.active{background:#2563EB;color:#fff;}
+.form-field{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:13px;line-height:18px;color:#475569;font-weight:500;}
+.required{color:#DC2626;margin-left:2px;}
+.form-readonly{display:block;min-height:20px;padding:8px 10px;border-radius:6px;background:#F8FAFC;color:#94A3B8;font-size:14px;}
+.form-value{display:block;min-height:20px;padding:8px 10px;border-radius:6px;background:#F8FAFC;color:#0F172A;font-size:14px;}
+.input,.select{height:36px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;padding:0 10px;font:inherit;font-size:14px;color:#0F172A;width:100%;}
+.input:focus,.select:focus{outline:2px solid #BFDBFE;border-color:#2563EB;}
+.app-scroll>.form-field{margin:0 var(--space-4) var(--space-3);}
+.app-scroll>.btn{margin:var(--space-4);}
+.app-scroll>.card{margin:var(--space-4);}
+.app-scroll>.feed-card{margin:var(--space-4);}
+.app-scroll>.typo-heading-1{display:block;margin:var(--space-8) var(--space-4) var(--space-4);}
+.feed-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(17,24,39,.04);}
+.feed-title{margin:0 0 6px;font-size:16px;line-height:24px;color:#0F172A;}
+.feed-body{margin:0;font-size:13px;line-height:20px;color:#64748B;}
+.image-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;margin:var(--space-4);border:1px dashed #CBD5E1;border-radius:12px;background:#F8FAFC;color:#94A3B8;font-size:12px;}
+body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[data-state="empty"] .list-placeholder,body[data-state="empty"] .list-text,body[data-state="empty"] .feed-card{display:none;}
+@media (max-width:900px){.page-sidebar{width:180px;flex-basis:180px;}.page-body{padding:16px;}.page-header-web{padding:0 16px;}}
+.state-switcher{position:fixed;right:24px;bottom:24px;z-index:100;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:12px;background:#fff;box-shadow:0 4px 20px rgba(17,24,39,.12);font-size:12px;color:#6B7280;}
 .state-switcher-label{font-weight:600;color:#111827;}
 .state-switcher a{padding:2px 0;}
 .state-switcher a:hover{color:#111827;}
@@ -506,14 +759,21 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 @media (max-width:700px){body{background:var(--color-surface-subtle);}.app{box-shadow:none;height:100vh;min-height:844px;}.state-switcher{display:none;}}`;
 }
 
-export function renderDocument(spec: PageSpec, profile: Profile): string {
+export function renderDocument(
+  spec: PageSpec,
+  profile: Profile,
+  options: RenderOptions = {}
+): string {
+  renderPageNames = options.pageNames ?? {};
+  renderProject = spec.meta.project;
+  renderPageId = spec.meta.pageId;
   const body = renderNode(spec.layout, profile);
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>${esc(spec.meta.name)} · 员工端</title>
+  <title>${esc(spec.meta.name)} · ${esc(spec.meta.project)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
@@ -534,26 +794,28 @@ export function renderDocument(spec: PageSpec, profile: Profile): string {
 }
 
 export function renderIndex(pages: PageSpec[]): string {
+  const project = pages[0]?.meta.project ?? "PRD UI";
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>员工端 · 高保真切片</title>
+  <title>${esc(project)} · 页面索引</title>
   <style>
     :root{font-family:"Noto Sans SC","PingFang SC",system-ui,sans-serif;color:#111827;background:#F5F6F8;}
     body{margin:0;padding:48px;display:flex;flex-direction:column;gap:24px;align-items:center;}
     h1{font-size:24px;line-height:32px;margin:0;}
     p{font-size:14px;line-height:20px;color:#6B7280;margin:0;max-width:640px;text-align:center;}
     .pages{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
-    a.card{display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;background:#fff;box-shadow:0 2px 12px rgba(17,24,39,.08);min-width:220px;}
-    a.card strong{font-size:16px;}
+    a.card{display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;background:#fff;box-shadow:0 2px 12px rgba(17,24,39,.08);min-width:220px;color:#111827;text-decoration:none;}
+    a.card:hover{box-shadow:0 4px 18px rgba(17,24,39,.14);}
+    a.card strong{font-size:16px;color:#0F172A;}
     a.card span{font-size:12px;color:#6B7280;}
   </style>
 </head>
 <body>
-  <h1>员工端 · 高保真切片</h1>
-  <p>从 Page Spec + b-mobile profile 渲染的两页移动端原型：今日、库存查询。打开页面后可在右侧切换默认/空/加载/失败状态。</p>
+  <h1>${esc(project)} · ${pages.length} 个页面</h1>
+  <p>从 Page Spec 渲染的页面索引。点击进入页面预览；移动端页面可在右侧切换默认/空/加载/失败状态。</p>
   <div class="pages">
     ${pages
       .map(

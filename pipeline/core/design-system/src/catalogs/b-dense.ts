@@ -133,7 +133,9 @@ export const bDenseCatalog: Catalog = {
       category: "data",
       props: {
         columns: { type: "string[]", required: true },
+        columnLabels: { type: "string[]" },
         pageSize: { type: "number", required: true },
+        rows: { type: "object[]" },
       },
       variants: ["default", "compact"],
       states: ["default", "empty", "loading", "error"],
@@ -209,6 +211,7 @@ export const bDenseCatalog: Catalog = {
         label: { type: "string", required: true },
         required: { type: "boolean" },
         readOnly: { type: "boolean" },
+        value: { type: "string" },
       },
       variants: ["default", "inline"],
       states: ["default", "error", "disabled"],

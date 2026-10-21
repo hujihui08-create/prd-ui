@@ -231,6 +231,9 @@ importers:
       '@prd-ui/spec-engineer':
         specifier: workspace:*
         version: link:../../core/spec-engineer
+      '@prd-ui/validators':
+        specifier: workspace:*
+        version: link:../../core/validators
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2

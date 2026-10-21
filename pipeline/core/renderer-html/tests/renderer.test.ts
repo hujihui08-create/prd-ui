@@ -3,11 +3,25 @@ import { UiBriefSchema } from "@prd-ui/contracts";
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import briefJson from "../../../samples/projects/employee-app/ui-brief.json";
-import { renderDocument } from "../src/index.js";
+import demoBriefJson from "../../../samples/projects/demo-orders-intake/ui-brief.json";
+import { renderDocument, renderIndex } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
 const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
 const byId = new Map(specs.map((spec) => [spec.meta.pageId, spec]));
+
+const demoBrief = UiBriefSchema.parse(demoBriefJson);
+const demoSpecs = compileProject(demoBrief, {
+  getProfile,
+  getCatalog,
+  getArchetype,
+});
+const demoById = new Map(
+  demoSpecs.map((spec) => [spec.meta.pageId, spec])
+);
+const demoPageNames = Object.fromEntries(
+  demoSpecs.map((spec) => [spec.meta.pageId, spec.meta.name])
+);
 
 describe("employee-app HTML renderer", () => {
   it("renders the today page with content and empty-state copy", () => {
@@ -38,5 +52,68 @@ describe("employee-app HTML renderer", () => {
     expect(html).toContain("低库存");
     expect(html).toContain("没有匹配的产品");
     expect(html).toContain("清空筛选");
+  });
+});
+
+describe("generic web/mobile renderer", () => {
+  it("renders PageShell pages with nav, table rows, and project title", () => {
+    const spec = demoById.get("orders-list")!;
+    const html = renderDocument(spec, getProfile("b-dense"), {
+      pageNames: demoPageNames,
+    });
+    expect(html).toContain('class="page-shell"');
+    expect(html).toContain("订单列表");
+    expect(html).toContain("ORD-20261021-0001");
+    expect(html).toContain("张三");
+    expect(html).toContain("订单概览");
+    expect(html).toContain("订单列表 · demo-orders");
+    expect(html).not.toContain("员工端");
+  });
+
+  it("renders PageShell overview stats and recent rows", () => {
+    const html = renderDocument(demoById.get("orders-overview")!, getProfile("b-dense"), {
+      pageNames: demoPageNames,
+    });
+    expect(html).toContain("今日订单");
+    expect(html).toContain("128");
+    expect(html).toContain("ORD-20261021-0002");
+  });
+
+  it("renders MobileShell feed and form slots", () => {
+    const feed = renderDocument(demoById.get("home-feed")!, getProfile("c-expressive"), {
+      pageNames: demoPageNames,
+    });
+    expect(feed).toContain("秋季修护专题");
+    expect(feed).toContain("会员日提醒");
+    expect(feed).toContain("tab-label");
+    expect(feed).not.toContain("请配置 feedItems");
+
+    const auth = renderDocument(demoById.get("auth")!, getProfile("c-expressive"), {
+      pageNames: demoPageNames,
+    });
+    expect(auth).toContain("邮箱");
+    expect(auth).toContain("密码");
+    expect(auth).toContain('class="input"');
+    expect(auth).toContain("登录");
+  });
+
+  it("renders detail values from brief mock data", () => {
+    const detail = renderDocument(
+      demoById.get("order-detail")!,
+      getProfile("b-dense"),
+      { pageNames: demoPageNames }
+    );
+    expect(detail).toContain("ORD-20261021-0001");
+    expect(detail).toContain("¥268.00");
+    expect(detail).toContain("张三");
+    expect(detail).toContain("编辑订单");
+  });
+
+  it("renders an index with project title and styled links", () => {
+    const index = renderIndex(demoSpecs);
+    expect(index).toContain("demo-orders · 页面索引");
+    expect(index).toContain("8 个页面");
+    expect(index).toContain('href="orders-list.html"');
+    expect(index).toContain("color:#111827;text-decoration:none;");
   });
 });

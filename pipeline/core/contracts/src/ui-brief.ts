@@ -29,6 +29,15 @@ export interface UiBriefPageContent {
   }>;
 }
 
+export interface UiBriefMockData {
+  /** Read-only field values for detail pages. */
+  values?: Record<string, string>;
+  /** Rows for list/detail tables; keys are the page's field names. */
+  rows?: Array<Record<string, string>>;
+  /** Rows for the overview "recent data" list. */
+  listItems?: string[];
+}
+
 export interface UiBriefPage {
   id: PageId;
   name: string;
@@ -41,6 +50,8 @@ export interface UiBriefPage {
   requiredStates: string[];
   reqRefs: string[];
   fields?: string[];
+  /** Display labels keyed by field id; defaults to the field id. */
+  fieldLabels?: Record<string, string>;
   actions?: string[];
   filterFields?: string[];
   emptyTitle?: string;
@@ -48,6 +59,7 @@ export interface UiBriefPage {
   summaryTitle?: string;
   feedItems?: Array<{ title: string; body: string }>;
   stats?: Array<{ label: string; value: string }>;
+  mockData?: UiBriefMockData;
   content?: UiBriefPageContent;
 }
 
@@ -156,6 +168,16 @@ export const UiBriefPageContentSchema = z
   })
   .strict();
 
+export const UiBriefMockDataSchema = z
+  .object({
+    values: z.record(z.string().min(1), z.string()).optional(),
+    rows: z
+      .array(z.record(z.string().min(1), z.string()))
+      .optional(),
+    listItems: z.array(z.string().min(1)).optional(),
+  })
+  .strict();
+
 export const UiBriefPageSchema = z
   .object({
     id: PageIdSchema,
@@ -169,6 +191,7 @@ export const UiBriefPageSchema = z
     requiredStates: z.array(z.string().min(1)).min(1),
     reqRefs: z.array(z.string().regex(/^REQ-[A-Z0-9]+-\d+$/)).min(1),
     fields: z.array(z.string().min(1)).optional(),
+    fieldLabels: z.record(z.string().min(1), z.string().min(1)).optional(),
     actions: z.array(z.string().min(1)).optional(),
     filterFields: z.array(z.string().min(1)).optional(),
     emptyTitle: z.string().min(1).optional(),
@@ -180,6 +203,7 @@ export const UiBriefPageSchema = z
     stats: z
       .array(z.object({ label: z.string().min(1), value: z.string().min(1) }).strict())
       .optional(),
+    mockData: UiBriefMockDataSchema.optional(),
     content: UiBriefPageContentSchema.optional(),
   })
   .strict();

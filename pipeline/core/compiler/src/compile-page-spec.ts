@@ -34,8 +34,20 @@ function text(label: string, textRole = "body.md"): SpecNode {
   return { type: "Text", props: { text: label }, textRole };
 }
 
-function fieldFormNode(field: string, readOnly = true): SpecNode {
-  return { type: "FormField", props: { label: field, readOnly } };
+function fieldFormNode(
+  field: string,
+  readOnly = true,
+  value?: string,
+  label?: string
+): SpecNode {
+  return {
+    type: "FormField",
+    props: {
+      label: label ?? field,
+      readOnly,
+      ...(value === undefined ? {} : { value }),
+    },
+  };
 }
 
 /**
@@ -143,7 +155,12 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                 {
                   type: "Card",
                   props: { title: `${page.name}近期数据` },
-                  children: [{ type: "List", props: { items: 5 } }],
+                  children: [
+                    {
+                      type: "List",
+                      props: { items: page.mockData?.listItems ?? 5 },
+                    },
+                  ],
                 },
               ],
             },
@@ -153,6 +170,8 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
     case "list": {
       const columns = page.fields ?? ["名称", "状态"];
       const filterFields = page.filterFields ?? page.fields ?? [];
+      const labelFor = (field: string): string =>
+        page.fieldLabels?.[field] ?? field;
       const emptyTitle = page.emptyTitle ?? `暂无${page.name}`;
       const actions = page.actions ?? [];
       const extraActions = actions.slice(1);
@@ -169,13 +188,11 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
               children: [
                 {
                   type: "FilterBar",
-                  props: { fields: filterFields, action: actions[0] ?? "新建" },
+                  props: {
+                    fields: filterFields.map(labelFor),
+                    action: actions[0] ?? "新建",
+                  },
                 },
-                {
-                  type: "DataTable",
-                  props: { columns, pageSize: 20 },
-                },
-                { type: "Pagination", props: { pageSize: 20 } },
                 ...(extraActions.length > 0
                   ? [
                       {
@@ -185,6 +202,18 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                       },
                     ]
                   : []),
+                {
+                  type: "DataTable",
+                  props: {
+                    columns,
+                    columnLabels: columns.map(labelFor),
+                    pageSize: 20,
+                    ...(page.mockData?.rows === undefined
+                      ? {}
+                      : { rows: page.mockData.rows }),
+                  },
+                },
+                { type: "Pagination", props: { pageSize: 20 } },
                 emptyStateNode(page, emptyTitle, "调整筛选条件后重试"),
               ],
             },
@@ -204,13 +233,16 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
             {
               type: "Section",
               props: { padding: "space.6", gap: "space.4" },
-              children: (page.fields ?? []).map((field) => ({
-                type: "FormField",
-                props: { label: field, required: true },
-                children: [
-                  { type: "Input", props: { name: field, placeholder: `请输入${field}` } },
-                ],
-              })),
+              children: (page.fields ?? []).map((field) => {
+                const label = page.fieldLabels?.[field] ?? field;
+                return {
+                  type: "FormField",
+                  props: { label, required: true },
+                  children: [
+                    { type: "Input", props: { name: field, placeholder: `请输入${label}` } },
+                  ],
+                };
+              }),
             },
           ],
           actions: [
@@ -240,7 +272,9 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                     const meta = settingsFieldMeta[field];
                     return {
                       type: "FormField",
-                      props: { label: meta?.label ?? field },
+                      props: {
+                        label: meta?.label ?? page.fieldLabels?.[field] ?? field,
+                      },
                       children: [
                         {
                           type: "Select",
@@ -488,7 +522,9 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
             const meta = authFieldMeta[field];
             return {
               type: "FormField",
-              props: { label: meta?.label ?? field },
+              props: {
+                label: meta?.label ?? page.fieldLabels?.[field] ?? field,
+              },
               children: [
                 {
                   type: "Input",
@@ -526,6 +562,27 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
   const fields = page.fields ?? [];
   const summaryTitle = page.summaryTitle ?? `${page.name}摘要`;
   const actions = actionButtons(page, ["编辑"]);
+  const summaryItems =
+    page.mockData?.values === undefined
+      ? page.mockData?.listItems
+      : Object.entries(page.mockData.values).map(
+          ([key, value]) => `${page.fieldLabels?.[key] ?? key}: ${value}`
+        );
+  const status = page.mockData?.values?.status;
+  const statusTone =
+    status === undefined
+      ? "neutral"
+      : /在售|已完成|成功/.test(status)
+        ? "success"
+        : /待处理|进行|加载/.test(status)
+          ? "warning"
+          : /异常|失败|缺货/.test(status)
+            ? "danger"
+            : "neutral";
+  const statusBadge =
+    status === undefined
+      ? undefined
+      : { type: "Badge" as const, props: { label: status, tone: statusTone } };
 
   if (page.target === "mobile") {
     return {
@@ -538,12 +595,24 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
             type: "Card",
             props: { title: summaryTitle },
             children: [
-              { type: "List", props: { items: Math.max(fields.length, 3) } },
-              { type: "Badge", props: { label: "在售", tone: "success" } },
+              {
+                type: "List",
+                props: {
+                  items: summaryItems ?? Math.max(fields.length, 3),
+                },
+              },
+              ...(statusBadge === undefined ? [] : [statusBadge]),
             ],
           },
         ],
-        fields: fields.map((field) => fieldFormNode(field)),
+        fields: fields.map((field) =>
+          fieldFormNode(
+            field,
+            true,
+            page.mockData?.values?.[field],
+            page.fieldLabels?.[field]
+          )
+        ),
         actions,
       },
     };
@@ -558,14 +627,27 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
         {
           type: "Card",
           props: { title: summaryTitle },
-          children: [{ type: "List", props: { items: 4 } }],
+          children: [
+            {
+              type: "List",
+              props: { items: summaryItems ?? 4 },
+            },
+            ...(statusBadge === undefined ? [] : [statusBadge]),
+          ],
         },
       ],
       fields: [
         {
           type: "Section",
           props: { padding: "space.6", gap: "space.3" },
-          children: fields.map((field) => fieldFormNode(field)),
+          children: fields.map((field) =>
+            fieldFormNode(
+              field,
+              true,
+              page.mockData?.values?.[field],
+              page.fieldLabels?.[field]
+            )
+          ),
         },
       ],
       actions,

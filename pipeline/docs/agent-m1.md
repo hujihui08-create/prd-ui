@@ -36,9 +36,11 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 | 参数 | 说明 |
 |---|---|
 | `--project <path>` | 项目 YAML；默认 employee-app |
+| `--brief <path>` | 覆盖项目配置的 brief；用于消费 intake 签核后的 brief |
 | `--prd <path>` | PRD 原文/摘要；默认取 `project.yaml` 的 `prd` |
 | `--runs <dir>` | run 产物目录 |
 | `--runtime standalone\|dsh` | 执行适配器；默认 standalone |
+| `--profile <name>` | dsh profile；默认 `prd-ui-agents`；8 页 M1 可用 `prd-ui-intake`（65536 maxTokens） |
 | `--fixtures <dir>` | standalone fixtures；默认 `samples/agents/m1` |
 | `--only-role <role>` | 只跑某个 design role；IA 始终运行 |
 | `--max-cost-cny <n>` | 整 run 成本上限；默认 10 |
@@ -100,6 +102,20 @@ init -> ia -> ia_gate -> design (interaction + visual 并行) -> design_gate -> 
 - 只有 blocker 需要 waiver；major/minor 不阻断。
 - 文件缺失或块无效 → 该签核视为未签，run 为 `awaiting_signoff`。
 
+### 无模型调用签核
+
+如果 run 已完成 artifacts、状态为 `awaiting_signoff`，可以用 `agent:sign` 复用现有 run，只校验 gate/签核并更新 `state.json`，不重跑 Agent：
+
+```bash
+pnpm agent:sign \
+  --run /tmp/m1-8p/<runId> \
+  --signoff-visual-style /tmp/signoff-visual-style-8p.md
+```
+
+- `--signoff-ia <path>` 仅在 run 尚未有 IA 签核时需要。
+- 成功时写 `signoff/visual-style.md`、`agent-sign.json`，state 变为 `success`。
+- gate 未通过、签核缺失/无效时退出 1，不修改 state。
+
 ## 产物
 
 ```text
@@ -155,6 +171,16 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
 | 0 | `success` |
 | 1 | `awaiting_signoff` / `partial` / `failed` / `budget_exceeded` / `usage_incomplete` |
 | 2 | 参数错误（未知参数、非法 role、缺 PRD） |
+
+## 8 页出口（2026-10-21）
+
+- `samples/project.demo-orders-intake.yaml` 指向 signed 8 页 brief。
+- 真实 dsh M1：`--profile prd-ui-intake`，IA-001/002 以 sample waiver 处理；
+  `gates={ia:waived, interaction:passed, visualStyle:passed}`，¥0.3298，
+  `usageComplete=true`；随后用 `agent:sign` 完成 visual-style 签核，
+  `status=success`。
+- 产物为 8 页 IA/interaction/motion/visual spec；Spec Engineer 消费后产出 8 个
+  Page Spec。
 
 ## 真实 dsh 回归（2026-10-20）
 

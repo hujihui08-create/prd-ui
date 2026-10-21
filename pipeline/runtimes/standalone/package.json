@@ -18,6 +18,7 @@
     "@prd-ui/renderer-html": "workspace:*",
     "@prd-ui/runtime-dsh": "workspace:*",
     "@prd-ui/spec-engineer": "workspace:*",
+    "@prd-ui/validators": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
     "yaml": "^2.9.1"
   }

@@ -179,14 +179,14 @@ PRD：required sections、占位符、blocker evidence/confidence、question 预
 
 IA：复用 M1 `IA_*` 结构门禁，页面/角色 scope 来自 PRD extract。
 
-Brief：schema、PRD hash、页面集合、角色/路由、archetype/profile、状态矩阵、reqRefs/traceability、占位符、blocking questions/assumptions、compiler dry-run、brief signoff hash。
+Brief：schema、PRD hash、页面集合、角色/路由、archetype/profile、状态矩阵、reqRefs/traceability、占位符、blocking questions/assumptions、compiler dry-run + Phase 1 语义 validators、brief signoff hash。
 
 完整代码见 `core/intake/src/gates.ts`；brief 结构性 blocker 不写最终 brief。
 
 ## 样本与限制
 
 - `samples/agents/intake`：demo-orders 8 页 fixture；`samples/agents/intake-employee-app`：employee-app 2 页 fixture。
-- 8 页 sample PRD 的 v0 验收是 review + brief + compile dry-run；完整 8 页 M1/HTML 渲染属于后续阶段。
+- 8 页 sample PRD 的 v0 验收是 review + brief + compile dry-run；8 页 M1（真实 dsh）、Spec Engineer 与 HTML 渲染已经在 `samples/project.demo-orders-intake.yaml` 上跑通。
 - 真实 dsh：2 页 employee-app 完整跑通（success + publish，累计 ¥0.6948）；8 页 sample 使用 `prd-ui-intake` profile（65536 maxTokens），真实 findings 以 sample waiver 通过后 brief gate 通过，success + publish，累计 ¥0.90666。默认离线验收仍用 scripted fixtures。
 - `UiBrief.content` 的 `home`/`inventory-list` typed 字段仍是 employee-app 专用；其他页型使用通用字段，未知页型由 briefer 发 blocking question。
 - 未解析的 visual/motion 细节不在 intake 范围；交给 M1 Visual Style Agent。

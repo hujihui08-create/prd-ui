@@ -3,6 +3,69 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-21 — Phase 2 8-page exit slice (implemented)
+
+### Added
+
+- `agent:run --brief <path>` and `--profile <name>`: consume a signed brief
+  independent of `project.yaml` and select the dsh profile (the 8-page M1 run
+  uses `prd-ui-intake`, 65536 maxTokens).
+- `samples/project.demo-orders-intake.yaml` + checked-in 8-page
+  `samples/projects/demo-orders-intake/ui-brief.json` for the Phase 2 exit.
+- Intake brief gate now runs Phase 1 semantic validators in addition to the
+  compiler dry-run. This caught the real briefer's `orders-overview.fields`
+  error (the PRD says overview has no fields).
+- `agent:sign --run <dir> --signoff-visual-style <path>`: finalize an
+  `awaiting_signoff` M1 run with human signoff without rerunning agents; it
+  verifies gates/signoff and updates `state.json` to `success`.
+
+### Renderer audit + visual pass
+
+- Added the missing `PageShell` renderer and expanded `MobileShell` to render
+  `title`/`illustration`/`body`/`summary`/`feed`/`fields`/`actions`/`content`
+  slots. Before this, all six web pages and all three mobile pages rendered
+  blank.
+- Added renderers for `BottomNav`, `Stat`, `List`, `DataTable`, `FilterBar`,
+  `Pagination`, `FormField`, `Input`, `Select`, `FeedCard`, and `Image`.
+- Added generic `UiBriefPage.mockData` (`values`/`rows`/`listItems`) and
+  `fieldLabels`; the compiler now carries mock rows/values and localized
+  labels into Page Spec/HTML. `validateSemantic` accepts localized labels.
+- Fixed page titles (`name · project`), index title/link styling, nav labels
+  and icons, action-button layout, badge alignment, state switcher placement,
+  and empty-state table remnants.
+- 8-page visual scan now renders real stats, rows, detail values, feed cards,
+  localized labels, empty/loading states, and mobile bottom navigation.
+- Docs: implementation spec `2026-10-21-8page-renderer-mockdata-visual-fixes-design.md`,
+  remaining-work plan `2026-10-21-phase-2-remaining-work.md`, and
+  handoff `2026-10-21-8page-renderer-handoff.md`.
+
+### Verification
+
+- `pnpm test`: 488 passed; `pnpm test:dsh`: 2 passed; typecheck clean.
+- `phase1:verify --project samples/project.demo-orders-intake.yaml`:
+  `8 pages / 0 blockers`.
+- Real dsh 8-page M1 (`prd-ui-intake`): IA waived (sample IA-001/002), interaction
+  and visual-style passed, ¥0.3298; `agent:sign` finalized visual-style without a
+  model call, so the run is `success`.
+- `spec:engineer` on that run: 8 Page Specs, 8 motion pages, 0 blockers,
+  27 expected warnings (26 unresolved motion node ids + asset-briefs-missing).
+- `render:html`: 8 pages + `index.html`.
+- 2-page employee-app Phase 1/M1/Spec Engineer/HTML regressions remain green.
+
+### Limits
+
+- 8-page asset briefs were not produced (M1 visual style returned none), so the
+  27 warnings include `SPEC_ASSET_BRIEFS_MISSING`; asset review for 8 pages is
+  the next asset-stage item.
+- Motion is carried in Page Spec but not animated in HTML (v0.1).
+- M1 receives one catalog/motion-token set (`brief.meta.profile`, b-dense) for
+  mixed-profile briefs; the c-expressive mobile pages still pass but need a
+  per-profile catalog/motion input for stronger grounding.
+- The real UI Briefer does not yet emit `mockData`/`fieldLabels` reliably; the
+  8-page sample brief was enriched manually. Prompt/schema hardening is next.
+- Visual acceptance is manual (Playwright screenshots); there is no automated
+  screenshot-diff gate yet.
+
 ## 2026-10-20 — Phase 2 PRD Review + UI Briefer (implemented)
 
 ### Added
@@ -24,7 +87,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: **479 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
+- `pnpm test`: **488 tests**; `pnpm test:dsh`: 2 passed; typecheck clean.
 - 8-page demo-orders: PRD/IA signoff -> 8-page brief -> brief-hash signoff ->
   `success` + published `ui-brief.json`; scripted cost 0.045144 CNY,
   `usageComplete=true`.

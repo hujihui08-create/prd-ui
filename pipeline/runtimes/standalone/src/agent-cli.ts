@@ -30,9 +30,11 @@ export const USAGE = `Usage: pnpm agent:run [options]
 
 Options:
   --project <path>            Project YAML (default: samples/projects/employee-app/project.yaml)
+  --brief <path>              Brief override (default: project.yaml brief path)
   --prd <path>                PRD text/summary (default: project.yaml prd path)
   --runs <dir>                Directory that receives run artifacts
   --runtime standalone|dsh    Execution adapter (default: standalone)
+  --profile <name>            dsh profile override (default: prd-ui-agents)
   --fixtures <dir>            Standalone scripted fixtures (default: samples/agents/m1)
   --pricing <path>            Pricing file (default: pipeline/pricing.json)
   --only-role <role>          Run only a design role (ia|interaction|visual-style; repeatable)
@@ -46,9 +48,11 @@ Options:
 
 export interface AgentCliOptions {
   projectPath: string;
+  briefPath?: string;
   prdPath?: string;
   runsDir: string;
   runtime: "standalone" | "dsh";
+  profile: string;
   fixturesDir: string;
   pricingPath?: string;
   onlyRoles: AgentRole[];
@@ -94,6 +98,7 @@ export function parseArgs(argv: string[]): AgentCliOptions {
     projectPath: path.join(pipelineRoot, "samples", "projects", "employee-app", "project.yaml"),
     runsDir: path.join(pipelineRoot, "runs"),
     runtime: "standalone",
+    profile: "prd-ui-agents",
     fixturesDir: path.join(pipelineRoot, "samples", "agents", "m1"),
     onlyRoles: [],
     maxCostCny: 10,
@@ -121,8 +126,14 @@ export function parseArgs(argv: string[]): AgentCliOptions {
       case "--project":
         options.projectPath = path.resolve(value());
         break;
+      case "--brief":
+        options.briefPath = path.resolve(value());
+        break;
       case "--prd":
         options.prdPath = path.resolve(value());
+        break;
+      case "--profile":
+        options.profile = value();
         break;
       case "--runs":
         options.runsDir = path.resolve(value());
@@ -207,7 +218,7 @@ async function createRunners(
 ): Promise<Record<AgentRole, AgentRunnerPort>> {
   if (options.runtime === "dsh") {
     const { createDshAgentRunner } = await import("@prd-ui/runtime-dsh/agent-runner");
-    const runner = createDshAgentRunner();
+    const runner = createDshAgentRunner({ profile: options.profile });
     return { ia: runner, interaction: runner, "visual-style": runner };
   }
   const fixtures = await loadScriptedAgentFixtures(options.fixturesDir);
@@ -297,7 +308,8 @@ export async function main(
 
   try {
     const { config, baseDir } = loadProjectConfig(options.projectPath);
-    const briefPath = path.resolve(baseDir, config.brief);
+    const briefPath =
+      options.briefPath ?? path.resolve(baseDir, config.brief);
     const brief = await loadBrief(briefPath);
 
     const prdPath = options.prdPath ?? (config.prd ? path.resolve(baseDir, config.prd) : undefined);

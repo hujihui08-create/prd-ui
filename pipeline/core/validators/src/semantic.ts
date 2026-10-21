@@ -190,7 +190,9 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
   const strings = layoutStrings(spec.layout);
 
   for (const field of briefPage.fields ?? []) {
-    const localized = briefPage.archetype === "settings" ? settingsFieldLabels[field] : undefined;
+    const localized =
+      briefPage.fieldLabels?.[field] ??
+      (briefPage.archetype === "settings" ? settingsFieldLabels[field] : undefined);
     if (!strings.has(field) && !(localized !== undefined && strings.has(localized))) {
       push(
         "SEMANTIC-FIELD",
@@ -202,7 +204,8 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
   }
 
   for (const field of briefPage.filterFields ?? []) {
-    if (!strings.has(field)) {
+    const localized = briefPage.fieldLabels?.[field];
+    if (!strings.has(field) && !(localized !== undefined && strings.has(localized))) {
       push(
         "SEMANTIC-FILTER",
         "layout",

@@ -6,10 +6,10 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
 - `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `agents`, `spec-engineer`, `intake`.
-- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `spec:engineer`, `intake:run`).
+- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
 - `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
-- `pipeline/samples/` — `employee-app` (2-page mobile slice), `demo-crm`, M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`).
+- `pipeline/samples/` — `employee-app` (2-page mobile slice), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`). The 8-page acceptance project is `samples/project.demo-orders-intake.yaml`.
 - `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
 - `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption; `pipeline/docs/prd-review-briefer.md` — PRD review, UI Brief, signoffs, resume, publish.
@@ -34,6 +34,11 @@ pnpm agent:run --project samples/projects/employee-app/project.yaml --runs /tmp/
 pnpm spec:engineer --project samples/projects/employee-app/project.yaml --agent-run /tmp/m1-agent-runs/<runId> --runs /tmp/spec-engineer-runs
 pnpm intake:run --project samples/project.demo-orders.yaml --prd samples/sample-prd.md --runs /tmp/intake-runs --fixtures samples/agents/intake
 pnpm intake:run --project samples/projects/employee-app/project.yaml --prd samples/projects/employee-app/prd.md --fixtures samples/agents/intake-employee-app --runs /tmp/intake-employee
+pnpm phase1:verify --project samples/project.demo-orders-intake.yaml --runs /tmp/phase1-8p
+DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/project.demo-orders-intake.yaml --runtime dsh --profile prd-ui-intake --signoff-ia /tmp/signoff-ia-8p.md --runs /tmp/m1-8p
+pnpm agent:sign --run /tmp/m1-8p/<runId> --signoff-visual-style /tmp/signoff-visual-style-8p.md
+pnpm spec:engineer --project samples/project.demo-orders-intake.yaml --agent-run /tmp/m1-8p/<runId> --runs /tmp/spec-8p
+pnpm render:html --run /tmp/spec-8p/<runId> --out /tmp/html-8p
 
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
@@ -46,19 +51,22 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 - `--runtime dsh` for asset review needs a vision key; `standalone` with the
   scripted reviewer is the keyless path.
 - `agent:run` defaults to `standalone` scripted fixtures; `--runtime dsh` uses
-  the `prd-ui-agents` profile. `--allow-unreviewed` is a development smoke flag
-  and never produces `success`.
+  the `prd-ui-agents` profile. `--brief` overrides the project brief and
+  `--profile` overrides the dsh profile (the 8-page M1 run uses
+  `prd-ui-intake`). `--allow-unreviewed` is a development smoke flag and never
+  produces `success`.
 - `spec:engineer` consumes an M1 run (`success`/`awaiting_signoff`/`partial`);
   it writes Page Specs only when the gate passes. Motion node ids are warnings
   in v0 because the compiler has no stable node ids.
 - `intake:run` produces PRD review + IA + UI Brief; PRD/IA and brief signoffs
   are separate. It writes `ui-brief.json` only on `success`; use `--resume`
-  after signing. Brief signoff must carry the canonical `briefHash`.
+  after signing. Brief signoff must carry the canonical `briefHash`. The brief
+  gate runs compiler dry-run plus Phase 1 semantic validators.
 - `pnpm test:dsh` fails with an install hint if the pinned dsh binary is
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 479 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 488 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -75,7 +83,14 @@ warnings (19 unresolved motion node ids, 9 unused asset briefs). Intake v0:
 for signoff. Real dsh intake: 2-page employee-app completes (success + publish,
 ¥0.6948); the 8-page sample uses the `prd-ui-intake` profile (65536 maxTokens),
 waives its real F-001/IA-001/IA-002 sample gaps, and completes with publish
-(¥0.90666). M1 keeps `prd-ui-agents` at 32768.
+(¥0.90666). Phase 2 8-page exit: `phase1:verify` `8 pages / 0 blockers`;
+real dsh M1 `ia:waived / interaction:passed / visualStyle:passed`, then
+`agent:sign` finalized the visual-style signoff without a model call
+(`status=success`, ¥0.3298); Spec Engineer 8 Page Specs, 0 blockers; renderer
+8 HTML + index. Renderer now covers PageShell/MobileShell slots and generic
+components, mock data, and localized labels; the 8-page visual scan renders
+real content and states. M1 keeps `prd-ui-agents` at 32768; the 8-page M1 run
+uses `prd-ui-intake`.
 
 ## Architecture boundaries
 
@@ -147,6 +162,9 @@ waives its real F-001/IA-001/IA-002 sample gaps, and completes with publish
 - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md` — M1 agent layer contracts, gates, budgets, signoffs.
 - `docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md` — Phase 2 Spec Engineer v0: consume M1 specs into Page Spec.
 - `docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md` — Phase 2 front half: PRD Review + UI Briefer.
+- `docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md` — 8-page renderer/slots/mockData/fieldLabels fixes.
+- `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
+- `docs/handoffs/2026-10-21-8page-renderer-handoff.md` — current 8-page/renderer handoff.
 - `pipeline/docs/prd-review-briefer.md` — intake usage, signoffs, resume, publish, gates.
 - `pipeline/docs/spec-engineer-v0.md` — Spec Engineer usage, mapping, gates, v0 limits.
 - `pipeline/docs/agent-m1.md` — M1 usage, artifacts, signoff format, exit codes.

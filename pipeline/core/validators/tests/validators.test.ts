@@ -343,6 +343,7 @@ describe("brief semantic validation", () => {
     table.props = {
       ...(table.props ?? {}),
       columns: ["orderNo", "customer", "amount", "status", "createdAt"],
+      columnLabels: ["orderNo", "customer", "amount", "status", "createdAt"],
     };
     const filter = findNode(spec, "FilterBar");
     filter.props = { ...(filter.props ?? {}), action: "新建订单" };

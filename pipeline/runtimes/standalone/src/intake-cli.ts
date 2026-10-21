@@ -1,17 +1,21 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileProject } from "@prd-ui/compiler";
 import {
-  PageSpecSchema,
+  AssetManifestSchema,
   UiBriefSchema,
   parsePricingConfig,
   redactValue,
   resolvePricing,
+  type AssetManifest,
+  type ProjectConfig,
   type ReviewPricing,
   type UiBrief,
 } from "@prd-ui/contracts";
+import { validateProject } from "@prd-ui/validators";
 import { archetypes, getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import { createRunId, loadProjectConfig } from "@prd-ui/orchestrator";
 import type { AgentRunnerPort } from "@prd-ui/agents";
@@ -214,20 +218,59 @@ function hashText(text: string): string {
   return `sha256:${createHash("sha256").update(text, "utf8").digest("hex")}`;
 }
 
-function validateBrief(brief: UiBrief): BriefValidation {
-  try {
-    const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
-    const errors: string[] = [];
-    for (const spec of specs) {
-      const parsed = PageSpecSchema.safeParse(spec);
-      if (!parsed.success) {
-        errors.push(`${spec.meta.pageId}: ${parsed.error.message}`);
+function createBriefValidator(
+  config: ProjectConfig,
+  baseDir: string
+): (brief: UiBrief) => BriefValidation {
+  const manifests = new Map<string, AssetManifest>();
+  return (brief) => {
+    try {
+      for (const [profile, manifestPath] of Object.entries(config.manifests)) {
+        const file = path.resolve(baseDir, manifestPath);
+        manifests.set(
+          profile,
+          AssetManifestSchema.parse(JSON.parse(readFileSync(file, "utf8")))
+        );
       }
+      const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
+      const contextsByPage = Object.fromEntries(
+        specs.map((spec) => {
+          const manifest = manifests.get(spec.meta.profile);
+          if (manifest === undefined) {
+            throw new Error(`missing manifest for profile ${spec.meta.profile}`);
+          }
+          return [
+            spec.meta.pageId,
+            {
+              profile: getProfile(spec.meta.profile),
+              catalog: getCatalog(spec.meta.profile),
+              archetype: getArchetype(spec.meta.archetype),
+              manifest,
+              requiredStates:
+                brief.ia.pages.find((page) => page.id === spec.meta.pageId)
+                  ?.requiredStates,
+              briefPage: brief.ia.pages.find(
+                (page) => page.id === spec.meta.pageId
+              ),
+              navigation: brief.ia.navigation,
+            },
+          ];
+        })
+      );
+      const reports = validateProject(specs, contextsByPage);
+      const blockers = reports.flatMap((report) =>
+        report.findings
+          .filter((finding) => finding.severity === "blocker")
+          .map(
+            (finding) =>
+              `${report.pageId}: ${finding.ruleId} ${finding.issue}`
+          )
+      );
+      return { ok: blockers.length === 0, errors: blockers };
+    } catch (error) {
+      return { ok: false, errors: [errorMessage(error)] };
     }
-    return { ok: errors.length === 0, errors };
-  } catch (error) {
-    return { ok: false, errors: [errorMessage(error)] };
-  }
+  };
 }
 
 async function createRunners(options: IntakeCliOptions): Promise<{
@@ -447,7 +490,7 @@ export async function main(
         store,
         clock: { now: () => new Date() },
         log: createLogger(store),
-        validateBrief,
+        validateBrief: createBriefValidator(config, baseDir),
         hashText,
         supportedProfiles: ["b-dense", "b-mobile", "c-expressive"],
         supportedArchetypes: archetypes.map((archetype) => archetype.id),

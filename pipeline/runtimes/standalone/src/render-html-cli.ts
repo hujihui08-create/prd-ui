@@ -24,13 +24,24 @@ async function main(): Promise<void> {
   const files = (await readdir(specsDir)).filter((file) => file.endsWith(".json")).sort();
 
   const pages: PageSpec[] = [];
+  const pageNames: Record<string, string> = {};
   await mkdir(outDir, { recursive: true });
 
   for (const file of files) {
     const raw = JSON.parse(await readFile(path.join(specsDir, file), "utf8")) as unknown;
     const spec = PageSpecSchema.parse(raw) as PageSpec;
+    pageNames[spec.meta.pageId] = spec.meta.name;
+  }
+
+  for (const file of files) {
+    const raw = JSON.parse(await readFile(path.join(specsDir, file), "utf8")) as unknown;
+    const spec = PageSpecSchema.parse(raw) as PageSpec;
     const profile = getProfile(spec.meta.profile);
-    await writeFile(path.join(outDir, `${spec.meta.pageId}.html`), renderDocument(spec, profile), "utf8");
+    await writeFile(
+      path.join(outDir, `${spec.meta.pageId}.html`),
+      renderDocument(spec, profile, { pageNames }),
+      "utf8"
+    );
     pages.push(spec);
     console.log(`rendered ${spec.meta.pageId} -> ${path.join(outDir, `${spec.meta.pageId}.html`)}`);
   }

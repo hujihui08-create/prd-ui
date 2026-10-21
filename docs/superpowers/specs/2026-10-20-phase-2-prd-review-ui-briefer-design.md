@@ -2,7 +2,7 @@
 
 - 日期：2026-10-20
 - 状态：Implemented (2026-10-20)
-- 输入：Spec Engineer v0 完成（479 tests、真实 dsh M1 `awaiting_signoff` ¥0.2115、2 个 Page Spec / 0 blockers）
+- 输入：Spec Engineer v0 完成（488 tests、真实 dsh M1 `awaiting_signoff` ¥0.2115、2 个 Page Spec / 0 blockers）
 - 关联：
   - `docs/superpowers/specs/2026-10-19-prd-to-ui-pipeline-design.md` §5.1 / §5.2 / §6.1–§6.3
   - `docs/superpowers/specs/2026-10-20-m1-agent-layer-design.md`
@@ -34,7 +34,7 @@
 | 编译器 | 支持 10 个 archetype：overview/list/detail/form/settings/feed/home/inventory-list/auth/onboarding；`home`/`inventory-list` 的内容字段是样本专用 |
 | M1 | `agent:run`、`prd-ui-agents` profile、scripted/dsh runner、signoff/waiver、usage/pricing 已实现 |
 | Spec Engineer | v0 已实现；消费 M1 run，输出增强 Page Spec |
-| 回归基线 | 479 tests、`pnpm test:dsh` 2 passed、typecheck clean、phase1 `2 pages / 0 blockers`、standalone asset review `13/13` |
+| 回归基线 | 488 tests、`pnpm test:dsh` 2 passed、typecheck clean、phase1 `2 pages / 0 blockers`、standalone asset review `13/13` |
 | 真实 run 证据 | 当前 brief 的 dsh M1：`awaiting_signoff`、三 gate passed、¥0.2115、`usageComplete=true`；Spec Engineer 0 blockers / 22 warnings |
 | 8 页 PRD 样本 | `pipeline/samples/sample-prd.md`：8 页、角色/权限/页面清单/状态矩阵/字段表/验收示例/需求编号齐全 |
 
@@ -822,7 +822,7 @@ runs/<runId>/
 | T-P2B-12 | integration | resume 不重复调用已完成 agent；PRD 变更 → `PRD_CHANGED` |
 | T-P2B-13 | integration | `--publish-brief` 原子写；冲突默认拒绝；`--force` 记录旧 hash |
 | T-P2B-14 | contract | `UiBriefSchema` round-trip；M1 signoff 文件仍可解析 |
-| T-P2B-15 | regression | M1 `agent:run`、Spec Engineer、phase1 `2/0`、asset review `13/13`、479+ tests、typecheck |
+| T-P2B-15 | regression | M1 `agent:run`、Spec Engineer、phase1 `2/0`、asset review `13/13`、488+ tests、typecheck |
 | T-P2B-16 | manual | 真实 dsh：`samples/sample-prd.md` 8 页 review + brief（真实 findings 以 sample waiver 处理）；employee-app 2 页 brief 与现有手写 brief 语义一致；成本在 10 CNY 内 |
 
 ## 10. 验收标准
@@ -836,7 +836,7 @@ runs/<runId>/
 - [x] 缺 PRD 章节、占位符、未定义角色、blocking question、未知 archetype、compile 失败均被确定性阻断，且不写最终 brief。
 - [x] resume 不重复调用已完成 agent；PRD hash 变化会拒绝 resume。
 - [x] `--publish-brief` 只在签核后写入，默认不覆盖冲突文件。
-- [x] 479+ tests、`pnpm test:dsh` 2 passed、typecheck clean；phase1 `2 pages / 0 blockers`；asset review `13/13`；M1/Spec Engineer 不退化。
+- [x] 488+ tests、`pnpm test:dsh` 2 passed、typecheck clean；phase1 `2 pages / 0 blockers`；asset review `13/13`；M1/Spec Engineer 不退化。
 - [x] 真实 dsh 运行一次 8 页 PRD 的 review + brief（sample findings 以 waiver 处理），成本低于 10 CNY，`usageComplete=true`。
 - [x] 不修改 PRD 原文、不调用模型补需求、不生成 Figma/Studio。
 
@@ -886,7 +886,7 @@ runs/<runId>/
 ## 14. 验收记录（2026-10-20）
 
 - 实现：`core/contracts` 新增 PRD/brief 契约；`core/intake` 提供 normalize、PRD/IA/brief gates、`runIntake`、resume；`core/agents` 新增 `prd-review`/`ui-briefer` 角色，IA 增加 PRD-only 输入并把 gate 解耦为 `IaGateScope`；`pnpm intake:run` 与 scripted fixtures 落地。
-- 测试：`pnpm test` **479 passed**；`pnpm test:dsh` **2 passed**；`pnpm typecheck` clean。
+- 测试：`pnpm test` **488 passed**；`pnpm test:dsh` **2 passed**；`pnpm typecheck` clean。
 - 8 页 demo-orders 端到端：PRD Review + IA 通过；PRD/IA 签核后生成 8 页 brief 草稿；brief 签核（canonical hash 匹配）后 `success`，发布 `ui-brief.json`；scripted run `costCny=0.045144`，`usageComplete=true`。
 - employee-app 两页切片：brief gate 通过，2 页草稿，停在 `awaiting_signoff`；PRD/IA 与 brief 分阶段签核。
 - 回归：phase1 `2 pages / 0 blockers`；standalone asset review `13/13`；renderer HTML 与签入产物逐字节一致；M1/Spec Engineer 不退化。
@@ -897,4 +897,5 @@ runs/<runId>/
 - 真实 dsh：employee-app 2 页完整跑通（PRD Review + IA + UI Briefer，success，发布 2 页 `ui-brief.json`，累计 **¥0.6948**，`usageComplete=true`）。
 - 真实 dsh 8 页 sample：新增 `prd-ui-intake` profile（`maxTokens=65536`）后完整跑通；PRD Reviewer 的真实 findings（F-001）与 IA findings（IA-001/IA-002）以 sample waiver 通过 PRD/IA gate；brief gate 通过，`success` 并发布 8 页 `ui-brief.json`，累计 **¥0.90666**，`usageComplete=true`。
 - 实现中修正：signoff 同时携带 PRD/IA waiver；PRD gate 只校验 PRD waiver，IA gate 只校验 `IA-*` waiver；PRD finding id 约定为 `PRD-*`（真实 sample 的 F-001 仍可 waiver）。
-- v0 限制：完整 8 页 M1 + HTML 渲染属于后续阶段。
+- 下游 8 页出口已验证：`samples/project.demo-orders-intake.yaml` 的 Phase 1 `8 pages / 0 blockers`；真实 dsh M1 8 页 `ia:waived / interaction:passed / visualStyle:passed`，`agent:sign` 复用现有 run 完成 visual-style 签核（不调用模型，`success`）；Spec Engineer 8 Page Specs / 0 blockers；renderer 8 页 + index。renderer 补齐 PageShell/MobileShell 全部 slot、通用组件、`mockData`/`fieldLabels`，8 页 Playwright 视觉巡检有真实内容与状态。
+- v0 限制：8 页资产 brief 未产出（`SPEC_ASSET_BRIEFS_MISSING` warning）；8 页 asset review / 自动截图 diff 是后续阶段。M1 仍是单 catalog/motion token 输入；真实 UI Briefer 尚未稳定生成 `mockData`/`fieldLabels`。

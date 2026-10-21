@@ -90,6 +90,14 @@ runs/<runId>/
 | 1 | gate failed / 输入无效 |
 | 2 | 参数错误 |
 
+## 8 页 run（2026-10-21）
+
+- 输入：`samples/project.demo-orders-intake.yaml` 的 signed 8 页 brief → 真实 dsh M1
+  （IA waived、interaction/visual passed、`agent:sign` 后 `success`）。
+- 输出：8 个 Page Spec，8 个页面都有 motion；0 blockers；27 warnings
+  （26 个未解析 motion node、1 个 `SPEC_ASSET_BRIEFS_MISSING`）。
+- `render:html --run <spec-run>` 可直接渲染 8 页 + `index.html`；PageShell/MobileShell 的 web/mobile slots、stats/table/detail/feed、`mockData` 与 `fieldLabels` 已支持，8 页 Playwright 视觉巡检通过。
+
 ## 真实 run（2026-10-20）
 
 - 输入：employee-app clean M1 run（`success`，2 页，10 asset briefs）。

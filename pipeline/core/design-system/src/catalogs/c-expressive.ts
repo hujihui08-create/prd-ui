@@ -171,6 +171,7 @@ export const cExpressiveCatalog: Catalog = {
         label: { type: "string", required: true },
         required: { type: "boolean" },
         readOnly: { type: "boolean" },
+        value: { type: "string" },
       },
       variants: ["default", "inline"],
       states: ["default", "error", "disabled"],

@@ -1,0 +1,744 @@
+{
+  "meta": {
+    "project": "demo-orders",
+    "version": "0.1.0",
+    "sourcePrdHash": "sha256:836aeed63b497469448369cd242f944447a92cfdbe1ed8ff517c119d8fa00d53",
+    "date": "2026-10-20",
+    "profile": "b-dense",
+    "platforms": [
+      "web",
+      "mobile"
+    ]
+  },
+  "product": {
+    "name": "订单管理",
+    "type": "B 端运营后台 + C 端移动应用",
+    "goals": [
+      "运营人员在 web 查看订单概览、检索订单列表、查看订单详情并新建订单",
+      "管理员在 web 维护通知、语言与时区设置",
+      "C 端用户在 mobile 浏览首页信息流、查看商品详情并登录后发起购买"
+    ],
+    "users": [
+      "运营人员（admin、operator）",
+      "管理员（admin）",
+      "C 端用户（viewer）"
+    ],
+    "roles": [
+      "admin",
+      "operator",
+      "viewer"
+    ],
+    "scope": [
+      "web：orders-overview、orders-list、order-detail、order-form、settings",
+      "mobile：home-feed、item-detail、auth",
+      "页面级角色可见性：settings 仅 admin；web 订单页面 admin/operator；mobile 页面 viewer/admin",
+      "8 条需求 REQ-ORDER-001 至 REQ-ORDER-008 均有页面归属"
+    ],
+    "nonGoals": [
+      "支付渠道",
+      "退款",
+      "库存与履约系统",
+      "多租户",
+      "注册与找回密码",
+      "第三方登录"
+    ],
+    "successMetrics": [
+      "REQ-ORDER-001 至 REQ-ORDER-008 可按 PRD 第 6 节验收示例走查",
+      "所有页面具备 default/loading/error 及状态矩阵要求的 empty/disabled 状态",
+      "角色可见页面与 PRD 角色表一致，无权访问不渲染页面数据"
+    ]
+  },
+  "ia": {
+    "pages": [
+      {
+        "id": "orders-overview",
+        "name": "订单概览",
+        "purpose": "运营人员查看四项订单指标与近期订单列表",
+        "archetype": "overview",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/orders/overview",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-001"
+        ],
+        "fields": [],
+        "actions": [],
+        "summaryTitle": "近期订单",
+        "stats": [
+          {
+            "label": "今日订单",
+            "value": "128"
+          },
+          {
+            "label": "待处理",
+            "value": "12"
+          },
+          {
+            "label": "已完成",
+            "value": "96"
+          },
+          {
+            "label": "异常",
+            "value": "3"
+          }
+        ],
+        "mockData": {
+          "listItems": [
+            "ORD-20261021-0001 · 张三 · ¥268.00 · 待处理",
+            "ORD-20261021-0002 · 李四 · ¥520.00 · 已完成",
+            "ORD-20261021-0003 · 王五 · ¥128.00 · 待处理",
+            "ORD-20261021-0004 · 赵六 · ¥860.00 · 已完成"
+          ]
+        },
+        "fieldLabels": {
+          "orderNo": "订单号",
+          "customer": "客户",
+          "amount": "金额",
+          "status": "状态",
+          "createdAt": "创建时间"
+        }
+      },
+      {
+        "id": "orders-list",
+        "name": "订单列表",
+        "purpose": "运营人员检索与筛选订单，并进入新建订单",
+        "archetype": "list",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/orders",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-002"
+        ],
+        "fields": [
+          "orderNo",
+          "customer",
+          "amount",
+          "status",
+          "createdAt"
+        ],
+        "actions": [
+          "新建订单",
+          "搜索"
+        ],
+        "filterFields": [
+          "status",
+          "createdAt",
+          "customer"
+        ],
+        "emptyTitle": "暂无匹配订单",
+        "mockData": {
+          "rows": [
+            {
+              "orderNo": "ORD-20261021-0001",
+              "customer": "张三",
+              "amount": "¥268.00",
+              "status": "待处理",
+              "createdAt": "2026-10-21 09:20"
+            },
+            {
+              "orderNo": "ORD-20261021-0002",
+              "customer": "李四",
+              "amount": "¥520.00",
+              "status": "已完成",
+              "createdAt": "2026-10-21 09:35"
+            },
+            {
+              "orderNo": "ORD-20261021-0003",
+              "customer": "王五",
+              "amount": "¥128.00",
+              "status": "待处理",
+              "createdAt": "2026-10-21 10:02"
+            },
+            {
+              "orderNo": "ORD-20261021-0004",
+              "customer": "赵六",
+              "amount": "¥860.00",
+              "status": "已完成",
+              "createdAt": "2026-10-21 10:18"
+            }
+          ]
+        },
+        "fieldLabels": {
+          "orderNo": "订单号",
+          "customer": "客户",
+          "amount": "金额",
+          "status": "状态",
+          "createdAt": "创建时间"
+        }
+      },
+      {
+        "id": "order-detail",
+        "name": "订单详情",
+        "purpose": "查看单笔订单详情并进入编辑态",
+        "archetype": "detail",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/orders/:id",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-003"
+        ],
+        "fields": [
+          "orderNo",
+          "customer",
+          "amount",
+          "status",
+          "createdAt"
+        ],
+        "actions": [
+          "编辑订单",
+          "返回列表"
+        ],
+        "mockData": {
+          "values": {
+            "orderNo": "ORD-20261021-0001",
+            "customer": "张三",
+            "amount": "¥268.00",
+            "status": "待处理",
+            "createdAt": "2026-10-21 09:20"
+          }
+        },
+        "fieldLabels": {
+          "orderNo": "订单号",
+          "customer": "客户",
+          "amount": "金额",
+          "status": "状态",
+          "createdAt": "创建时间"
+        }
+      },
+      {
+        "id": "order-form",
+        "name": "新建订单",
+        "purpose": "新建订单并保存或取消",
+        "archetype": "form",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/orders/new",
+        "roles": [
+          "admin",
+          "operator"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-004"
+        ],
+        "fields": [
+          "customer",
+          "amount",
+          "status"
+        ],
+        "actions": [
+          "保存",
+          "取消"
+        ],
+        "fieldLabels": {
+          "orderNo": "订单号",
+          "customer": "客户",
+          "amount": "金额",
+          "status": "状态",
+          "createdAt": "创建时间"
+        }
+      },
+      {
+        "id": "settings",
+        "name": "设置",
+        "purpose": "管理员维护通知、语言与时区设置",
+        "archetype": "settings",
+        "target": "web",
+        "profile": "b-dense",
+        "route": "/settings",
+        "roles": [
+          "admin"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-005"
+        ],
+        "fields": [
+          "notifications",
+          "language",
+          "timezone"
+        ],
+        "actions": [
+          "保存设置"
+        ],
+        "fieldLabels": {
+          "notifications": "通知设置",
+          "language": "语言",
+          "timezone": "时区"
+        }
+      },
+      {
+        "id": "home-feed",
+        "name": "首页",
+        "purpose": "C 端用户浏览商品信息流",
+        "archetype": "feed",
+        "target": "mobile",
+        "profile": "c-expressive",
+        "route": "/home",
+        "roles": [
+          "viewer",
+          "admin"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-006"
+        ],
+        "fields": [],
+        "actions": [],
+        "emptyTitle": "暂无内容",
+        "feedItems": [
+          {
+            "title": "秋季修护专题",
+            "body": "敏感肌修护组合，今日下单享 8 折"
+          },
+          {
+            "title": "门店上新",
+            "body": "新品精华到店，欢迎到店体验"
+          },
+          {
+            "title": "会员日提醒",
+            "body": "本周六会员日，积分双倍"
+          }
+        ]
+      },
+      {
+        "id": "item-detail",
+        "name": "商品详情",
+        "purpose": "查看商品标题、价格与描述并发起购买",
+        "archetype": "detail",
+        "target": "mobile",
+        "profile": "c-expressive",
+        "route": "/item/:id",
+        "roles": [
+          "viewer",
+          "admin"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-007"
+        ],
+        "fields": [
+          "title",
+          "price",
+          "description"
+        ],
+        "actions": [
+          "立即购买"
+        ],
+        "mockData": {
+          "values": {
+            "title": "修护精华 30ml",
+            "price": "¥268.00",
+            "description": "舒缓修护，适合敏感肌。",
+            "status": "在售"
+          }
+        },
+        "fieldLabels": {
+          "title": "商品标题",
+          "price": "价格",
+          "description": "描述",
+          "status": "状态"
+        }
+      },
+      {
+        "id": "auth",
+        "name": "登录",
+        "purpose": "C 端用户使用邮箱密码登录",
+        "archetype": "auth",
+        "target": "mobile",
+        "profile": "c-expressive",
+        "route": "/auth",
+        "roles": [
+          "viewer",
+          "admin"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-ORDER-008"
+        ],
+        "fields": [
+          "email",
+          "password"
+        ],
+        "actions": [
+          "登录"
+        ],
+        "fieldLabels": {
+          "email": "邮箱",
+          "password": "密码"
+        }
+      }
+    ],
+    "navigation": {
+      "primary": [
+        "orders-overview",
+        "orders-list",
+        "settings",
+        "home-feed"
+      ]
+    },
+    "flows": [
+      {
+        "id": "web-order-browse",
+        "steps": [
+          "orders-overview",
+          "orders-list",
+          "order-detail"
+        ]
+      },
+      {
+        "id": "web-order-create",
+        "steps": [
+          "orders-list",
+          "order-form",
+          "order-detail"
+        ]
+      },
+      {
+        "id": "web-settings",
+        "steps": [
+          "settings"
+        ]
+      },
+      {
+        "id": "mobile-browse",
+        "steps": [
+          "home-feed",
+          "item-detail"
+        ]
+      },
+      {
+        "id": "mobile-login",
+        "steps": [
+          "auth",
+          "home-feed"
+        ]
+      }
+    ]
+  },
+  "data": {
+    "entities": [
+      {
+        "name": "Order",
+        "fields": [
+          {
+            "name": "orderNo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "pending",
+              "paid",
+              "shipped",
+              "completed",
+              "cancelled"
+            ]
+          },
+          {
+            "name": "createdAt",
+            "type": "datetime",
+            "required": true
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "name": "Settings",
+        "fields": [
+          {
+            "name": "notifications",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "on",
+              "off"
+            ]
+          },
+          {
+            "name": "language",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "zh-CN",
+              "en-US"
+            ]
+          },
+          {
+            "name": "timezone",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "fields": [
+          {
+            "name": "title",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "price",
+            "type": "number",
+            "required": true
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "name": "AuthCredentials",
+        "fields": [
+          {
+            "name": "email",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "password",
+            "type": "string",
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+  "assets": {
+    "icons": [],
+    "illustrations": [],
+    "images": []
+  },
+  "designDirection": {
+    "profile": "b-dense",
+    "density": "dense",
+    "tone": "neutral",
+    "motionLevel": "low"
+  },
+  "openQuestions": [
+    {
+      "id": "Q-001",
+      "question": "订单概览的「待处理」和「异常」分别对应 Order.status 的哪些值或组合条件？四项指标是计数还是比例？",
+      "blocking": false
+    },
+    {
+      "id": "Q-002",
+      "question": "商品详情「立即购买」进入的下单流程对应哪个页面或路由？viewer 在该流程中的权限是什么？",
+      "blocking": false
+    },
+    {
+      "id": "Q-003",
+      "question": "order-detail 的编辑态是页内编辑还是独立路由或复用 order-form？可编辑字段、保存与取消行为是什么？",
+      "blocking": false
+    },
+    {
+      "id": "Q-004",
+      "question": "orders-list 筛选栏包含哪些字段和控件？日期筛选是范围还是单日？状态默认值与可选项是什么？",
+      "blocking": false
+    },
+    {
+      "id": "Q-005",
+      "question": "auth 在邮箱校验未通过时，登录按钮应禁用还是保持可点击并在提交后展示字段错误？字段错误在何时触发？",
+      "blocking": false
+    },
+    {
+      "id": "Q-006",
+      "question": "无权限提示是否作为 settings 及所有角色受限页面的必需状态纳入状态矩阵？",
+      "blocking": false
+    },
+    {
+      "id": "Q-007",
+      "question": "item-detail 的 price 类型、币种和格式是什么？auth 的 email、password 是否必填，校验规则是什么？",
+      "blocking": false
+    },
+    {
+      "id": "Q-008",
+      "question": "新建订单时 customer 是选择已有客户还是输入名称？若需要新建客户，phone 与 email 在哪个页面采集？",
+      "blocking": false
+    },
+    {
+      "id": "Q-009",
+      "question": "orders-overview 的近期订单列表包含哪些列、多少条、时间窗口是什么？无近期订单时是否需要 empty 状态？",
+      "blocking": false
+    },
+    {
+      "id": "Q-010",
+      "question": "settings 保存成功反馈以什么形式呈现（内联提示、toast 还是页面状态），持续多久？",
+      "blocking": false
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-001",
+      "statement": "订单金额以人民币（CNY）计，保留两位小数。"
+    },
+    {
+      "id": "A-002",
+      "statement": "Phase 1 仅包含登录，不包含注册、找回密码与第三方登录。"
+    },
+    {
+      "id": "A-003",
+      "statement": "商品详情字段由内容服务提供，Phase 1 不纳入订单数据模型。"
+    },
+    {
+      "id": "A-004",
+      "statement": "Phase 1 权限仅做页面级可见性控制，不细化到字段级。"
+    },
+    {
+      "id": "A-005",
+      "statement": "orders-overview 固定渲染今日订单、待处理、已完成、异常四个指标卡；指标数值由运行期数据提供。"
+    },
+    {
+      "id": "A-006",
+      "statement": "item-detail 的「立即购买」保留为页面主操作；brief 不新增 C 端下单页面或路由。"
+    },
+    {
+      "id": "A-007",
+      "statement": "order-detail 的「编辑订单」不新增独立路由，编辑界面归属 order-detail 页面内。"
+    },
+    {
+      "id": "A-008",
+      "statement": "orders-list 以 status、createdAt、customer 三个字段承接状态、日期与关键字筛选。"
+    },
+    {
+      "id": "A-009",
+      "statement": "auth 的邮箱格式错误在提交校验后以字段错误展示；登录按钮仅在登录请求期间进入 disabled。"
+    },
+    {
+      "id": "A-010",
+      "statement": "角色受限页面在无权访问时展示无权限提示且不渲染页面数据；brief 不新增 forbidden 状态，requiredStates 沿用 PRD 状态矩阵。"
+    },
+    {
+      "id": "A-011",
+      "statement": "item-detail 的 title、price、description 作为 Product 内容实体建模；price 为数值型金额，title 与 description 为文本；auth 的 email、password 作为 AuthCredentials 实体建模，二者均为必填文本字段。"
+    },
+    {
+      "id": "A-012",
+      "statement": "order-form 的 customer 为客户名称文本输入；Customer.phone 与 Customer.email 不在 Phase 1 页面中采集。"
+    },
+    {
+      "id": "A-013",
+      "statement": "orders-overview 的近期订单列表按 Order 的 orderNo、customer、amount、status、createdAt 展示；条数与时间窗口不在 brief 中固化。"
+    },
+    {
+      "id": "A-014",
+      "statement": "settings 保存成功后展示成功反馈，但不新增 success 状态，requiredStates 沿用 PRD 状态矩阵。"
+    }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-ORDER-001": [
+        "orders-overview"
+      ],
+      "REQ-ORDER-002": [
+        "orders-list"
+      ],
+      "REQ-ORDER-003": [
+        "order-detail"
+      ],
+      "REQ-ORDER-004": [
+        "order-form"
+      ],
+      "REQ-ORDER-005": [
+        "settings"
+      ],
+      "REQ-ORDER-006": [
+        "home-feed"
+      ],
+      "REQ-ORDER-007": [
+        "item-detail"
+      ],
+      "REQ-ORDER-008": [
+        "auth"
+      ]
+    },
+    "unmapped": []
+  }
+}
