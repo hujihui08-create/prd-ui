@@ -799,6 +799,8 @@ Expected: FAIL.
 - Summary card: add `props.badge` and `props.badgeTone` instead of a Badge child; remove the Badge node.
 - Home tabs: `const tabs = [...new Set([page.id, ...(brief.ia.navigation.tabs ?? brief.ia.navigation.primary)])]`; `activeTab = page.id`; set `showTabs: tabs.length > 1` so a single tab cannot render an empty TabBar.
 - Form: for `startTime`/`endTime`, emit `Input` with `inputType: "datetime-local"`.
+- Mobile-form customer field: emit `FormField` with a `Row` child containing the `Input` and a ghost `Button` labeled「选择」(action `选择客户`); remove `选择客户` from `otherActions` so it is not duplicated.
+- Mobile-list search (page has `searchIdleTitle`): do not emit the bottom `actions` slot (the input filters live); keep `查看详情` in the secondary actions row so the renderer can hide it until results.
 - Mobile-form: only emit the `另一模式` Row when `page.formModes === undefined`.
 
 - [ ] **Step 4: Renderer changes**
