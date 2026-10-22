@@ -352,9 +352,9 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - M0 只接 A 库真实文件；B/C 的 adapter 接口和状态机已实现，真实供应商在 M2。
 - M1 只产出 IA/Interaction/Visual spec 与 findings；Spec Engineer v0 已把 interaction/motion/asset 写进 Page Spec；v0.4 clean 8 页 motion 已进 HTML，其他项目未迁移的 motion nodeId 仍按 warning。
 - M1 没有签核 UI；CLI 只校验 `signoff/*.md` 的机器可读块。`--allow-unreviewed` 不会产生 `success`。
-- Spec Engineer v0 是确定性 mapper，不做 Spec Repair；gate 失败只写 findings。PRD Reviewer/UI Briefer、Visual Review/baseline diff 已实现；Figma、录屏/trace 仍属 Phase 3。
-- 8 页 M1 仍只接收一个 catalog/motion token 集（`brief.meta.profile`）；混合 profile brief 的移动页已通过，但需要 per-profile 输入增强。
-- 真实 UI Briefer 尚未稳定输出 `mockData`/`fieldLabels`；8 页 sample brief 是人工补齐的，briefer prompt/schema 还需硬化。
-- 8 页 asset briefs 未产出，`SPEC_ASSET_BRIEFS_MISSING` 仍是 warning；8 页 asset review 未跑。
-- 视觉验收已有 24 项 baseline + 确定性 gate + Visual Critic；critic 仍是 advisory，真实 model 有采样波动，尚未实现“finding 收敛”的确定性 replay。
+- Spec Engineer v0 是确定性 mapper，不做 Spec Repair；gate 失败只写 findings。PRD Reviewer/UI Briefer、Visual Review/baseline diff/Visual Critic 已实现；Figma、录屏/trace 仍属 Phase 3。
+- M1 已支持 per-profile catalog/motion 输入；混合 profile brief 按页注入。
+- UI Briefer 已自动生成 `mockData`/`fieldLabels`；clean 8 页 brief 无手工 patch。
+- 8 页资产 brief 与 asset review 已落地（4/4 passed）。
+- 视觉验收已有 24 项 baseline + 确定性 gate + Visual Critic；同一输入的 signed-critique cache 可稳定复现，fresh critique 仍有采样波动；6 条 major 记为 v0.5 债务。
 - 插画 fixture 是 test-fixture，不是最终品牌资产。

@@ -20,7 +20,7 @@ html/                       8 页渲染结果 + index.html（v0.4 修复后）
 screenshots/                19 张 v0.3.1 人工 Playwright 截图（历史）
 visual-review/              本轮最终证据（passed，已签核）
   visual-review.json        review 结果：status=passed，9 findings，signoff valid，critic cacheHit=true
-  state.json                run 状态：success，signoff.visual=true
+  state.json                run 状态：passed，signoff.visual=true
   screenshots/              24 张 390×844 矩阵截图 + manifest.json
   findings/visual-gate.json 确定性 gate + 全部 findings（0 blocker）
   findings/visual-critic.json Visual Critic 原始 critique、usage、cost
@@ -44,7 +44,7 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
 | HTML / Phase 1 | `run-2026-10-22T13-59-42-062Z` | 8 页 + index；`8 pages / 0 blockers` |
 | Visual baseline | `pipeline/baselines/employee-app-phase2` | 24 cases / 24 PNG（PNG 与上一版一致）；visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6` |
 | Visual review（最终，cache hit） | `run-2026-10-22T13-55-24-469Z` | `status=passed`；24/24 截图；diff 24/0/0；0 console / 0 overflow；9 findings（6 major / 3 minor / **0 blocker**）；`usageComplete=true`；¥0（signed-cache，0 次模型调用） |
-| Signoff | — | `Sample Reviewer`，2026-10-22，`waivers=[]`；visual manifest `sha256:3321dd61…25c6`；findings `sha256:70a435f3…4455`；`signoff.valid=true`，`state.json.status=success` |
+| Signoff | — | `Sample Reviewer`，2026-10-22，`waivers=[]`；visual manifest `sha256:3321dd61…25c6`；findings `sha256:70a435f3…4455`；`signoff.valid=true`，`state.json.status=passed` |
 | Critique cache | `.visual-cache/critiques/93ae567d….json` | key `sha256:93ae567d…62f`（manifest visual hash + spec hash + dsh/prd-ui-visual/deepseek-flash）；cache hit，模型调用 0 |
 
 ### 成本
@@ -105,7 +105,7 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
   `爽约·已取消` danger。
 - **业务状态**：已取消/爽约渲染对应 badge、只读 note，只保留客户详情；
   已确认告知显示确认人/时间并隐藏确认 CTA。
-- **VC-009 skeleton**：未实现 calendar-shaped skeleton，列为 v0.5 polish。
+- **VC-009 skeleton**：已实现七列/八行 calendar skeleton；完整 12 行模板仍列为 v0.5 polish。
 
 Playwright 复核见 `run-summary/playwright-checks-v04.json`：picker 选择/取消/
 reload、完整日期预填、搜索行 chevron、列表日期分组、disabled、状态动作栏。

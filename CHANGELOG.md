@@ -65,7 +65,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - Final real-dsh review `run-2026-10-22T13-55-24-469Z`: 24/24 screenshots,
   0 console / 0 overflow, diff 24/0/0, 9 findings (6 major / 3 minor /
   0 blocker), `usageComplete=true`, ¥0 (cache). Signed per the stopping rule
-  (`waivers=[]`); `status=passed`, `state=success`. The critic verdict remains
+  (`waivers=[]`); `status=passed`, `state=passed`. The critic verdict remains
   `changes`; the 6 residual majors are recorded as v0.5 debt.
 - Playwright: picker select/cancel/reload, calendar full-date prefill, tabs,
   search idle/empty/results, detail/notice dedupe, calendar legend + horizontal

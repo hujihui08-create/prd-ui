@@ -1308,7 +1308,7 @@ handoff/
 - 轻量 vanilla JS 控制器（v0.4）：`businessStates` 驱动详情页状态与动作栏、`formModes`（new/reschedule）驱动 CTA 与客户锁定、`views` 切换日历/列表、搜索 idle/过滤/清空/空态、空格预填、详情抽屉、customer picker 草稿恢复（sessionStorage）、完整日期预填。PageShell 页面不注入交互。
 - Motion：compiler 写语义 `node.id`，Spec Engineer 解析 M1 binding（legacy alias + group 展开），renderer 输出 `data-motion-*` CSS 动效并按 `prefers-reduced-motion` 回退。
 - Visual Review：`core/visual-review` 构建 24 项截图矩阵，Playwright 截图 + pixelmatch baseline diff，Visual Critic 走 `prd-ui-visual`（vision、只读工具、65536 maxTokens、900s timeout），人工 `visual:sign` 后才 `passed`。
-- 仍后置：critic major 视觉债（disabled 样式、双 check-in CTA、术后告知时序、搜索/列表行卡片化、calendar loading/empty 结构）、确定性 critic replay、Figma/Studio/Asset Compiler、完整 a11y。
+- 仍后置（v0.5）：today「查看全部」；390px 三日历滚动提示；loading skeleton 完整 12 行模板；empty overlay 呈现；form mode pills；static reschedule 截图上下文。Critic 同输入已用 signed cache 稳定复现；fresh critique 仍有采样波动。Figma/Studio/Asset Compiler、完整 a11y 仍后置。
 
 版本路径（内部迭代）：
 

@@ -15,7 +15,7 @@
 - ESM everywhere; relative TS imports use `.js`.
 - `core/` must not import `@deepseek-ai/*` or runtime adapters.
 - Local commits only; no push. Never commit `.env`, keys, `node_modules`, or `/tmp` artifacts.
-- Baseline: 529 tests, typecheck clean, `test:dsh` 2 passed, Phase 1 `8/2/4/8` all 0 blockers.
+- Baseline: 644 tests, typecheck clean, `test:dsh` 4 passed, Phase 1 `8/2/4/8` all 0 blockers.
 - Real dsh commands: `set -a; . ./.env; set +a`, `DSH_HOME="$PWD/dsh/home"`, `--max-cost-cny 3`.
 - The signed clean brief `samples/projects/employee-app-phase2/ui-brief.json` must not be manually edited. Picker/date defaults must be deterministic when the brief omits the new optional fields.
 - Visual hard gates are deterministic only; Visual Critic findings are advisory and blockers require human waiver.
@@ -1450,7 +1450,7 @@ pnpm phase1:verify --project samples/projects/employee-app-appointments-03/proje
 pnpm phase1:verify --project samples/projects/employee-app-phase2/project.yaml --runs /tmp/final-v04-phase2
 ```
 
-Expected: tests pass, typecheck clean, `test:dsh` 2 passed, Phase 1 `8/2/4/8` all 0.
+Expected: tests pass, typecheck clean, `test:dsh` 4 passed, Phase 1 `8/2/4/8` all 0.
 
 Final audit: no `.env`, keys, `node_modules`, `/tmp`, or `/Users` strings in artifacts. Commit locally only.
 

@@ -12,7 +12,7 @@
 >
 > **2026-10-22 增量（v0.3.1 clean 收尾，已提交）**：`employee-app-phase2` 8 页真实 PRD 已干净跑通：intake `run-2026-10-22T03-09-28-544Z` success，PRD/IA gate + brief gate passed，**0 waiver / 0 手工 brief patch**，brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 `run-2026-10-22T03-16-05-257Z` `ia:passed / interaction:passed / visualStyle:passed`（0 waiver，¥0.43998，visual signoff 由 `agent:sign` 完成）；Spec Engineer `run-2026-10-22T03-23-54-618Z` 8 Page Specs / 0 blockers / 36 warnings；HTML 8 页 + index，Phase 1 `8/0`。Renderer 新增业务状态动作栏、new/reschedule 表单 mode、日历/列表切换、搜索过滤与详情抽屉；Playwright 交互验收 19 张截图。当前 **529 tests**、typecheck clean、`test:dsh` 2 passed；Phase 1 `8/2/4/8` 全 0 blockers。最终链路成本 ¥1.3378（含早前重试 ¥2.9358）。下一步是 v0.4：motion 进 HTML、稳定 node id、Visual Critic/截图 diff、customer picker、完整日期预填；Phase 3（Figma/沙箱/Handoff）仍未开始。v0.4 债务清单见 `docs/superpowers/specs/2026-10-22-clean-phase-2-finish-design.md` §9。
 
-> **2026-10-22 增量（v0.4 动效 + 视觉回归，已完成）**：motion 语义 node id、Spec Engineer `--strict-motion`（8 Page Specs / 0 blockers / **0 motion unresolved**）、renderer CSS 动效 + reduced-motion、customer picker（select/cancel/back/reload）、完整日期 `datetime-local` 预填、24 项 visual baseline、`core/visual-review` 确定性 gate/pixel diff、真实 dsh Visual Critic（`prd-ui-visual`，65536 maxTokens，900s timeout）与 `visual:sign` 全部落地。concrete-major + final focused 修复后视觉 run `run-2026-10-22T13-55-24-469Z`：`status=passed`（按 stopping rule 签核），24/24 截图、0 console / 0 overflow、diff 24/0/0、9 findings（6 major / 3 minor / **0 blocker**）、signed critique cache 命中 ¥0（0 次模型调用）；critic verdict 仍 changes，6 major 记为 v0.5 债。当前 **644 tests**、typecheck clean、`test:dsh` 4 passed、Phase 1 `8/2/4/8` 全 0 blockers。证据在 `pipeline/artifacts/employee-app-phase2/visual-review/`；baseline 在 `pipeline/baselines/employee-app-phase2/`。剩余是最终 review 的 6 个 major（today 查看全部、三日历滚动提示、loading skeleton 完整度、empty 覆盖呈现、mode pills、reschedule 静态截图上下文）、确定性 critic replay，以及 Phase 3/4（Figma/Studio/Asset Compiler/a11y/真实项目验收）。
+> **2026-10-22 增量（v0.4 动效 + 视觉回归，已完成）**：motion 语义 node id、Spec Engineer `--strict-motion`（8 Page Specs / 0 blockers / **0 motion unresolved**）、renderer CSS 动效 + reduced-motion、customer picker（select/cancel/back/reload）、完整日期 `datetime-local` 预填、24 项 visual baseline、`core/visual-review` 确定性 gate/pixel diff、真实 dsh Visual Critic（`prd-ui-visual`，65536 maxTokens，900s timeout）与 `visual:sign` 全部落地。concrete-major + final focused 修复后视觉 run `run-2026-10-22T13-55-24-469Z`：`status=passed`（按 stopping rule 签核），24/24 截图、0 console / 0 overflow、diff 24/0/0、9 findings（6 major / 3 minor / **0 blocker**）、signed critique cache 命中 ¥0（0 次模型调用）；critic verdict 仍 changes，6 major 记为 v0.5 债。当前 **644 tests**、typecheck clean、`test:dsh` 4 passed、Phase 1 `8/2/4/8` 全 0 blockers。证据在 `pipeline/artifacts/employee-app-phase2/visual-review/`；baseline 在 `pipeline/baselines/employee-app-phase2/`。剩余是最终 review 的 6 个 major（today 查看全部、三日历滚动提示、loading skeleton 完整度、empty 覆盖呈现、mode pills、reschedule 静态截图上下文）、fresh critique 采样波动（同输入已由 signed cache 稳定），以及 Phase 3/4（Figma/Studio/Asset Compiler/a11y/真实项目验收）。
 
 ---
 
@@ -257,7 +257,7 @@ samples/project.demo-orders-intake.yaml
 3. **P1**：8 页 asset briefs + asset review。
 4. **P1**：真实 PRD 端到端验收。
 5. ~~P2：motion HTML + 稳定 node id；自动截图 diff~~（v0.4 已完成）。
-6. **Phase 3**：Figma/Studio/Handoff/a11y；critic major 视觉债与确定性 replay。
+6. **Phase 3**：Figma/Studio/Handoff/a11y；v0.5 critic major 视觉债（signed cache 已覆盖同输入稳定复现，fresh critique 仍采样）。
 
 ---
 

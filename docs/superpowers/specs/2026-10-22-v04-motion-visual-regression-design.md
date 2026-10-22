@@ -601,7 +601,7 @@ v0.4 的 8 项端到端验收全部通过，最终视觉证据在
 | Render | 8 页 + `index.html`；8 页均带 `data-motion-preset` / `data-node-id`；日历 `data-slot-date` 为完整 `YYYY-MM-DD`；form 为 `datetime-local` |
 | Baseline | `pipeline/baselines/employee-app-phase2`：24 cases / 24 PNG（PNG 未变）；visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6` |
 | Visual review（最终） | `run-2026-10-22T13-55-24-469Z`：24/24 截图，0 console、0 overflow、diff 24/0/0；9 findings（6 major / 3 minor / 0 blocker）；`usageComplete=true`；¥0（signed-critique cache hit，0 次模型调用）；`status=passed` |
-| Signoff | `Sample Reviewer`，2026-10-22，`waivers=[]`；visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6`；findings `sha256:70a435f32b2b0b09c9eca6f6973a9fb1879a887fd06b0a67301ba1d2936d4455`；`signoff.valid=true`，`state.json.status=success` |
+| Signoff | `Sample Reviewer`，2026-10-22，`waivers=[]`；visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6`；findings `sha256:70a435f32b2b0b09c9eca6f6973a9fb1879a887fd06b0a67301ba1d2936d4455`；`signoff.valid=true`，`state.json.status=passed` |
 | Picker | form → 选择 → customer-search（picker）→ 张女士 → 返回 form，customer 回填且 project/start/end/therapist 保留；取消/返回/reload 保留草稿；reschedule 锁定客户 |
 | 日期 | 日历空格 `2025-11-03 09:00` → `startTime=2025-11-03T09:00`、`endTime=2025-11-03T10:00`；周源为 2025-11-03（11-05 周三） |
 | 保真 | 列表无字段标题 Row；detail/notice 客户与状态各出现一次；Tab 今日/预约列表；搜索 idle 无「查看详情」/底部「搜索」，空态有「清空关键词」；日历图例 + 720px 横向滚动 |
@@ -616,8 +616,9 @@ v0.4 的 8 项端到端验收全部通过，最终视觉证据在
 CTA、`告知分块`、native 日期）已在本轮修复。
 
 真实 critic 存在采样波动：首次 review（`run-2026-10-22T10-35-22-301Z`）12 findings，
-签核后重跑得到不同 findings set；“同输入二次评审 findings 收敛”仍未实现为
-确定性 replay。
+签核后重跑得到不同 findings set。v0.4 用 signed-critique cache（manifest hash +
+Page Spec hash + profile/model）解决同一输入的稳定复现：cache hit 时复用
+critique/findings/signoff，0 次模型调用；fresh critique 仍是采样结果。
 
 真实 critic 的首个 8 页 run（`run-2026-10-22T10-24-11-704Z`）在 32768 maxTokens /
 300s 下超时（¥0.9835，`usageComplete=false`，`VISUAL_CRITIC_UNAVAILABLE`）；
@@ -630,7 +631,7 @@ concrete-major 跟进再花 ¥1.4273972928（含两次 fail-closed），累计 �
 按 reviewer 要求修复了 9 项 concrete majors：reschedule 调试 chip、disabled
 样式与只读 banner、重复 check-in、术后告知时序、搜索页浮动「查看详情」、
 列表页「查看完整详情」、列表行降噪、只读 action 行、`告知分块` 标签；另统一
-状态色、业务状态 badge/note、列表日期分组，并记录 VC-009 skeleton 为 v0.5。
+状态色、业务状态 badge/note、列表日期分组；VC-009 已实现七列/八行 calendar skeleton，完整 12 行模板仍记为 v0.5。
 
 Final focused round 又修复了 5 个 concrete majors：reschedule prefill
 （sessionStorage keyed by appointment/record id）、reschedule mode pill 锁定、
@@ -641,7 +642,7 @@ loading skeleton、empty 保留 grid/legend + 清空筛选；另增强 disabled 
 最终 review `run-2026-10-22T13-55-24-469Z` 为 9 findings（6 major / 3
 minor / 0 blocker），`usageComplete=true`，¥0：signed-critique cache 命中，
 复用 critique/findings/signoff，0 次模型调用。按用户 stopping rule 签核，
-`waivers=[]`；`visual-review.json.status=passed`、`state.json.status=success`。
+`waivers=[]`；`visual-review.json.status=passed`、`state.json.status=passed`。
 Critic verdict 仍为 `changes`，不声称 critic pass。
 
 Cache：key = 视觉截图 manifest hash（32px block / 4 levels）+ Page Spec hash +
