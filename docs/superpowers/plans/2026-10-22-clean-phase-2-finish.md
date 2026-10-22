@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript ESM, vitest, tsx, dsh `0.2.1-rc.2`, pnpm workspace, Playwright MCP for interaction checks.
 
+**Status:** Completed 2026-10-22 (v0.3.1). Final evidence in the last section.
+
 ## Global Constraints
 
 - ESM everywhere; relative TS imports use `.js`.
@@ -63,7 +65,7 @@ pipeline/artifacts/employee-app-phase2/                    refreshed artifacts
   `BRIEF_FORM_MODE_ACTION_UNKNOWN`, `BRIEF_VIEW_WITHOUT_TIME`,
   `BRIEF_SEARCH_IDLE_MISSING`.
 
-- [ ] **Step 1: Write failing contract tests**
+- [x] **Step 1: Write failing contract tests**
 
 In `core/contracts/tests/contracts.test.ts`:
 
@@ -104,12 +106,12 @@ it("parses interaction metadata on a brief page", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `pnpm exec vitest run core/contracts/tests/contracts.test.ts`
 Expected: FAIL because the schema rejects the new keys.
 
-- [ ] **Step 3: Add the interfaces and strict schemas**
+- [x] **Step 3: Add the interfaces and strict schemas**
 
 In `core/contracts/src/ui-brief.ts` add to `UiBriefPage`:
 
@@ -142,7 +144,7 @@ linkedRoutes?: {
 
 and mirror them in `PageSpecSchema`.
 
-- [ ] **Step 4: Write failing gate tests**
+- [x] **Step 4: Write failing gate tests**
 
 Add to `core/intake/tests/gates.test.ts`:
 
@@ -186,7 +188,7 @@ it("blocks missing or unknown business state actions", () => {
 Add analogous tests for `BRIEF_FORM_MODE_ACTION_UNKNOWN`,
 `BRIEF_VIEW_WITHOUT_TIME`, and `BRIEF_SEARCH_IDLE_MISSING`.
 
-- [ ] **Step 5: Implement the gate checks**
+- [x] **Step 5: Implement the gate checks**
 
 In `runBriefGate`, inside the page loop:
 
@@ -233,12 +235,12 @@ if (
 }
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `pnpm exec vitest run core/contracts/tests/contracts.test.ts core/intake/tests/gates.test.ts`
 Expected: PASS.
 
-- [ ] **Step 7: Commit (local only)**
+- [x] **Step 7: Commit (local only)**
 
 ```bash
 git add core/contracts/src/ui-brief.ts core/contracts/src/page-spec.ts core/contracts/tests/contracts.test.ts core/intake/src/gates.ts core/intake/tests/gates.test.ts
@@ -260,7 +262,7 @@ git commit -m "feat(intake): add interaction metadata and brief gate rules"
 - Consumes: Task 1 schema.
 - Produces: prompt rules for `businessStates`, `formModes`, `views`, `searchIdleTitle`, home/host constraints.
 
-- [ ] **Step 1: Write failing prompt assertions**
+- [x] **Step 1: Write failing prompt assertions**
 
 In `core/intake/tests/briefer-prompt.test.ts`:
 
@@ -274,12 +276,12 @@ it("requires interaction metadata for stateful pages", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `pnpm exec vitest run core/intake/tests/briefer-prompt.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Add the prompt rules**
+- [x] **Step 3: Add the prompt rules**
 
 In `core/agents/src/roles/ui-briefer.ts` mapping rules:
 
@@ -291,7 +293,7 @@ In `core/agents/src/roles/ui-briefer.ts` mapping rules:
 "- Never emit host actions such as 前往客户 Tab / 工作台 / 我的.",
 ```
 
-- [ ] **Step 4: Update fixtures**
+- [x] **Step 4: Update fixtures**
 
 Use a Node script or manual edit:
 
@@ -324,12 +326,12 @@ Use a Node script or manual edit:
   `"views": ["calendar", "list"], "defaultView": "calendar"` to
   `appointment-list`.
 
-- [ ] **Step 5: Run the prompt + intake tests**
+- [x] **Step 5: Run the prompt + intake tests**
 
 Run: `pnpm exec vitest run core/intake/tests/briefer-prompt.test.ts runtimes/standalone/tests/intake-cli.test.ts`
 Expected: PASS. If a fixture now fails the new gate, add the missing metadata rather than weakening the gate.
 
-- [ ] **Step 6: Commit (local only)**
+- [x] **Step 6: Commit (local only)**
 
 ```bash
 git add core/agents/src/roles/ui-briefer.ts core/intake/tests/briefer-prompt.test.ts samples/agents/intake-employee-app/ui-briefer.json samples/agents/intake-appointments-03/ui-briefer.json samples/agents/intake-employee-app-phase2/ui-briefer.json
@@ -349,7 +351,7 @@ git commit -m "feat(briefer): require business states, form modes, views, search
 - Produces: `PageSpec.businessStates/formModes/views/defaultView/searchIdleTitle/currentStatus/linkedRoutes`.
 - Produces data props on nodes: `action`, `field`, `searchText`, `emptyKind`, `viewPanel`.
 
-- [ ] **Step 1: Write failing compiler tests**
+- [x] **Step 1: Write failing compiler tests**
 
 Add a test using a clone of the 03 brief with:
 
@@ -372,12 +374,12 @@ expect(compilePageSpec(appointmentListPage).views).toEqual(["calendar", "list"])
 expect(compilePageSpec(appointmentListPage).defaultView).toBe("calendar");
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `pnpm exec vitest run core/compiler/tests/compiler.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement metadata and defaults**
+- [x] **Step 3: Implement metadata and defaults**
 
 In `compilePageSpec`, replace the return object with:
 
@@ -449,7 +451,7 @@ return {
 };
 ```
 
-- [ ] **Step 4: Add data props**
+- [x] **Step 4: Add data props**
 
 - `btn(label, emphasis, action?)` sets `props.action`.
 - `fieldFormNode` sets `props.field = field`.
@@ -461,12 +463,12 @@ return {
 - `Button` renderer emits `data-view-toggle` when `props.viewToggle` is true.
 - Search rows carry `searchText`; the search idle/empty states carry `emptyKind`.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 Run: `pnpm exec vitest run core/compiler/tests/compiler.test.ts`
 Expected: PASS.
 
-- [ ] **Step 6: Commit (local only)**
+- [x] **Step 6: Commit (local only)**
 
 ```bash
 git add core/compiler/src/compile-page-spec.ts core/compiler/tests/compiler.test.ts
@@ -486,7 +488,7 @@ git commit -m "feat(compiler): carry interaction metadata and data hooks"
 - Produces: `<script id="interaction-config" type="application/json">` and inline controller.
 - Produces: SearchBar `<input data-search-input>`, Button `data-action`, ListRow `data-search-text`, EmptyState `data-empty-kind`, Section `data-view-panel`, CalendarGrid cells `data-slot-date/time`, blocks `data-block`.
 
-- [ ] **Step 1: Write failing renderer tests**
+- [x] **Step 1: Write failing renderer tests**
 
 ```ts
 it("emits interaction config and data hooks for the appointment detail", () => {
@@ -513,12 +515,12 @@ it("emits interaction config and data hooks for the appointment detail", () => {
 Add tests for `data-search-input`, `data-view-panel`, `data-empty-kind`, and
 `data-view-toggle`.
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `pnpm exec vitest run core/renderer-html/tests/renderer.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Add data attributes**
+- [x] **Step 3: Add data attributes**
 
 - `renderDocument`: add `data-page-archetype`, `data-page-id`,
   `data-current-status` (if present), and the config script:
@@ -552,7 +554,7 @@ const config = {
 - Add `.empty-state[data-empty-kind]{display:flex}` so the search idle/empty
   panels can be shown by JS; `[hidden]` still wins.
 
-- [ ] **Step 4: Add the inline controller**
+- [x] **Step 4: Add the inline controller**
 
 Add `renderInteractionScript(): string` returning a `<script>` body. It must:
 
@@ -774,12 +776,12 @@ Add the script before `</body>` only when the page has any interaction config
 `.search-input`, `[hidden]{display:none!important}`, `.state-note`, and a
 small drawer.
 
-- [ ] **Step 5: Run renderer tests**
+- [x] **Step 5: Run renderer tests**
 
 Run: `pnpm exec vitest run core/renderer-html/tests/renderer.test.ts`
 Expected: PASS.
 
-- [ ] **Step 6: Commit (local only)**
+- [x] **Step 6: Commit (local only)**
 
 ```bash
 git add core/renderer-html/src/index.ts core/renderer-html/tests/renderer.test.ts
@@ -796,7 +798,7 @@ git commit -m "feat(renderer): add inline interaction controller"
 - Update: `samples/agents/intake-employee-app-phase2/*.json`
 - Update: `samples/projects/employee-app-phase2/ui-brief.json` signoff
 
-- [ ] **Step 1: Add explicit metadata to the PRD**
+- [x] **Step 1: Add explicit metadata to the PRD**
 
 In `samples/projects/employee-app-phase2/prd.md`, add a section:
 
@@ -827,7 +829,7 @@ In `samples/projects/employee-app-phase2/prd.md`, add a section:
 - 首次进入显示 `searchIdleTitle`，不返回默认客户列表；输入关键词后过滤。
 ```
 
-- [ ] **Step 2: Run clean intake**
+- [x] **Step 2: Run clean intake**
 
 ```bash
 cd pipeline
@@ -843,7 +845,7 @@ Expected: 8 pages, brief gate passed. If gate blockers appear, let gate-repair
 run; inspect `findings/brief-gate.json`. **Do not edit the brief manually.**
 If after 2 repair rounds it still fails, stop and report the blocker.
 
-- [ ] **Step 3: Sign and publish**
+- [x] **Step 3: Sign and publish**
 
 Create `/tmp/signoff-clean-prd-ia.md`:
 
@@ -885,14 +887,14 @@ Resume with `--signoff-prd-ia`, `--signoff-brief`, and `--publish-brief
 samples/projects/employee-app-phase2/ui-brief.json`. Any blocker that is not a
 host boundary means the PRD/brief must be fixed and the intake rerun.
 
-- [ ] **Step 4: Refresh fixtures**
+- [x] **Step 4: Refresh fixtures**
 
 Copy the accepted briefer output to
 `samples/agents/intake-employee-app-phase2/ui-briefer.json` in the
 `{ output, usage, usageComplete }` shape, preserving the new metadata.
 Run `pnpm exec vitest run runtimes/standalone/tests/intake-cli.test.ts`.
 
-- [ ] **Step 5: Commit (local only)**
+- [x] **Step 5: Commit (local only)**
 
 ```bash
 git add samples/projects/employee-app-phase2 samples/agents/intake-employee-app-phase2
@@ -903,7 +905,7 @@ git commit -m "feat(samples): clean phase2 brief with interaction metadata"
 
 ## Task 6: M1, Spec Engineer, HTML, interactions
 
-- [ ] **Step 1: Run M1**
+- [x] **Step 1: Run M1**
 
 ```bash
 DSH_HOME="$PWD/dsh/home" pnpm agent:run \
@@ -916,7 +918,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 Expected: `ia:waived` (host boundaries only) / `interaction:passed` /
 `visualStyle:passed`; `agent:sign` if only visual-style is missing.
 
-- [ ] **Step 2: Spec Engineer and render**
+- [x] **Step 2: Spec Engineer and render**
 
 ```bash
 pnpm spec:engineer --project samples/projects/employee-app-phase2/project.yaml \
@@ -927,7 +929,7 @@ pnpm phase1:verify --project samples/projects/employee-app-phase2/project.yaml -
 
 Expected: 8 Page Specs / 0 blockers; 8 HTML + index; Phase 1 8/0.
 
-- [ ] **Step 3: Playwright interaction checks**
+- [x] **Step 3: Playwright interaction checks**
 
 Serve `/tmp/html-clean` and verify:
 
@@ -937,7 +939,7 @@ Serve `/tmp/html-clean` and verify:
 4. Detail: click 已到店确认 → status 已到店 and action bar shrinks; click 取消 → readonly note; 爽约/已取消 no actions.
 5. Screenshot all 8 pages + interaction states.
 
-- [ ] **Step 4: Copy artifacts and commit**
+- [x] **Step 4: Copy artifacts and commit**
 
 Copy HTML/screenshots/signoffs/run summaries to
 `pipeline/artifacts/employee-app-phase2/`. Commit locally.
@@ -946,7 +948,7 @@ Copy HTML/screenshots/signoffs/run summaries to
 
 ## Task 7: Docs and full regression
 
-- [ ] **Step 1: Run the full suite**
+- [x] **Step 1: Run the full suite**
 
 ```bash
 cd pipeline
@@ -961,7 +963,7 @@ pnpm phase1:verify --project samples/projects/employee-app-phase2/project.yaml -
 
 Expected: 510+ tests, typecheck clean, `test:dsh` 2, Phase 1 8/2/4/8 all 0.
 
-- [ ] **Step 2: Update docs**
+- [x] **Step 2: Update docs**
 
 Update `docs/superpowers/specs/2026-10-19-prd-to-ui-pipeline-design.md` §14.1,
 the new clean spec, `README.md`, `AGENTS.md`, `CHANGELOG.md`, the remaining-work
@@ -972,7 +974,39 @@ plan, and the handoff with:
 - interaction screenshots;
 - remaining v0.4 work (motion, stable node ids, Visual Critic/diff).
 
-- [ ] **Step 3: Final audit and commit**
+- [x] **Step 3: Final audit and commit**
 
 Confirm no `.env`, keys, `node_modules`, or `/tmp` artifacts are committed.
 Local commit only; no push.
+
+---
+
+## Final evidence (2026-10-22)
+
+- Intake `run-2026-10-22T03-09-28-544Z`: `success`; 8 pages, all `b-mobile`;
+  PRD/IA gate passed, brief gate passed; **0 waivers, 0 manual brief edits**;
+  brief hash `sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335`;
+  ¥0.8977902624, `usageComplete=true`; one PRD/IA answer (PRD-005 calendar
+  09:00–20:00, 60-minute slots).
+- M1 `run-2026-10-22T03-16-05-257Z`: `success`;
+  `gates={ia:passed, interaction:passed, visualStyle:passed}`; 0 waivers;
+  visual-style signoff via `agent:sign`; ¥0.4399832736
+  (IA ¥0.1676724192 + interaction ¥0.2259093024 + visual-style ¥0.046401552),
+  `usageComplete=true`.
+- Spec Engineer `run-2026-10-22T03-23-54-618Z`: 8 Page Specs, 0 blockers,
+  36 warnings (34 `SPEC_MOTION_NODE_UNRESOLVED`, 2 `SPEC_ASSET_UNUSED`); assets
+  missing none, referenced `icon-plus` / `icon-search`.
+- HTML: 8 pages + `index.html`; `phase1:verify` `8 pages / 0 blockers`.
+- Playwright: search idle/张/clear/nonsense; calendar/list toggle; empty cell →
+  form with date/time; drawer → 查看完整详情 → detail; list row / 查看完整详情 →
+  detail; form new/reschedule CTA + customer lock; detail 已到店/取消/爽约;
+  treatment notice confirm with 确认人/确认时间; 19 screenshots.
+- Regression: 529 tests passed, typecheck clean, `test:dsh` 2 passed; Phase 1
+  `8 / 2 / 4 / 8` pages all 0 blockers.
+- Cost: final chain ¥1.337773536; ¥2.935835885 including earlier retries.
+- v0.4 debt: customer picker not wired in the static renderer; calendar prefill
+  is day-of-month (`03 09:00`), not full `YYYY-MM-DD`; M1 interaction spec
+  `cd.new-appointment` still says prefill+lock while the signed brief keeps new
+  editable (artifact unchanged); 34 motion-node warnings; asset review
+  unchanged (2026-10-21 evidence, no `/tmp` paths); 爽约/已取消 keep the
+  read-only 客户详情 nav.

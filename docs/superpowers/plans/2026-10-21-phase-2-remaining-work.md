@@ -1,9 +1,11 @@
 # Phase 2 剩余工作实施计划
 
 - 日期：2026-10-21
-- 状态：Planned（未开始）
+- 状态：Completed（2026-10-22）
 - 输入：8 页 Renderer/Mock Data/视觉修复已完成（`docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md`）
 - 目标：把“8 页 sample 能跑 + 手工视觉巡检通过”推进到“真实 PRD 可重复跑通、资产/视觉/动效可验收”。
+
+> **完成说明（2026-10-22）**：本计划的 Phase 2 出口由 `docs/superpowers/plans/2026-10-22-clean-phase-2-finish.md` 以 v0.3.1 clean 收尾替代——`employee-app-phase2` 8 页真实 PRD 已做到 0 waiver / 0 手工 brief patch、M1 三 gate passed、8 Page Specs / 0 blockers、8 页 HTML + index、529 tests、19 张交互截图。下文历史任务细节保留不改；v0.4（motion/视觉回归）与 Phase 3 仍未开始。
 
 > **For agentic workers:** 按任务顺序执行；每个任务先补失败测试/验收用例，再实现。不要把多个任务混成一个 commit。
 

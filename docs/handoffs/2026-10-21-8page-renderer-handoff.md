@@ -9,6 +9,8 @@
 - 对话式交接：`docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md`
 
 > **2026-10-21 增量**：Task 1、03 四页切片、视觉 v0.1、per-profile M1、资产链、Phase 2 8 页真实 PRD 均已完成。Phase 2 出口：`employee-app-phase2` 8 页（brief gate passed，sample IA waiver）、M1 三 gate passed（¥0.4355）、Spec 8/0、HTML 8 页、Phase 1 8/0；per-profile 8 页 demo-orders run interaction passed（¥0.5105）；asset review 4/4。当前 **510 tests**。下一阶段是 v0.4（motion + 视觉回归）或 Phase 3（Figma/沙箱/Handoff）；Phase 2 出口依赖 sample waiver + brief patch，下一轮应重跑 intake 清理。
+>
+> **2026-10-22 增量（v0.3.1 clean 收尾，已提交）**：`employee-app-phase2` 8 页真实 PRD 已干净跑通：intake `run-2026-10-22T03-09-28-544Z` success，PRD/IA gate + brief gate passed，**0 waiver / 0 手工 brief patch**，brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 `run-2026-10-22T03-16-05-257Z` `ia:passed / interaction:passed / visualStyle:passed`（0 waiver，¥0.43998，visual signoff 由 `agent:sign` 完成）；Spec Engineer `run-2026-10-22T03-23-54-618Z` 8 Page Specs / 0 blockers / 36 warnings；HTML 8 页 + index，Phase 1 `8/0`。Renderer 新增业务状态动作栏、new/reschedule 表单 mode、日历/列表切换、搜索过滤与详情抽屉；Playwright 交互验收 19 张截图。当前 **529 tests**、typecheck clean、`test:dsh` 2 passed；Phase 1 `8/2/4/8` 全 0 blockers。最终链路成本 ¥1.3378（含早前重试 ¥2.9358）。下一步是 v0.4：motion 进 HTML、稳定 node id、Visual Critic/截图 diff、customer picker、完整日期预填；Phase 3（Figma/沙箱/Handoff）仍未开始。v0.4 债务清单见 `docs/superpowers/specs/2026-10-22-clean-phase-2-finish-design.md` §9。
 
 ---
 

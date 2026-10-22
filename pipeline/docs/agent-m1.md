@@ -212,6 +212,25 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
 - 限制：Phase 2 出口依赖 sample IA waivers 和 brief patch；下一轮应重跑
   intake 让 briefer 直接生成合规 brief 并重新签核。
 
+## Phase 2 clean 收尾 M1（2026-10-22，v0.3.1）
+
+- 项目：`samples/projects/employee-app-phase2`；clean intake
+  `run-2026-10-22T03-09-28-544Z`，0 waiver / 0 手工 brief patch，brief hash
+  `sha256:b558b57a…b8335`。
+- 真实 dsh M1：`run-2026-10-22T03-16-05-257Z`，
+  `gates={ia:passed, interaction:passed, visualStyle:passed}`，0 waivers；
+  visual-style 由 `pnpm agent:sign` 签核（不调用模型），最终
+  `status=success`。
+- 成本 ¥0.4399832736（IA ¥0.1676724192 + interaction ¥0.2259093024 +
+  visual-style ¥0.046401552），`usageComplete=true`。
+- 产物：8 页 IA map/findings、interaction spec、motion spec、visual style、
+  4 个 asset briefs（`icon-home` / `icon-plus` / `icon-search` / `icon-user`）
+  和两道 signoff。
+- 已知债务：`interaction-spec.json` 的 `cd.new-appointment` 仍写“预填并锁定
+  客户”，与已签核 brief（new 可编辑、仅 reschedule 锁定）不一致；artifact
+  保留不改，留给 v0.4 对齐 prompt/schema。详见
+  `docs/superpowers/specs/2026-10-22-clean-phase-2-finish-design.md` §9。
+
 ## per-profile M1（2026-10-21）
 
 - `agent:run` 从 brief 页面收集 profile，向 Interaction prompt 传

@@ -1,7 +1,7 @@
 # Clean Phase 2 收尾设计（v0.3.1）
 
 - 日期：2026-10-22
-- 状态：Approved（设计三段已确认）
+- 状态：Implemented（2026-10-22）
 - 输入：Phase 2 出口（带 sample waiver + brief patch）、`employee-app-phase2` 8 页真实 PRD、上一轮遗留项
 - 关联：[主设计文档](2026-10-19-prd-to-ui-pipeline-design.md)、[Phase 2 出口设计](2026-10-21-phase-2-exit-per-profile-assets-design.md)、[视觉 v0.1 设计](2026-10-21-visual-fidelity-v01-design.md)
 
@@ -224,3 +224,28 @@ Compiler 在 Page Spec 中保留 `businessStates` / `formModes` / `views` / `def
 - 本地 commit（不 push）。
 
 v0.4（motion/视觉回归）与 Phase 3/4 不在本 spec。
+
+## 9. 实现结果（2026-10-22）
+
+Clean intake 与后续链路全部在 `employee-app-phase2` 8 页真实 PRD 上跑通，**0 waiver、0 手工 brief patch**。
+
+| 阶段 | Run | 结果 |
+|---|---|---|
+| intake | `run-2026-10-22T03-09-28-544Z` | `success`；8 页全 `b-mobile`；PRD/IA gate passed（0 blockers、0 waivers）、brief gate passed；brief hash `sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335`；0 手工 brief edits；一次 PRD/IA 答案（PRD-005：日历 09:00–20:00 / 60 分钟粒度）；¥0.8977902624，`usageComplete=true` |
+| M1 | `run-2026-10-22T03-16-05-257Z` | `success`；`gates={ia:passed, interaction:passed, visualStyle:passed}`；0 waivers；visual-style 通过 `agent:sign` 签核（无模型调用）；¥0.4399832736（IA ¥0.1676724192 + interaction ¥0.2259093024 + visual-style ¥0.046401552），`usageComplete=true` |
+| Spec Engineer | `run-2026-10-22T03-23-54-618Z` | 8 Page Specs、0 blockers、36 warnings（34 `SPEC_MOTION_NODE_UNRESOLVED` + 2 `SPEC_ASSET_UNUSED`）；assets missing 无，referenced `icon-plus` / `icon-search` |
+| HTML | — | 8 页 + `index.html`；`phase1:verify` `8 pages / 0 blockers` |
+| Playwright | — | 搜索 idle/张/清空/无匹配；日历/列表切换；空格 → form 带 date/time；抽屉 → 查看完整详情；列表行/查看完整详情 → detail；form new/reschedule CTA + 客户锁定；detail 已到店/取消/爽约；告知确认（确认人/确认时间）；19 张截图 |
+
+- 回归：529 tests passed、typecheck clean、`pnpm test:dsh` 2 passed；Phase 1 `8/2/4/8` 全部 0 blockers。
+- 成本：最终链路 ¥1.337773536（intake + M1）；含早前重试共 ¥2.935835885。
+- 产物归档在 `pipeline/artifacts/employee-app-phase2/`，无 `/tmp` 或 `/Users` 绝对路径。
+
+### v0.4 债务
+
+- customer picker 未接入静态 renderer：PRD/brief 声明的 form → customer-search `mode=picker` 流程没有链接路由/绑定。
+- 日历空格预填只有 day-of-month（`03 09:00`），不是 PRD 要求的完整 `YYYY-MM-DD`。
+- M1 `interaction-spec.json` 的 `cd.new-appointment` 仍写“预填并锁定客户”，与已签核 brief/PRD/renderer（new 可编辑、仅 reschedule 锁定）冲突；按评审证据保留不改，留给 v0.4 对齐 prompt/schema。
+- 34 条 motion node warning 是 v0 预期（compiler 无稳定 node id）；2 条 unused asset brief（`icon-home`、`icon-user`）。
+- asset review 未在本轮重跑，`asset-review/` 仍是 2026-10-21 的项目资产证据（README 与 `evidenceScope` 已标注）。
+- 爽约/已取消仍保留只读“客户详情”导航；底部业务动作栏已隐藏。

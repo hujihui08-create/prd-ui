@@ -3,6 +3,58 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-22 — Clean Phase 2 finish (v0.3.1)
+
+### Added
+
+- `UiBriefPage` interaction metadata (optional): `businessStates`,
+  `formModes` (`new`/`reschedule`, `customerLocked`), `views`/`defaultView`, and
+  `searchIdleTitle`; Briefer prompt rules and strict brief-gate checks (action
+  subsets, detail/form/list scope, defaults).
+- Renderer data attributes and a lightweight vanilla-JS controller: business
+  states drive the detail summary/badge/status and action bar, form modes switch
+  the CTA and lock the customer on reschedule, calendar/list toggle, search
+  idle/filter/clear/empty, empty calendar cell prefill, and a read-only drawer.
+- Compiler metadata defaults, `appointment-create` → `icon-plus` icon mapping,
+  and a deterministic `清空关键词` action in the search empty state.
+- Renderer linking fixes: calendar drawer and list 「查看完整详情」 navigate to
+  appointment detail; search/list rows link through `linkedRoutes`; treatment
+  notice confirmation fills 确认人/确认时间.
+
+### Verification
+
+- Clean real-dsh intake `run-2026-10-22T03-09-28-544Z`: `employee-app-phase2`
+  8 pages, all `b-mobile`, PRD/IA gate passed, brief gate passed, 0 waivers,
+  0 manual brief patches, brief hash
+  `sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335`,
+  ¥0.8977902624, `usageComplete=true`.
+- Clean real-dsh M1 `run-2026-10-22T03-16-05-257Z`: `status=success`,
+  `gates={ia:passed, interaction:passed, visualStyle:passed}`, 0 waivers,
+  visual-style signoff via `agent:sign`, ¥0.4399832736.
+- Spec Engineer `run-2026-10-22T03-23-54-618Z`: 8 Page Specs, 0 blockers,
+  36 warnings (34 unresolved motion node ids, 2 unused asset briefs); assets
+  missing none, referenced `icon-plus` / `icon-search`.
+- `render:html`: 8 pages + `index.html`; `phase1:verify` `8 pages / 0 blockers`.
+- Playwright at 390×844: search idle/张/clear/empty, calendar/list toggle,
+  empty-cell prefill, drawer, detail 已到店/取消/爽约, form new/reschedule with
+  customer lock, treatment notice confirmation; 19 screenshots under
+  `pipeline/artifacts/employee-app-phase2/`.
+- `pnpm test`: 529 passed; `pnpm test:dsh`: 2 passed; typecheck clean; Phase 1
+  `8 / 2 / 4 / 8` pages all 0 blockers.
+- Final chain cost ¥1.337773536 (intake + M1); ¥2.935835885 including earlier
+  retries.
+
+### Limits
+
+- Customer picker is declared by the brief but not wired in the static
+  renderer; calendar prefill uses day-of-month (`03 09:00`) instead of a full
+  `YYYY-MM-DD`.
+- M1 `interaction-spec.json` node `cd.new-appointment` still says "prefill and
+  lock", contradicting the signed brief (new is editable; only reschedule
+  locks). The artifact is kept unchanged as v0.4 debt.
+- Motion HTML, stable node ids, Visual Critic, screenshot diff, Studio, and
+  Asset Compiler remain open.
+
 ## 2026-10-21 — Phase 2 exit: per-profile M1, asset chain, 8-page real PRD
 
 ### Added

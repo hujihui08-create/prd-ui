@@ -96,7 +96,7 @@ init -> intake -> review（PRD Reviewer + IA 并行）
 | `budget_exceeded` / `usage_incomplete` | 预算或 usage fail-closed |
 
 - `--resume` 复用已完成的 agent 产物；PRD hash 变化会报 `PRD_CHANGED`。
-- 第一段签核后 resume 只运行 UI Briefer；brief gate 等待签核时 resume 只重新 gate，不重复调用 briefer。
+- 第一段签核后 resume 只运行 UI Briefer；brief gate 等待签核（`awaiting_signoff`）时 resume 只重新 gate，不重复调用 briefer；brief gate 为 `blocked` 时 resume 会重新生成 brief（Briefer + gate-repair 轮次），而不是对旧草稿再次 gate。
 - `--publish-brief` 只在 `success` 时执行；默认拒绝覆盖不同内容，`--force` 才覆盖。
 
 ## 签核
@@ -189,7 +189,7 @@ Brief 数据完整性（warning，不阻断）：Briefer 必须为每个页面�
 
 - `samples/agents/intake`：demo-orders 8 页 fixture（含 `fieldLabels` / `mockData` / `feedItems`）；`samples/agents/intake-employee-app`：employee-app 2 页 fixture（含库存页中文标签与 home typed content）；`samples/agents/intake-appointments-03`：03 预约与告知 4 页 fixture（真实 run 固化，含 `mobile-list` / `mobile-form`）。
 - `samples/projects/employee-app-appointments-03`：从 `03-预约与告知.md` + `00-总纲.md` 共享规则整理的四页真实 PRD 切片；`intake:run` 真实 dsh 4 页、brief gate 通过、publish，¥0.5147。
-- `samples/projects/employee-app-phase2`：从 00–04 拼的 8 页真实 PRD 切片（今日、客户搜索、客户详情、预约详情、新增/改期、术后告知、预约列表、回访登记）；真实 dsh 8 页、brief gate 通过、publish，¥0.5249（IA sample waivers + 一次确定性 brief 收敛）。fixtures 在 `samples/agents/intake-employee-app-phase2`。
+- `samples/projects/employee-app-phase2`：从 00–04 拼的 8 页真实 PRD 切片（今日、客户搜索、客户详情、预约详情、新增/改期、术后告知、预约列表、回访登记）；v0.3.1 clean run `run-2026-10-22T03-09-28-544Z`：8 页全 `b-mobile`、PRD/IA 与 brief gate passed、**0 waiver / 0 手工 brief patch**、brief hash `sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335`、¥0.8977902624、`usageComplete=true`。早前带 IA sample waiver + 一次确定性 brief 收敛的 8 页 run（¥0.5249）已被本轮替代。fixtures 在 `samples/agents/intake-employee-app-phase2`。
 - 8 页 sample PRD 的 v0 验收是 review + brief + compile dry-run；8 页 M1（真实 dsh）、Spec Engineer 与 HTML 渲染已经在 `samples/project.demo-orders-intake.yaml` 上跑通。
 - 真实 dsh：2 页 employee-app 完整跑通（success + publish，累计 ¥0.6948）；8 页 sample 使用 `prd-ui-intake` profile（65536 maxTokens），真实 findings 以 sample waiver 通过后 brief gate 通过，success + publish，累计 ¥0.90666。默认离线验收仍用 scripted fixtures。
 - Task 1 真实 dsh 干净 run：8 页、brief gate 通过、`awaiting_signoff`，总成本 ¥0.5938（PRD review ¥0.1760 + IA ¥0.2050 + briefer ¥0.2128，均 1 次调用），产出 `orders-list` 5 rows、`order-detail` 5 values、overview 4 listItems、feed 4 feedItems 和完整 `fieldLabels`。Run：`/tmp/intake-task1-dsh-clean/run-2026-10-21T07-34-29-193Z`。

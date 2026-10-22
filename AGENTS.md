@@ -66,7 +66,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 510 tests passing, `pnpm test:dsh` 2 passed,
+Current expected evidence: 529 tests passing, `pnpm test:dsh` 2 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -87,7 +87,9 @@ waives its real F-001/IA-001/IA-002 sample gaps, and completes with publish
 real dsh M1 `ia:waived / interaction:passed / visualStyle:passed`, then
 `agent:sign` finalized the visual-style signoff without a model call
 (`status=success`, ¥0.3298); Spec Engineer 8 Page Specs, 0 blockers; renderer
-8 HTML + index. Renderer now covers PageShell/MobileShell slots and generic
+8 HTML + index. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across
+the demo-orders, employee-app, 03-slice, and phase2 projects. Renderer now
+covers PageShell/MobileShell slots and generic
 components, mock data, and localized labels; the 8-page visual scan renders
 real content and states. M1 keeps `prd-ui-agents` at 32768; the 8-page M1 run
 uses `prd-ui-intake`. Task 1 briefer data: scripted 8-page intake now produces
@@ -103,18 +105,22 @@ cost ¥0.5938, `usageComplete=true`. 03 real-PRD slice: 4 pages
 components were added for this slice. Visual v0.1 adds `CalendarGrid` (seven-day
 grid), a fixed mobile action footer with primary/secondary split, single-CTA
 mobile form with an alternate-mode note, and `noticeBlocks` per-project notice
-cards. Phase 2 exit: `employee-app-phase2` 8-page real PRD slice, PRD
-readiness ready, brief gate passed with sample IA waivers, M1
-`ia:waived / interaction:passed / visualStyle:passed` (¥0.4355), Spec Engineer
-8 Page Specs / 0 blockers / 20 warnings, assets referenced=2 / missing=0,
-render 8 HTML + index, `phase1:verify` 8 pages / 0 blockers, Playwright
-screenshots checked in. Per-profile M1 real run on the 8-page demo-orders
+cards. Phase 2 clean exit (v0.3.1): `employee-app-phase2` 8-page real PRD
+slice, PRD readiness ready, **0 waivers and 0 manual brief patches**, brief hash
+`sha256:b558b57a…b8335`, intake ¥0.8978; M1
+`ia:passed / interaction:passed / visualStyle:passed` (0 waivers, ¥0.44),
+Spec Engineer 8 Page Specs / 0 blockers / 36 warnings, assets missing=0,
+render 8 HTML + index, `phase1:verify` 8 pages / 0 blockers; Playwright
+interaction checks (search idle/filter/clear/empty, calendar/list toggle,
+empty-cell prefill, drawer, form new/reschedule with customer lock, detail
+status actions, notice confirmation) with 19 screenshots checked in. The
+earlier 2026-10-21 exit with sample IA waivers and one brief patch is
+superseded. Per-profile M1 real run on the 8-page demo-orders
 sample: prompt contains b-dense + c-expressive, interaction passed (¥0.5105).
-Asset chain: 4 standard briefs, `asset:review --briefs` 4/4 passed. The
-Phase 2 exit used sample IA waivers and a deterministic brief patch; the next
-iteration should rerun intake for a clean signed brief. Business-status action
-switching, real form mode, motion, Visual Critic, Studio, and Asset Compiler
-remain open.
+Asset chain: 4 standard briefs, `asset:review --briefs` 4/4 passed. Motion
+HTML, Visual Critic, screenshot diff, customer picker wiring, and full-date
+calendar prefill remain open (v0.4); Studio and Asset Compiler remain
+post-Phase-2.
 
 ## Architecture boundaries
 

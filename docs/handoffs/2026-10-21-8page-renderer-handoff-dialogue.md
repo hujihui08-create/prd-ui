@@ -7,6 +7,8 @@
 > A = 出交接人；B = 接手人。事实以主交接文档和仓库为准。
 >
 > **2026-10-21 增量**：Task 1、03 四页切片、视觉 v0.1、per-profile M1、资产链、Phase 2 8 页真实 PRD 均已完成。Phase 2 出口：`employee-app-phase2` 8 页（brief gate passed，sample IA waiver）、M1 三 gate passed（¥0.4355）、Spec 8/0、HTML 8 页、Phase 1 8/0；per-profile 8 页 demo-orders run interaction passed（¥0.5105）；asset review 4/4；当前 510 tests。下一阶段是 v0.4（motion + 视觉回归）或 Phase 3（Figma/沙箱/Handoff）。
+>
+> **2026-10-22 增量（v0.3.1 clean 收尾，已提交）**：`employee-app-phase2` 8 页已干净跑通——intake 0 waiver / 0 手工 brief patch、brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 三 gate passed、0 waiver（¥0.43998）；Spec 8 Page Specs / 0 blockers / 36 warnings；HTML 8 页 + index，Phase 1 `8/0`；Playwright 交互验收（搜索、日历/列表、new/reschedule、状态动作栏、告知确认）19 张截图；当前 529 tests，Phase 1 `8/2/4/8` 全 0 blockers。下一步是 v0.4：motion 进 HTML、稳定 node id、Visual Critic/截图 diff、customer picker、完整日期预填。
 
 ---
 

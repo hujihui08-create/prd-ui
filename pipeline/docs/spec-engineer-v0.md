@@ -108,6 +108,21 @@ runs/<runId>/
 - 渲染：8 页 HTML + `index.html`；calendar/search/noticeBlocks/固定操作栏可见；
   Phase 1 `8 pages / 0 blockers`。
 
+## Phase 2 clean 收尾（2026-10-22，v0.3.1）
+
+- 输入：`samples/projects/employee-app-phase2` 的 clean 8 页 brief（0 waiver /
+  0 手工 patch，hash `sha256:b558b57a…b8335`）→ M1
+  `run-2026-10-22T03-16-05-257Z`（`ia:passed / interaction:passed /
+  visualStyle:passed`，0 waivers）。
+- 输出：`run-2026-10-22T03-23-54-618Z`，8 个 Page Spec、0 blockers、36 warnings
+  （34 `SPEC_MOTION_NODE_UNRESOLVED` + 2 `SPEC_ASSET_UNUSED`）。
+- assets：`missing=[]`，`referenced` 为 `icon-plus` / `icon-search`；未引用的
+  `icon-home` / `icon-user` 记入 `SPEC_ASSET_UNUSED`。
+- Page Spec 携带 `businessStates` / `formModes` / `views` 等交互元数据；
+  renderer 据此渲染状态动作栏、new/reschedule、日历/列表切换和搜索交互，
+  Playwright 交互验收 19 张截图。
+- 渲染：8 页 HTML + `index.html`；Phase 1 `8 pages / 0 blockers`。
+
 ## 真实 run（2026-10-20）
 
 - 输入：employee-app clean M1 run（`success`，2 页，10 asset briefs）。
