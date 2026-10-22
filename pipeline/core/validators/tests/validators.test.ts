@@ -241,22 +241,6 @@ function removeNodesOfType(node: SpecNode, type: string): void {
   }
 }
 
-function removeNodesOfVariant(node: SpecNode, variant: string): void {
-  if (node.children) {
-    node.children = node.children.filter(
-      (child) => !(child.type === "Row" && child.props?.variant === variant)
-    );
-    for (const child of node.children) removeNodesOfVariant(child, variant);
-  }
-  for (const [slotName, slotNodes] of Object.entries(node.slots ?? {})) {
-    const kept = slotNodes.filter(
-      (child) => !(child.type === "Row" && child.props?.variant === variant)
-    );
-    node.slots![slotName] = kept;
-    for (const child of kept) removeNodesOfVariant(child, variant);
-  }
-}
-
 function ruleIds(report: ValidationReport): string[] {
   return [...new Set(report.findings.map((finding) => finding.ruleId))];
 }
@@ -726,18 +710,55 @@ describe("structural semantic representations", () => {
   it("accepts a CalendarGrid for date/time fields", () => {
     const spec = structuredClone(phase2ById.get("appointment-list")!);
     removeNodesOfType(spec.layout, "CalendarGrid");
-    // The date filter label would otherwise satisfy the field as an exact
-    // string; remove it to isolate the calendar representation.
     removeNodesOfType(spec.layout, "CollapsedFilter");
-    // Hidden semantic labels also represent the fields; strip them too so this
-    // test exercises the CalendarGrid path only.
-    removeNodesOfVariant(spec.layout, "sr-only");
+    // Remove the list-row detail affordance so the fallback cannot satisfy
+    // every field; only the row meta should still represent time.
+    delete spec.linkedRoutes;
+    delete spec.views;
     const report = validatePageSpec(spec, phase2ContextFor(spec));
     const missing = report.findings
       .filter((finding) => finding.ruleId === "SEMANTIC-FIELD")
       .map((finding) => finding.evidence);
     expect(missing, findingDetail(report)).toContain("date");
-    expect(missing).toContain("time");
+    expect(missing).not.toContain("time");
+  });
+
+  it("accepts businessStates for state-gated detail actions", () => {
+    const spec = structuredClone(phase2ById.get("appointment-detail")!);
+    delete spec.businessStates;
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    const actions = report.findings
+      .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
+      .map((finding) => finding.evidence);
+    expect(actions, findingDetail(report)).toContain("术后告知");
+  });
+
+  it("accepts list rows/views as the detail affordance", () => {
+    const spec = structuredClone(phase2ById.get("appointment-list")!);
+    removeNodesOfType(spec.layout, "ListRow");
+    delete spec.views;
+    delete spec.defaultView;
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    const actions = report.findings
+      .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
+      .map((finding) => finding.evidence);
+    expect(actions, findingDetail(report)).toContain("查看完整详情");
+  });
+
+  it("does not accept a bare Text node as an action representation", () => {
+    const spec = structuredClone(phase2ById.get("customer-search")!);
+    removeNodesOfType(spec.layout, "SearchBar");
+    const section = spec.layout.slots?.content?.[0];
+    section?.children?.push({
+      type: "Text",
+      props: { text: "搜索" },
+    } as SpecNode);
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    expect(
+      report.findings
+        .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
+        .map((finding) => finding.evidence)
+    ).toContain("搜索");
   });
 });
 
@@ -756,7 +777,7 @@ describe("schema validation", () => {
 describe("catalog validation", () => {
   it("reports CATALOG-UNKNOWN for a component outside the catalog", () => {
     const spec = cloneSpec("orders-list");
-    findNode(spec, "FilterBar").type = "MysteryPanel";
+    findNode(spec, "Pagination").type = "MysteryPanel";
 
     const report = validatePageSpec(spec, contextFor(spec));
     expect(ruleIds(report)).toEqual(["CATALOG-UNKNOWN"]);

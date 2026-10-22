@@ -35,17 +35,6 @@ function collectNodes(node: SpecNode, nodes: SpecNode[] = []): SpecNode[] {
   return nodes;
 }
 
-/** Nodes a sighted user can see: skips hidden semantic (sr-only) rows. */
-function collectVisibleNodes(node: SpecNode, nodes: SpecNode[] = []): SpecNode[] {
-  if (node.type === "Row" && node.props?.variant === "sr-only") return nodes;
-  nodes.push(node);
-  for (const child of node.children ?? []) collectVisibleNodes(child, nodes);
-  for (const slotNodes of Object.values(node.slots ?? {})) {
-    for (const child of slotNodes) collectVisibleNodes(child, nodes);
-  }
-  return nodes;
-}
-
 describe("compileProject", () => {
   it("compiles exactly the eight sample pages", () => {
     expect(specs).toHaveLength(8);
@@ -440,7 +429,7 @@ describe("brief-driven page content", () => {
     expect(spec.layout.type).toBe("MobileShell");
     expect(nodesOf(spec, "CollapsedFilter")[0]?.props?.label).toBe("状态");
     expect(
-      collectVisibleNodes(spec.layout)
+      collectNodes(spec.layout)
         .filter((node) => node.type === "Text")
         .map((node) => node.props?.text)
     ).toEqual(["日历", "列表"]);
@@ -1054,6 +1043,15 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
   const phase2Spec = (pageId: string): PageSpec =>
     compilePhase2().find((spec) => spec.meta.pageId === pageId)!;
 
+  it("emits no hidden semantic rows", () => {
+    for (const spec of compilePhase2()) {
+      const hidden = collectNodes(spec.layout).filter(
+        (node) => node.type === "Row" && node.props?.variant === "sr-only"
+      );
+      expect(hidden, spec.meta.pageId).toEqual([]);
+    }
+  });
+
   it("emits a full ISO calendar week, status legend, and row-date columns", () => {
     const list = phase2Spec("appointment-list");
     const grid = nodesOf(list, "CalendarGrid")[0]!;
@@ -1084,7 +1082,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       (node) => node.type === "Row" && node.props?.variant === "caption"
     );
     expect(captionRows).toEqual([]);
-    const fieldLabels = collectVisibleNodes(list.layout).filter(
+    const fieldLabels = collectNodes(list.layout).filter(
       (node) => node.type === "Text" && ["客户", "时间段", "状态"].includes(String(node.props?.text))
     );
     expect(fieldLabels).toEqual([]);

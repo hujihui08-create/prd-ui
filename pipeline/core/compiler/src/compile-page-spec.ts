@@ -970,22 +970,6 @@ function buildLayout(
               type: "Section",
               props: { padding: "space.4", gap: "space.2" },
               children: [
-                // Keep field/action labels addressable for semantic validation
-                // without reintroducing the visible field-caption row.
-                ...(fields.length === 0 && actions.length === 0
-                  ? []
-                  : [
-                      {
-                        type: "Row" as const,
-                        props: { gap: "space.1", variant: "sr-only" },
-                        children: [
-                          ...fields.map((field) => text(labelFor(field), "label.sm")),
-                          ...actions
-                            .filter((label) => label !== "搜索")
-                            .map((label) => text(label, "label.sm")),
-                        ],
-                      },
-                    ]),
                 ...(searchField === undefined
                   ? []
                   : [
@@ -1340,16 +1324,6 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     ? [
         {
           type: "Row" as const,
-          props: { gap: "space.1", variant: "sr-only" },
-          children: [
-            text(
-              page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
-              "label.sm"
-            ),
-          ],
-        },
-        {
-          type: "Row" as const,
           props: { gap: "space.2" },
           children: [
             {
@@ -1365,13 +1339,6 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
 
   if (page.target === "mobile") {
     const fieldNodes: SpecNode[] = [
-      // Hidden action labels keep the brief contract intact when the visible
-      // row intentionally drops a duplicate or state-gated action.
-      {
-        type: "Row" as const,
-        props: { gap: "space.1", variant: "sr-only" },
-        children: actionLabels.map((label) => text(label, "label.sm")),
-      },
       ...missingFields.map((field) =>
         fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
       ),

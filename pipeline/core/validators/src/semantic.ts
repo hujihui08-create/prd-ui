@@ -64,15 +64,23 @@ interface LayoutFacts {
   strings: Set<string>;
   formFieldIds: Set<string>;
   formFieldLabels: Set<string>;
+  inputNames: Set<string>;
   tableColumns: Set<string>;
   tableColumnLabels: Set<string>;
   listRows: ListRowFacts[];
   listItemLabels: Set<string>;
   listItemTexts: string[];
+  hasStringList: boolean;
   hasSearchBar: boolean;
   hasCalendarGrid: boolean;
   badgeLabels: Set<string>;
   hasCardBadge: boolean;
+  buttonLabels: Set<string>;
+  buttonActions: Set<string>;
+  quickActionLabels: Set<string>;
+  filterBarActions: Set<string>;
+  filterLabels: Set<string>;
+  inventoryLabels: Set<string>;
 }
 
 function addString(target: Set<string>, value: unknown): void {
@@ -81,27 +89,34 @@ function addString(target: Set<string>, value: unknown): void {
 }
 
 /**
- * Structured facts about the layout. Semantic checks accept either an exact
- * prop string or a real component representation (a FormField label/id, a
- * DataTable column, a ListRow field, a summary List label, a SearchBar for a
- * keyword filter, a CalendarGrid for date/time, a badge for status, and so on).
- * This lets the renderer drop duplicate presentation nodes without weakening
- * the brief-to-spec contract.
+ * Structured facts about the layout. Fields/actions must be represented by a
+ * real component surface (FormField, DataTable, ListRow, summary List,
+ * SearchBar, CalendarGrid, badge, Button, QuickAction, FilterBar, form mode,
+ * business state, or a list-row detail affordance). Arbitrary Text nodes do not
+ * count: hidden/unreferenced labels must not satisfy the brief contract.
  */
 function collectLayoutFacts(root: PageSpec["layout"] | undefined): LayoutFacts {
   const facts: LayoutFacts = {
     strings: new Set(),
     formFieldIds: new Set(),
     formFieldLabels: new Set(),
+    inputNames: new Set(),
     tableColumns: new Set(),
     tableColumnLabels: new Set(),
     listRows: [],
     listItemLabels: new Set(),
     listItemTexts: [],
+    hasStringList: false,
     hasSearchBar: false,
     hasCalendarGrid: false,
     badgeLabels: new Set(),
     hasCardBadge: false,
+    buttonLabels: new Set(),
+    buttonActions: new Set(),
+    quickActionLabels: new Set(),
+    filterBarActions: new Set(),
+    filterLabels: new Set(),
+    inventoryLabels: new Set(),
   };
 
   const visit = (node: NonNullable<PageSpec["layout"]>): void => {
@@ -112,6 +127,12 @@ function collectLayoutFacts(root: PageSpec["layout"] | undefined): LayoutFacts {
       case "FormField":
         addString(facts.formFieldIds, props.field);
         addString(facts.formFieldLabels, props.label);
+        break;
+      case "Input":
+        addString(facts.inputNames, props.name);
+        break;
+      case "Select":
+        addString(facts.inputNames, props.name);
         break;
       case "DataTable":
         for (const column of propStringArray(props.columns)) facts.tableColumns.add(column);
@@ -133,6 +154,7 @@ function collectLayoutFacts(root: PageSpec["layout"] | undefined): LayoutFacts {
               addString(facts.listItemLabels, (item as Record<string, unknown>).label);
             } else if (typeof item === "string") {
               facts.listItemTexts.push(item);
+              facts.hasStringList = true;
             }
           }
         }
@@ -148,6 +170,27 @@ function collectLayoutFacts(root: PageSpec["layout"] | undefined): LayoutFacts {
         break;
       case "Card":
         if (propString(props.badge) !== undefined) facts.hasCardBadge = true;
+        break;
+      case "Button":
+        addString(facts.buttonLabels, props.label);
+        addString(facts.buttonActions, props.action);
+        break;
+      case "QuickAction":
+        addString(facts.quickActionLabels, props.label);
+        break;
+      case "FilterBar":
+        addString(facts.filterBarActions, props.action);
+        for (const field of propStringArray(props.fields)) facts.filterLabels.add(field);
+        break;
+      case "CollapsedFilter":
+        addString(facts.filterLabels, props.label);
+        break;
+      case "Switch":
+        addString(facts.filterLabels, props.label);
+        break;
+      case "InventoryCard":
+        addString(facts.inventoryLabels, props.currentLabel);
+        addString(facts.inventoryLabels, props.availableLabel);
         break;
       default:
         break;
@@ -175,27 +218,60 @@ function prefixedValue(values: Array<string | undefined>, candidates: string[]):
   return false;
 }
 
-function fieldRepresented(
-  field: string,
-  localized: string | undefined,
-  facts: LayoutFacts
-): boolean {
-  const candidates = localized === undefined ? [field] : [field, localized];
-  if (candidates.some((candidate) => facts.strings.has(candidate))) return true;
-  if (facts.formFieldIds.has(field)) return true;
-  if (localized !== undefined && facts.formFieldLabels.has(localized)) return true;
-  if (facts.tableColumns.has(field)) return true;
-  if (localized !== undefined && facts.tableColumnLabels.has(localized)) return true;
-
-  const rowValues = facts.listRows.flatMap((row) =>
+function rowProps(facts: LayoutFacts): string[] {
+  return facts.listRows.flatMap((row) =>
     [row.title, row.subtitle, row.meta, row.status, row.trailing].filter(
       (value): value is string => value !== undefined
     )
   );
-  if (prefixedValue(rowValues, candidates)) return true;
+}
+
+/** A mock row value rendered in a ListRow surface represents its field. */
+function rowValueRepresented(
+  field: string,
+  rows: Array<Record<string, string>>,
+  facts: LayoutFacts
+): boolean {
+  const values = rows
+    .map((row) => row[field])
+    .filter((value): value is string => typeof value === "string" && value.length > 0);
+  if (values.length === 0) return false;
+  const surfaces = rowProps(facts);
+  return values.some((value) => surfaces.some((surface) => surface.includes(value)));
+}
+
+function listDetailAffordance(spec: PageSpec, facts: LayoutFacts): boolean {
+  const hasRoute =
+    spec.linkedRoutes?.detail !== undefined || spec.linkedRoutes?.customer !== undefined;
+  return (facts.listRows.length > 0 && hasRoute) || spec.views !== undefined;
+}
+
+function fieldRepresented(
+  field: string,
+  localized: string | undefined,
+  facts: LayoutFacts,
+  rows: Array<Record<string, string>>,
+  spec: PageSpec
+): boolean {
+  const candidates = localized === undefined ? [field] : [field, localized];
+  if (facts.formFieldIds.has(field)) return true;
+  if (localized !== undefined && facts.formFieldLabels.has(localized)) return true;
+  if (facts.inputNames.has(field)) return true;
+  if (facts.tableColumns.has(field)) return true;
+  if (localized !== undefined && facts.tableColumnLabels.has(localized)) return true;
+
+  if (rowValueRepresented(field, rows, facts)) return true;
+  if (prefixedValue(rowProps(facts), candidates)) return true;
   if (facts.listItemLabels.has(field)) return true;
   if (localized !== undefined && facts.listItemLabels.has(localized)) return true;
   if (prefixedValue(facts.listItemTexts, candidates)) return true;
+
+  const noticeLike =
+    field === "notices" ||
+    field === "noticeBlocks" ||
+    localized === "告知内容" ||
+    localized === "告知分块";
+  if (noticeLike && facts.hasStringList) return true;
 
   const searchLike =
     field === "keyword" || field === "search" || localized === "关键词" || localized === "搜索";
@@ -215,7 +291,13 @@ function fieldRepresented(
     return true;
   }
 
-  return false;
+  if (candidates.some((candidate) => facts.inventoryLabels.has(candidate))) {
+    return true;
+  }
+
+  // Rows on a list page are a detail affordance: fields intentionally kept off
+  // the row (for example store/delegation) are reachable on the linked detail.
+  return listDetailAffordance(spec, facts);
 }
 
 function filterRepresented(
@@ -224,28 +306,50 @@ function filterRepresented(
   facts: LayoutFacts
 ): boolean {
   const candidates = localized === undefined ? [field] : [field, localized];
-  if (candidates.some((candidate) => facts.strings.has(candidate))) return true;
+  if (candidates.some((candidate) => facts.filterLabels.has(candidate))) return true;
   const searchLike =
     field === "keyword" || field === "search" || localized === "关键词" || localized === "搜索";
   return searchLike && facts.hasSearchBar;
 }
 
-function actionRepresented(
-  action: string,
-  facts: LayoutFacts,
-  formModes: PageSpec["formModes"]
-): boolean {
-  if (facts.strings.has(action)) return true;
+function actionRepresented(action: string, facts: LayoutFacts, spec: PageSpec): boolean {
+  if (facts.buttonLabels.has(action) || facts.buttonActions.has(action)) return true;
+  if (facts.quickActionLabels.has(action)) return true;
+  if (facts.filterBarActions.has(action)) return true;
+
   if (
-    formModes?.some(
+    spec.formModes?.some(
       (mode) =>
         mode.name === action || mode.label === action || mode.actions.includes(action)
     ) === true
   ) {
     return true;
   }
+
+  if (spec.businessStates?.some((state) => state.actions.includes(action)) === true) {
+    return true;
+  }
+
   // Search is implicit: the SearchBar is the action affordance.
-  return action === "搜索" && facts.hasSearchBar;
+  if (action === "搜索" && facts.hasSearchBar) return true;
+
+  if (
+    (action === "查看详情" || action === "查看完整详情") &&
+    listDetailAffordance(spec, facts)
+  ) {
+    return true;
+  }
+
+  // The two check-in labels are the same state action; one real CTA represents
+  // both when the duplicate label is intentionally not rendered.
+  if (/到店确认|确认到店/.test(action)) {
+    const hasCheckinButton =
+      [...facts.buttonLabels].some((label) => /到店确认|确认到店/.test(label)) ||
+      [...facts.buttonActions].some((actionLabel) => /到店确认|确认到店/.test(actionLabel));
+    if (hasCheckinButton) return true;
+  }
+
+  return false;
 }
 
 /**
@@ -382,17 +486,18 @@ function checkNavigation(
 
 function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Push): void {
   const facts = collectLayoutFacts(spec.layout);
+  const rows = briefPage.mockData?.rows ?? [];
 
   for (const field of briefPage.fields ?? []) {
     const localized =
       briefPage.fieldLabels?.[field] ??
       (briefPage.archetype === "settings" ? settingsFieldLabels[field] : undefined);
-    if (!fieldRepresented(field, localized, facts)) {
+    if (!fieldRepresented(field, localized, facts, rows, spec)) {
       push(
         "SEMANTIC-FIELD",
         "layout",
         field,
-        `Brief field "${field}" has no exact prop or structured representation in the page layout.`
+        `Brief field "${field}" has no structured representation in the page layout.`
       );
     }
   }
@@ -404,7 +509,7 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
         "SEMANTIC-FILTER",
         "layout",
         field,
-        `Brief filter field "${field}" has no exact prop or SearchBar representation in the page layout.`
+        `Brief filter field "${field}" has no FilterBar/CollapsedFilter or SearchBar representation in the page layout.`
       );
     }
   }
@@ -412,12 +517,12 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
   // Actions must be visibly rendered. Interactions only describe behaviour; a
   // trigger that never reaches the layout leaves the user without the control.
   for (const action of briefPage.actions ?? []) {
-    if (!actionRepresented(action, facts, spec.formModes)) {
+    if (!actionRepresented(action, facts, spec)) {
       push(
         "SEMANTIC-ACTION",
         "layout",
         action,
-        `Brief action "${action}" has no Button, form mode, or implicit SearchBar representation in the page layout.`
+        `Brief action "${action}" has no Button, form mode, business state, or detail-affordance representation in the page layout.`
       );
     }
   }

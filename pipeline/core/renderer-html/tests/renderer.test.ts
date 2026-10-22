@@ -305,6 +305,17 @@ describe("generic web/mobile renderer", () => {
 });
 
 describe("v0.4 picker, dates, and fidelity fixes", () => {
+  it("renders the eight pages without hidden sr-only rows", () => {
+    for (const spec of phase2Specs) {
+      const html = renderDocument(spec, getProfile(spec.meta.profile), {
+        pageNames: phase2PageNames,
+        pageRoutes: phase2Routes,
+        pageArchetypes: phase2Archetypes,
+      });
+      expect(html, spec.meta.pageId).not.toContain("sr-only");
+    }
+  });
+
   it("extracts only curated read-only notes", () => {
     expect(readOnlyNote("只读说明「爽约已记录入客户档案」；员工端不提供爽约入口")).toBe(
       "爽约已记录入客户档案"

@@ -560,12 +560,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Row": {
       const gap = str(props.gap);
       const variant = str(props.variant);
-      const variantClass =
-        variant === "filter"
-          ? " filter-row"
-          : variant === "sr-only"
-            ? " sr-only"
-            : "";
+      const variantClass = variant === "filter" ? " filter-row" : "";
       return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
     }
     case "Stack":
@@ -884,7 +879,6 @@ ${typeClasses(profile)}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
