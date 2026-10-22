@@ -209,6 +209,24 @@ describe("generic web/mobile renderer", () => {
     expect(form).toContain('data-field="customer"');
   });
 
+  it("binds the calendar drawer and list detail action to the linked detail route", () => {
+    const html = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      {
+        pageRoutes: Object.fromEntries(
+          phase2Specs.map((entry) => [entry.meta.pageId, entry.meta.route])
+        ),
+      }
+    );
+    expect(html).toContain('data-action="查看完整详情"');
+    expect(html).toContain("appointment-detail.html");
+    expect(html).toContain("detail.textContent = \"查看完整详情\"");
+    expect(html).toContain(
+      "if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;"
+    );
+  });
+
   it("renders an index with project title and styled links", () => {
     const index = renderIndex(demoSpecs);
     expect(index).toContain("demo-orders · 页面索引");

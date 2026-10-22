@@ -1103,17 +1103,31 @@ function renderInteractionScript(): string {
           line.textContent = labels[key] + "：" + data[key];
           card.append(line);
         }
+        const detail = document.createElement("button");
+        detail.type = "button";
+        detail.className = "btn primary";
+        detail.textContent = "查看完整详情";
+        detail.addEventListener("click", () => {
+          if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
+          else showHint("当前切片没有预约详情页");
+        });
         const close = document.createElement("button");
         close.type = "button";
         close.className = "btn secondary";
         close.textContent = "关闭";
         close.addEventListener("click", () => drawer.remove());
-        card.append(close);
+        card.append(detail, close);
         drawer.append(card);
         drawer.addEventListener("click", (event) => {
           if (event.target === drawer) drawer.remove();
         });
         document.body.append(drawer);
+      });
+    }
+    for (const button of qsa('[data-action="查看完整详情"]')) {
+      button.addEventListener("click", () => {
+        if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
+        else showHint("当前切片没有预约详情页");
       });
     }
     apply();
