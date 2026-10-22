@@ -104,19 +104,41 @@ export function readOnlyNote(note: string | undefined): string | undefined {
 }
 
 export const PICKER_STORAGE_PREFIX = "prd-ui:picker:";
+export const FORM_ORIGIN_PREFIX = "prd-ui:form:origin:";
 
-/**
- * The page that opened a mobile form. A picker page is never an origin: when
- * the form is re-entered after selecting a customer, the original list/detail
- * page must remain the back target.
- */
-export function formOrigin(referrer: string | undefined): string | undefined {
-  if (referrer === undefined || referrer.length === 0) return undefined;
-  if (referrer.includes("mode=picker")) return undefined;
-  return referrer;
+export function formDraftKey(pageId: string): string {
+  return PICKER_STORAGE_PREFIX + pageId;
 }
 
-/** Every pending picker key (draft, selected, and return) under the prefix. */
+export function pickerReturnKey(): string {
+  return PICKER_STORAGE_PREFIX + "return";
+}
+
+export function formOriginKey(pageId: string): string {
+  return FORM_ORIGIN_PREFIX + pageId;
+}
+
+/**
+ * The page that opened a mobile form. A picker page is never an origin, and a
+ * cross-origin referrer is ignored. Direct opens fall back to the index.
+ */
+export function formOrigin(
+  referrer: string | undefined,
+  currentHref: string,
+  fallback = "index.html"
+): string {
+  if (referrer === undefined || referrer.length === 0) return fallback;
+  if (referrer.includes("mode=picker")) return fallback;
+  try {
+    const referrerUrl = new URL(referrer, currentHref);
+    const currentUrl = new URL(currentHref);
+    return referrerUrl.origin === currentUrl.origin ? referrer : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/** Every pending picker key (draft and return) under the prefix. */
 export function pickerStorageKeys(keys: string[]): string[] {
   return keys.filter((key) => key.startsWith(PICKER_STORAGE_PREFIX));
 }
@@ -1366,17 +1388,26 @@ function renderInteractionScript(): string {
     const params = new URLSearchParams(location.search);
     const pickerSearch = config.customerPicker;
     const pickerReturn = config.pickerReturnTo;
-    const draftKey = "prd-ui:picker:" + config.pageId;
-    const selectedKey = "prd-ui:picker:selected";
-    const returnKey = "prd-ui:picker:return";
-    const originKey = "prd-ui:form:origin";
-    if (document.body.dataset.pageKind === "form") {
-      // Remember the page that opened the form; a picker is never an origin,
-      // so returning from customer selection keeps the original list/detail.
+    const pickerPrefix = ${JSON.stringify(PICKER_STORAGE_PREFIX)};
+    const originPrefix = ${JSON.stringify(FORM_ORIGIN_PREFIX)};
+    const draftKey = pickerPrefix + config.pageId;
+    const returnKey = pickerPrefix + "return";
+    const originKey = originPrefix + config.pageId;
+    if (document.body.dataset.pageKind === "form" && !sessionStorage.getItem(originKey)) {
+      // Per-form origin: a picker is never an origin, cross-origin referrers
+      // are ignored, and a direct open falls back to the index page.
       const referrer = document.referrer;
+      let origin = "index.html";
       if (referrer && referrer.indexOf("mode=picker") < 0) {
-        sessionStorage.setItem(originKey, referrer);
+        try {
+          if (new URL(referrer, location.href).origin === location.origin) {
+            origin = referrer;
+          }
+        } catch {
+          // keep the index fallback
+        }
       }
+      sessionStorage.setItem(originKey, origin);
     }
     if (params.get("mode") === "picker") {
       const title = document.querySelector(".page-title");
@@ -1413,23 +1444,20 @@ function renderInteractionScript(): string {
             config.pageArchetypes?.[requestedReturn] === "mobile-form";
           const target = allowed ? requestedReturn : pickerReturn;
           if (!target) return;
-          const selectedText = row.dataset.searchText ?? "";
-          const customerName = selectedText.split(" ")[0] ?? "";
-          sessionStorage.setItem(returnKey, target);
-          sessionStorage.setItem(selectedKey, selectedText);
-          // Keep the customer in the draft too, so reloads after a restore
-          // still show the selected customer even before selected is read.
-          const targetDraftKey = "prd-ui:picker:" + target;
+          const selectedName = (row.dataset.searchText ?? "").split(" ")[0] ?? "";
+          const targetDraftKey = pickerPrefix + target;
           const targetDraftRaw = sessionStorage.getItem(targetDraftKey);
           if (targetDraftRaw) {
             try {
               const draft = JSON.parse(targetDraftRaw);
-              draft.customer = customerName;
+              draft.customer = selectedName;
               sessionStorage.setItem(targetDraftKey, JSON.stringify(draft));
             } catch {
               // keep the draft as-is
             }
           }
+          // The picker:return flag was set when the picker opened; leave it
+          // for the form load. There is no global selected key.
           location.href = target + ".html";
         });
       }
@@ -1440,7 +1468,6 @@ function renderInteractionScript(): string {
       if (hasPrefill) {
         // Calendar/list prefill always wins over a stale picker draft.
         sessionStorage.removeItem(draftKey);
-        sessionStorage.removeItem(selectedKey);
         sessionStorage.removeItem(returnKey);
       } else if (isPickerReturn) {
         const draftRaw = sessionStorage.getItem(draftKey);
@@ -1459,19 +1486,13 @@ function renderInteractionScript(): string {
             sessionStorage.removeItem(draftKey);
           }
         }
-        // Both the draft and the return/selected keys stay until save, form
-        // back, or a calendar prefill; a reload must restore them again.
-        const selected = sessionStorage.getItem(selectedKey);
-        if (selected) {
-          const customer = document.querySelector('[data-field=customer] input');
-          if (customer) customer.value = selected.split(" ")[0] ?? "";
-        }
+        // The draft and return flag stay until save, form back, or a
+        // calendar prefill; a reload restores the same draft again.
       }
-      // Saving the form ends the picker draft (back clears it separately).
+      // Saving the form ends its own picker draft and origin.
       for (const button of qsa(".app-actions [data-action]")) {
         button.addEventListener("click", () => {
           sessionStorage.removeItem(draftKey);
-          sessionStorage.removeItem(selectedKey);
           sessionStorage.removeItem(returnKey);
           sessionStorage.removeItem(originKey);
         });
@@ -1554,22 +1575,30 @@ export function renderDocument(
     (() => {
       const back = document.querySelector(".back-icon");
       if (!back) return;
+      const pickerPrefix = ${JSON.stringify(PICKER_STORAGE_PREFIX)};
+      const originPrefix = ${JSON.stringify(FORM_ORIGIN_PREFIX)};
+      const formDraftKey = ${JSON.stringify(formDraftKey(spec.meta.pageId))};
+      const pickerReturnKey = ${JSON.stringify(pickerReturnKey())};
+      const formOriginKey = ${JSON.stringify(formOriginKey(spec.meta.pageId))};
       back.addEventListener("click", () => {
         const pageKind = document.body.dataset.pageKind;
-        const isFormOrDetail = pageKind === "form" || pageKind === "detail";
-        const origin = isFormOrDetail
-          ? sessionStorage.getItem("prd-ui:form:origin")
-          : null;
-        if (isFormOrDetail) {
-          // Clear every pending picker key for every form, not just this page.
-          for (const key of Object.keys(sessionStorage)) {
-            if (key.indexOf("prd-ui:picker:") === 0) sessionStorage.removeItem(key);
-          }
-          sessionStorage.removeItem("prd-ui:form:origin");
-        }
-        if (origin) {
+        if (pageKind === "form") {
+          // Form back returns to its recorded origin, never to the picker.
+          const origin = sessionStorage.getItem(formOriginKey) || "index.html";
+          sessionStorage.removeItem(formDraftKey);
+          sessionStorage.removeItem(pickerReturnKey);
+          sessionStorage.removeItem(formOriginKey);
           location.href = origin;
           return;
+        }
+        if (pageKind === "detail") {
+          // Detail back cancels every pending picker draft and form origin.
+          for (const key of Object.keys(sessionStorage)) {
+            if (key.indexOf(pickerPrefix) === 0) sessionStorage.removeItem(key);
+          }
+          for (const key of Object.keys(sessionStorage)) {
+            if (key.indexOf(originPrefix) === 0) sessionStorage.removeItem(key);
+          }
         }
         if (history.length > 1) history.back();
         else location.href = "index.html";

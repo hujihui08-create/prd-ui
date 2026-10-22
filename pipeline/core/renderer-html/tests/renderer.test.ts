@@ -9,8 +9,11 @@ import appointmentsBriefJson from "../../../samples/projects/employee-app-appoin
 import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
 import {
   createMotionContext,
+  formDraftKey,
   formOrigin,
+  formOriginKey,
   motionAttrs,
+  pickerReturnKey,
   pickerStorageKeys,
   readOnlyNote,
   renderDocument,
@@ -312,30 +315,33 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(readOnlyNote(undefined)).toBeUndefined();
   });
 
-  it("records only non-picker form origins and sweeps picker keys", () => {
-    expect(formOrigin("https://app.example.com/appointment-list.html")).toBe(
+  it("records only same-origin non-picker form origins and sweeps picker keys", () => {
+    const formHref = "https://app.example.com/appointment-form.html";
+    expect(formOrigin("https://app.example.com/appointment-list.html", formHref)).toBe(
       "https://app.example.com/appointment-list.html"
     );
     expect(
       formOrigin(
-        "https://app.example.com/customer-search.html?mode=picker&returnTo=appointment-form"
+        "https://app.example.com/customer-search.html?mode=picker&returnTo=appointment-form",
+        formHref
       )
-    ).toBeUndefined();
-    expect(formOrigin("")).toBeUndefined();
-    expect(formOrigin(undefined)).toBeUndefined();
+    ).toBe("index.html");
+    expect(formOrigin("https://other.example.com/list.html", formHref)).toBe("index.html");
+    expect(formOrigin("", formHref)).toBe("index.html");
+    expect(formOrigin(undefined, formHref)).toBe("index.html");
     expect(
       pickerStorageKeys([
         "prd-ui:picker:appointment-form",
-        "prd-ui:picker:selected",
         "prd-ui:picker:return",
-        "prd-ui:form:origin",
+        "prd-ui:form:origin:appointment-form",
         "other",
       ])
-    ).toEqual([
-      "prd-ui:picker:appointment-form",
-      "prd-ui:picker:selected",
-      "prd-ui:picker:return",
-    ]);
+    ).toEqual(["prd-ui:picker:appointment-form", "prd-ui:picker:return"]);
+    expect(formDraftKey("appointment-form")).toBe("prd-ui:picker:appointment-form");
+    expect(pickerReturnKey()).toBe("prd-ui:picker:return");
+    expect(formOriginKey("appointment-form")).toBe(
+      "prd-ui:form:origin:appointment-form"
+    );
   });
 
   it("renders picker hooks, full dates, and deduplicated detail fields", () => {
@@ -391,7 +397,9 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(search).toContain('"appointment-form":"mobile-form"');
     expect(search).toContain('config.pageArchetypes?.[requestedReturn] === "mobile-form"');
     expect(search).toContain('const target = allowed ? requestedReturn : pickerReturn;');
-    expect(search).toContain('sessionStorage.setItem(returnKey, target)');
+    expect(search).toContain('const targetDraftKey = pickerPrefix + target');
+    expect(search).toContain("draft.customer = selectedName");
+    expect(search).not.toContain("sessionStorage.setItem(returnKey, target)");
   });
 
   it("renders today plus the brief tabs on the home tab bar", () => {
@@ -426,12 +434,12 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       '"stateNotes":{"爽约":"爽约已记录入客户档案","已取消":"本单已取消"}'
     );
     expect(detail).toContain('back.addEventListener("click"');
-    expect(detail).toContain('sessionStorage.getItem("prd-ui:form:origin")');
-    expect(detail).toContain('key.indexOf("prd-ui:picker:") === 0');
+    expect(detail).toContain('key.indexOf(originPrefix) === 0');
     expect(detail).toContain("location.href = origin");
     expect(detail).toContain("history.length > 1");
     expect(detail).toContain('location.href = "index.html"');
     expect(detail).toContain(".back-icon{font-size:20px;cursor:pointer;}");
+    expect(detail).not.toContain("prd-ui:picker:selected");
 
     const list = renderDocument(
       phase2ById.get("appointment-list")!,
@@ -452,22 +460,27 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(form).toContain("config.formModeLabels?.[mode.name]");
     expect(form).toContain('sessionStorage.setItem(draftKey, JSON.stringify(draft))');
     expect(form).toContain('sessionStorage.setItem(returnKey, config.pageId)');
-    expect(form).toContain('sessionStorage.setItem(returnKey, target)');
     expect(form).toContain('sessionStorage.getItem(returnKey) === config.pageId');
     expect(form).toContain("if (hasPrefill)");
-    expect(form).toContain('sessionStorage.getItem(selectedKey)');
     expect(form).toContain("document.referrer");
     expect(form).toContain('referrer.indexOf("mode=picker") < 0');
-    expect(form).toContain('sessionStorage.setItem(originKey, referrer)');
-    expect(form).toContain("// Both the draft and the return/selected keys stay");
-    expect(form).toContain('sessionStorage.setItem(selectedKey, selectedText)');
-    expect(form).toContain("draft.customer = customerName");
+    expect(form).toContain('sessionStorage.getItem(originKey)');
+    expect(form).toContain('sessionStorage.setItem(originKey, origin)');
+    expect(form).toContain('const targetDraftKey = pickerPrefix + target');
+    expect(form).toContain("draft.customer = selectedName");
     expect(form).toContain('sessionStorage.setItem(targetDraftKey, JSON.stringify(draft))');
     expect(form).toContain("sessionStorage.removeItem(draftKey)");
-    expect(form).toContain("sessionStorage.removeItem(selectedKey)");
     expect(form).toContain("sessionStorage.removeItem(returnKey)");
     expect(form).toContain("sessionStorage.removeItem(originKey)");
     expect(form).toContain('document.body.dataset.pageKind === "form"');
+    expect(form).not.toContain("prd-ui:picker:selected");
+    expect(form).not.toContain("prd-ui:picker:callback-register");
+    expect(form).toContain('const formDraftKey = "prd-ui:picker:appointment-form";');
+    expect(form).toContain('const pickerReturnKey = "prd-ui:picker:return";');
+    expect(form).toContain(
+      'const formOriginKey = "prd-ui:form:origin:appointment-form";'
+    );
+    expect(form).toContain("location.href = origin");
 
     const search = renderDocument(
       phase2ById.get("customer-search")!,
@@ -475,6 +488,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       { pageRoutes: phase2Routes }
     );
     expect(search).toContain('data-picker-return="appointment-form"');
+    expect(search).not.toContain("prd-ui:picker:selected");
   });
 });
 
