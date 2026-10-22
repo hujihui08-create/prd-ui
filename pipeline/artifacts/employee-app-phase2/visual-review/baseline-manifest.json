@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T11:16:41.168Z",
+  "generatedAt": "2026-10-22T11:43:58.306Z",
   "cases": [
     {
       "id": "today.default",
@@ -176,7 +176,7 @@
         "height": 844
       },
       "file": "appointment-form.state.disabled.png",
-      "sha256": "sha256:be65900ddc944b47169a9a5b7ed5ee24dd7330a89faf59c5096a744c4319a65f"
+      "sha256": "sha256:873857b7ae1335dbd15e59e06a17d7180e41f78d54fe9a48b3838594f5c0a052"
     },
     {
       "id": "appointment-form.mode.reschedule",
@@ -190,7 +190,7 @@
         "height": 844
       },
       "file": "appointment-form.mode.reschedule.png",
-      "sha256": "sha256:1e2e1ef442d3360b539fd820dc1ab060199d8c6312befd9a4f8d5fc7753b17bc"
+      "sha256": "sha256:ac71f60c6c387e988ea65efa3c89590bf855e3c808ac1fb2d9432de77d605c38"
     },
     {
       "id": "treatment-notice.default",
@@ -226,7 +226,7 @@
         "height": 844
       },
       "file": "appointment-list.default.png",
-      "sha256": "sha256:c2b7aef33c3bbfedea74ec275577353c5402bf82ffe06493f192b1c7651afb60"
+      "sha256": "sha256:9347b52320ca78c5529967045f75f164f4cf5eabf345c0bfc79f1a2bdd9c8116"
     },
     {
       "id": "appointment-list.state.loading",
@@ -240,7 +240,7 @@
         "height": 844
       },
       "file": "appointment-list.state.loading.png",
-      "sha256": "sha256:8906b6b3aad02e6671700a895d669321f7ed7e6fbad1b9c5cec14a7b22f55bb6"
+      "sha256": "sha256:7aff7884302538a1db7b0bb86efb4cafac05e17f6bb38f1f541d5c2d66033b5d"
     },
     {
       "id": "appointment-list.state.error",
@@ -268,7 +268,7 @@
         "height": 844
       },
       "file": "appointment-list.state.empty.png",
-      "sha256": "sha256:ed5d4f20c01343dcaa0ef450a98fb5637883df95b6fc464a26e91e045349d82e"
+      "sha256": "sha256:00058f549ea2140cd41f44933f8394cdcd7bb27068290251f009486a8f833e78"
     },
     {
       "id": "appointment-list.view.list",
@@ -282,7 +282,7 @@
         "height": 844
       },
       "file": "appointment-list.view.list.png",
-      "sha256": "sha256:aa83bd3554fe880850ba040fc69dc09fbe730ea7cbca69b46aeb03b1b307e4dd"
+      "sha256": "sha256:a0859fa8466bb3e00c55485c910a1764f55f654b37b98a047df7d7de2b1635ff"
     },
     {
       "id": "appointment-list.drawer",
@@ -296,7 +296,7 @@
         "height": 844
       },
       "file": "appointment-list.drawer.png",
-      "sha256": "sha256:ad830a125257b2b17421037bd1fb7677a7d8717ec3c7c9ba328fe38cde2c93df"
+      "sha256": "sha256:b48476b3c6fc2cf4ec9249f3c8722b31766075763b3cd826b0de9ed4b11696cd"
     },
     {
       "id": "callback-register.default",

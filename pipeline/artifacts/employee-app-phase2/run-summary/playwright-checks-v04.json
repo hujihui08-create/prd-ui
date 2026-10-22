@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "checkedAt": "2026-10-22T11:30:00.000Z",
+  "checkedAt": "2026-10-22T11:50:00.000Z",
   "viewport": {
     "width": 390,
     "height": 844
@@ -39,12 +39,12 @@
       "id": "calendar.empty-cell-prefill",
       "status": "passed",
       "steps": [
-        "appointment-list calendar: click empty cell 2026-11-02 09:00"
+        "appointment-list calendar: click empty cell 2025-11-03 09:00"
       ],
       "observed": {
-        "url": "appointment-form.html?mode=new&date=2026-11-02&time=09%3A00",
-        "startTime": "2026-11-02T09:00",
-        "endTime": "2026-11-02T10:00",
+        "url": "appointment-form.html?mode=new&date=2025-11-03&time=09%3A00",
+        "startTime": "2025-11-03T09:00",
+        "endTime": "2025-11-03T10:00",
         "startType": "datetime-local",
         "endType": "datetime-local"
       }
@@ -111,20 +111,22 @@
           "overflowX": "auto"
         },
         "fullDates": [
-          "2026-11-02",
-          "2026-11-03",
-          "2026-11-04",
-          "2026-11-05",
-          "2026-11-06",
-          "2026-11-07",
-          "2026-11-08"
+          "2025-11-03",
+          "2025-11-04",
+          "2025-11-05",
+          "2025-11-06",
+          "2025-11-07",
+          "2025-11-08",
+          "2025-11-09"
         ],
         "dateHeader": "11-05 周三",
         "pageDetailCta": false,
         "rows": [
           "张女士 已登记 小气泡 · 王美容 10:00-11:00",
           "李女士 已到店 补水 · 王美容 14:00-15:00"
-        ]
+        ],
+        "dateFilter": "11-05 周三",
+        "activeDateLabel": "日历 · 11-05 周三"
       }
     },
     {
@@ -156,6 +158,36 @@
         "pickerDisabled": true,
         "modeTabsDisabled": true,
         "saveDisabled": true
+      }
+    },
+    {
+      "id": "reschedule.prefill",
+      "status": "passed",
+      "steps": [
+        "appointment-detail: click 改期",
+        "appointment-form?mode=reschedule&recordId=appointment-detail"
+      ],
+      "observed": {
+        "customer": "张女士",
+        "project": "小气泡",
+        "startTime": "2025-11-05T10:00",
+        "endTime": "2025-11-05T11:00",
+        "therapist": "王美容",
+        "customerLocked": true,
+        "newModePillHidden": true,
+        "rescheduleModeFixed": true
+      }
+    },
+    {
+      "id": "appointment-list.loading-empty",
+      "status": "passed",
+      "observed": {
+        "loadingHasFilters": true,
+        "loadingHasLegend": true,
+        "loadingHasGridSkeleton": true,
+        "emptyKeepsGrid": true,
+        "emptyKeepsLegend": true,
+        "emptyClearFilter": "清空筛选"
       }
     }
   ]

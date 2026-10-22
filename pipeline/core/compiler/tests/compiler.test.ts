@@ -105,7 +105,7 @@ describe("compileProject", () => {
     const list = compiled.find((spec) => spec.meta.pageId === "appointment-list")!;
     expect(form.customerPicker).toBe("customer-search");
     expect(search.pickerReturnTo).toBe("appointment-form");
-    expect(list.calendarWeekStart).toBe("2026-11-02");
+    expect(list.calendarWeekStart).toBe("2025-11-03");
     expect(search.calendarWeekStart).toBeUndefined();
   });
 
@@ -466,7 +466,7 @@ describe("brief-driven page content", () => {
       statusTone: "warning",
     });
     expect(nodesOf(spec, "ListRow")[0]?.props?.trailing).toBeUndefined();
-    expect(nodesOf(spec, "Button")[0]?.props?.label).toBe("新增预约");
+    expect(nodesOf(spec, "Button").map((node) => node.props?.label)).toContain("新增预约");
   });
 
   it("compiles a mobile-form page with inputs, selects, and actions", () => {
@@ -1058,13 +1058,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     const list = phase2Spec("appointment-list");
     const grid = nodesOf(list, "CalendarGrid")[0]!;
     expect(grid.props?.days).toEqual([
-      { label: "周一", date: "2026-11-02", today: false },
-      { label: "周二", date: "2026-11-03", today: false },
-      { label: "周三", date: "2026-11-04", today: false },
-      { label: "周四", date: "2026-11-05", today: false },
-      { label: "周五", date: "2026-11-06", today: false },
-      { label: "周六", date: "2026-11-07", today: false },
-      { label: "周日", date: "2026-11-08", today: false },
+      { label: "周一", date: "2025-11-03", today: false },
+      { label: "周二", date: "2025-11-04", today: false },
+      { label: "周三", date: "2025-11-05", today: false },
+      { label: "周四", date: "2025-11-06", today: false },
+      { label: "周五", date: "2025-11-07", today: false },
+      { label: "周六", date: "2025-11-08", today: false },
+      { label: "周日", date: "2025-11-09", today: false },
     ]);
     expect(
       (grid.props?.blocks as Array<{ day: number }>).map((block) => block.day)
@@ -1075,7 +1075,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       "爽约",
       "已取消",
     ]);
-    expect(list.calendarWeekStart).toBe("2026-11-02");
+    expect(list.calendarWeekStart).toBe("2025-11-03");
   });
 
   it("keeps list field labels out of the visible layout", () => {

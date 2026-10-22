@@ -178,8 +178,10 @@ button{font:inherit;color:inherit;}
 .empty-actions{margin-top:var(--space-2);}
 .empty-state[data-empty-kind]{display:flex;}
 body[data-state="empty"] .empty-state{display:flex;}
-body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card,body[data-state="empty"] .calendar{display:none;}
-body[data-state="empty"] .typo-heading-3{display:none;}
+body[data-state="empty"] .empty-calendar{position:fixed;top:230px;left:24px;right:24px;z-index:10;background:#fff;border-radius:var(--radius-lg);padding:24px 16px;box-shadow:0 8px 24px rgba(15,23,42,.12);}
+body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card{display:none;}
+body[data-state="empty"] .calendar-block{display:none;}
+body[data-state="empty"] .calendar-grid{opacity:.55;}
 body[data-state="empty"] .summary{display:none;}
 .state-panel{display:none;position:absolute;left:0;right:0;top:48px;bottom:0;z-index:30;background:var(--color-surface-subtle);padding:var(--space-4);flex-direction:column;gap:var(--space-3);}
 .app.has-tabs .state-panel{bottom:64px;}
@@ -188,6 +190,14 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .skeleton{border-radius:var(--radius-lg);background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
 .skeleton.short{height:48px;}
 .skeleton.card{height:140px;}
+.loading-calendar{display:none;flex-direction:column;gap:12px;}
+.app[data-page-archetype="mobile-list"] .state-panel.loading > .skeleton{display:none;}
+.app[data-page-archetype="mobile-list"] .state-panel.loading .loading-calendar{display:flex;}
+.loading-filter-row,.loading-legend{display:flex;gap:8px;}
+.loading-filter-row span,.loading-legend span{height:24px;border-radius:6px;background:#E7E9ED;color:#6B7280;font-size:11px;display:inline-flex;align-items:center;justify-content:center;padding:0 8px;}
+.loading-legend span{height:20px;font-size:10px;}
+.loading-grid{display:grid;grid-template-columns:36px repeat(7,1fr);grid-auto-rows:16px;gap:2px;}
+.loading-grid i{display:block;border-radius:2px;background:#E7E9ED;}
 .error-box{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
 .error-icon{font-size:40px;color:var(--color-text-tertiary);}
 .error-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
@@ -201,7 +211,7 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 body[data-state="disabled"] .app-scroll input,
 body[data-state="disabled"] .app-scroll select,
 body[data-state="disabled"] .app-scroll textarea{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
-body[data-state="disabled"] .app-actions .btn.primary{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border:1px solid var(--color-border-subtle);}
+body[data-state="disabled"] .app-actions .btn.primary{opacity:1;background:#E5E7EB;color:#6B7280;border:1px solid #D1D5DB;}
 body[data-state="disabled"] .mode-tabs button,
 body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
 .readonly-banner{margin:12px 16px;padding:12px;border:1px solid color-mix(in srgb,var(--color-status-warning) 30%,white);border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-status-warning) 10%,white);color:var(--color-text-secondary);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);}
@@ -345,6 +355,15 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     <div class="skeleton short"></div>
     <div class="skeleton card"></div>
     <div class="skeleton card"></div>
+    <div class="loading-calendar">
+      <div class="loading-filter-row">
+        <span>状态 全部</span><span>日期 11-05 周三</span>
+      </div>
+      <div class="loading-legend">
+        <span>已登记</span><span>已到店</span><span>爽约</span><span>已取消</span>
+      </div>
+      <div class="loading-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
   </div>
   <div class="state-panel error" aria-hidden="true">
     <div class="error-box">
@@ -417,6 +436,13 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
     const rowValue = (row) => row.querySelector(".list-text-value");
+    const summaryValue = (label) => {
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if (rowLabel(row) !== label) continue;
+        return (rowValue(row)?.textContent ?? "").trim();
+      }
+      return "";
+    };
     const serviceCompleted = (() => {
       for (const row of qsa(".app-scroll .list-text-row")) {
         if (rowLabel(row) !== "服务完成") continue;
@@ -515,12 +541,25 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       button.addEventListener("click", () => {
         const action = button.dataset.action;
         if (action === "改期" && config.linkedRoutes.form) {
+          const recordKey = config.referenceId ?? config.pageId;
+          const record = {
+            customer: summaryValue("客户"),
+            project: summaryValue("项目"),
+            time: summaryValue("时间段"),
+            therapist: summaryValue("护理师"),
+          };
+          if (record.customer !== "" || record.time !== "") {
+            sessionStorage.setItem(
+              "prd-ui:appointment:" + recordKey,
+              JSON.stringify(record)
+            );
+          }
           location.href =
             config.linkedRoutes.form +
             "?mode=reschedule" +
             (config.referenceId
               ? "&appointmentId=" + encodeURIComponent(config.referenceId)
-              : "");
+              : "&recordId=" + encodeURIComponent(recordKey));
           return;
         }
         if (action === "术后告知") {
@@ -555,6 +594,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const modes = config.formModes;
     if (!modes) return;
     const params = new URLSearchParams(location.search);
+    const lockEntryMode = params.get("mode") === "reschedule";
     let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
     const submit = document.querySelector(".app-actions [data-action]");
     const customer = document.querySelector('[data-field=customer] input');
@@ -611,12 +651,74 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
         }
       }
     }
+    const recordKey =
+      params.get("recordId") ?? params.get("appointmentId") ?? config.referenceId;
+    if (current.name === "reschedule" && recordKey && !(dateParam && timeParam)) {
+      const rawRecord = sessionStorage.getItem("prd-ui:appointment:" + recordKey);
+      if (rawRecord) {
+        try {
+          const record = JSON.parse(rawRecord);
+          const pad = (value) => String(value).padStart(2, "0");
+          const timeText = typeof record.time === "string" ? record.time : "";
+          const dateMatch = /(\d{1,2})-(\d{1,2})\s*周([一二三四五六日])/.exec(timeText);
+          const timeMatch =
+            /(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/.exec(timeText);
+          let isoDate = null;
+          if (dateMatch) {
+            const weekday = "一二三四五六日".indexOf(dateMatch[3]);
+            const month = Number(dateMatch[1]);
+            const day = Number(dateMatch[2]);
+            const baseYear = new Date().getFullYear();
+            for (const delta of [0, -1, 1, -2, 2]) {
+              const year = baseYear + delta;
+              const candidate = new Date(year, month - 1, day);
+              if (
+                candidate.getFullYear() === year &&
+                candidate.getMonth() === month - 1 &&
+                candidate.getDate() === day &&
+                (candidate.getDay() + 6) % 7 === weekday
+              ) {
+                isoDate = year + "-" + pad(month) + "-" + pad(day);
+                break;
+              }
+            }
+          }
+          if (typeof record.customer === "string" && customer) {
+            customer.value = record.customer;
+          }
+          const project = document.querySelector('input[name="project"]');
+          if (typeof record.project === "string" && project) {
+            project.value = record.project;
+          }
+          const therapist = document.querySelector('input[name="therapist"]');
+          if (typeof record.therapist === "string" && therapist) {
+            therapist.value = record.therapist;
+          }
+          if (isoDate && timeMatch) {
+            if (startInput) {
+              startInput.value =
+                isoDate + "T" + pad(Number(timeMatch[1])) + ":" + timeMatch[2];
+            }
+            if (endInput) {
+              endInput.value =
+                isoDate + "T" + pad(Number(timeMatch[3])) + ":" + timeMatch[4];
+            }
+          }
+        } catch {
+          // A malformed record is ignored; the locked form still renders.
+        }
+      }
+    }
     const customerPickerButton = document.querySelector(
       '[data-field=customer] [data-action="选择客户"]'
     );
     const apply = () => {
       for (const button of Array.from(tabs.children)) {
         button.classList.toggle("active", button.dataset.mode === current.name);
+        if (lockEntryMode) {
+          button.hidden = button.dataset.mode !== current.name;
+          button.disabled = true;
+        }
       }
       if (submit) {
         submit.textContent = current.actions[0] ?? submit.textContent;
@@ -906,6 +1008,14 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     }
   }
 
+  function applyFilterActions() {
+    for (const button of qsa('[data-action="清空筛选"]')) {
+      button.addEventListener("click", () => {
+        location.href = location.pathname;
+      });
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
@@ -913,6 +1023,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   applyViews();
   applyPicker();
   applyReadonlyState();
+  applyFilterActions();
 })();
 </script>
   <script>

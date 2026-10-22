@@ -79,7 +79,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 636 tests passing, `pnpm test:dsh` 4 passed,
+Current expected evidence: 637 tests passing, `pnpm test:dsh` 4 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -136,14 +136,15 @@ picker, and full-date prefill work: Spec Engineer `--strict-motion` gives 8
 Page Specs / 0 blockers / 0 motion unresolved, baseline is 24 cases, and the
 follow-up concrete-major fixes (debug route chip, disabled styling, duplicate
 check-in, premature notice, search/list CTAs, list row density, read-only action
-row, notice label, status tones) are implemented. The final real-dsh review is
-`status=awaiting_signoff` with 24/24 screenshots, 0 console / 0 overflow /
-0 diff failures, 10 findings (5 major / 5 minor / 0 blocker), ¥0.3287296224;
-it is **not signed** because 5 new structural majors (mode pills, calendar
-orientation, loading/empty calendar structure, reschedule context) need a design
-decision. The earlier signed `passed` run is superseded. Failure attempts
-(console-error, max-tokens) and costs are recorded; deterministic critic replay
-and Phase 3/4 work remain.
+row, notice label, status tones, reschedule prefill, mode lock, calendar/date
+consistency, loading/empty structures) are implemented. The final real-dsh
+review is `status=passed` after signing per the stopping rule: 24/24
+screenshots, 0 console / 0 overflow / 0 diff failures, 11 findings (6 major /
+5 minor / 0 blocker), ¥0.3260564064, `waivers=[]`. The critic verdict remains
+`changes`; the 6 residual majors are v0.5 debt (today 查看全部, 3-day calendar
+cue, loading skeleton completeness, empty overlay, mode pills, reschedule
+matrix context). Failure attempts (console-error, max-tokens) and costs are
+recorded; deterministic critic replay and Phase 3/4 work remain.
 
 ## Architecture boundaries
 

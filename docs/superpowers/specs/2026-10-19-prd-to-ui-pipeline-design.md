@@ -1294,10 +1294,10 @@ handoff/
 | 阶段 | 状态 | 已有证据 |
 |---|---|---|
 | Phase 0 · Spike | 完成（历史） | `spike/` 保留 Figma 写回与 HTML 验证，不作为现行实现 |
-| Phase 1 · 基础 | 完成 | `core/*` 契约/编译器/校验/renderer；**12 个 archetype**（原 10 个 + `mobile-list` / `mobile-form`）；636 tests、typecheck clean、`test:dsh` 4 passed |
+| Phase 1 · 基础 | 完成 | `core/*` 契约/编译器/校验/renderer；**12 个 archetype**（原 10 个 + `mobile-list` / `mobile-form`）；637 tests、typecheck clean、`test:dsh` 4 passed |
 | Phase 2 · 前半段 | 完成 | `intake:run`：PRD normalize/review + IA + UI Briefer + 两道签核 + 原子发布；Briefer 自动产出 `fieldLabels` / `mockData` / `feedItems` |
 | Phase 2 · 后半段 | 完成 | M1 → Spec Engineer → HTML；per-profile M1 真实 run（b-dense + c-expressive）interaction passed；8 页 sample 出口 `8 pages / 0 blockers`；03 真实 PRD 四页切片全链路通过（intake ¥0.5147、M1 ¥0.2746、Spec 4 页 / 0 blockers、HTML 4 页） |
-| Phase 2 · 完整出口 | 完成（2026-10-22，clean v0.4；视觉签核待决策） | `employee-app-phase2` 8 页真实 PRD：intake `run-2026-10-22T03-09-28-544Z` success，8 页全 `b-mobile`，brief hash `sha256:b558b57a…b8335`，0 waivers / 0 手工 brief patch，¥0.8978；M1 `run-2026-10-22T03-16-05-257Z` `gates={ia:passed, interaction:passed, visualStyle:passed}`、0 waivers、`agent:sign` 后 success，¥0.43998；Spec Engineer v0.4 `run-2026-10-22T10-22-51-461Z` 8 Page Specs / 8 motion pages / 0 blockers / 0 motion unresolved（2 unused asset warnings）；HTML 8 页 + index，`phase1:verify` 8/0；v0.4 Visual Review：baseline 24 cases。concrete-major 修复后最终 `run-2026-10-22T11-23-22-756Z` 24/24 截图、0 console / 0 overflow、diff 24/0/0、10 findings（5 major / 5 minor / 0 blocker）、`usageComplete=true`、¥0.3287296224；`status=awaiting_signoff`、**未签核**，因为 5 个新结构 major（mode pills、日历日期一致性/today、loading/empty calendar、reschedule 记录上下文）需要设计决策。Motion node id / picker / 完整日期 / 本轮 concrete-major 修复已进 HTML；其余 major 作为 v0.5 视觉债记录。Studio/Asset Compiler 仍后置 |
+| Phase 2 · 完整出口 | 完成（2026-10-22，clean v0.4；v0.5 视觉债） | `employee-app-phase2` 8 页真实 PRD：intake `run-2026-10-22T03-09-28-544Z` success，8 页全 `b-mobile`，brief hash `sha256:b558b57a…b8335`，0 waivers / 0 手工 brief patch，¥0.8978；M1 `run-2026-10-22T03-16-05-257Z` `gates={ia:passed, interaction:passed, visualStyle:passed}`、0 waivers、`agent:sign` 后 success，¥0.43998；Spec Engineer v0.4 `run-2026-10-22T10-22-51-461Z` 8 Page Specs / 8 motion pages / 0 blockers / 0 motion unresolved（2 unused asset warnings）；HTML 8 页 + index，`phase1:verify` 8/0；v0.4 Visual Review：baseline 24 cases。concrete-major 修复后最终 `run-2026-10-22T11-44-01-938Z` 24/24 截图、0 console / 0 overflow、diff 24/0/0、11 findings（6 major / 5 minor / 0 blocker）、`usageComplete=true`、¥0.3260564064；按停止规则签核，`status=passed`、`signoff.valid=true`，6 major 作为 v0.5 视觉债记录。Motion node id / picker / 完整日期 / reschedule prefill / 日历一致 / loading-empty 结构已进 HTML。Studio/Asset Compiler 仍后置 |
 | Phase 3 · Figma + 沙箱 | 未开始 | Figma Renderer、scratch 沙箱、测试 Subagent、Handoff 均未实现 |
 | Phase 4 · 验收 | 未开始 | 真实项目走查、用户最终签核未做 |
 
@@ -1318,7 +1318,7 @@ handoff/
 | v0.2 | 多 profile + 资产 | 已完成：per-profile M1、标准图标 inventory、asset review |
 | v0.3 | Phase 2 验收交付 | 已完成（sample waiver）：8 页真实 PRD、HTML/资产/视觉巡检 |
 | v0.3.1 | Clean Phase 2 收尾 | 已完成：0 waiver / 0 brief patch、状态动作栏、表单 mode、日历/搜索交互、529 tests、19 张交互截图 |
-| v0.4 | 动效 + 视觉回归 | 已完成：motion node id / CSS 动效、picker、完整日期、24 项截图 baseline、真实 Visual Critic（待签核）、636 tests、`test:dsh` 4、Phase 1 8/2/4/8 全 0；critic major 转入 Phase 3/4 视觉债 |
+| v0.4 | 动效 + 视觉回归 | 已完成：motion node id / CSS 动效、picker、完整日期、24 项截图 baseline、真实 Visual Critic（已签核，v0.5 债）、637 tests、`test:dsh` 4、Phase 1 8/2/4/8 全 0；critic major 转入 Phase 3/4 视觉债 |
 | v1.0 | 项目最终交付 | Phase 3 + Phase 4：Figma/Studio/Handoff、沙箱、真实项目用户签核 |
 
 ---

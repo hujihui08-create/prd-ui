@@ -1,4 +1,4 @@
-# 员工端 · Phase 2 8 页 clean 出口（v0.4 视觉修复，待决策）
+# 员工端 · Phase 2 8 页 clean 出口（v0.4 已签核；v0.5 视觉债）
 
 从 `samples/projects/employee-app-phase2/prd.md` 的真实 PRD 走完整链路：
 
@@ -10,7 +10,7 @@ PRD → intake:run（PRD review + IA + UI Briefer + 两道签核）
     → render:html（8 页 + index.html）
     → visual:baseline（24 张确定性截图）
     → visual:review --runtime dsh（确定性 gate + pixel diff + Visual Critic）
-    → visual:sign（本轮未签核：critic 仍为 changes）
+    → visual:sign（按 stopping rule 签核；critic verdict 仍为 changes，残留 major 记为 v0.5 债）
 ```
 
 ## 目录
@@ -18,12 +18,13 @@ PRD → intake:run（PRD review + IA + UI Briefer + 两道签核）
 ```text
 html/                       8 页渲染结果 + index.html（v0.4 修复后）
 screenshots/                19 张 v0.3.1 人工 Playwright 截图（历史）
-visual-review/              本轮最终证据（awaiting_signoff，未签核）
-  visual-review.json        review 结果：status=awaiting_signoff，10 findings
-  state.json                run 状态：awaiting_signoff，signoff.visual=false
+visual-review/              本轮最终证据（passed，已签核）
+  visual-review.json        review 结果：status=passed，11 findings，signoff valid
+  state.json                run 状态：success，signoff.visual=true
   screenshots/              24 张 390×844 矩阵截图 + manifest.json
   findings/visual-gate.json 确定性 gate + 全部 findings（0 blocker）
   findings/visual-critic.json Visual Critic 原始 critique、usage、cost
+  signoff/visual.md         人工签核（manifestHash + findingsHash，waivers=[]）
   baseline-manifest.json    与 pipeline/baselines/employee-app-phase2 一致
 run-summary/                intake / M1 / agent:sign / Spec / Visual Review / Phase 1 摘要
 signoffs/                   PRD/IA、brief、visual-style 签核（历史）
@@ -38,20 +39,18 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
 |---|---|---|
 | intake | `run-2026-10-22T03-09-28-544Z` | success；8 页全 `b-mobile`；0 waivers、0 手工 brief edits；brief hash `sha256:b558b57a…b8335`；¥0.8977902624 |
 | M1 | `run-2026-10-22T03-16-05-257Z` | success；`ia:passed / interaction:passed / visualStyle:passed`；0 waivers；¥0.4399832736 |
-| Spec Engineer | `run-2026-10-22T11-15-21-596Z` | 8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
-| HTML / Phase 1 | `run-2026-10-22T11-17-13-206Z` | 8 页 + index；`8 pages / 0 blockers` |
-| Visual baseline | `pipeline/baselines/employee-app-phase2` | 24 cases / 24 PNG；manifest `sha256:4f43b2f39589b777366573918dd931fb3ce12854e39a4d2e4561c866a6158b0b` |
-| Visual review（最终） | `run-2026-10-22T11-23-22-756Z` | `status=awaiting_signoff`；24/24 截图；diff 24/0/0；0 console / 0 overflow；10 findings（5 major / 5 minor / **0 blocker**）；`usageComplete=true`；¥0.3287296224 |
-| Signoff | — | **未签核**。最终 review 仍为 `changes`，5 个新 major 需要设计决策；`signoff.visual=false` |
+| Spec Engineer | `run-2026-10-22T11-38-52-733Z` | 8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
+| HTML / Phase 1 | `run-2026-10-22T11-44-13-297Z` | 8 页 + index；`8 pages / 0 blockers` |
+| Visual baseline | `pipeline/baselines/employee-app-phase2` | 24 cases / 24 PNG；manifest `sha256:c584af99d3360c033bd2f3edb9a6d06eec242088330f605a423a5cd0810214e6` |
+| Visual review（最终） | `run-2026-10-22T11-44-01-938Z` | `status=passed`；24/24 截图；diff 24/0/0；0 console / 0 overflow；11 findings（6 major / 5 minor / **0 blocker**）；`usageComplete=true`；¥0.3260564064 |
+| Signoff | — | `Sample Reviewer`，2026-10-22，`waivers=[]`；manifest `sha256:a113e004…dc90`；findings `sha256:92286d4b…afdc`；`signoff.valid=true`，`state.json.status=success` |
 
 ### 成本
 
-- 本轮（用户要求修复 concrete majors 后）visual critic 真实调用：
-  ¥0.3504589632（console-error blocked）+ ¥0.2169933408（旧 HTML critic）+
-  ¥0.5312153664（max-tokens blocked）+ ¥0.3287296224（最终）=
-  **¥1.4273972928**。
-- 上一轮 Task 9 记录：¥1.6415096768。
-- 累计 critic 成本 **¥3.0689069696**，单次仍低于 ¥3 cap；失败调用计入成本。
+- 首轮 Task 9 critic：¥1.6415096768。
+- concrete-major 轮：¥1.4273972928（含两次 fail-closed）。
+- final focused 轮：¥0.3260564064。
+- 累计 critic 成本 **¥3.394963376**，单次仍低于 ¥3 cap；失败调用计入成本。
 
 ## 页面
 
@@ -108,25 +107,30 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
 Playwright 复核见 `run-summary/playwright-checks-v04.json`：picker 选择/取消/
 reload、完整日期预填、搜索行 chevron、列表日期分组、disabled、状态动作栏。
 
-## 最终 critic findings（10，0 blocker）
+## 最终 critic findings（11，0 blocker；已按 stopping rule 签核）
 
-Major（5，均为设计决策，未签核）：
+Critic verdict 仍为 `changes`，但确定性 gate 全绿且无 blocker；按用户指定的
+stopping rule 签核，并把残留 major 记为 v0.5 债。未声称 critic verdict 为 pass。
 
-1. `appointment-form` default：新增/改期 mode pills 是页面级交互控件，
-   与 Page Spec/入口路由模式冲突；建议改为只读上下文或移除。
-2. `appointment-list` default：日历周（11-02 起）、列表日期（11-05）与
-   `日期 全部` 三个日期信号不一致，且无 today 高亮/当前日期标签。
-3. `appointment-list` loading：仍是通用 skeleton，未保留筛选/图例/七列网格。
-4. `appointment-list` empty：空态移除日历网格，图例悬空，无清空筛选 action。
-5. `appointment-form` reschedule：锁定客户仍为空，项目/时间/护理师未恢复，
-   与空白新增表单难以区分。
+Major（6，v0.5 债）：
 
-Minor（5）：今日缺「查看全部」、今日两个空态样式不一致、disabled 保存按钮
-对比过低、datetime-local 原生 `mm/dd/yyyy` 占位、已到店只有 `开单` 时仍用
-secondary 样式。
+1. `today` 缺「我的预约」的「查看全部」入口（需要 brief/导航补充）。
+2. `appointment-list` default：390px 下七日历只显示 3 天，无滚动提示/边缘 fade。
+3. `appointment-list` loading：skeleton 仍是薄条网格，未完全匹配 12 行时间轴/页脚。
+4. `appointment-list` empty：空态是悬浮卡片覆盖网格；grid/legend 保留但覆盖式呈现。
+5. `appointment-form` default：新增/改期 mode pills 仍可见；reschedule 进入时已隐藏
+   新增 pill 并锁定改期，但 critic 建议彻底移除切换控件。
+6. `appointment-form` reschedule 的 **矩阵截图** 没有记录上下文（form 只在点击
+   详情「改期」后恢复；静态 `?mode=reschedule` 截图无记录）。实际 Playwright
+   流程已恢复 customer/project/start/end/therapist 并锁定 customer。
 
-这些是本轮新增的主观/结构 major，未通过签核；需要产品/设计决定是否进入
-v0.5。未伪造 `passed`，也未使用 waiver。
+Minor（5）：datetime 原生 `mm/dd/yyyy` 占位、已到店单独 `开单` 仍是 secondary
+样式、详情客户名与「客户详情」重复、callback 回访结果默认「已联系」、列表视图
+切换文案/标题未标明当前视图。
+
+本轮修复的 5 个 concrete majors：reschedule prefill、mode pill 锁定、日历/日期/
+筛选一致性（2025-11-03 周、`日期 11-05 周三`、active date label）、loading
+calendar skeleton、empty grid + legend + 清空筛选。另修复 disabled save 对比。
 
 ## 重新生成
 
@@ -157,9 +161,10 @@ pnpm visual:sign --run <visual-runs-dir>/<runId> \
 
 ## 已知限制 / 后续
 
-- 最终 review 未签核；5 个 major 需决定是否进入 v0.5：mode switcher、
-  日历日期一致性/today 高亮、loading skeleton、empty calendar、reschedule
-  记录上下文。
+- 最终 review 已按 stopping rule 签核（`visual-review.json.status=passed`）；
+  critic verdict 仍为 `changes`，6 major 记录为 v0.5 债：today 查看全部、
+  三日历滚动提示、loading skeleton 完整度、empty 覆盖式呈现、mode pills、
+  reschedule 静态截图上下文。
 - 今日缺「查看全部」、空态样式不统一、disabled save 对比、native datetime
   占位、已到店 `开单` 主次样式为 minor。
 - 真实 critic 有采样波动：本轮曾出现 console-error、max-tokens 两次失败；

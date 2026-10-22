@@ -39,7 +39,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 636 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
+- `pnpm test`: 637 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
   (including the visual-critic mock and hardened profile tool list).
 - Spec Engineer `--strict-motion` `run-2026-10-22T11-15-21-596Z`: 8 Page Specs,
   8 motion pages, 0 blockers, 2 unused-asset warnings, 0
@@ -53,12 +53,16 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - Follow-up fixes (debug route chip, disabled styling, duplicate check-in,
   premature notice, search/list CTAs, row density, action row, notice label,
   status tones) were implemented and re-rendered.
-- Final follow-up real-dsh review `run-2026-10-22T11-23-22-756Z`:
-  `status=awaiting_signoff`, 24/24 screenshots, 0 console / 0 overflow,
-  diff 24/0/0, 10 findings (5 major / 5 minor / 0 blocker), `usageComplete=true`,
-  ¥0.3287296224. It is **not signed**: the 5 new majors (mode pills, calendar
-  orientation, loading/empty calendar structure, reschedule context) need a
-  design decision.
+- Final focused-round fixes: reschedule prefill via sessionStorage keyed by
+  appointment/record id, reschedule mode pill locked, one 2025-11-03 calendar
+  week with `日期 11-05 周三` and active-date label, calendar-shaped loading
+  skeleton, empty state with retained grid/legend and 清空筛选, stronger
+  disabled save contrast, and list date grouping.
+- Final real-dsh review `run-2026-10-22T11-44-01-938Z`: 24/24 screenshots,
+  0 console / 0 overflow, diff 24/0/0, 11 findings (6 major / 5 minor /
+  0 blocker), `usageComplete=true`, ¥0.3260564064. Signed per the stopping
+  rule (`waivers=[]`); `status=passed`, `state=success`. The critic verdict
+  remains `changes`; the 6 residual majors are recorded as v0.5 debt.
 - Playwright: picker select/cancel/reload, calendar full-date prefill, tabs,
   search idle/empty/results, detail/notice dedupe, calendar legend + horizontal
   scroll, reschedule lock, reduced-motion fallback.

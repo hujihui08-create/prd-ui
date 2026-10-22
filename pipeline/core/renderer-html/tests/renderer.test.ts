@@ -359,9 +359,9 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       getProfile("b-mobile"),
       { pageRoutes: phase2Routes }
     );
-    expect(list).toContain('data-slot-date="2026-11-02"');
-    expect(list).toContain('data-slot-date="2026-11-08"');
-    expect(list).toContain('data-calendar-week-start="2026-11-02"');
+    expect(list).toContain('data-slot-date="2025-11-03"');
+    expect(list).toContain('data-slot-date="2025-11-09"');
+    expect(list).toContain('data-calendar-week-start="2025-11-03"');
     expect(list).not.toContain("日期 时间段 客户");
     expect(list).toContain("日历");
 
@@ -371,8 +371,30 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       { pageRoutes: phase2Routes }
     );
     expect(detail.match(/data-field="customer"/g)?.length ?? 0).toBe(0);
-    expect(detail.match(/已登记<\/span>/g)?.length ?? 0).toBe(1);
+    expect(detail.match(/class="badge tone-warning">已登记<\/span>/g)?.length ?? 0).toBe(1);
     expect(detail).not.toContain('form-readonly">已登记');
+  });
+
+  it("stores and restores reschedule record context", () => {
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(detail).toContain('prd-ui:appointment:');
+    expect(detail).toContain('summaryValue("客户")');
+    expect(detail).toContain('summaryValue("时间段")');
+
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(form).toContain('"prd-ui:appointment:" + recordKey');
+    expect(form).toContain('current.name === "reschedule" && recordKey');
+    expect(form).toContain("record.project");
+    expect(form).toContain("record.therapist");
+    expect(form).toContain("startInput.value");
   });
 
   it("renders the search idle state without a page-level detail CTA", () => {

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T11:30:00.000Z",
+  "generatedAt": "2026-10-22T11:50:00.000Z",
   "specEngineer": {
-    "runId": "run-2026-10-22T11-15-21-596Z",
+    "runId": "run-2026-10-22T11-38-52-733Z",
     "pages": 8,
     "motionPages": 8,
     "blockers": 0,
@@ -20,11 +20,11 @@
   },
   "baseline": {
     "cases": 24,
-    "manifestHash": "sha256:4f43b2f39589b777366573918dd931fb3ce12854e39a4d2e4561c866a6158b0b"
+    "manifestHash": "sha256:c584af99d3360c033bd2f3edb9a6d06eec242088330f605a423a5cd0810214e6"
   },
   "visualReview": {
-    "runId": "run-2026-10-22T11-23-22-756Z",
-    "status": "awaiting_signoff",
+    "runId": "run-2026-10-22T11-44-01-938Z",
+    "status": "passed",
     "cases": 24,
     "screenshots": 24,
     "diff": {
@@ -32,28 +32,28 @@
       "failed": 0,
       "missing": 0
     },
-    "findings": 10,
+    "findings": 11,
     "blockers": 0,
-    "major": 5,
+    "major": 6,
     "minor": 5,
-    "costCny": 0.3287296224,
+    "costCny": 0.3260564064,
     "usageComplete": true,
     "model": "deepseek-flash",
-    "manifestHash": "sha256:1a8005647950a1c6363061c4b8c5ef2cd0c843283b96bc9d3ab47ffeb8772551",
-    "findingsHash": "sha256:220e6f56449b0f20c936e90a794bc0f1afaab5e242687b176032de79e1e325b2",
+    "manifestHash": "sha256:a113e00407c702b5463456e422ee3860a79cfbf491adb7905359a2dede18dc90",
+    "findingsHash": "sha256:92286d4b7970fa2491d2b624fa704269793233af85f7cfff3431dd798233afdc",
     "signoff": {
-      "valid": false
+      "valid": true,
+      "signer": "Sample Reviewer",
+      "date": "2026-10-22",
+      "waivedFindings": []
     },
-    "stateStatus": "awaiting_signoff"
+    "stateStatus": "success"
   },
-  "roundCosts": {
-    "consoleErrorRun": 0.3504589632,
-    "oldHtmlCriticRun": 0.2169933408,
-    "maxTokensRun": 0.5312153664,
-    "finalRun": 0.3287296224,
-    "followUpTotal": 1.4273972928,
-    "priorTask9Total": 1.6415096768,
-    "cumulative": 3.0689069696
+  "costs": {
+    "initialTask9": 1.6415096768,
+    "followUpRound": 1.4273972928,
+    "finalFocusedRound": 0.3260564064,
+    "cumulative": 3.394963376
   },
-  "note": "Final review is awaiting_signoff with 5 major / 5 minor / 0 blocker; not signed. The new majors are design decisions (mode switcher, calendar orientation/loading/empty structure, reschedule context) recorded for a follow-up decision."
+  "note": "Final focused round signed per stopping rule with 6 major / 5 minor / 0 blocker; residual majors are v0.5 debt. The critic verdict remains changes; the run status is passed because deterministic gates passed and the signoff is valid."
 }

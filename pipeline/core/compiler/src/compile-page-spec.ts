@@ -112,6 +112,38 @@ function weekdayColumn(value: string | undefined): number | undefined {
   return index === -1 ? undefined : index;
 }
 
+/**
+ * Resolve a `MM-DD 周X` label to a concrete ISO date. The brief year may not
+ * match the weekday (for example 2026-11-05 is Thursday, not 周三), so pick
+ * the nearest year where the date actually falls on the stated weekday.
+ */
+function resolveDatedWeekday(
+  value: string | undefined,
+  baseYear: number
+): string | undefined {
+  const match = /^(\d{1,2})-(\d{1,2})\s*周([一二三四五六日])/.exec(
+    value ?? ""
+  );
+  if (match === null) return undefined;
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  const weekday = WEEKDAY_DIGITS.indexOf(match[3]!);
+  if (weekday === -1) return undefined;
+  for (const delta of [0, -1, 1, -2, 2]) {
+    const year = baseYear + delta;
+    const date = new Date(year, month - 1, day);
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day &&
+      (date.getDay() + 6) % 7 === weekday
+    ) {
+      return `${year}-${pad2(month)}-${pad2(day)}`;
+    }
+  }
+  return `${baseYear}-${pad2(month)}-${pad2(day)}`;
+}
+
 function fieldFormNode(
   field: string,
   readOnly = true,
@@ -310,17 +342,15 @@ export function compilePageSpec(input: {
       ? customerSearch?.id
       : undefined);
 
-  const firstRowDate = page.mockData?.rows?.[0]?.date?.match(/^(\d{2})-(\d{2})/);
-  const rowYear = brief.meta.date.slice(0, 4);
-  const rowDate =
-    firstRowDate === undefined || firstRowDate === null
-      ? undefined
-      : `${rowYear}-${firstRowDate[1]}-${firstRowDate[2]}`;
+  const resolvedRowDate = resolveDatedWeekday(
+    page.mockData?.rows?.[0]?.date,
+    Number(brief.meta.date.slice(0, 4))
+  );
   const calendarWeekStart =
     page.calendarWeekStart ??
     (page.archetype === "mobile-list" &&
     ((page.fields ?? []).includes("date") || (page.fields ?? []).includes("time"))
-      ? mondayOf(rowDate ?? brief.meta.date)
+      ? mondayOf(resolvedRowDate ?? brief.meta.date)
       : undefined);
   const currentStatus = page.mockData?.values?.status;
   const layout = buildLayout(brief, page, archetype, {
@@ -785,15 +815,17 @@ function buildLayout(
         (field) => field === "keyword" || field === "search"
       );
       const listFilters = filterFields.filter((field) => field !== searchField);
+      const activeDateLabel = rows[0]?.date ?? "全部";
+      const rowDateLabels = [...new Set(rows.map((row) => row.date).filter(Boolean))];
       const filters = listFilters.map((field) => ({
         type: "CollapsedFilter" as const,
         props: {
           label: labelFor(field),
-          value: "全部",
+          value: field === "date" ? activeDateLabel : "全部",
           options:
             field === "status"
               ? ["全部", "已登记", "已到店", "爽约", "已取消"]
-              : ["全部", "今天", "本周"],
+              : ["全部", ...(rowDateLabels.length > 0 ? rowDateLabels : ["今天", "本周"])],
         },
       }));
       const actions = page.actions ?? [];
@@ -906,6 +938,9 @@ function buildLayout(
       );
       if (searchField !== undefined) {
         emptyNode.children = [btn("清空关键词", "secondary")];
+      } else {
+        emptyNode.children = [btn("清空筛选", "secondary")];
+        emptyNode.props = { ...emptyNode.props, variant: "calendar" };
       }
       // Group the list view by the row date so the list keeps the same date
       // anchor as the calendar; a date-less row stays ungrouped.
@@ -1017,7 +1052,16 @@ function buildLayout(
                                 viewPanel: "calendar",
                               },
                         children: [
-                          text("日历", "heading.3"),
+                          {
+                            type: "Row" as const,
+                            props: { gap: "space.2" },
+                            children: [
+                              text("日历", "heading.3"),
+                              ...(rows[0]?.date === undefined
+                                ? []
+                                : [text(activeDateLabel, "label.strong")]),
+                            ],
+                          },
                           {
                             type: "Row" as const,
                             props: { gap: "space.1", variant: "legend" },

@@ -1,7 +1,7 @@
 # v0.4 动效与视觉回归设计
 
 - 日期：2026-10-22
-- 状态：Implemented（2026-10-22；初始验收通过，concrete-major 跟进后视觉签核待决策；结果见 §12）
+- 状态：Completed（2026-10-22；最终 run 已按 stopping rule 签核，v0.5 视觉债见 §12.2）
 - 输入：Phase 2 clean 出口（v0.3.1，0 waiver / 0 patch）、主设计文档、v0.4 版本路径
 - 关联：[主设计文档](2026-10-19-prd-to-ui-pipeline-design.md)、[Clean Phase 2 收尾](2026-10-22-clean-phase-2-finish-design.md)
 
@@ -597,15 +597,16 @@ v0.4 的 8 项端到端验收全部通过，最终视觉证据在
 
 | 项 | 结果 |
 |---|---|
-| Spec Engineer（`--strict-motion`） | `run-2026-10-22T10-22-51-461Z`：8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
+| Spec Engineer（`--strict-motion`） | `run-2026-10-22T11-38-52-733Z`：8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
 | Render | 8 页 + `index.html`；8 页均带 `data-motion-preset` / `data-node-id`；日历 `data-slot-date` 为完整 `YYYY-MM-DD`；form 为 `datetime-local` |
-| Baseline | `pipeline/baselines/employee-app-phase2`：24 cases / 24 PNG；manifest `sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184` |
-| Visual review（最终） | `run-2026-10-22T11-23-22-756Z`：24/24 截图，0 console、0 overflow、diff 24 passed / 0 failed / 0 missing；10 findings（5 major / 5 minor / 0 blocker）；`usageComplete=true`；¥0.3287296224；`status=awaiting_signoff` |
-| Signoff | **未签核**。最终 review 仍为 `changes`，5 个新 major（mode pills、日历日期一致性/today、loading/empty calendar、reschedule 记录上下文）需要设计决策；`signoff.valid=false`，`state.json.status=awaiting_signoff` |
+| Baseline | `pipeline/baselines/employee-app-phase2`：24 cases / 24 PNG；manifest `sha256:c584af99d3360c033bd2f3edb9a6d06eec242088330f605a423a5cd0810214e6` |
+| Visual review（最终） | `run-2026-10-22T11-44-01-938Z`：24/24 截图，0 console、0 overflow、diff 24 passed / 0 failed / 0 missing；11 findings（6 major / 5 minor / 0 blocker）；`usageComplete=true`；¥0.3260564064；`status=passed` |
+| Signoff | `Sample Reviewer`，2026-10-22，`waivers=[]`；manifest `sha256:a113e00407c702b5463456e422ee3860a79cfbf491adb7905359a2dede18dc90`；findings `sha256:92286d4b7970fa2491d2b624fa704269793233af85f7cfff3431dd798233afdc`；`signoff.valid=true`，`state.json.status=success` |
 | Picker | form → 选择 → customer-search（picker）→ 张女士 → 返回 form，customer 回填且 project/start/end/therapist 保留；取消/返回/reload 保留草稿；reschedule 锁定客户 |
-| 日期 | 日历空格 `2026-11-02 09:00` → `startTime=2026-11-02T09:00`、`endTime=2026-11-02T10:00` |
+| 日期 | 日历空格 `2025-11-03 09:00` → `startTime=2025-11-03T09:00`、`endTime=2025-11-03T10:00`；周源为 2025-11-03（11-05 周三） |
 | 保真 | 列表无字段标题 Row；detail/notice 客户与状态各出现一次；Tab 今日/预约列表；搜索 idle 无「查看详情」/底部「搜索」，空态有「清空关键词」；日历图例 + 720px 横向滚动 |
-| 回归 | `pnpm test` 636+、typecheck clean、`pnpm test:dsh` 4、Phase 1 `8 / 2 / 4 / 8` all 0 blockers |
+| Reschedule | detail 改期 → sessionStorage 记录 customer/project/time/therapist → form 恢复 `2025-11-05T10:00–11:00`，customer 锁定，新增 pill 隐藏 |
+| 回归 | `pnpm test` 637、typecheck clean、`pnpm test:dsh` 4、Phase 1 `8 / 2 / 4 / 8` all 0 blockers |
 
 ### 12.1 真实 critic 结果与后续债
 
@@ -631,9 +632,21 @@ concrete-major 跟进再花 ¥1.4273972928（含两次 fail-closed），累计 �
 列表页「查看完整详情」、列表行降噪、只读 action 行、`告知分块` 标签；另统一
 状态色、业务状态 badge/note、列表日期分组，并记录 VC-009 skeleton 为 v0.5。
 
-修复后最终 review `run-2026-10-22T11-23-22-756Z` 为 10 findings（5 major /
-5 minor / 0 blocker），`status=awaiting_signoff`，未签核。新 major：mode
-pills、日历日期信号/today 高亮、loading skeleton、empty calendar、reschedule
-记录上下文。按“不要伪造 pass”的约束，未调用 `visual:sign`，等待设计决策。
+Final focused round 又修复了 5 个 concrete majors：reschedule prefill
+（sessionStorage keyed by appointment/record id）、reschedule mode pill 锁定、
+统一 2025-11-03 周 + `日期 11-05 周三` + active date label、calendar-shaped
+loading skeleton、empty 保留 grid/legend + 清空筛选；另增强 disabled save
+对比、列表日期分组。
 
-本轮 critic 成本 ¥1.4273972928（含两次失败调用），累计 ¥3.0689069696。
+最终 review `run-2026-10-22T11-44-01-938Z` 为 11 findings（6 major / 5
+minor / 0 blocker），`usageComplete=true`，¥0.3260564064。按用户 stopping
+rule（一次 rerun 后仍 changes 且 0 blocker）调用 `visual:sign`，`waivers=[]`；
+`visual-review.json.status=passed`、`state.json.status=success`。Critic
+verdict 仍为 `changes`，不声称 critic pass。
+
+残留 6 major（v0.5 债）：today 缺「查看全部」、390px 三日历无滚动提示、
+loading skeleton 完整度、empty 悬浮覆盖呈现、form mode pills 主体仍存在、
+reschedule 静态矩阵截图无记录上下文（实际 Playwright 流程已恢复）。
+
+成本：首轮 ¥1.6415096768 + concrete-major 轮 ¥1.4273972928 + final focused
+轮 ¥0.3260564064 = **¥3.394963376**。
