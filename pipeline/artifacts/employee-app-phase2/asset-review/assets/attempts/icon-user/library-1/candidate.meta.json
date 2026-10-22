@@ -1,0 +1,21 @@
+{
+  "assetId": "icon-user",
+  "source": "library",
+  "sourceTier": "A",
+  "attempt": 1,
+  "file": {
+    "path": "assets/attempts/icon-user/library-1/candidate.svg",
+    "format": "svg",
+    "hash": "sha256:cd71aead1fdddca7aa1bebbf9e3a63989d4c5a4d6c6973a00234d352f9382257"
+  },
+  "producer": {
+    "tool": "library",
+    "model": "lucide",
+    "references": [
+      "icons/user.svg"
+    ]
+  },
+  "license": "ISC",
+  "costUsd": 0,
+  "producedAt": "2026-10-22T03:43:54.112Z"
+}

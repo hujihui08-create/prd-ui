@@ -6,7 +6,7 @@
       "id": "icon-home",
       "kind": "icon",
       "library": "library",
-      "style": "employee-app-phase2/b-mobile-neutral",
+      "style": "employee-app/b-mobile-neutral",
       "files": [
         {
           "path": "assets/frozen/icon-home/asset.svg",
@@ -20,7 +20,7 @@
       "id": "icon-plus",
       "kind": "icon",
       "library": "library",
-      "style": "employee-app-phase2/b-mobile-neutral",
+      "style": "employee-app/b-mobile-neutral",
       "files": [
         {
           "path": "assets/frozen/icon-plus/asset.svg",
@@ -34,7 +34,7 @@
       "id": "icon-search",
       "kind": "icon",
       "library": "library",
-      "style": "employee-app-phase2/b-mobile-neutral",
+      "style": "employee-app/b-mobile-neutral",
       "files": [
         {
           "path": "assets/frozen/icon-search/asset.svg",
@@ -48,7 +48,7 @@
       "id": "icon-user",
       "kind": "icon",
       "library": "library",
-      "style": "employee-app-phase2/b-mobile-neutral",
+      "style": "employee-app/b-mobile-neutral",
       "files": [
         {
           "path": "assets/frozen/icon-user/asset.svg",

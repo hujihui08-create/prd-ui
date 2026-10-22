@@ -47,7 +47,7 @@
     "iconSetPassed": true,
     "illustrationSetPassed": true
   },
-  "usageSource": "unavailable",
-  "usageComplete": false,
+  "usageSource": "json-events",
+  "usageComplete": true,
   "complete": true
 }

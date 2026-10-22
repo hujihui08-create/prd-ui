@@ -1,0 +1,21 @@
+{
+  "assetId": "icon-home",
+  "source": "library",
+  "sourceTier": "A",
+  "attempt": 1,
+  "file": {
+    "path": "assets/attempts/icon-home/library-1/candidate.svg",
+    "format": "svg",
+    "hash": "sha256:b7307b0d22ce4f66d8e06021825f7a1c9653a8f64b3237572897f6cc7265d65e"
+  },
+  "producer": {
+    "tool": "library",
+    "model": "lucide",
+    "references": [
+      "icons/home.svg"
+    ]
+  },
+  "license": "ISC",
+  "costUsd": 0,
+  "producedAt": "2026-10-22T03:43:12.468Z"
+}

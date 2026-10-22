@@ -110,7 +110,8 @@ slice, PRD readiness ready, **0 waivers and 0 manual brief patches**, brief hash
 `sha256:b558b57a…b8335`, intake ¥0.8978; M1
 `ia:passed / interaction:passed / visualStyle:passed` (0 waivers, ¥0.44),
 Spec Engineer 8 Page Specs / 0 blockers / 36 warnings, assets missing=0,
-render 8 HTML + index, `phase1:verify` 8 pages / 0 blockers; Playwright
+asset review 4/4 passed (¥0.1698), render 8 HTML + index,
+`phase1:verify` 8 pages / 0 blockers; Playwright
 interaction checks (search idle/filter/clear/empty, calendar/list toggle,
 empty-cell prefill, drawer, form new/reschedule with customer lock, detail
 status actions, notice confirmation) with 19 screenshots checked in. The

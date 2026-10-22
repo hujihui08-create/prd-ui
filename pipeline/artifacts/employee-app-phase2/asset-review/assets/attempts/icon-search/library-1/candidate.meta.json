@@ -1,0 +1,21 @@
+{
+  "assetId": "icon-search",
+  "source": "library",
+  "sourceTier": "A",
+  "attempt": 1,
+  "file": {
+    "path": "assets/attempts/icon-search/library-1/candidate.svg",
+    "format": "svg",
+    "hash": "sha256:ef9dc16399dfe210911c9eba8a87830d810df631ab5d12e8f56dc365eff22f8b"
+  },
+  "producer": {
+    "tool": "library",
+    "model": "lucide",
+    "references": [
+      "icons/search.svg"
+    ]
+  },
+  "license": "ISC",
+  "costUsd": 0,
+  "producedAt": "2026-10-22T03:43:35.041Z"
+}

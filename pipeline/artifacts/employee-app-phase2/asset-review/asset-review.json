@@ -1,17 +1,17 @@
 {
-  "runId": "run-2026-10-21T10-48-48-004Z",
+  "runId": "run-2026-10-22T03-43-12-461Z",
   "project": "employee-app-phase2",
   "profile": "b-mobile",
-  "startedAt": "2026-10-21T10:48:48.007Z",
-  "finishedAt": "2026-10-21T10:48:48.022Z",
+  "startedAt": "2026-10-22T03:43:12.466Z",
+  "finishedAt": "2026-10-22T03:44:06.649Z",
   "assets": [
     {
       "assetId": "icon-home",
       "brief": {
         "id": "icon-home",
         "kind": "icon",
-        "scene": "Semantic marker for the Today workspace destination in the employee mobile app.",
-        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "scene": "Navigation glyph for the 今日 home surface; outline house silhouette signalling the store workbench start point.",
+        "styleRef": "employee-app/b-mobile-neutral",
         "size": {
           "width": 24,
           "height": 24
@@ -22,17 +22,15 @@
           "strokeWidth": 1.5,
           "currentColor": true,
           "noText": true,
-          "noLogo": true,
-          "noScreenshot": true,
-          "safeArea": 2
+          "noLogo": true
         },
         "sourceChain": [
           "library"
         ],
         "brandCritical": false,
         "humanSignoffRequired": false,
-        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
-        "sourceHint": "Select the library home outline and normalize to the shared 24px grid, 1.5px stroke, rounded caps and joins."
+        "visualRef": "employee-app/b-mobile-neutral#icon-24-outline-1.5",
+        "sourceHint": "Select from a standard 24px outline icon library (Lucide/Phosphor/Tabler class), keep stroke at 1.5px on the 24px grid, strip brand or filled variants, ship as currentColor SVG."
       },
       "status": "passed",
       "sourceTier": "A",
@@ -63,7 +61,7 @@
             },
             "license": "ISC",
             "costUsd": 0,
-            "producedAt": "2026-10-21T10:48:48.008Z"
+            "producedAt": "2026-10-22T03:43:12.468Z"
           },
           "gate": {
             "passed": true,
@@ -73,17 +71,28 @@
             "verdict": "pass",
             "hardIssues": [],
             "scores": {
-              "brandFit": 5,
+              "brandFit": 4,
               "semantics": 5,
-              "consistency": 4,
-              "editability": 4,
+              "consistency": 5,
+              "editability": 5,
               "composition": 5
             },
-            "suggestedChanges": [],
-            "reason": "M0 scripted pass."
+            "suggestedChanges": [
+              "Optional: drop the utility `class=\"lucide lucide-home\"` (or scope it) so host CSS cannot restyle the glyph; keep the ISC license comment for attribution.",
+              "Optional: if the nav bar is dense, verify the door cut-out still reads at 16–20px optical size; no change needed at the specified 24px."
+            ],
+            "reason": "Rendered PNG confirms a clean outline house glyph: door cut-out is centered and legible, stroke weight matches the 1.5px / 24px outline convention, and the silhouette is balanced within the 3–21px safe area of the grid. The SVG uses `fill=\"none\"` with `stroke=\"currentColor\"`, explicit width/height 24 and viewBox 0 0 24 24, contains no text or logo marks, and ships two simple path elements with no transforms, groups, or baked-in palette colors, matching the brief constraints and the Lucide-class source hint while staying neutral against the b-mobile-neutral palette via currentColor. Hard gate is empty, all dimensions are ≥4, and the average is 4.8."
           },
           "issues": [],
-          "timestamp": "2026-10-21T10:48:48.007Z"
+          "reviewUsage": {
+            "inputTokens": 9708,
+            "outputTokens": 1395,
+            "cacheReadTokens": 36224,
+            "totalTokens": 47327
+          },
+          "reviewCostUsd": 0.0048037439999999995,
+          "reviewCostCny": 0.0345869568,
+          "timestamp": "2026-10-22T03:43:12.467Z"
         }
       ],
       "degraded": false,
@@ -109,8 +118,8 @@
       "brief": {
         "id": "icon-plus",
         "kind": "icon",
-        "scene": "Create/add affordance for new appointment entry and other additive actions.",
-        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "scene": "Add/create affordance for 新增预约 entry points; simple 12px-arm plus cross, optically centered.",
+        "styleRef": "employee-app/b-mobile-neutral",
         "size": {
           "width": 24,
           "height": 24
@@ -121,17 +130,15 @@
           "strokeWidth": 1.5,
           "currentColor": true,
           "noText": true,
-          "noLogo": true,
-          "noScreenshot": true,
-          "safeArea": 2
+          "noLogo": true
         },
         "sourceChain": [
           "library"
         ],
         "brandCritical": false,
         "humanSignoffRequired": false,
-        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
-        "sourceHint": "Select the library plus outline; avoid filled badges or enclosed variants."
+        "visualRef": "employee-app/b-mobile-neutral#icon-24-outline-1.5",
+        "sourceHint": "Standard library plus glyph from the same 24px outline set as the other three icons so stroke weight and terminal caps match exactly."
       },
       "status": "passed",
       "sourceTier": "A",
@@ -162,7 +169,7 @@
             },
             "license": "ISC",
             "costUsd": 0,
-            "producedAt": "2026-10-21T10:48:48.016Z"
+            "producedAt": "2026-10-22T03:43:23.362Z"
           },
           "gate": {
             "passed": true,
@@ -172,17 +179,27 @@
             "verdict": "pass",
             "hardIssues": [],
             "scores": {
-              "brandFit": 5,
+              "brandFit": 4,
               "semantics": 5,
-              "consistency": 4,
-              "editability": 4,
-              "composition": 5
+              "consistency": 5,
+              "editability": 5,
+              "composition": 4
             },
-            "suggestedChanges": [],
-            "reason": "M0 scripted pass."
+            "suggestedChanges": [
+              "Optional polish only: the glyph spans 5→19 (14-unit arms) rather than a literal 12px arm; if the brief's \"12px-arm\" is exact, change to M6 12h12 / M12 6v12. No change required for the library-set intent."
+            ],
+            "reason": "Canonical Lucide 24px outline plus: 24×24 viewBox, stroke-width 1.5, round caps/joins, fill=none, currentColor, two plain path elements, no text or logo. The cross is symmetric about (12,12) and optically centered, reads unambiguously as the add/create affordance, and its stroke weight and terminal caps match the sibling 24px outline icons called for by the source hint. Minor deviation: arms are 14 units (5→19) instead of the brief's literal 12px arm, giving slightly tighter 5px padding; this is a standard-library characteristic and does not impair legibility or centering. Hard gate passed with no issues; scores average 4.6 with no dimension below 4."
           },
           "issues": [],
-          "timestamp": "2026-10-21T10:48:48.015Z"
+          "reviewUsage": {
+            "inputTokens": 9761,
+            "outputTokens": 1959,
+            "cacheReadTokens": 36992,
+            "totalTokens": 48712
+          },
+          "reviewCostUsd": 0.005501051999999999,
+          "reviewCostCny": 0.0396075744,
+          "timestamp": "2026-10-22T03:43:23.361Z"
         }
       ],
       "degraded": false,
@@ -208,8 +225,8 @@
       "brief": {
         "id": "icon-search",
         "kind": "icon",
-        "scene": "Search affordance for customer lookup by name or masked mobile number.",
-        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "scene": "Customer search entry and picker trigger; magnifier glyph representing 姓名/脱敏手机号 lookup.",
+        "styleRef": "employee-app/b-mobile-neutral",
         "size": {
           "width": 24,
           "height": 24
@@ -220,17 +237,15 @@
           "strokeWidth": 1.5,
           "currentColor": true,
           "noText": true,
-          "noLogo": true,
-          "noScreenshot": true,
-          "safeArea": 2
+          "noLogo": true
         },
         "sourceChain": [
           "library"
         ],
         "brandCritical": false,
         "humanSignoffRequired": false,
-        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
-        "sourceHint": "Select the library magnifier outline; keep the handle at 45 degrees and no glyph text."
+        "visualRef": "employee-app/b-mobile-neutral#icon-24-outline-1.5",
+        "sourceHint": "Standard library magnifier glyph, handle joined to the lens without a gap, 1.5px stroke on the 24px grid, delivered as currentColor SVG."
       },
       "status": "passed",
       "sourceTier": "A",
@@ -261,7 +276,7 @@
             },
             "license": "ISC",
             "costUsd": 0,
-            "producedAt": "2026-10-21T10:48:48.018Z"
+            "producedAt": "2026-10-22T03:43:35.041Z"
           },
           "gate": {
             "passed": true,
@@ -273,15 +288,23 @@
             "scores": {
               "brandFit": 5,
               "semantics": 5,
-              "consistency": 4,
-              "editability": 4,
+              "consistency": 5,
+              "editability": 5,
               "composition": 5
             },
             "suggestedChanges": [],
-            "reason": "M0 scripted pass."
+            "reason": "Lucide search glyph satisfies the brief on every constraint: 24x24 viewBox on the 24 grid, stroke-width 1.5, currentColor, round caps/joins, no text or logo, and no hardcoded palette colors (so it inherits the neutral baseline token when used). Rendered PNG inspection confirms the actual raster matches spec: at 2x the ring is 3px (1.5px at 24px), the glyph is centered (content bounds ~2.25–21.75 in both axes, optical center 12,12), and nothing is clipped at the canvas edge. The handle path m21 21-4.34-4.34 terminates essentially on the lens circumference (distance ~8.00 vs r=8), so the handle is joined without a gap as the sourceHint requires. Markup is two primitives (one path, one circle) with no fills or embedded raster, making it trivially editable and recolorable. Semantics are unambiguous for a magnifier search/picker trigger. Hard gate passed with no issues; no blocking defects to report."
           },
           "issues": [],
-          "timestamp": "2026-10-21T10:48:48.017Z"
+          "reviewUsage": {
+            "inputTokens": 10003,
+            "outputTokens": 3563,
+            "cacheReadTokens": 53888,
+            "totalTokens": 67454
+          },
+          "reviewCostUsd": 0.0075998279999999994,
+          "reviewCostCny": 0.0547187616,
+          "timestamp": "2026-10-22T03:43:35.041Z"
         }
       ],
       "degraded": false,
@@ -307,8 +330,8 @@
       "brief": {
         "id": "icon-user",
         "kind": "icon",
-        "scene": "Customer identity marker for lookup results and customer detail context.",
-        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "scene": "Person/客户 identity glyph used for customer affordances and as the staff avatar fallback.",
+        "styleRef": "employee-app/b-mobile-neutral",
         "size": {
           "width": 24,
           "height": 24
@@ -319,17 +342,15 @@
           "strokeWidth": 1.5,
           "currentColor": true,
           "noText": true,
-          "noLogo": true,
-          "noScreenshot": true,
-          "safeArea": 2
+          "noLogo": true
         },
         "sourceChain": [
           "library"
         ],
         "brandCritical": false,
         "humanSignoffRequired": false,
-        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
-        "sourceHint": "Select the library single-person outline; neutral silhouette with no gender or role cue."
+        "visualRef": "employee-app/b-mobile-neutral#icon-24-outline-1.5",
+        "sourceHint": "Standard library single-person outline glyph (head + shoulders), no face detail, 1.5px stroke on the 24px grid, currentColor SVG from the same family as the other three icons."
       },
       "status": "passed",
       "sourceTier": "A",
@@ -360,7 +381,7 @@
             },
             "license": "ISC",
             "costUsd": 0,
-            "producedAt": "2026-10-21T10:48:48.020Z"
+            "producedAt": "2026-10-22T03:43:54.112Z"
           },
           "gate": {
             "passed": true,
@@ -372,15 +393,23 @@
             "scores": {
               "brandFit": 5,
               "semantics": 5,
-              "consistency": 4,
-              "editability": 4,
+              "consistency": 5,
+              "editability": 5,
               "composition": 5
             },
             "suggestedChanges": [],
-            "reason": "M0 scripted pass."
+            "reason": "Canonical Lucide single-person outline glyph: head circle plus open shoulder arc, no facial detail, correctly centered on the 24px grid with balanced 3px optical margins. Uses currentColor, fill=\"none\", 1.5px stroke with round caps/joins, and no text or logo, matching every brief constraint. It is the same Lucide 1.59.0 static family, stroke weight, and cap/join treatment as the sibling home/plus/search icons, so it reads as one set. Only two simple primitives, so it is trivially editable and renders cleanly at 24px/2x."
           },
           "issues": [],
-          "timestamp": "2026-10-21T10:48:48.020Z"
+          "reviewUsage": {
+            "inputTokens": 10495,
+            "outputTokens": 1842,
+            "cacheReadTokens": 52992,
+            "totalTokens": 65329
+          },
+          "reviewCostUsd": 0.005676852,
+          "reviewCostCny": 0.040873334399999996,
+          "timestamp": "2026-10-22T03:43:54.111Z"
         }
       ],
       "degraded": false,
@@ -408,7 +437,12 @@
     "retried": 0,
     "unresolved": 0,
     "degraded": 0,
-    "reviewerErrors": 0
+    "reviewerErrors": 0,
+    "reviewInputTokens": 39967,
+    "reviewOutputTokens": 8759,
+    "reviewCacheTokens": 180096,
+    "reviewCostUsd": 0.023581475999999997,
+    "reviewCostCny": 0.16978662719999998
   },
   "batchGates": {
     "iconSet": {
@@ -420,9 +454,9 @@
       "issues": []
     }
   },
-  "usageSource": "unavailable",
-  "usageComplete": false,
+  "usageSource": "json-events",
+  "usageComplete": true,
   "passed": true,
-  "evidenceDate": "2026-10-21",
-  "evidenceScope": "Earlier 2026-10-21 asset-review evidence; not part of the 2026-10-22 clean M1/Spec/render run."
+  "evidenceDate": "2026-10-22",
+  "evidenceScope": "Clean 2026-10-22 phase2 M1 asset briefs (icon-home/plus/search/user), reviewed with real dsh vision model"
 }

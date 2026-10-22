@@ -1,0 +1,21 @@
+{
+  "assetId": "icon-plus",
+  "source": "library",
+  "sourceTier": "A",
+  "attempt": 1,
+  "file": {
+    "path": "assets/attempts/icon-plus/library-1/candidate.svg",
+    "format": "svg",
+    "hash": "sha256:ee8763e4744336bc6d7a976d081d5879a38f891d6de07a2d71a1bee05f76839e"
+  },
+  "producer": {
+    "tool": "library",
+    "model": "lucide",
+    "references": [
+      "icons/plus.svg"
+    ]
+  },
+  "license": "ISC",
+  "costUsd": 0,
+  "producedAt": "2026-10-22T03:43:23.362Z"
+}

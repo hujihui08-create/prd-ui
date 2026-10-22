@@ -236,9 +236,10 @@ Clean intake 与后续链路全部在 `employee-app-phase2` 8 页真实 PRD 上�
 | Spec Engineer | `run-2026-10-22T03-23-54-618Z` | 8 Page Specs、0 blockers、36 warnings（34 `SPEC_MOTION_NODE_UNRESOLVED` + 2 `SPEC_ASSET_UNUSED`）；assets missing 无，referenced `icon-plus` / `icon-search` |
 | HTML | — | 8 页 + `index.html`；`phase1:verify` `8 pages / 0 blockers` |
 | Playwright | — | 搜索 idle/张/清空/无匹配；日历/列表切换；空格 → form 带 date/time；抽屉 → 查看完整详情；列表行/查看完整详情 → detail；form new/reschedule CTA + 客户锁定；detail 已到店/取消/爽约；告知确认（确认人/确认时间）；19 张截图 |
+| Asset review | `run-2026-10-22T03-43-12-461Z` | clean M1 的 4 个标准图标 brief（`icon-home` / `icon-plus` / `icon-search` / `icon-user`）：4/4 passed、0 unresolved、0 degraded、0 reviewer errors；真实 dsh vision；¥0.1697866272 |
 
 - 回归：529 tests passed、typecheck clean、`pnpm test:dsh` 2 passed；Phase 1 `8/2/4/8` 全部 0 blockers。
-- 成本：最终链路 ¥1.337773536（intake + M1）；含早前重试共 ¥2.935835885。
+- 成本：最终链路 ¥1.5075601632（intake + M1 + asset review）；含早前重试共 ¥3.105622512。
 - 产物归档在 `pipeline/artifacts/employee-app-phase2/`，无 `/tmp` 或 `/Users` 绝对路径。
 
 ### v0.4 债务
@@ -247,5 +248,4 @@ Clean intake 与后续链路全部在 `employee-app-phase2` 8 页真实 PRD 上�
 - 日历空格预填只有 day-of-month（`03 09:00`），不是 PRD 要求的完整 `YYYY-MM-DD`。
 - M1 `interaction-spec.json` 的 `cd.new-appointment` 仍写“预填并锁定客户”，与已签核 brief/PRD/renderer（new 可编辑、仅 reschedule 锁定）冲突；按评审证据保留不改，留给 v0.4 对齐 prompt/schema。
 - 34 条 motion node warning 是 v0 预期（compiler 无稳定 node id）；2 条 unused asset brief（`icon-home`、`icon-user`）。
-- asset review 未在本轮重跑，`asset-review/` 仍是 2026-10-21 的项目资产证据（README 与 `evidenceScope` 已标注）。
 - 爽约/已取消仍保留只读“客户详情”导航；底部业务动作栏已隐藏。

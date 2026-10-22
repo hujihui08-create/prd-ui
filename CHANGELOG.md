@@ -39,10 +39,13 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   empty-cell prefill, drawer, detail 已到店/取消/爽约, form new/reschedule with
   customer lock, treatment notice confirmation; 19 screenshots under
   `pipeline/artifacts/employee-app-phase2/`.
+- Clean asset review `run-2026-10-22T03-43-12-461Z`: the 4 standard icon briefs
+  (`icon-home` / `icon-plus` / `icon-search` / `icon-user`) passed 4/4 with real
+  dsh vision, 0 unresolved/degraded/reviewer errors, ¥0.1697866272.
 - `pnpm test`: 529 passed; `pnpm test:dsh`: 2 passed; typecheck clean; Phase 1
   `8 / 2 / 4 / 8` pages all 0 blockers.
-- Final chain cost ¥1.337773536 (intake + M1); ¥2.935835885 including earlier
-  retries.
+- Final chain cost ¥1.5075601632 (intake + M1 + asset review); ¥3.105622512
+  including earlier retries.
 
 ### Limits
 

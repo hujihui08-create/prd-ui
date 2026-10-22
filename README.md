@@ -11,7 +11,7 @@
 - **Spec Engineer v0**：确定性 mapper，把 M1 的 interaction/motion/asset artifacts 写进 Page Spec；新增可选 `interactions[].nodeId` 与 `motion`，输出 gate/summary。motion 已携带、尚未动画到 HTML。
 - **PRD Review + UI Briefer**：Phase 2 前半段。`pnpm intake:run` 读 PRD，做确定性 normalize、PRD Reviewer、IA review、UI Briefer；两道人工签核后才写 `ui-brief.json`，可 resume 和原子发布。
 - **Phase 2 8 页出口**：已签核的 8 页 brief 可跑通 M1（IA/Interaction/Visual）、Spec Engineer、8 页 Page Spec 和 8 页 HTML；Phase 1 语义校验 `8 pages / 0 blockers`。
-- **Phase 2 出口（真实 PRD）**：`samples/projects/employee-app-phase2` 的 8 页真实 PRD 切片已跑通 clean 链路（v0.3.1）：intake 8 页、0 waiver、0 手工 brief patch，brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 三 gate passed、0 waiver（¥0.44）；Spec Engineer 8 Page Specs / 0 blockers；8 页 HTML + index，Phase 1 `8/0`。Studio/Asset Compiler 仍后置。
+- **Phase 2 出口（真实 PRD）**：`samples/projects/employee-app-phase2` 的 8 页真实 PRD 切片已跑通 clean 链路（v0.3.1）：intake 8 页、0 waiver、0 手工 brief patch，brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 三 gate passed、0 waiver（¥0.44）；Spec Engineer 8 Page Specs / 0 blockers；4 个标准图标 asset review 4/4 passed（¥0.17）；8 页 HTML + index，Phase 1 `8/0`。Studio/Asset Compiler 仍后置。
 - **Renderer 视觉 v0.1 + 交互 v0.3.1**：`mobile-list` 七列日历 + 列表双维度；`mobile-form` 单主 CTA；detail 底部固定操作栏与主/次动作拆分；`noticeBlocks` 告知按项目分块；共 12 个 archetype。轻量 vanilla JS 支持业务状态动作栏、new/reschedule 表单 mode、日历/列表切换、搜索过滤与详情抽屉。
 - **双运行时**：同一 core 状态机；`standalone` 用 scripted reviewer 跑 CI，`dsh` 用 headless + vision 模型跑真实评审。默认 provider 是 DeepSeek（`deepseek-flash`），没有 OpenAI fallback。
 - **dsh 适配**：项目内 pinned profile（`@deepseek-ai/dsh@0.2.1-rc.2`），插件可加载；真实评审需要配置 vision key。
@@ -291,7 +291,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - `pnpm phase1:verify --project samples/project.demo-orders-intake.yaml`：8 页 brief 的 Phase 1 语义校验，`8 pages / 0 blockers`。
 - `pnpm phase1:verify --project samples/projects/employee-app-appointments-03/project.yaml`：03 真实 PRD 四页切片，`4 pages / 0 blockers`；真实 dsh intake `¥0.5147`、M1 `¥0.2746`（`ia:waived / interaction:passed / visualStyle:passed`）、Spec Engineer 4 Page Specs / 0 blockers、HTML 4 页。产物：[`pipeline/artifacts/employee-app-appointments-03/`](pipeline/artifacts/employee-app-appointments-03/)。
 - 8 页 M1/Spec Engineer/renderer：8 Page Specs、8 HTML + index；M1 gate `ia:waived / interaction:passed / visualStyle:passed`，Spec Engineer 0 blockers。
-- Phase 2 clean 出口（v0.3.1）：`samples/projects/employee-app-phase2` 8 页真实 PRD 切片；intake 8 页、0 waiver、0 手工 brief patch、brief hash `sha256:b558b57a…b8335`（¥0.8978）、M1 `ia:passed / interaction:passed / visualStyle:passed`（0 waiver，¥0.43998）、Spec Engineer 8 Page Specs / 0 blockers / 36 warnings、assets missing=0、HTML 8 页、`phase1:verify` `8 pages / 0 blockers`；Playwright 交互验收 19 张截图。产物：[`pipeline/artifacts/employee-app-phase2/`](pipeline/artifacts/employee-app-phase2/)。
+- Phase 2 clean 出口（v0.3.1）：`samples/projects/employee-app-phase2` 8 页真实 PRD 切片；intake 8 页、0 waiver、0 手工 brief patch、brief hash `sha256:b558b57a…b8335`（¥0.8978）、M1 `ia:passed / interaction:passed / visualStyle:passed`（0 waiver，¥0.43998）、Spec Engineer 8 Page Specs / 0 blockers / 36 warnings、assets missing=0、4 个标准图标 asset review 4/4 passed（¥0.1698）、HTML 8 页、`phase1:verify` `8 pages / 0 blockers`；Playwright 交互验收 19 张截图。产物：[`pipeline/artifacts/employee-app-phase2/`](pipeline/artifacts/employee-app-phase2/)。
 - per-profile M1：8 页 demo-orders sample 真实 run prompt 含 b-dense + c-expressive，interaction passed（¥0.5105）。
 - 资产链：`deriveStandardAssetInventory` + Visual Style 4 个标准图标 briefs；`asset:review --briefs` `4/4 passed`。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。

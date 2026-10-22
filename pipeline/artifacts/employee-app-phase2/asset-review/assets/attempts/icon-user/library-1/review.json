@@ -1,0 +1,14 @@
+{
+  "verdict": "pass",
+  "hardIssues": [],
+  "scores": {
+    "brandFit": 5,
+    "semantics": 5,
+    "consistency": 5,
+    "editability": 5,
+    "composition": 5
+  },
+  "suggestedChanges": [],
+  "reason": "Canonical Lucide single-person outline glyph: head circle plus open shoulder arc, no facial detail, correctly centered on the 24px grid with balanced 3px optical margins. Uses currentColor, fill=\"none\", 1.5px stroke with round caps/joins, and no text or logo, matching every brief constraint. It is the same Lucide 1.59.0 static family, stroke weight, and cap/join treatment as the sibling home/plus/search icons, so it reads as one set. Only two simple primitives, so it is trivially editable and renders cleanly at 24px/2x.",
+  "inconsistencies": []
+}

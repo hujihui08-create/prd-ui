@@ -19,7 +19,7 @@ run-summary/                intake / M1 / agent:sign / Spec / Phase 1 摘要
 signoffs/                   PRD/IA、brief、visual-style 签核
 gates/                      ia / interaction / visual-style gate 结果
 m1-final-ia-blocked/        早前 blocked M1 IA 的证据（保留）
-asset-review/               2026-10-21 的项目资产证据（非 clean run，见其 README）
+asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4 passed）
 ```
 
 ## Clean run 数字
@@ -29,9 +29,10 @@ asset-review/               2026-10-21 的项目资产证据（非 clean run，�
 | intake | `run-2026-10-22T03-09-28-544Z` | success；8 页全 `b-mobile`；PRD/IA + brief gate passed；0 waivers、0 手工 brief edits；brief hash `sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335`；¥0.8977902624 |
 | M1 | `run-2026-10-22T03-16-05-257Z` | success；`ia:passed / interaction:passed / visualStyle:passed`；0 waivers；¥0.4399832736 |
 | Spec Engineer | `run-2026-10-22T03-23-54-618Z` | 8 Page Specs、0 blockers、36 warnings（34 motion node + 2 unused asset） |
+| Asset review | `run-2026-10-22T03-43-12-461Z` | clean M1 的 4 个标准图标 brief：4/4 passed、0 unresolved；真实 dsh vision；¥0.1697866272 |
 | HTML / Phase 1 | — | 8 页 + index；`8 pages / 0 blockers` |
 
-最终链路成本 ¥1.337773536；含早前重试共 ¥2.935835885。
+最终链路成本 ¥1.5075601632（intake + M1 + asset review）；含早前重试共 ¥3.105622512。
 
 ## 页面
 
@@ -80,6 +81,5 @@ pnpm render:html --run <spec-run-dir> --out <html-out-dir>
   与已签核 brief（new 可编辑、仅 reschedule 锁定）不一致；artifact 保留不改。
 - 34 条 motion node warning 是 v0 预期；2 条 unused asset brief
   （`icon-home` / `icon-user`）。
-- `asset-review/` 不是本轮产物，仍是 2026-10-21 的资产证据。
 - 爽约/已取消保留只读“客户详情”导航；底部业务动作栏已隐藏。
 - motion 尚未动画到 HTML；没有 Visual Critic / 自动截图 diff。
