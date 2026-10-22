@@ -64,7 +64,7 @@ export const bMobileCatalog: Catalog = {
           ],
         },
         summary: { allowed: ["Card", "List", "ListItem", "Badge", "Stack", "Row", "Text"] },
-        fields: { allowed: ["Section", "FormField", "Input", "Select", "Stack", "Row", "Text"] },
+        fields: { allowed: ["Section", "FormField", "Input", "Select", "EmptyState", "Stack", "Row", "Text"] },
         actions: { allowed: ["Section", "Button", "Row", "Stack", "Text"] },
         "bottom-nav": { allowed: ["TabBar"] },
       },

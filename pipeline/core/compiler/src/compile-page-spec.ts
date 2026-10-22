@@ -1111,6 +1111,9 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
                   children: secondaryActions,
                 },
               ]),
+          ...(page.emptyTitle === undefined
+            ? []
+            : [emptyStateNode(page, page.emptyTitle)]),
         ],
         actions,
       },
@@ -1181,6 +1184,9 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
                     children: secondaryActions,
                   },
                 ]),
+            ...(page.emptyTitle === undefined
+              ? []
+              : [emptyStateNode(page, page.emptyTitle)]),
           ],
         },
       ],

@@ -43,7 +43,7 @@ export const bDenseCatalog: Catalog = {
           ],
         },
         summary: { allowed: ["Card", "List", "ListItem", "Badge", "Stack", "Row", "Text"] },
-        fields: { allowed: ["Section", "FormField", "Input", "Select", "Grid", "Stack", "Row", "Text"] },
+        fields: { allowed: ["Section", "FormField", "Input", "Select", "Grid", "EmptyState", "Stack", "Row", "Text"] },
         actions: { allowed: ["Section", "Button", "Row", "Stack", "Text"] },
         groups: {
           allowed: [

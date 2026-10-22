@@ -358,6 +358,7 @@ describe("brief-driven page content", () => {
         status: "状态",
         notices: "告知内容",
       },
+      emptyTitle: "暂无告知内容",
       noticeBlocks: [
         { title: "小气泡", items: ["24 小时内避免沾水", "注意防晒"] },
         { title: "补水", items: ["多饮水，做好保湿"] },
@@ -387,6 +388,7 @@ describe("brief-driven page content", () => {
     expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain(
       "告知内容"
     );
+    expect(nodesOf(spec, "EmptyState")[0]?.props?.title).toBe("暂无告知内容");
   });
 
   it("compiles a mobile-list search page", () => {
