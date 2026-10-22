@@ -75,21 +75,6 @@ function text(label: string, textRole = "body.md"): SpecNode {
   return { type: "Text", props: { text: label }, textRole };
 }
 
-/**
- * Keep a semantic label in the layout without repeating it visually. Phase 1
- * semantic validation requires every brief field/action to appear as an exact
- * prop value, so pages that intentionally drop a visible label row (mobile
- * list field captions, implicit search, alternate form modes) carry the labels
- * here instead. `.sr-only` clips the row for sighted users.
- */
-function srOnlyRow(labels: string[]): SpecNode {
-  return {
-    type: "Row",
-    props: { gap: "space.1", variant: "sr-only" },
-    children: labels.map((label) => text(label, "label.sm")),
-  };
-}
-
 function pad2(value: number): string {
   return String(value).padStart(2, "0");
 }
@@ -876,6 +861,11 @@ function buildLayout(
             subtitleParts.push(labelValue("store", row.store));
           }
         }
+        // With a project value the subtitle is project-first; store still needs
+        // a visible home on cross-store rows (PRD §5.7).
+        if (projectValue !== undefined && fields.includes("store") && row.store !== undefined) {
+          subtitleParts.push(labelValue("store", row.store));
+        }
         if (fields.includes("delegation")) {
           subtitleParts.push(
             labelValue("delegation", textOf(row, "delegation") ?? "—")
@@ -906,14 +896,6 @@ function buildLayout(
       if (searchField !== undefined) {
         emptyNode.children = [btn("清空关键词", "secondary")];
       }
-      // The visible caption row is gone; keep the exact labels for Phase 1
-      // semantic validation and screen readers. Search pages also drop the
-      // bottom action bar, so the primary action label travels here.
-      const hiddenLabels = [
-        ...fields.map(labelFor),
-        ...(searchField === undefined ? [] : [labelFor(searchField)]),
-        ...(interaction.searchIdleTitle === undefined ? [] : [primary]),
-      ];
       return {
         type: "MobileShell",
         props: { title: page.name, back: true, showTabs: false },
@@ -929,7 +911,10 @@ function buildLayout(
                   : [
                       {
                         type: "SearchBar",
-                        props: { placeholder: `搜索${labelFor(searchField)}` },
+                        props: {
+                          placeholder:
+                            interaction.searchIdleTitle ?? `搜索${labelFor(searchField)}`,
+                        },
                       },
                     ]),
                 ...(filters.length === 0
@@ -941,7 +926,6 @@ function buildLayout(
                         children: filters,
                       },
                     ]),
-                srOnlyRow(hiddenLabels),
                 ...(searchField !== undefined && interaction.searchIdleTitle !== undefined
                   ? [
                       {
@@ -1122,9 +1106,7 @@ function buildLayout(
                     { type: "Text" as const, props: { text: label }, textRole: "label.strong" },
                   ],
                 }))
-              : alternateActions.length === 0
-                ? []
-                : [srOnlyRow(alternateActions)]),
+              : []),
             ...(otherActions.length === 0
               ? []
               : [
@@ -1222,16 +1204,12 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
         );
   // The status badge owns the state; drop the duplicate body row when other
   // rows remain. Pages with a lone status value keep it so the summary card is
-  // not empty, and the exact 状态 label travels in an sr-only row.
+  // not empty.
   const entriesWithoutStatus = valueEntries?.filter(([key]) => key !== "status");
   const summaryEntries =
     entriesWithoutStatus !== undefined && entriesWithoutStatus.length > 0
       ? entriesWithoutStatus
       : valueEntries;
-  const statusInSummary =
-    status !== undefined && summaryEntries?.some(([key]) => key === "status") === true;
-  const statusLabelRow: SpecNode[] =
-    status === undefined || statusInSummary ? [] : [srOnlyRow(["状态"])];
   const summaryItems =
     summaryEntries === undefined
       ? page.mockData?.listItems
@@ -1296,7 +1274,6 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       ...missingFields.map((field) =>
         fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
       ),
-      ...statusLabelRow,
       ...(secondaryActions.length === 0
         ? []
         : [
@@ -1318,7 +1295,7 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     }
     return {
       type: "MobileShell",
-      props: { title: page.name, tabs },
+      props: { title: page.name, tabs, back: true },
       reqRef: page.reqRefs[0] as ReqId | undefined,
       slots: {
         summary: [summaryCard, ...noticeSection],
@@ -1342,7 +1319,6 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
             ...missingFields.map((field) =>
               fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
             ),
-            ...statusLabelRow,
             ...(secondaryActions.length === 0
               ? []
               : [

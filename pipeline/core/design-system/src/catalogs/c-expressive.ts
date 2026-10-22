@@ -12,6 +12,7 @@ export const cExpressiveCatalog: Catalog = {
       props: {
         title: { type: "string", required: true },
         tabs: { type: "string[]" },
+        back: { type: "boolean" },
       },
       variants: ["default"],
       states: ["default", "loading", "error"],

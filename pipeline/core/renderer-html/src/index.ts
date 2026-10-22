@@ -14,10 +14,13 @@ export interface RenderOptions {
   pageNames?: Record<string, string>;
   /** page id -> route, used to resolve linked routes to static HTML files. */
   pageRoutes?: Record<string, string>;
+  /** page id -> archetype, used to validate runtime picker return targets. */
+  pageArchetypes?: Record<string, string>;
 }
 
 let renderPageNames: Record<string, string> = {};
 let renderPageRoutes: Record<string, string> = {};
+let renderPageArchetypes: Record<string, string> = {};
 let renderMotionContext: MotionContext | undefined;
 let renderSpec: PageSpec | undefined;
 let renderProject = "PRD UI";
@@ -499,8 +502,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Row": {
       const gap = str(props.gap);
       const variant = str(props.variant);
-      const variantClass =
-        variant === "filter" ? " filter-row" : variant === "sr-only" ? " sr-only" : "";
+      const variantClass = variant === "filter" ? " filter-row" : "";
       return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
     }
     case "Stack":
@@ -887,7 +889,6 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
 .btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
 .btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -989,6 +990,12 @@ function renderInteractionScript(): string {
       states[0]?.name;
     const currentState = () => states.find((state) => state.name === status);
     const allowed = () => currentState()?.actions ?? [];
+    const toneFor = (value) => {
+      if (/已到店|已完成|已确认|成功|在售/.test(value)) return "success";
+      if (/已登记|待确认|未确认|待到店|待处理|进行|加载/.test(value)) return "warning";
+      if (/爽约|已取消|失败|异常|缺货/.test(value)) return "danger";
+      return "neutral";
+    };
     const bar = document.querySelector(".app-actions");
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
@@ -1002,7 +1009,10 @@ function renderInteractionScript(): string {
       }
       if (bar) bar.hidden = visibleInBar === 0;
       const badge = document.querySelector(".app-scroll .badge");
-      if (badge) badge.textContent = status;
+      if (badge) {
+        badge.textContent = status;
+        badge.className = "badge tone-" + toneFor(status);
+      }
       const statusField = document.querySelector('[data-field="status"] .form-value, [data-field="status"] .form-readonly');
       if (statusField) statusField.textContent = status;
       for (const row of qsa(".app-scroll .list-text-row")) {
@@ -1059,13 +1069,16 @@ function renderInteractionScript(): string {
         }
       }
       let note = document.querySelector(".state-note");
-      if (currentState()?.note) {
+      // Only read-only states (no bottom-bar action) carry a note; actionable
+      // states must not show long PRD explanations.
+      const noteText = visibleInBar === 0 ? currentState()?.note : undefined;
+      if (noteText) {
         if (!note && noteHost) {
           note = document.createElement("div");
           note.className = "state-note";
           noteHost.append(note);
         }
-        if (note) note.textContent = currentState().note;
+        if (note) note.textContent = noteText;
       } else if (note) {
         note.remove();
       }
@@ -1119,7 +1132,8 @@ function renderInteractionScript(): string {
       for (const mode of modes) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = mode.label;
+        button.dataset.mode = mode.name;
+        button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
         button.addEventListener("click", () => {
           current = mode;
           const appointmentId = params.get("appointmentId") ?? config.referenceId;
@@ -1160,7 +1174,7 @@ function renderInteractionScript(): string {
     );
     const apply = () => {
       for (const button of Array.from(tabs.children)) {
-        button.classList.toggle("active", button.textContent === current.label);
+        button.classList.toggle("active", button.dataset.mode === current.name);
       }
       if (submit) {
         submit.textContent = current.actions[0] ?? submit.textContent;
@@ -1191,6 +1205,7 @@ function renderInteractionScript(): string {
     const rows = qsa("[data-search-text]");
     const idle = document.querySelector('[data-empty-kind="idle"]');
     const empty = document.querySelector('[data-empty-kind="empty"]');
+    const pickerMode = new URLSearchParams(location.search).get("mode") === "picker";
     const apply = () => {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
@@ -1202,9 +1217,10 @@ function renderInteractionScript(): string {
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
-      // The detail entry depends on results; idle and no-match hide it.
+      // The detail entry depends on results; picker mode never navigates to
+      // the customer detail page.
       for (const button of qsa('[data-action="查看详情"]')) {
-        button.hidden = visible === 0;
+        button.hidden = pickerMode || visible === 0;
       }
     };
     input.addEventListener("input", apply);
@@ -1347,39 +1363,61 @@ function renderInteractionScript(): string {
     if (params.get("mode") === "picker" && pickerReturn) {
       for (const row of qsa("[data-search-text]")) {
         row.addEventListener("click", () => {
+          // Only return to a page that is actually a mobile form; otherwise
+          // fall back to the compiler-derived return target.
+          const requestedReturn = params.get("returnTo");
+          const allowed =
+            requestedReturn !== null &&
+            config.pageArchetypes?.[requestedReturn] === "mobile-form";
+          const target = allowed ? requestedReturn : pickerReturn;
+          if (!target) return;
+          sessionStorage.setItem("prd-ui:picker:return", target);
           sessionStorage.setItem("prd-ui:picker:selected", row.dataset.searchText ?? "");
-          location.href = pickerReturn + ".html";
+          location.href = target + ".html";
         });
       }
     }
     if (document.body.dataset.pageKind === "form") {
-      const draftRaw = sessionStorage.getItem("prd-ui:picker:" + config.pageId);
-      if (draftRaw) {
-        try {
-          const draft = JSON.parse(draftRaw);
-          for (const [name, value] of Object.entries(draft)) {
-            const input =
-              document.querySelector('[name="' + name + '"]') ||
-              document.querySelector(
-                '[data-field="' + name + '"] input, [data-field="' + name + '"] select'
-              );
-            if (input) input.value = value;
+      const draftKey = "prd-ui:picker:" + config.pageId;
+      const selectedKey = "prd-ui:picker:selected";
+      const returnKey = "prd-ui:picker:return";
+      const hasPrefill = Boolean(params.get("date") && params.get("time"));
+      const isPickerReturn = sessionStorage.getItem(returnKey) === config.pageId;
+      if (isPickerReturn) sessionStorage.removeItem(returnKey);
+      if (hasPrefill) {
+        // Calendar/list prefill always wins over a stale picker draft.
+        sessionStorage.removeItem(draftKey);
+        sessionStorage.removeItem(selectedKey);
+      } else if (isPickerReturn) {
+        const draftRaw = sessionStorage.getItem(draftKey);
+        if (draftRaw) {
+          try {
+            const draft = JSON.parse(draftRaw);
+            for (const [name, value] of Object.entries(draft)) {
+              const input =
+                document.querySelector('[name="' + name + '"]') ||
+                document.querySelector(
+                  '[data-field="' + name + '"] input, [data-field="' + name + '"] select'
+                );
+              if (input) input.value = value;
+            }
+          } catch {
+            sessionStorage.removeItem(draftKey);
           }
-        } catch {
-          sessionStorage.removeItem("prd-ui:picker:" + config.pageId);
         }
-      }
-      const selected = sessionStorage.getItem("prd-ui:picker:selected");
-      if (selected) {
-        const customer = document.querySelector('[data-field=customer] input');
-        if (customer) customer.value = selected.split(" ")[0] ?? "";
-        sessionStorage.removeItem("prd-ui:picker:selected");
+        const selected = sessionStorage.getItem(selectedKey);
+        if (selected) {
+          const customer = document.querySelector('[data-field=customer] input');
+          if (customer) customer.value = selected.split(" ")[0] ?? "";
+          sessionStorage.removeItem(selectedKey);
+        }
       }
       // Saving or cancelling the form ends the picker drafts.
       for (const button of qsa(".app-actions [data-action]")) {
         button.addEventListener("click", () => {
-          sessionStorage.removeItem("prd-ui:picker:" + config.pageId);
-          sessionStorage.removeItem("prd-ui:picker:selected");
+          sessionStorage.removeItem(draftKey);
+          sessionStorage.removeItem(selectedKey);
+          sessionStorage.removeItem(returnKey);
         });
       }
     }
@@ -1402,6 +1440,7 @@ export function renderDocument(
 ): string {
   renderPageNames = options.pageNames ?? {};
   renderPageRoutes = options.pageRoutes ?? {};
+  renderPageArchetypes = options.pageArchetypes ?? {};
   renderSpec = spec;
   renderMotionContext = createMotionContext(spec);
   renderProject = spec.meta.project;
@@ -1412,17 +1451,28 @@ export function renderDocument(
     const href = routeHref(route);
     if (href !== undefined) linkedRoutes[key] = href;
   }
+  const formModeLabels =
+    spec.formModes === undefined
+      ? null
+      : Object.fromEntries(
+          spec.formModes.map((mode) => [
+            mode.name,
+            mode.name === "new" ? "新增预约" : mode.name === "reschedule" ? "改期" : mode.label,
+          ])
+        );
   const config = {
     archetype: spec.meta.archetype,
     pageId: spec.meta.pageId,
     businessStates: spec.businessStates ?? null,
     formModes: spec.formModes ?? null,
+    formModeLabels,
     views: spec.views ?? null,
     defaultView: spec.defaultView ?? null,
     searchIdleTitle: spec.searchIdleTitle ?? null,
     currentStatus: spec.currentStatus ?? null,
     customerPicker: spec.customerPicker ?? null,
     pickerReturnTo: spec.pickerReturnTo ?? null,
+    pageArchetypes: renderPageArchetypes,
     referenceId: spec.referenceId ?? spec.meta.pageId,
     linkedRoutes,
   };

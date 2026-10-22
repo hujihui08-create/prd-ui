@@ -58,6 +58,9 @@ const phase2Routes = Object.fromEntries(
 const phase2PageNames = Object.fromEntries(
   phase2Specs.map((spec) => [spec.meta.pageId, spec.meta.name])
 );
+const phase2Archetypes = Object.fromEntries(
+  phase2Specs.map((spec) => [spec.meta.pageId, spec.meta.archetype])
+);
 
 type PageMotion = NonNullable<PageSpec["motion"]>;
 
@@ -331,11 +334,25 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     const search = renderDocument(
       phase2ById.get("customer-search")!,
       getProfile("b-mobile"),
-      { pageRoutes: phase2Routes }
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
     );
     expect(search).not.toContain('class="app-actions"');
     expect(search).toContain('data-action="查看详情"');
-    expect(search).toContain("button.hidden = visible === 0");
+    expect(search).toContain('placeholder="输入姓名或脱敏手机号搜索客户"');
+    expect(search).toContain("button.hidden = pickerMode || visible === 0");
+  });
+
+  it("carries page archetypes and validates the runtime picker return target", () => {
+    const search = renderDocument(
+      phase2ById.get("customer-search")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(search).toContain('"pageArchetypes":{"today":"home"');
+    expect(search).toContain('"appointment-form":"mobile-form"');
+    expect(search).toContain('config.pageArchetypes?.[requestedReturn] === "mobile-form"');
+    expect(search).toContain('const target = allowed ? requestedReturn : pickerReturn;');
+    expect(search).toContain('sessionStorage.setItem("prd-ui:picker:return", target)');
   });
 
   it("renders today plus the brief tabs on the home tab bar", () => {
@@ -359,6 +376,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(detail).toContain(
       'new URLSearchParams(location.search).get("status")'
     );
+    expect(detail).toContain("back-icon");
+    expect(detail).toContain(
+      'badge.className = "badge tone-" + toneFor(status)'
+    );
+    expect(detail).toContain(
+      "visibleInBar === 0 ? currentState()?.note : undefined"
+    );
 
     const list = renderDocument(
       phase2ById.get("appointment-list")!,
@@ -375,8 +399,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       { pageRoutes: phase2Routes }
     );
     expect(form).toContain('dateParam + "T" + timeParam');
+    expect(form).toContain('"formModeLabels":{"new":"新增预约","reschedule":"改期"}');
+    expect(form).toContain("config.formModeLabels?.[mode.name]");
     expect(form).toContain('sessionStorage.setItem("prd-ui:picker:"');
-    expect(form).toContain('sessionStorage.getItem("prd-ui:picker:selected")');
+    expect(form).toContain('sessionStorage.setItem("prd-ui:picker:return", target)');
+    expect(form).toContain('sessionStorage.getItem(returnKey) === config.pageId');
+    expect(form).toContain("if (hasPrefill)");
+    expect(form).toContain('sessionStorage.getItem(selectedKey)');
     expect(form).toContain('document.body.dataset.pageKind === "form"');
 
     const search = renderDocument(

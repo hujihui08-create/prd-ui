@@ -42,17 +42,210 @@ function collectPropStrings(value: unknown, found: Set<string>): void {
   }
 }
 
-function layoutStrings(root: PageSpec["layout"] | undefined): Set<string> {
-  const found = new Set<string>();
+function propString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function propStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+interface ListRowFacts {
+  title?: string;
+  subtitle?: string;
+  meta?: string;
+  status?: string;
+  trailing?: string;
+}
+
+interface LayoutFacts {
+  strings: Set<string>;
+  formFieldIds: Set<string>;
+  formFieldLabels: Set<string>;
+  tableColumns: Set<string>;
+  tableColumnLabels: Set<string>;
+  listRows: ListRowFacts[];
+  listItemLabels: Set<string>;
+  listItemTexts: string[];
+  hasSearchBar: boolean;
+  hasCalendarGrid: boolean;
+  badgeLabels: Set<string>;
+  hasCardBadge: boolean;
+}
+
+function addString(target: Set<string>, value: unknown): void {
+  const text = propString(value);
+  if (text !== undefined) target.add(text);
+}
+
+/**
+ * Structured facts about the layout. Semantic checks accept either an exact
+ * prop string or a real component representation (a FormField label/id, a
+ * DataTable column, a ListRow field, a summary List label, a SearchBar for a
+ * keyword filter, a CalendarGrid for date/time, a badge for status, and so on).
+ * This lets the renderer drop duplicate presentation nodes without weakening
+ * the brief-to-spec contract.
+ */
+function collectLayoutFacts(root: PageSpec["layout"] | undefined): LayoutFacts {
+  const facts: LayoutFacts = {
+    strings: new Set(),
+    formFieldIds: new Set(),
+    formFieldLabels: new Set(),
+    tableColumns: new Set(),
+    tableColumnLabels: new Set(),
+    listRows: [],
+    listItemLabels: new Set(),
+    listItemTexts: [],
+    hasSearchBar: false,
+    hasCalendarGrid: false,
+    badgeLabels: new Set(),
+    hasCardBadge: false,
+  };
+
   const visit = (node: NonNullable<PageSpec["layout"]>): void => {
-    collectPropStrings(node.props, found);
+    const props = node.props ?? {};
+    collectPropStrings(props, facts.strings);
+
+    switch (node.type) {
+      case "FormField":
+        addString(facts.formFieldIds, props.field);
+        addString(facts.formFieldLabels, props.label);
+        break;
+      case "DataTable":
+        for (const column of propStringArray(props.columns)) facts.tableColumns.add(column);
+        for (const label of propStringArray(props.columnLabels)) facts.tableColumnLabels.add(label);
+        break;
+      case "ListRow":
+        facts.listRows.push({
+          title: propString(props.title),
+          subtitle: propString(props.subtitle),
+          meta: propString(props.meta),
+          status: propString(props.status),
+          trailing: propString(props.trailing),
+        });
+        break;
+      case "List":
+        if (Array.isArray(props.items)) {
+          for (const item of props.items as unknown[]) {
+            if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+              addString(facts.listItemLabels, (item as Record<string, unknown>).label);
+            } else if (typeof item === "string") {
+              facts.listItemTexts.push(item);
+            }
+          }
+        }
+        break;
+      case "SearchBar":
+        facts.hasSearchBar = true;
+        break;
+      case "CalendarGrid":
+        facts.hasCalendarGrid = true;
+        break;
+      case "Badge":
+        addString(facts.badgeLabels, props.label);
+        break;
+      case "Card":
+        if (propString(props.badge) !== undefined) facts.hasCardBadge = true;
+        break;
+      default:
+        break;
+    }
+
     for (const child of node.children ?? []) visit(child);
     for (const nodes of Object.values(node.slots ?? {})) {
       for (const child of nodes) visit(child);
     }
   };
+
   if (root) visit(root);
-  return found;
+  return facts;
+}
+
+/** A label/id counts when a prop uses it as a `label：value` prefix. */
+function prefixedValue(values: Array<string | undefined>, candidates: string[]): boolean {
+  for (const value of values) {
+    if (value === undefined) continue;
+    for (const candidate of candidates) {
+      if (value === candidate) return true;
+      if (value.includes(`${candidate}：`) || value.includes(`${candidate}:`)) return true;
+    }
+  }
+  return false;
+}
+
+function fieldRepresented(
+  field: string,
+  localized: string | undefined,
+  facts: LayoutFacts
+): boolean {
+  const candidates = localized === undefined ? [field] : [field, localized];
+  if (candidates.some((candidate) => facts.strings.has(candidate))) return true;
+  if (facts.formFieldIds.has(field)) return true;
+  if (localized !== undefined && facts.formFieldLabels.has(localized)) return true;
+  if (facts.tableColumns.has(field)) return true;
+  if (localized !== undefined && facts.tableColumnLabels.has(localized)) return true;
+
+  const rowValues = facts.listRows.flatMap((row) =>
+    [row.title, row.subtitle, row.meta, row.status, row.trailing].filter(
+      (value): value is string => value !== undefined
+    )
+  );
+  if (prefixedValue(rowValues, candidates)) return true;
+  if (facts.listItemLabels.has(field)) return true;
+  if (localized !== undefined && facts.listItemLabels.has(localized)) return true;
+  if (prefixedValue(facts.listItemTexts, candidates)) return true;
+
+  const searchLike =
+    field === "keyword" || field === "search" || localized === "关键词" || localized === "搜索";
+  if (searchLike && facts.hasSearchBar) return true;
+
+  const dateLike =
+    field === "date" || field === "time" || localized === "日期" || localized === "时间段";
+  if (dateLike && facts.hasCalendarGrid) return true;
+
+  const statusLike = field === "status" || localized === "状态";
+  if (
+    statusLike &&
+    (facts.hasCardBadge ||
+      facts.badgeLabels.size > 0 ||
+      facts.listRows.some((row) => row.status !== undefined))
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function filterRepresented(
+  field: string,
+  localized: string | undefined,
+  facts: LayoutFacts
+): boolean {
+  const candidates = localized === undefined ? [field] : [field, localized];
+  if (candidates.some((candidate) => facts.strings.has(candidate))) return true;
+  const searchLike =
+    field === "keyword" || field === "search" || localized === "关键词" || localized === "搜索";
+  return searchLike && facts.hasSearchBar;
+}
+
+function actionRepresented(
+  action: string,
+  facts: LayoutFacts,
+  formModes: PageSpec["formModes"]
+): boolean {
+  if (facts.strings.has(action)) return true;
+  if (
+    formModes?.some(
+      (mode) =>
+        mode.name === action || mode.label === action || mode.actions.includes(action)
+    ) === true
+  ) {
+    return true;
+  }
+  // Search is implicit: the SearchBar is the action affordance.
+  return action === "搜索" && facts.hasSearchBar;
 }
 
 /**
@@ -61,11 +254,12 @@ function layoutStrings(root: PageSpec["layout"] | undefined): Set<string> {
  *
  * - `SEMANTIC-META`: name, purpose, route, or roles differ from the brief page.
  * - `SEMANTIC-NAV`: the root shell's nav (web) or tabs (mobile) miss a brief item.
- * - `SEMANTIC-FIELD`: a brief field does not appear as an exact layout prop value
- *   (settings fields may appear as their localized label).
- * - `SEMANTIC-FILTER`: a brief filter field does not appear as an exact layout
- *   prop value.
- * - `SEMANTIC-ACTION`: a brief action does not appear as an exact layout prop value.
+ * - `SEMANTIC-FIELD`: a brief field has no exact prop or structured representation
+ *   (FormField, DataTable, ListRow, summary List label, SearchBar, CalendarGrid,
+ *   badge).
+ * - `SEMANTIC-FILTER`: a brief filter field has no exact prop or SearchBar.
+ * - `SEMANTIC-ACTION`: a brief action has no exact prop, Button, form mode, or
+ *   implicit SearchBar representation.
  * - `SEMANTIC-EMPTY`: the brief empty title does not appear in the layout.
  *
  * Every finding is a blocker. Checks are skipped when the corresponding piece
@@ -187,30 +381,30 @@ function checkNavigation(
 }
 
 function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Push): void {
-  const strings = layoutStrings(spec.layout);
+  const facts = collectLayoutFacts(spec.layout);
 
   for (const field of briefPage.fields ?? []) {
     const localized =
       briefPage.fieldLabels?.[field] ??
       (briefPage.archetype === "settings" ? settingsFieldLabels[field] : undefined);
-    if (!strings.has(field) && !(localized !== undefined && strings.has(localized))) {
+    if (!fieldRepresented(field, localized, facts)) {
       push(
         "SEMANTIC-FIELD",
         "layout",
         field,
-        `Brief field "${field}" does not appear as an exact value in the page layout.`
+        `Brief field "${field}" has no exact prop or structured representation in the page layout.`
       );
     }
   }
 
   for (const field of briefPage.filterFields ?? []) {
     const localized = briefPage.fieldLabels?.[field];
-    if (!strings.has(field) && !(localized !== undefined && strings.has(localized))) {
+    if (!filterRepresented(field, localized, facts)) {
       push(
         "SEMANTIC-FILTER",
         "layout",
         field,
-        `Brief filter field "${field}" does not appear as an exact value in the page layout.`
+        `Brief filter field "${field}" has no exact prop or SearchBar representation in the page layout.`
       );
     }
   }
@@ -218,17 +412,17 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
   // Actions must be visibly rendered. Interactions only describe behaviour; a
   // trigger that never reaches the layout leaves the user without the control.
   for (const action of briefPage.actions ?? []) {
-    if (!strings.has(action)) {
+    if (!actionRepresented(action, facts, spec.formModes)) {
       push(
         "SEMANTIC-ACTION",
         "layout",
         action,
-        `Brief action "${action}" does not appear as an exact value in the page layout.`
+        `Brief action "${action}" has no Button, form mode, or implicit SearchBar representation in the page layout.`
       );
     }
   }
 
-  if (briefPage.emptyTitle !== undefined && !strings.has(briefPage.emptyTitle)) {
+  if (briefPage.emptyTitle !== undefined && !facts.strings.has(briefPage.emptyTitle)) {
     push(
       "SEMANTIC-EMPTY",
       "layout",

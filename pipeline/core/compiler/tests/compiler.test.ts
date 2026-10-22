@@ -424,9 +424,10 @@ describe("brief-driven page content", () => {
     });
     expect(spec.layout.type).toBe("MobileShell");
     expect(nodesOf(spec, "CollapsedFilter")[0]?.props?.label).toBe("状态");
-    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toEqual(
-      expect.arrayContaining(["客户", "项目", "时间段", "状态", "护理师"])
-    );
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toEqual([
+      "日历",
+      "列表",
+    ]);
     expect(nodesOf(spec, "CalendarGrid")[0]?.props).toMatchObject({
       days: expect.arrayContaining([
         expect.objectContaining({ label: "周一", date: "2026-10-19", today: true }),
@@ -579,8 +580,10 @@ describe("brief-driven page content", () => {
       catalog: getCatalog("b-mobile"),
       archetype: getArchetype("mobile-list"),
     });
-    expect(nodesOf(spec, "SearchBar")[0]?.props?.placeholder).toContain("关键词");
-    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain(
+    expect(nodesOf(spec, "SearchBar")[0]?.props?.placeholder).toBe(
+      "输入姓名或脱敏手机号搜索客户"
+    );
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).not.toContain(
       "关键词"
     );
     expect(nodesOf(spec, "CollapsedFilter").map((node) => node.props?.label)).not.toContain(
@@ -869,7 +872,6 @@ describe("brief-driven page content", () => {
         (item) => item.label
       )
     ).toEqual(expect.arrayContaining(["客户"]));
-    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain("状态");
   });
 
   it("defaults form modes and calendar/list views", () => {
@@ -1066,11 +1068,11 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       (node) => node.type === "Row" && node.props?.variant === "caption"
     );
     expect(captionRows).toEqual([]);
-    const visibleLabels = collectNodes(list.layout)
-      .filter((node) => node.type === "Text" && node.props?.text === "客户")
-      .map((node) => node);
-    expect(visibleLabels).toHaveLength(1);
-    expect(visibleLabels[0]?.id).toBeDefined();
+    const fieldLabels = collectNodes(list.layout).filter(
+      (node) => node.type === "Text" && ["客户", "时间段", "状态"].includes(String(node.props?.text))
+    );
+    expect(fieldLabels).toEqual([]);
+    expect(nodesOf(list, "ListRow")[0]?.props?.subtitle).toContain("门店：星光店");
   });
 
   it("emits datetime-local inputs and an inline customer picker", () => {
@@ -1112,7 +1114,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       expect.arrayContaining(["客户", "手机号", "项目", "时间段"])
     );
     expect(items.map((item) => item.label)).not.toContain("状态");
-    expect(nodesOf(detail, "Text").map((node) => node.props?.text)).toContain("状态");
+    expect(detail.layout.props?.back).toBe(true);
     const actionRow = collectNodes(detail.layout).find(
       (node) => node.type === "Row" && node.props?.variant === "filter"
     );

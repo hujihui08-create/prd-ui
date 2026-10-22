@@ -11,6 +11,7 @@ import {
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import briefJson from "../../../samples/ui-brief.sample.json";
+import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
 import {
   contrastRatio,
   validatePageSpec,
@@ -24,6 +25,10 @@ const brief = UiBriefSchema.parse(briefJson);
 const deps = { getProfile, getCatalog, getArchetype };
 const specs = compileProject(brief, deps);
 const specByPageId = new Map(specs.map((spec) => [spec.meta.pageId, spec]));
+
+const phase2Brief = UiBriefSchema.parse(phase2BriefJson);
+const phase2Specs = compileProject(phase2Brief, deps);
+const phase2ById = new Map(phase2Specs.map((spec) => [spec.meta.pageId, spec]));
 
 const manifestsByProfile: Record<string, AssetManifest> = {
   "b-dense": {
@@ -74,6 +79,13 @@ const manifestsByProfile: Record<string, AssetManifest> = {
     placeholders: [],
     complete: true,
   },
+  "b-mobile": {
+    project: "employee-app-phase2",
+    profile: "b-mobile",
+    assets: [],
+    placeholders: [],
+    complete: true,
+  },
 };
 
 function requiredSpec(pageId: string): PageSpec {
@@ -104,6 +116,11 @@ function contextForSpec(
 function contextFor(spec: PageSpec): ValidationContext {
   const page = brief.ia.pages.find((candidate) => candidate.id === spec.meta.pageId);
   return contextForSpec(spec, page, brief.ia.navigation);
+}
+
+function phase2ContextFor(spec: PageSpec): ValidationContext {
+  const page = phase2Brief.ia.pages.find((candidate) => candidate.id === spec.meta.pageId);
+  return contextForSpec(spec, page, phase2Brief.ia.navigation);
 }
 
 /** Context without brief data; semantic checks must be skipped. */
@@ -209,6 +226,19 @@ function findNode(spec: PageSpec, type: string): SpecNode {
   const match = walkSpecNodes(spec.layout).find(({ node }) => node.type === type);
   if (!match) throw new Error(`Node not found: ${type}`);
   return match.node;
+}
+
+/** Remove every node of a type, including children and slot arrays. */
+function removeNodesOfType(node: SpecNode, type: string): void {
+  if (node.children) {
+    node.children = node.children.filter((child) => child.type !== type);
+    for (const child of node.children) removeNodesOfType(child, type);
+  }
+  for (const [slotName, slotNodes] of Object.entries(node.slots ?? {})) {
+    const kept = slotNodes.filter((child) => child.type !== type);
+    node.slots![slotName] = kept;
+    for (const child of kept) removeNodesOfType(child, type);
+  }
 }
 
 function ruleIds(report: ValidationReport): string[] {
@@ -594,6 +624,102 @@ describe("brief semantic validation", () => {
     expect(semanticRuleIds(report)).toEqual([]);
     expect(report.findings, findingDetail(report)).toEqual([]);
     expect(report.passed).toBe(true);
+  });
+});
+
+describe("structural semantic representations", () => {
+  it("accepts every phase2 page with the fidelity layout", () => {
+    for (const spec of phase2Specs) {
+      const report = validatePageSpec(spec, phase2ContextFor(spec));
+      expect(
+        semanticRuleIds(report),
+        `${spec.meta.pageId}: ${findingDetail(report)}`
+      ).toEqual([]);
+      expect(report.passed, findingDetail(report)).toBe(true);
+    }
+  });
+
+  it("requires a summary List or FormField for detail fields", () => {
+    const spec = structuredClone(phase2ById.get("appointment-detail")!);
+    const summary = spec.layout.slots?.summary?.[0];
+    expect(summary?.type).toBe("Card");
+    summary!.children = [];
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    const missing = report.findings
+      .filter((finding) => finding.ruleId === "SEMANTIC-FIELD")
+      .map((finding) => finding.evidence);
+    expect(missing, findingDetail(report)).toEqual(
+      expect.arrayContaining(["customer", "project"])
+    );
+  });
+
+  it("requires a badge or ListRow status for the status field", () => {
+    const spec = structuredClone(phase2ById.get("appointment-detail")!);
+    const summary = spec.layout.slots?.summary?.[0];
+    delete summary!.props!.badge;
+    delete summary!.props!.badgeTone;
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    const missing = report.findings
+      .filter((finding) => finding.ruleId === "SEMANTIC-FIELD")
+      .map((finding) => finding.evidence);
+    expect(missing, findingDetail(report)).toContain("status");
+  });
+
+  it("accepts a SearchBar for the keyword filter and implicit 搜索 action", () => {
+    const clean = validatePageSpec(
+      structuredClone(phase2ById.get("customer-search")!),
+      phase2ContextFor(phase2ById.get("customer-search")!)
+    );
+    expect(semanticRuleIds(clean), findingDetail(clean)).toEqual([]);
+
+    const spec = structuredClone(phase2ById.get("customer-search")!);
+    removeNodesOfType(spec.layout, "SearchBar");
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    expect(semanticRuleIds(report), findingDetail(report)).toEqual(
+      expect.arrayContaining(["SEMANTIC-FILTER", "SEMANTIC-ACTION"])
+    );
+    expect(
+      report.findings
+        .filter((finding) => finding.ruleId === "SEMANTIC-FILTER")
+        .map((finding) => finding.evidence)
+    ).toContain("keyword");
+    expect(
+      report.findings
+        .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
+        .map((finding) => finding.evidence)
+    ).toContain("搜索");
+  });
+
+  it("accepts form modes for alternate save actions", () => {
+    const clean = validatePageSpec(
+      structuredClone(phase2ById.get("appointment-form")!),
+      phase2ContextFor(phase2ById.get("appointment-form")!)
+    );
+    expect(semanticRuleIds(clean), findingDetail(clean)).toEqual([]);
+
+    const spec = structuredClone(phase2ById.get("appointment-form")!);
+    delete spec.formModes;
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    expect(
+      report.findings
+        .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
+        .map((finding) => finding.evidence)
+    ).toContain("保存改期");
+  });
+
+  it("accepts a CalendarGrid for date/time fields", () => {
+    const spec = structuredClone(phase2ById.get("appointment-list")!);
+    removeNodesOfType(spec.layout, "CalendarGrid");
+    // The date filter label would otherwise satisfy the field as an exact
+    // string; remove it to isolate the calendar representation.
+    removeNodesOfType(spec.layout, "CollapsedFilter");
+    const report = validatePageSpec(spec, phase2ContextFor(spec));
+    const missing = report.findings
+      .filter((finding) => finding.ruleId === "SEMANTIC-FIELD")
+      .map((finding) => finding.evidence);
+    expect(missing, findingDetail(report)).toContain("date");
+    // time remains represented by the ListRow meta string.
+    expect(missing).not.toContain("time");
   });
 });
 

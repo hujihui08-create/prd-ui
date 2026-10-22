@@ -26,6 +26,7 @@ async function main(): Promise<void> {
   const pages: PageSpec[] = [];
   const pageNames: Record<string, string> = {};
   const pageRoutes: Record<string, string> = {};
+  const pageArchetypes: Record<string, string> = {};
   await mkdir(outDir, { recursive: true });
 
   for (const file of files) {
@@ -33,6 +34,7 @@ async function main(): Promise<void> {
     const spec = PageSpecSchema.parse(raw) as PageSpec;
     pageNames[spec.meta.pageId] = spec.meta.name;
     pageRoutes[spec.meta.pageId] = spec.meta.route;
+    pageArchetypes[spec.meta.pageId] = spec.meta.archetype;
   }
 
   for (const file of files) {
@@ -41,7 +43,7 @@ async function main(): Promise<void> {
     const profile = getProfile(spec.meta.profile);
     await writeFile(
       path.join(outDir, `${spec.meta.pageId}.html`),
-      renderDocument(spec, profile, { pageNames, pageRoutes }),
+      renderDocument(spec, profile, { pageNames, pageRoutes, pageArchetypes }),
       "utf8"
     );
     pages.push(spec);
