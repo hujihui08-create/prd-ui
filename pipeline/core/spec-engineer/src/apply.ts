@@ -99,7 +99,11 @@ function buildMotion(
   const presets: Record<string, PageMotionPreset> = {};
   for (const name of used) {
     const preset = motionSpec.presets[name];
-    if (preset !== undefined) presets[name] = preset;
+    if (preset !== undefined) {
+      // Page Specs carry CSS values, while M1 presets may name an easing token.
+      const easing = motionSpec.tokens.easing[preset.easing] ?? preset.easing;
+      presets[name] = { ...preset, easing };
+    }
   }
 
   return {

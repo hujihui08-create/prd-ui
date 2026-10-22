@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PageSpec } from "@prd-ui/contracts";
+import type { MotionSpec } from "@prd-ui/agents";
 import {
   applySpecs,
   collectAssetReferences,
@@ -161,6 +162,39 @@ describe("applySpecs", () => {
 
     const inventory = specs.find((spec) => spec.meta.pageId === "inventory-query")!;
     expect(Object.keys(inventory.motion?.presets ?? {})).toEqual(["empty-fade"]);
+  });
+
+  it("expands preset easing token names to CSS values", () => {
+    const today = applySpecs(
+      makeInput({
+        motionSpec: {
+          ...motionSpec,
+          tokens: {
+            ...motionSpec.tokens,
+            easing: { standard: "cubic-bezier(0.2, 0, 0, 1)" },
+          },
+        },
+      })
+    ).find((spec) => spec.meta.pageId === "today")!;
+
+    expect(today.motion?.presets["page-enter"]?.easing).toBe(
+      "cubic-bezier(0.2, 0, 0, 1)"
+    );
+  });
+
+  it("keeps a preset easing that is already a CSS value", () => {
+    const custom: MotionSpec = {
+      ...motionSpec,
+      presets: {
+        ...motionSpec.presets,
+        "page-enter": { durationMs: 200, easing: "ease-in-out" },
+      },
+    };
+    const today = applySpecs(makeInput({ motionSpec: custom })).find(
+      (spec) => spec.meta.pageId === "today"
+    )!;
+
+    expect(today.motion?.presets["page-enter"]?.easing).toBe("ease-in-out");
   });
 
   it("does not mutate the base specs or the client motion spec", () => {
