@@ -8,8 +8,10 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@prd-ui/agents": "workspace:*",
-    "@prd-ui/contracts": "workspace:*",
-    "zod": "^4.6.7"
+    "@prd-ui/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@prd-ui/compiler": "workspace:*",
+    "@prd-ui/design-system": "workspace:*"
   }
 }

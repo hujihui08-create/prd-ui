@@ -108,6 +108,88 @@ describe("runVisualGate", () => {
     expect(gate.issues).toEqual([]);
   });
 
+  it("blocks every case when the baseline manifest is empty", () => {
+    const second: VisualCase = { ...visualCase, id: "b.default", pageId: "b" };
+    const gate = runVisualGate({
+      cases: [visualCase, second],
+      screenshots: [
+        screenshot({}),
+        screenshot({ caseId: "b.default", path: "screenshots/b.default.png" }),
+      ],
+      findings: [],
+      diff: [],
+      baselineCases: [],
+    });
+
+    expect(gate.passed).toBe(false);
+    expect(gate.issues).toHaveLength(2);
+    expect(gate.issues.map((entry) => entry.id)).toEqual([
+      "VISUAL_BASELINE_MISSING:a.default",
+      "VISUAL_BASELINE_MISSING:b.default",
+    ]);
+    expect(gate.issues).toEqual([
+      expect.objectContaining({
+        code: "VISUAL_BASELINE_MISSING",
+        severity: "blocker",
+        pageId: "a",
+        state: "default",
+        message: "missing baseline for a.default",
+      }),
+      expect.objectContaining({
+        code: "VISUAL_BASELINE_MISSING",
+        severity: "blocker",
+        pageId: "b",
+        state: "default",
+        message: "missing baseline for b.default",
+      }),
+    ]);
+  });
+
+  it("passes when every case has a baseline", () => {
+    const second: VisualCase = { ...visualCase, id: "b.default", pageId: "b" };
+    const gate = runVisualGate({
+      cases: [visualCase, second],
+      screenshots: [
+        screenshot({}),
+        screenshot({ caseId: "b.default", path: "screenshots/b.default.png" }),
+      ],
+      findings: [],
+      diff: [],
+      baselineCases: ["a.default", "b.default"],
+    });
+    expect(gate.passed).toBe(true);
+    expect(gate.issues).toEqual([]);
+  });
+
+  it("reports only cases absent from a partial baseline", () => {
+    const second: VisualCase = { ...visualCase, id: "b.default", pageId: "b" };
+    const gate = runVisualGate({
+      cases: [visualCase, second],
+      screenshots: [
+        screenshot({}),
+        screenshot({ caseId: "b.default", path: "screenshots/b.default.png" }),
+      ],
+      findings: [],
+      diff: [],
+      baselineCases: ["a.default"],
+    });
+    expect(gate.passed).toBe(false);
+    expect(gate.issues.map((entry) => entry.id)).toEqual([
+      "VISUAL_BASELINE_MISSING:b.default",
+    ]);
+  });
+
+  it("skips baseline checks when no baseline manifest is supplied", () => {
+    const gate = runVisualGate({
+      cases: [visualCase],
+      screenshots: [screenshot({})],
+      findings: [],
+      diff: [],
+    });
+    expect(gate.passed).toBe(true);
+    expect(gate.issues).toEqual([]);
+  });
+
   it("treats a missing baseline as zero diff and 1% as the boundary", () => {
     const gate = runVisualGate({
       cases: [visualCase],

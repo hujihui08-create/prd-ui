@@ -46,6 +46,11 @@ export interface VisualGateInput {
   screenshots: ScreenshotEvidence[];
   findings: VisualFinding[];
   diff: VisualDiffEntry[];
+  /**
+   * Baseline manifest case ids. `undefined` means no baseline exists yet
+   * (first establishment), so baseline coverage is not checked.
+   */
+  baselineCases?: string[];
 }
 
 export interface VisualGateResult {

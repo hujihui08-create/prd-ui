@@ -59,6 +59,20 @@ export function runVisualGate(input: VisualGateInput): VisualGateResult {
       });
     }
   }
+  if (input.baselineCases !== undefined) {
+    const baseline = new Set(input.baselineCases);
+    for (const visualCase of input.cases) {
+      if (baseline.has(visualCase.id)) continue;
+      issues.push({
+        id: `VISUAL_BASELINE_MISSING:${visualCase.id}`,
+        severity: "blocker",
+        code: "VISUAL_BASELINE_MISSING",
+        pageId: visualCase.pageId,
+        state: visualCase.state,
+        message: `missing baseline for ${visualCase.id}`,
+      });
+    }
+  }
   for (const finding of input.findings) issues.push(finding);
   return {
     passed: issues.every((entry) => entry.severity !== "blocker"),

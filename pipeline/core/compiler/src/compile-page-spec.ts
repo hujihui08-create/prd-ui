@@ -364,6 +364,10 @@ export function compilePageSpec(input: {
       ? {}
       : { views, defaultView: page.defaultView ?? views[0]! }),
     ...(searchIdleTitle === undefined ? {} : { searchIdleTitle }),
+    ...(page.emptyTitle === undefined ? {} : { emptyTitle: page.emptyTitle }),
+    ...(page.noticeBlocks === undefined
+      ? {}
+      : { noticeBlocks: page.noticeBlocks }),
     ...(pickerReturnTo === undefined ? {} : { pickerReturnTo }),
     ...(customerPicker === undefined ? {} : { customerPicker }),
     ...(calendarWeekStart === undefined ? {} : { calendarWeekStart }),

@@ -146,6 +146,10 @@ export interface PageSpec {
   views?: Array<"calendar" | "list">;
   defaultView?: "calendar" | "list";
   searchIdleTitle?: string;
+  /** Brief empty-state title; marks a page with a designed generic empty state. */
+  emptyTitle?: string;
+  /** Notice blocks for treatment/handoff notice pages (presence enables review coverage). */
+  noticeBlocks?: Array<{ title: string; items: string[] }>;
   /** Form page a customer-search page returns to after a picker selection. */
   pickerReturnTo?: PageId;
   /** Customer-search page a mobile form opens as a picker. */
@@ -242,6 +246,17 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
     views: z.array(z.enum(["calendar", "list"])).optional(),
     defaultView: z.enum(["calendar", "list"]).optional(),
     searchIdleTitle: z.string().min(1).optional(),
+    emptyTitle: z.string().min(1).optional(),
+    noticeBlocks: z
+      .array(
+        z
+          .object({
+            title: z.string().min(1),
+            items: z.array(z.string().min(1)).min(1),
+          })
+          .strict()
+      )
+      .optional(),
     pickerReturnTo: PageIdSchema.optional(),
     customerPicker: PageIdSchema.optional(),
     calendarWeekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
