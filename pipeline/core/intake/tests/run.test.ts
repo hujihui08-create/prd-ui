@@ -21,6 +21,7 @@ import {
   project,
   review,
   validPrdSignoff,
+  withBrief,
 } from "./fixtures.js";
 
 const now = "2026-10-20T00:00:00.000Z";
@@ -216,6 +217,34 @@ describe("runIntake", () => {
       })
     );
     expect(third.status).toBe("success");
+  });
+
+  it("regenerates a blocked brief when the run resumes", async () => {
+    const store = new MemoryStore();
+    const invalid = withBrief((brief) => {
+      for (const page of brief.ia.pages) page.profile = "mobile-home";
+      return brief;
+    });
+    const invalidRunner = new StaticRunner({
+      ia: iaOutput,
+      "prd-review": review,
+      "ui-briefer": invalid,
+    });
+    const first = await runIntake(
+      makeInput(store, {
+        runners: {
+          ia: invalidRunner,
+          "prd-review": invalidRunner,
+          "ui-briefer": invalidRunner,
+        },
+      })
+    );
+    expect(first.status).toBe("blocked");
+    expect(first.state.stage).toBe("brief_gate");
+
+    const second = await runIntake(makeInput(store, { resume: true }));
+    expect(second.status).toBe("awaiting_signoff");
+    expect(second.draft?.brief.ia.pages).toHaveLength(8);
   });
 
   it("blocks on a PRD blocker and does not run the briefer", async () => {

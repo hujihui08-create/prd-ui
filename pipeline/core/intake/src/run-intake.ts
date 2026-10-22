@@ -1030,7 +1030,12 @@ export async function runIntake(input: RunIntakeInput): Promise<IntakeRunResult>
             gate,
           });
         }
-        return finish(gate.status === "blocked" ? "blocked" : "awaiting_signoff", undefined, {
+        if (gate.status === "blocked") {
+          // A blocked brief is not signable; regenerate it with the current
+          // prompt and let the gate-repair rounds run again.
+          return runBrief(review, ia, input.signoffPrdIa, input.signoffBrief);
+        }
+        return finish("awaiting_signoff", undefined, {
           review,
           draft,
           briefHash: hash,
