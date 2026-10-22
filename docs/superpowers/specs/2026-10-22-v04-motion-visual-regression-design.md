@@ -93,12 +93,12 @@ export function semanticNodeId(
 | 页面 | 示例 id |
 |---|---|
 | today | `today.page.root`、`today.quick.new-appointment`、`today.quick.create-order`、`today.quick.customer-search`、`today.row.appointment`、`today.row.callback` |
-| customer-search | `customer-search.input.keyword`、`customer-search.row.result`、`customer-search.action.clear`、`customer-search.action.view-detail` |
+| customer-search | `customer-search.row.result`、`customer-search.action.clear`、`customer-search.action.view-detail` |
 | customer-detail | `customer-detail.action.view-appointment`、`.new-appointment`、`.view-notice`、`.callback` |
 | appointment-detail | `appointment-detail.action.checkin`、`.open-order`、`.reschedule`、`.cancel`、`.notice`、`.customer` |
 | appointment-form | `appointment-form.field.customer`、`.start-time`、`.end-time`、`.therapist`、`.source`、`appointment-form.action.save`、`.pick-customer`；`new`/`reschedule` 是 JS 模式标签，不是 motion 节点 |
-| treatment-notice | `treatment-notice.action.confirm`、`treatment-notice.row.notice` |
-| appointment-list | `appointment-list.action.new-appointment`、`.toggle-view`、`.view-detail`、`appointment-list.row.appointment`、`appointment-list.calendar`、`appointment-list.view.list` |
+| treatment-notice | `treatment-notice.action.confirm` |
+| appointment-list | `appointment-list.action.new-appointment`、`.toggle-view`、`.view-detail`、`appointment-list.row.appointment`、`appointment-list.calendar.grid`、`appointment-list.view.list` |
 | callback-register | `callback-register.field.customer`、`.service`、`.content`、`.result`、`callback-register.action.save`、`.pick-customer` |
 
 规则：
