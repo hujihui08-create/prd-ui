@@ -615,7 +615,7 @@ git commit -m "feat(renderer): apply page motion presets and reduced-motion fall
 
 **Interfaces:**
 - Produces: `UiBriefPage.pickerReturnTo?`, `customerPicker?`, `calendarWeekStart?`; mirrored on `PageSpec`.
-- Produces gate codes: `BRIEF_PICKER_RETURN_UNKNOWN`, `BRIEF_CUSTOMER_PICKER_UNKNOWN`, `BRIEF_CALENDAR_DATE_INVALID`.
+- Produces gate codes: `BRIEF_PICKER_RETURN_UNKNOWN`, `BRIEF_PICKER_RETURN_UNSUPPORTED`, `BRIEF_CUSTOMER_PICKER_UNKNOWN`, `BRIEF_CUSTOMER_PICKER_UNSUPPORTED`, `BRIEF_CALENDAR_DATE_INVALID`, `BRIEF_CALENDAR_FIELDS_MISSING`.
 - Produces compiler defaults from the signed brief without editing it.
 
 - [ ] **Step 1: Write failing contract + compiler tests**

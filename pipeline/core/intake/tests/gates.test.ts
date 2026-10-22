@@ -407,21 +407,69 @@ describe("brief gate", () => {
     );
   });
 
-  it("accepts known picker targets and ISO calendar dates", () => {
-    const valid = withBrief((brief) => {
+  it("blocks picker and calendar metadata on unsupported page types", () => {
+    const pickerReturn = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      page.pickerReturnTo = "orders-list";
+      return brief;
+    });
+    const pickerReturnCodes = gateForDraft(pickerReturn).issues.map((issue) => issue.code);
+    expect(pickerReturnCodes).toContain("BRIEF_PICKER_RETURN_UNSUPPORTED");
+    expect(pickerReturnCodes).not.toContain("BRIEF_PICKER_RETURN_UNKNOWN");
+
+    const customerPicker = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.archetype = "mobile-list";
+      const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      page.customerPicker = "orders-list";
+      return brief;
+    });
+    const customerPickerCodes = gateForDraft(customerPicker).issues.map(
+      (issue) => issue.code
+    );
+    expect(customerPickerCodes).toContain("BRIEF_CUSTOMER_PICKER_UNSUPPORTED");
+    expect(customerPickerCodes).not.toContain("BRIEF_CUSTOMER_PICKER_UNKNOWN");
+
+    const listWithoutDate = withBrief((brief) => {
       const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
       list.archetype = "mobile-list";
       list.calendarWeekStart = "2026-11-02";
-      const detail = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
-      detail.pickerReturnTo = "orders-list";
+      return brief;
+    });
+    expect(gateForDraft(listWithoutDate).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_CALENDAR_FIELDS_MISSING"
+    );
+
+    const nonListPage = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      page.calendarWeekStart = "2026-11-02";
+      return brief;
+    });
+    expect(gateForDraft(nonListPage).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_CALENDAR_FIELDS_MISSING"
+    );
+  });
+
+  it("accepts supported picker targets and calendar metadata", () => {
+    const valid = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.id = "customer-search";
+      list.archetype = "mobile-list";
+      list.fields = [...(list.fields ?? []), "date"];
+      list.pickerReturnTo = "order-form";
+      list.calendarWeekStart = "2026-11-02";
       const form = brief.ia.pages.find((entry) => entry.id === "order-form")!;
-      form.customerPicker = "orders-list";
+      form.archetype = "mobile-form";
+      form.customerPicker = "customer-search";
       return brief;
     });
     const codes = gateForDraft(valid).issues.map((issue) => issue.code);
     expect(codes).not.toContain("BRIEF_PICKER_RETURN_UNKNOWN");
+    expect(codes).not.toContain("BRIEF_PICKER_RETURN_UNSUPPORTED");
     expect(codes).not.toContain("BRIEF_CUSTOMER_PICKER_UNKNOWN");
+    expect(codes).not.toContain("BRIEF_CUSTOMER_PICKER_UNSUPPORTED");
     expect(codes).not.toContain("BRIEF_CALENDAR_DATE_INVALID");
+    expect(codes).not.toContain("BRIEF_CALENDAR_FIELDS_MISSING");
   });
 
   it("warns when a search page has no idle title", () => {

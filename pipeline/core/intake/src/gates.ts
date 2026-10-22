@@ -603,17 +603,39 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         )
       );
     }
-    if (page.pickerReturnTo !== undefined && !pageIdSet.has(page.pickerReturnTo)) {
-      issues.push(
-        issue(
-          "BRIEF_PICKER_RETURN_UNKNOWN",
-          "blocker",
-          `pickerReturnTo ${page.pickerReturnTo} is not a page`,
-          page.id
-        )
-      );
+    if (page.pickerReturnTo !== undefined) {
+      if (page.id !== "customer-search" || page.archetype !== "mobile-list") {
+        issues.push(
+          issue(
+            "BRIEF_PICKER_RETURN_UNSUPPORTED",
+            "blocker",
+            "pickerReturnTo is only allowed on the customer-search mobile-list page",
+            page.id
+          )
+        );
+      }
+      if (!pageIdSet.has(page.pickerReturnTo)) {
+        issues.push(
+          issue(
+            "BRIEF_PICKER_RETURN_UNKNOWN",
+            "blocker",
+            `pickerReturnTo ${page.pickerReturnTo} is not a page`,
+            page.id
+          )
+        );
+      }
     }
     if (page.customerPicker !== undefined) {
+      if (page.archetype !== "mobile-form") {
+        issues.push(
+          issue(
+            "BRIEF_CUSTOMER_PICKER_UNSUPPORTED",
+            "blocker",
+            "customerPicker is only allowed on mobile-form pages",
+            page.id
+          )
+        );
+      }
       const target = brief.ia.pages.find((entry) => entry.id === page.customerPicker);
       if (target?.archetype !== "mobile-list") {
         issues.push(
@@ -626,18 +648,31 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         );
       }
     }
-    if (
-      page.calendarWeekStart !== undefined &&
-      !/^\d{4}-\d{2}-\d{2}$/.test(page.calendarWeekStart)
-    ) {
-      issues.push(
-        issue(
-          "BRIEF_CALENDAR_DATE_INVALID",
-          "blocker",
-          `calendarWeekStart ${page.calendarWeekStart} is not ISO`,
-          page.id
-        )
-      );
+    if (page.calendarWeekStart !== undefined) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(page.calendarWeekStart)) {
+        issues.push(
+          issue(
+            "BRIEF_CALENDAR_DATE_INVALID",
+            "blocker",
+            `calendarWeekStart ${page.calendarWeekStart} is not ISO`,
+            page.id
+          )
+        );
+      }
+      const calendarFields = page.fields ?? [];
+      if (
+        page.archetype !== "mobile-list" ||
+        (!calendarFields.includes("date") && !calendarFields.includes("time"))
+      ) {
+        issues.push(
+          issue(
+            "BRIEF_CALENDAR_FIELDS_MISSING",
+            "blocker",
+            "calendarWeekStart requires a mobile-list page with date or time fields",
+            page.id
+          )
+        );
+      }
     }
     if (
       (page.filterFields ?? []).some((field) => field === "keyword" || field === "search") &&
