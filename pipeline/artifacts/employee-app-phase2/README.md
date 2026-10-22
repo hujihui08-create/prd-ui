@@ -19,12 +19,13 @@ PRD → intake:run（PRD review + IA + UI Briefer + 两道签核）
 html/                       8 页渲染结果 + index.html（v0.4 修复后）
 screenshots/                19 张 v0.3.1 人工 Playwright 截图（历史）
 visual-review/              本轮最终证据（passed，已签核）
-  visual-review.json        review 结果：status=passed，11 findings，signoff valid
+  visual-review.json        review 结果：status=passed，9 findings，signoff valid，critic cacheHit=true
   state.json                run 状态：success，signoff.visual=true
   screenshots/              24 张 390×844 矩阵截图 + manifest.json
   findings/visual-gate.json 确定性 gate + 全部 findings（0 blocker）
   findings/visual-critic.json Visual Critic 原始 critique、usage、cost
   signoff/visual.md         人工签核（manifestHash + findingsHash，waivers=[]）
+  critique-cache.json       最终 signed critique cache entry（key/manifest/spec/model/signoff）
   baseline-manifest.json    与 pipeline/baselines/employee-app-phase2 一致
 run-summary/                intake / M1 / agent:sign / Spec / Visual Review / Phase 1 摘要
 signoffs/                   PRD/IA、brief、visual-style 签核（历史）
@@ -39,18 +40,20 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
 |---|---|---|
 | intake | `run-2026-10-22T03-09-28-544Z` | success；8 页全 `b-mobile`；0 waivers、0 手工 brief edits；brief hash `sha256:b558b57a…b8335`；¥0.8977902624 |
 | M1 | `run-2026-10-22T03-16-05-257Z` | success；`ia:passed / interaction:passed / visualStyle:passed`；0 waivers；¥0.4399832736 |
-| Spec Engineer | `run-2026-10-22T11-38-52-733Z` | 8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
-| HTML / Phase 1 | `run-2026-10-22T11-44-13-297Z` | 8 页 + index；`8 pages / 0 blockers` |
-| Visual baseline | `pipeline/baselines/employee-app-phase2` | 24 cases / 24 PNG；manifest `sha256:c584af99d3360c033bd2f3edb9a6d06eec242088330f605a423a5cd0810214e6` |
-| Visual review（最终） | `run-2026-10-22T11-44-01-938Z` | `status=passed`；24/24 截图；diff 24/0/0；0 console / 0 overflow；11 findings（6 major / 5 minor / **0 blocker**）；`usageComplete=true`；¥0.3260564064 |
-| Signoff | — | `Sample Reviewer`，2026-10-22，`waivers=[]`；manifest `sha256:a113e004…dc90`；findings `sha256:92286d4b…afdc`；`signoff.valid=true`，`state.json.status=success` |
+| Spec Engineer | `run-2026-10-22T12-10-44-917Z` | 8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
+| HTML / Phase 1 | `run-2026-10-22T13-59-42-062Z` | 8 页 + index；`8 pages / 0 blockers` |
+| Visual baseline | `pipeline/baselines/employee-app-phase2` | 24 cases / 24 PNG（PNG 与上一版一致）；visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6` |
+| Visual review（最终，cache hit） | `run-2026-10-22T13-55-24-469Z` | `status=passed`；24/24 截图；diff 24/0/0；0 console / 0 overflow；9 findings（6 major / 3 minor / **0 blocker**）；`usageComplete=true`；¥0（signed-cache，0 次模型调用） |
+| Signoff | — | `Sample Reviewer`，2026-10-22，`waivers=[]`；visual manifest `sha256:3321dd61…25c6`；findings `sha256:70a435f3…4455`；`signoff.valid=true`，`state.json.status=success` |
+| Critique cache | `.visual-cache/critiques/93ae567d….json` | key `sha256:93ae567d…62f`（manifest visual hash + spec hash + dsh/prd-ui-visual/deepseek-flash）；cache hit，模型调用 0 |
 
 ### 成本
 
 - 首轮 Task 9 critic：¥1.6415096768。
 - concrete-major 轮：¥1.4273972928（含两次 fail-closed）。
 - final focused 轮：¥0.3260564064。
-- 累计 critic 成本 **¥3.394963376**，单次仍低于 ¥3 cap；失败调用计入成本。
+- cache/final round: model calls ¥1.8082032192（含 1 次 max-tokens fail-closed），最终 cached review ¥0。
+- 累计 critic 成本 **¥5.2031665952**，单次仍低于 ¥3 cap；失败调用计入成本。
 
 ## 页面
 
@@ -107,7 +110,7 @@ asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4
 Playwright 复核见 `run-summary/playwright-checks-v04.json`：picker 选择/取消/
 reload、完整日期预填、搜索行 chevron、列表日期分组、disabled、状态动作栏。
 
-## 最终 critic findings（11，0 blocker；已按 stopping rule 签核）
+## 最终 critic findings（9，0 blocker；已按 stopping rule 签核）
 
 Critic verdict 仍为 `changes`，但确定性 gate 全绿且无 blocker；按用户指定的
 stopping rule 签核，并把残留 major 记为 v0.5 债。未声称 critic verdict 为 pass。
@@ -124,13 +127,13 @@ Major（6，v0.5 债）：
    详情「改期」后恢复；静态 `?mode=reschedule` 截图无记录）。实际 Playwright
    流程已恢复 customer/project/start/end/therapist 并锁定 customer。
 
-Minor（5）：datetime 原生 `mm/dd/yyyy` 占位、已到店单独 `开单` 仍是 secondary
-样式、详情客户名与「客户详情」重复、callback 回访结果默认「已联系」、列表视图
-切换文案/标题未标明当前视图。
+Minor（3）：datetime 原生 `mm/dd/yyyy` 占位、当前/选中日期列无高亮、
+`appointment-list.state.error` 丢失筛选/视图上下文。
 
-本轮修复的 5 个 concrete majors：reschedule prefill、mode pill 锁定、日历/日期/
-筛选一致性（2025-11-03 周、`日期 11-05 周三`、active date label）、loading
-calendar skeleton、empty grid + legend + 清空筛选。另修复 disabled save 对比。
+本轮修复的 concrete majors：reschedule prefill、mode pill 锁定、日历/日期/filter
+一致性（2025-11-03 周、`日期 11-05 周三`、active date label）、loading calendar
+skeleton、empty grid + legend + 清空筛选。另修复 disabled save 对比，并把截图
+manifest 改成 visual hash（32px block / 4 levels），baseline PNG 未变（pixel diff 0）。
 
 ## 重新生成
 

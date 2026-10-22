@@ -1,7 +1,7 @@
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { AgentRunnerPort } from "@prd-ui/agents";
+import { parseSignoffMarkdown, type AgentRunnerPort } from "@prd-ui/agents";
 import { redactValue, type ReviewPricing } from "@prd-ui/contracts";
 import { createRunId } from "@prd-ui/orchestrator";
 import {
@@ -24,6 +24,7 @@ import {
   hashValue,
   loadVisualProject,
   manifestCaseFor,
+  visualManifestFingerprint,
   visualManifestHash,
   type VisualDiffSummary,
   type VisualManifest,
@@ -39,7 +40,13 @@ import {
   type VisualCriticInput,
   type VisualCriticRun,
 } from "./visual/critic.js";
-import { findMatchingSignoff, unwaivedGate } from "./visual/signoff.js";
+import { findMatchingSignoff, unwaivedGate, validateVisualSignoff, type MatchingSignoff } from "./visual/signoff.js";
+import {
+  critiqueCacheKey,
+  defaultCacheDir,
+  readCritiqueCache,
+  type CritiqueCacheEntry,
+} from "./visual/cache.js";
 
 const pipelineRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -90,6 +97,8 @@ export interface VisualReviewDeps {
   createCriticRunner?: () => Promise<AgentRunnerPort>;
   /** Test seam for the shared pricing table. */
   loadPricing?: () => Promise<ReviewPricing>;
+  /** Test seam for the signed-critique cache directory. */
+  cacheDir?: string;
 }
 
 export class VisualReviewUsageError extends Error {}
@@ -280,6 +289,8 @@ interface ReviewArtifacts {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
+  specHash: string;
+  cacheKey: string;
   signoff: { valid: boolean; signer?: string; date?: string; waivedFindings?: string[] };
   critic: {
     runtime: string;
@@ -287,6 +298,9 @@ interface ReviewArtifacts {
     model?: string;
     budgetEnforced?: boolean;
     costSource?: string;
+    cacheHit?: boolean;
+    cacheKey?: string;
+    cacheSource?: string;
   };
   error?: string;
 }
@@ -510,7 +524,7 @@ export async function main(
       const shot = shotByCase.get(visualCase.id);
       if (shot === undefined) continue;
       manifestCases.push(
-        manifestCaseFor(visualCase, shot.path, shot.sha256)
+        manifestCaseFor(visualCase, shot.path, shot.sha256, shot.visualHash)
       );
     }
     const manifest: VisualManifest = {
@@ -547,7 +561,92 @@ export async function main(
       specs: loaded.specs,
       findings: deterministicFindings,
     };
-    const critic = await runCritic({ options, criticInput, runDir, deps });
+    const cacheDir = deps.cacheDir ?? defaultCacheDir();
+    const specHash = hashValue(loaded.specs);
+    const modelKey =
+      options.runtime === "dsh"
+        ? (process.env.PRD_UI_VISION_MODEL ?? null)
+        : "scripted";
+    const cacheKey = critiqueCacheKey({
+      manifestHash: visualManifestFingerprint(manifest),
+      specHash,
+      runtime: options.runtime,
+      profile: options.profile ?? null,
+      model: modelKey,
+    });
+    let cachedCritic: VisualCriticRun | undefined;
+    let cachedSignoff: MatchingSignoff | undefined;
+    let cacheMissReason: string | undefined;
+    try {
+      const cached = await readCritiqueCache(cacheDir, cacheKey);
+      if (cached === undefined) {
+        cacheMissReason = "no-cache-entry";
+      } else if (
+        cached.manifestHash !== manifestHash ||
+        cached.specHash !== specHash ||
+        cached.runtime !== options.runtime ||
+        cached.profile !== (options.profile ?? null)
+      ) {
+        cacheMissReason = "key-mismatch";
+      } else {
+        const candidateGate = runVisualGate({
+          cases,
+          screenshots,
+          findings: [...deterministicFindings, ...cached.findings],
+          diff: diffContext.entries,
+          baselineCases: baseline.validIds,
+        });
+        const candidateHash = hashValue(candidateGate.issues);
+        const parsed = parseSignoffMarkdown(cached.signoff.text);
+        const validation = validateVisualSignoff({
+          parsed,
+          findings: candidateGate.issues,
+          manifestHash,
+          findingsHash: candidateHash,
+          now: new Date(),
+        });
+        if (
+          validation.ok &&
+          parsed.signer !== undefined &&
+          parsed.date !== undefined
+        ) {
+          cachedCritic = {
+            findings: cached.findings,
+            critique: cached.critique,
+            ...(cached.usage === undefined ? {} : { usage: cached.usage }),
+            costCny: 0,
+            usageComplete: true,
+            ...(cached.model === null ? {} : { model: cached.model }),
+            budgetEnforced: true,
+            costSource: "cache",
+            cacheHit: true,
+            cacheKey,
+            cacheSource: "signed-cache",
+          };
+          cachedSignoff = {
+            text: cached.signoff.text,
+            signer: parsed.signer,
+            date: parsed.date,
+            waivedFindings: validation.waivedFindings,
+          };
+        } else {
+          cacheMissReason = "stale-signoff";
+        }
+      }
+    } catch (error) {
+      cacheMissReason = `cache-unreadable: ${errorMessage(error)}`;
+    }
+    if (cachedCritic !== undefined) {
+      await log({
+        type: "critic_cache_hit",
+        cacheKey,
+        model: cachedCritic.model ?? null,
+      });
+    } else {
+      await log({ type: "critic_cache_miss", cacheKey, reason: cacheMissReason ?? "unknown" });
+    }
+    const critic =
+      cachedCritic ?? (await runCritic({ options, criticInput, runDir, deps }));
     const criticFindings = critic.findings;
     const costSource =
       critic.costSource ??
@@ -567,6 +666,9 @@ export async function main(
       budgetEnforced,
       critique: critic.critique ?? null,
       error: critic.error ?? null,
+      ...(critic.cacheHit === undefined ? {} : { cacheHit: critic.cacheHit }),
+      ...(critic.cacheKey === undefined ? {} : { cacheKey: critic.cacheKey }),
+      ...(critic.cacheSource === undefined ? {} : { cacheSource: critic.cacheSource }),
     });
     await log({
       type: "critic_finished",
@@ -576,6 +678,8 @@ export async function main(
       costCny: critic.costCny,
       costSource,
       usageComplete: critic.usageComplete,
+      cacheHit: critic.cacheHit === true,
+      cacheKey,
     });
 
     const gate = runVisualGate({
@@ -588,14 +692,16 @@ export async function main(
     const findings = gate.issues;
     const findingsHash = hashValue(findings);
 
-    const matchedSignoff = await findMatchingSignoff({
-      runsDir: options.runsDir,
-      currentRunDir: runDir,
-      manifestHash,
-      findingsHash,
-      findings,
-      now: new Date(),
-    });
+    const matchedSignoff =
+      cachedSignoff ??
+      (await findMatchingSignoff({
+        runsDir: options.runsDir,
+        currentRunDir: runDir,
+        manifestHash,
+        findingsHash,
+        findings,
+        now: new Date(),
+      }));
     if (matchedSignoff !== undefined) {
       await store.writeText("signoff/visual.md", matchedSignoff.text);
     }
@@ -635,6 +741,8 @@ export async function main(
       usageComplete: critic.usageComplete,
       manifestHash,
       findingsHash,
+      specHash,
+      cacheKey,
       signoff: {
         valid: signoffValid,
         ...(matchedSignoff === undefined
@@ -651,6 +759,9 @@ export async function main(
         ...(critic.model === undefined ? {} : { model: critic.model }),
         budgetEnforced,
         costSource,
+        ...(critic.cacheHit === undefined ? {} : { cacheHit: critic.cacheHit }),
+        ...(critic.cacheKey === undefined ? {} : { cacheKey: critic.cacheKey }),
+        ...(critic.cacheSource === undefined ? {} : { cacheSource: critic.cacheSource }),
       },
     };
     const state = buildState({

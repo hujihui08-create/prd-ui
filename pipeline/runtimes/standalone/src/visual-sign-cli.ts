@@ -4,6 +4,13 @@ import { fileURLToPath } from "node:url";
 import { parseSignoffMarkdown } from "@prd-ui/agents";
 import { redactValue } from "@prd-ui/contracts";
 import { FileArtifactStore } from "./asset/artifact-store.js";
+import { critiqueToVisualFindings } from "./visual/critic.js";
+import {
+  defaultCacheDir,
+  writeCritiqueCache,
+  type CritiqueCacheEntry,
+  type CritiqueCacheSignoff,
+} from "./visual/cache.js";
 import {
   hashValue,
   parseVisualRunState,
@@ -102,12 +109,91 @@ function summary(
   }) as Record<string, unknown>;
 }
 
+async function persistSignedCritiqueCache(input: {
+  store: FileArtifactStore;
+  cacheDir: string;
+  signoffText: string;
+  parsed: ReturnType<typeof parseSignoffMarkdown>;
+  waivedFindings: string[];
+  state: VisualRunState;
+  manifestHash: string;
+  findingsHash: string;
+}): Promise<boolean> {
+  let review: unknown;
+  let critic: unknown;
+  try {
+    review = JSON.parse(await input.store.readText("visual-review.json")) as unknown;
+    critic = JSON.parse(
+      await input.store.readText("findings/visual-critic.json")
+    ) as unknown;
+  } catch {
+    return false;
+  }
+  if (!isRecord(review) || !isRecord(critic)) return false;
+  const cacheKey = review.cacheKey;
+  const specHash = review.specHash;
+  const runtime = isRecord(review.critic) ? review.critic.runtime : undefined;
+  const profile = isRecord(review.critic) ? review.critic.profile : undefined;
+  const model = isRecord(review.critic) ? review.critic.model : undefined;
+  const critique = critic.critique;
+  if (
+    typeof cacheKey !== "string" ||
+    typeof specHash !== "string" ||
+    (runtime !== "standalone" && runtime !== "dsh") ||
+    !isRecord(critique)
+  ) {
+    return false;
+  }
+  const parsed = input.parsed;
+  if (parsed.signer === undefined || parsed.date === undefined) return false;
+  const cacheSignoff: CritiqueCacheSignoff = {
+    text: input.signoffText,
+    signer: parsed.signer,
+    date: parsed.date,
+    manifestHash: input.manifestHash,
+    findingsHash: input.findingsHash,
+    waivedFindings: input.waivedFindings,
+  };
+  const entry: CritiqueCacheEntry = {
+    schemaVersion: "1.0",
+    key: cacheKey,
+    createdAt: new Date().toISOString(),
+    manifestHash: input.manifestHash,
+    specHash,
+    runtime,
+    profile: typeof profile === "string" ? profile : null,
+    model: typeof model === "string" ? model : null,
+    critique: critique as CritiqueCacheEntry["critique"],
+    findings: critiqueToVisualFindings(critique as CritiqueCacheEntry["critique"]),
+    ...(critic.usage === undefined || critic.usage === null
+      ? {}
+      : { usage: critic.usage as CritiqueCacheEntry["usage"] }),
+    usageComplete: critic.usageComplete === true,
+    costCny: typeof critic.costCny === "number" ? critic.costCny : 0,
+    ...(typeof critic.costSource === "string"
+      ? { costSource: critic.costSource }
+      : {}),
+    ...(typeof critic.budgetEnforced === "boolean"
+      ? { budgetEnforced: critic.budgetEnforced }
+      : {}),
+    signoff: cacheSignoff,
+  };
+  await writeCritiqueCache(input.cacheDir, entry);
+  return true;
+}
+
+export interface VisualSignDeps {
+  /** Test seam for the signed-critique cache directory. */
+  cacheDir?: string;
+}
+
 export async function main(
   argv: string[],
   io: { stdout: (line: string) => void; stderr: (line: string) => void } = {
     stdout: (line) => console.log(line),
     stderr: (line) => console.error(line),
-  }
+  },
+  deps: VisualSignDeps = {}
 ): Promise<number> {
   let options: VisualSignOptions;
   try {
@@ -264,6 +350,22 @@ export async function main(
       // The state is authoritative; a missing gate artifact does not block signing.
     }
 
+    let cachePersisted = false;
+    try {
+      cachePersisted = await persistSignedCritiqueCache({
+        store,
+        cacheDir: deps.cacheDir ?? defaultCacheDir(),
+        signoffText: text,
+        parsed,
+        waivedFindings: validation.waivedFindings,
+        state: next,
+        manifestHash,
+        findingsHash,
+      });
+    } catch {
+      // A cache write failure must not invalidate a valid human signoff.
+    }
+
     await store.writeJson("visual-sign.json", {
       schemaVersion: "1.0",
       runId: next.runId,
@@ -277,6 +379,7 @@ export async function main(
       waivedFindings: validation.waivedFindings,
       costCny: next.costCny,
       usageComplete: next.usageComplete,
+      cachePersisted,
     });
     await store.appendText(
       "logs/visual.ndjson",
@@ -289,6 +392,7 @@ export async function main(
           manifestHash,
           findingsHash,
           waivedFindings: validation.waivedFindings,
+          cachePersisted,
           timestamp: now,
         })
       )}\n`

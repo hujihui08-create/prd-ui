@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T11:47:28.650Z",
+  "generatedAt": "2026-10-22T13:57:10.549Z",
   "gate": {
     "passed": true,
     "issues": [
@@ -11,8 +11,8 @@
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "today",
         "state": "default",
-        "message": "The 「我的预约」 card header contains only the title; the required 「查看全部」 action is missing, so the card has no in-context drill-down and reads as a dead end (the only route to the list is the bottom tab). Proposal: Add a right-aligned 「查看全部 ›」 text button on the card-title baseline, linking to /appointments; keep it hidden when the section is empty or lacks permission.",
-        "evidence": "screenshots/today.default.png — top-right of the 「我的预约」 card header (y≈205–225) is empty."
+        "message": "The 我的预约 section header lacks the required “查看全部” link, so the card has no path to the full appointment list and the header reads as unfinished. Proposal: Add a right-aligned “查看全部 ›” text link in the 我的预约 card header, styled as a secondary/ghost action and routing to /appointments.",
+        "evidence": "screenshots/today.default.png — the right side of the 「我的预约」card header (about y=224, x≈330–358) is empty; no 「查看全部」 entry appears."
       },
       {
         "id": "VC-002",
@@ -20,8 +20,8 @@
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "appointment-list",
         "state": "default",
-        "message": "At 390px the seven-day schedule is only readable for three days at a time; the remaining days are off-screen with no scroll affordance, edge fade, or compact week strip, so a store employee cannot scan the week's bookings and the grid looks accidentally cropped. Proposal: Either expose the week explicitly (fixed time gutter plus a compact 7-day header/edge scroll cue or horizontal paging) or use a single-day timeline with a week strip; make the active day obvious in the header.",
-        "evidence": "screenshots/appointment-list.default.png — calendar week grid (y≈210–770); only 周一/周二/周三 columns are fully visible, with the next day split at the right edge."
+        "message": "The seven-day calendar is visually reduced to three wide day columns with no cue that more days exist; the week reads as a three-day grid and Thursday–Sunday cannot be discovered. Proposal: Present all seven days at a compact width, or add an explicit horizontal-scroll/page affordance with a partial next column and a week label; keep the selected/today column highlighted.",
+        "evidence": "screenshots/appointment-list.default.png — the calendar header shows only 「周一 11-03」「周二 11-04」「周三 11-05」 three columns (about y=205–260); Thursday–Sunday have no visible entry, paging, or scroll affordance."
       },
       {
         "id": "VC-003",
@@ -29,8 +29,8 @@
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "appointment-list",
         "state": "loading",
-        "message": "The calendar skeleton is a thin band of generic blocks with no time gutter, day header, or hourly rows, and both the 「切换日历/列表」 control and the bottom 「新增预约」 CTA disappear; a full calendar collapses into a mostly blank page and jumps massively when data arrives. Proposal: Render a calendar-shaped skeleton with the same fixed time column, seven day columns, and 12 hourly rows, and keep the filters, view toggle, and footer CTA visible (disabled during loading) so the layout height matches the loaded state.",
-        "evidence": "screenshots/appointment-list.state.loading.png — content area y≈130–265; everything below y≈265 is empty."
+        "message": "The loading state does not preserve the loaded calendar's structure or controls: the short 7×6 block replaces a 12-hour grid, and the date heading and view toggle vanish, so the page jumps and loses context when data arrives. Proposal: Mirror the final grid in the skeleton (seven columns, hourly rows, time labels) and keep the date heading and view toggle visible but disabled during loading.",
+        "evidence": "screenshots/appointment-list.state.loading.png — the skeleton below the filter row is a short 7-column × ~6-row bar block (about y=132–255), with no time labels or date heading, and the 「切换日历/列表」control visible in the default state is gone."
       },
       {
         "id": "VC-004",
@@ -38,8 +38,8 @@
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "appointment-list",
         "state": "empty",
-        "message": "The empty state is rendered as an elevated floating card on top of the retained calendar, hiding the day header and the 09:00–12:00 rows; the page simultaneously shows a modal-like panel and a grid, so the empty state looks like an accidental overlay rather than an inline result. Proposal: Make the empty state inline inside the calendar panel (no shadow, aligned to the grid) or replace only the appointment blocks while keeping the header and time axis visible; never cover the grid.",
-        "evidence": "screenshots/appointment-list.state.empty.png — shadowed white empty card spanning x≈18–372, y≈225–365, over the calendar grid."
+        "message": "The empty state is rendered as an overlay floating above the calendar instead of an inline state; it masks the day header and morning slots and looks like an accidental modal over the grid. Proposal: Render the empty message inline in the calendar area (or directly below the legend) without covering the day headers or time axis, keeping the grid structure visible.",
+        "evidence": "screenshots/appointment-list.state.empty.png — the white 「当前条件没有预约」card floats over the calendar (about y=225–365), covering the day header and the 09:00–12:00 rows while the grid below 12:00 remains visible."
       },
       {
         "id": "VC-005",
@@ -47,17 +47,17 @@
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "appointment-form",
         "state": "default",
-        "message": "A two-option mode control sits under the 「新增/改期预约」 title, duplicating the route-driven mode and introducing a second navigation layer; in the reschedule screenshot it collapses to a lone 「改期」 pill, so it reads as a stray tag rather than usable context. Proposal: Remove the in-form mode switch; let the entry route determine the mode. If context is needed, show one static line (e.g. 「改期 · 张女士 · 11-05 10:00」) instead of a selectable control.",
-        "evidence": "screenshots/appointment-form.default.png — control row directly under the page title, y≈65–88: 「新增预约」 filled pill and 「改期」 outlined pill."
+        "message": "This mode switch is not part of the page spec and reads as an internal route/debug control; it duplicates the title, competes with the form's primary action, and implies users can switch to reschedule without an appointment context. Proposal: Remove the pills; use the title plus a context banner for reschedule, and let the entry point decide the mode.",
+        "evidence": "screenshots/appointment-form.default.png — below the page title 「新增/改期预约」 there are 「新增预约」「改期」 pill buttons (about y=57–88), with 「新增预约」 filled black; the reschedule screenshot leaves only a single black 「改期」pill."
       },
       {
         "id": "VC-006",
         "severity": "major",
         "code": "VISUAL_CRITIC_MAJOR",
         "pageId": "appointment-form",
-        "state": "default",
-        "message": "In reschedule mode the locked customer field shows only a placeholder and both time fields are empty; no original appointment value or reference appears anywhere, so the user cannot tell which customer or time slot is being rescheduled. Proposal: Restore and display the original customer, time range, and therapist as read-only values (or a context banner) in reschedule mode; the locked customer field must show the actual customer name, not a placeholder.",
-        "evidence": "screenshots/appointment-form.mode.reschedule.png — 客户 field y≈118–168 (disabled placeholder 「请输入客户」) and empty 开始/结束时间 fields y≈250–350."
+        "state": "reschedule",
+        "message": "Reschedule mode should restore the appointment; instead it presents a disabled, empty customer field and a blank form with no indication of which appointment is being changed, so the state looks broken and users cannot verify they are rescheduling the right booking. Proposal: Prefill the locked customer and the appointment's current project/time/therapist, add a compact “正在改期：… 原时段 …” context, and show a skeleton or ErrorState until the document is available.",
+        "evidence": "screenshots/appointment-form.mode.reschedule.png — the 客户 field is disabled but shows the placeholder 「请输入客户」 (about y=132–172); 项目, 开始/结束时间, and 护理师 are all empty, and there is no summary of the original appointment or time slot."
       },
       {
         "id": "VC-007",
@@ -65,44 +65,26 @@
         "code": "VISUAL_CRITIC_MINOR",
         "pageId": "appointment-form",
         "state": "default",
-        "message": "The datetime placeholders use a US locale format inside an otherwise Chinese interface, inconsistent with the 「11-05 周三 10:00」 format used across the app. Proposal: Use a zh-CN date/time placeholder or a custom picker that renders the product's date convention consistently in both time fields.",
-        "evidence": "screenshots/appointment-form.mode.reschedule.png — 开始时间 and 结束时间 inputs at y≈285 and y≈335 show the placeholder 「mm/dd/yyyy, --:-- --」."
+        "message": "The date-time placeholders are in US English format, breaking localization and the otherwise consistent Chinese brand voice. Proposal: Localize the picker/placeholder to zh-CN (for example YYYY-MM-DD HH:mm) or use the app's custom date-time control.",
+        "evidence": "screenshots/appointment-form.default.png — the native 开始时间/结束时间 inputs show the English placeholder 「mm/dd/yyyy, --:-- --」 (about y=234 and y=306) inside an otherwise Chinese UI."
       },
       {
         "id": "VC-008",
         "severity": "minor",
         "code": "VISUAL_CRITIC_MINOR",
-        "pageId": "appointment-detail",
-        "state": "已到店",
-        "message": "When 「开单」 is the only footer action it is still styled as a full-width white outline button, the same weight as ghost/secondary actions; the sole business action in this state reads as low priority or disabled. Proposal: Promote a lone footer action to the primary filled style; if 开单 must remain secondary, keep it compact and right-aligned rather than spanning the full width.",
-        "evidence": "screenshots/appointment-detail.business.已到店.png — fixed bottom bar, full-width outlined 「开单」 button at y≈795–830."
+        "pageId": "appointment-list",
+        "state": "default",
+        "message": "The current/selected day column is not highlighted, so the calendar loses its temporal anchor even though the date filter and heading both indicate 11-05. Proposal: Apply a subtle selected/today tint to the 周三 column and its header, distinct from the status colors.",
+        "evidence": "screenshots/appointment-list.default.png — the 「周三 11-05」 column header and background are identical to the adjacent days (about y=211–253); no current-day highlight is visible."
       },
       {
         "id": "VC-009",
         "severity": "minor",
         "code": "VISUAL_CRITIC_MINOR",
-        "pageId": "appointment-detail",
-        "state": "default",
-        "message": "The customer name is styled identically to ordinary field values with no link cue, while a separate 「客户详情」 button also opens the same destination; the entry is duplicated and the name itself is not visibly actionable. Proposal: When the customer is viewable, render the name as a distinct link (brand colour/chevron) and remove the duplicate button; when not viewable, keep the name as plain text and hide the button.",
-        "evidence": "screenshots/appointment-detail.default.png — 客户 row value 「张女士」 at y≈130–150, plus a separate 「客户详情」 ghost button at y≈575–610."
-      },
-      {
-        "id": "VC-010",
-        "severity": "minor",
-        "code": "VISUAL_CRITIC_MINOR",
-        "pageId": "callback-register",
-        "state": "default",
-        "message": "The required outcome field is pre-selected to 「已联系」 in the default state, silently supplying a business result the user did not choose and making an accidental save possible. Proposal: Show 「请选择回访结果」 as an unselected placeholder and require an explicit choice on save; do not default to the first option.",
-        "evidence": "screenshots/callback-register.default.png — 回访结果 select at y≈305–340 shows 「已联系」 without user input."
-      },
-      {
-        "id": "VC-011",
-        "severity": "minor",
-        "code": "VISUAL_CRITIC_MINOR",
         "pageId": "appointment-list",
-        "state": "default",
-        "message": "The view toggle keeps the identical 「切换日历/列表」 label in both views, and the list view loses the 日历/列表 heading that the calendar view has, so the current view is never explicitly announced. Proposal: Use a segmented 日历 | 列表 control with the active segment highlighted (or label the button with the destination), and show a consistent 「列表 · 11-05 周三」 heading in list mode.",
-        "evidence": "screenshots/appointment-list.view.list.png — 「切换日历/列表」 button at y≈100–137 and the date heading at y≈150–170."
+        "state": "error",
+        "message": "The error state drops the date/filter/view context, so the user cannot see which day or filter failed, and retry has no visible context. Proposal: Keep the filter/date row and view toggle visible above the error block (disabled if necessary) so the failed query remains identifiable.",
+        "evidence": "screenshots/appointment-list.state.error.png — the page shows only the centered error state (about y=340–475); the 状态/日期 filters, the view switch, and the 「日历 11-05 周三」 heading are all gone."
       }
     ]
   },

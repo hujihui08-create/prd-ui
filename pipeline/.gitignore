@@ -1,2 +1,5 @@
 node_modules/
 runs/
+
+# local signed-critique cache
+.visual-cache/

@@ -283,7 +283,12 @@ export async function main(
       for (const visualCase of cases) {
         const entry = byCase.get(visualCase.id)!;
         manifestCases.push(
-          manifestCaseFor(visualCase, `${visualCase.id}.png`, entry.sha256)
+          manifestCaseFor(
+            visualCase,
+            `${visualCase.id}.png`,
+            entry.sha256,
+            entry.visualHash
+          )
         );
       }
 

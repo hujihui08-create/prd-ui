@@ -1,6 +1,8 @@
 # v0.4 Motion and Visual Regression Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
+
+**Status:** Completed (2026-10-22; Tasks 1–9 done; final signed run passed with 6-major v0.5 debt)
 
 **Goal:** Make the 8-page clean Phase 2 HTML motion-capable and visually regression-tested: stable semantic node ids, real CSS motion in HTML, a post-render Visual Review stage with screenshots/pixel diff/Visual Critic/signoff, customer picker, full-date prefill, and the agreed visual-fidelity fixes.
 
@@ -63,7 +65,7 @@ pipeline/artifacts/employee-app-phase2/visual-review/  evidence
 - Produces: `SpecNode.motionGroup?: string`.
 - Produces: every compiled `SpecNode.id` deterministic and unique; repeated rows carry `motionGroup`.
 
-- [ ] **Step 1: Write the failing semantic-id tests**
+- [x] **Step 1: Write the failing semantic-id tests**
 
 ```ts
 // pipeline/core/design-system/tests/semantic-ids.test.ts
@@ -105,12 +107,12 @@ it("assigns deterministic semantic node ids and row groups", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/design-system/tests/semantic-ids.test.ts core/compiler/tests/compiler.test.ts`
 Expected: FAIL because `semantic-ids` and node ids do not exist.
 
-- [ ] **Step 3: Add the registry**
+- [x] **Step 3: Add the registry**
 
 ```ts
 // pipeline/core/design-system/src/semantic-ids.ts
@@ -171,11 +173,11 @@ export const CARD_KEYS: Record<string, string> = {
 
 Export these from `core/design-system/src/index.ts`.
 
-- [ ] **Step 4: Add `motionGroup` to the Page Spec contract**
+- [x] **Step 4: Add `motionGroup` to the Page Spec contract**
 
 In `core/contracts/src/page-spec.ts` add `motionGroup?: string;` to `SpecNode` and the same optional field to `SpecNodeSchema` (after `id`).
 
-- [ ] **Step 5: Assign ids in the compiler**
+- [x] **Step 5: Assign ids in the compiler**
 
 Add to `compile-page-spec.ts`:
 
@@ -245,12 +247,12 @@ function assignNodeIds(page: UiBriefPage, layout: SpecNode): void {
 
 Call `assignNodeIds(page, layout)` immediately after `const layout = buildLayout(...)`.
 
-- [ ] **Step 6: Run tests**
+- [x] **Step 6: Run tests**
 
 Run: `cd pipeline && pnpm exec vitest run core/design-system/tests/semantic-ids.test.ts core/compiler/tests/compiler.test.ts`
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add core/design-system/src/semantic-ids.ts core/design-system/src/index.ts core/design-system/tests/semantic-ids.test.ts core/contracts/src/page-spec.ts core/compiler/src/compile-page-spec.ts core/compiler/tests/compiler.test.ts
@@ -278,7 +280,7 @@ git commit -m "feat(compiler): assign deterministic semantic node ids"
 - Produces: `resolveMotionTarget(spec, nodeId): { id: string; group: boolean } | undefined`.
 - Produces: `RunSpecEngineerInput.strictMotionPages?: string[]`; CLI `--strict-motion`.
 
-- [ ] **Step 1: Write failing resolution tests**
+- [x] **Step 1: Write failing resolution tests**
 
 ```ts
 // pipeline/core/spec-engineer/tests/apply.test.ts
@@ -314,12 +316,12 @@ it("resolves exact ids, groups, and legacy aliases", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/spec-engineer/tests/apply.test.ts`
 Expected: FAIL because the module/function does not exist.
 
-- [ ] **Step 3: Add aliases and resolver**
+- [x] **Step 3: Add aliases and resolver**
 
 ```ts
 // pipeline/core/spec-engineer/src/motion-aliases.ts
@@ -382,7 +384,7 @@ export function resolveMotionTarget(
 }
 ```
 
-- [ ] **Step 4: Use the resolver in `buildMotion`**
+- [x] **Step 4: Use the resolver in `buildMotion`**
 
 Change `buildMotion(bindings, motionSpec)` to `buildMotion(spec, bindings, motionSpec)` and map each binding:
 
@@ -398,7 +400,7 @@ bindings.map((binding) => {
 
 Pass the current `spec` at the call site.
 
-- [ ] **Step 5: Add strict unresolved gate**
+- [x] **Step 5: Add strict unresolved gate**
 
 In `gates.ts`, collect `motionGroups` alongside node ids. For each binding, resolve alias/group and if neither exists:
 
@@ -416,11 +418,11 @@ issues.push(
 
 Add `strictMotionPages?: string[]` to `MotionGateInput`/`RunSpecEngineerInput` and thread it through.
 
-- [ ] **Step 6: Add the CLI flag**
+- [x] **Step 6: Add the CLI flag**
 
 In `spec-cli.ts`, accept `--strict-motion`; when present, pass `strictMotionPages: brief.ia.pages.map((page) => page.id)`.
 
-- [ ] **Step 7: Write and run the strict gate test**
+- [x] **Step 7: Write and run the strict gate test**
 
 ```ts
 it("blocks unresolved motion ids for strict pages", () => {
@@ -438,7 +440,7 @@ it("blocks unresolved motion ids for strict pages", () => {
 Run: `cd pipeline && pnpm exec vitest run core/spec-engineer/tests/apply.test.ts core/spec-engineer/tests/gates.test.ts runtimes/standalone/tests/spec-cli.test.ts`
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add core/spec-engineer/src/motion-aliases.ts core/spec-engineer/src/apply.ts core/spec-engineer/src/gates.ts core/spec-engineer/src/contracts.ts core/spec-engineer/src/run-spec-engineer.ts core/spec-engineer/tests/apply.test.ts core/spec-engineer/tests/gates.test.ts runtimes/standalone/src/spec-cli.ts runtimes/standalone/tests/spec-cli.test.ts
@@ -458,7 +460,7 @@ git commit -m "feat(spec-engineer): resolve motion bindings to semantic node ids
 - Consumes: `SpecNode.id`, `SpecNode.motionGroup`, `PageSpec.motion`.
 - Produces: `createMotionContext(spec)`, `motionAttrs(node, ctx)`, `renderMotionCss()`.
 
-- [ ] **Step 1: Write the failing renderer test**
+- [x] **Step 1: Write the failing renderer test**
 
 ```ts
 it("renders node and group motion attributes plus reduced-motion fallback", () => {
@@ -475,12 +477,12 @@ it("renders node and group motion attributes plus reduced-motion fallback", () =
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/renderer-html/tests/renderer.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement `motion.ts`**
+- [x] **Step 3: Implement `motion.ts`**
 
 ```ts
 import type { PageSpec, SpecNode } from "@prd-ui/contracts";
@@ -573,7 +575,7 @@ export function renderMotionCss(): string {
 }
 ```
 
-- [ ] **Step 4: Wire motion into `renderNode`/`renderDocument`**
+- [x] **Step 4: Wire motion into `renderNode`/`renderDocument`**
 
 - `renderDocument` sets a module global `renderMotionContext = createMotionContext(spec)` before `renderNode`.
 - Add `motionAttrs(node, renderMotionContext)` to the root `PageShell`/`MobileShell` tags and to `Button`, `QuickAction`, `FormField`, `ListRow`, `Card`, `Section`, `CalendarGrid` tags.
@@ -586,12 +588,12 @@ export function renderMotionCss(): string {
 document.documentElement.dataset.motionFallback = ${JSON.stringify(spec.motion?.reducedMotion.fallback ?? "none")};
 ```
 
-- [ ] **Step 5: Run renderer tests**
+- [x] **Step 5: Run renderer tests**
 
 Run: `cd pipeline && pnpm exec vitest run core/renderer-html/tests/renderer.test.ts`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add core/renderer-html/src/motion.ts core/renderer-html/src/index.ts core/renderer-html/tests/renderer.test.ts
@@ -618,7 +620,7 @@ git commit -m "feat(renderer): apply page motion presets and reduced-motion fall
 - Produces gate codes: `BRIEF_PICKER_RETURN_UNKNOWN`, `BRIEF_PICKER_RETURN_UNSUPPORTED`, `BRIEF_CUSTOMER_PICKER_UNKNOWN`, `BRIEF_CUSTOMER_PICKER_UNSUPPORTED`, `BRIEF_CALENDAR_DATE_INVALID`, `BRIEF_CALENDAR_FIELDS_MISSING`.
 - Produces compiler defaults from the signed brief without editing it.
 
-- [ ] **Step 1: Write failing contract + compiler tests**
+- [x] **Step 1: Write failing contract + compiler tests**
 
 ```ts
 it("parses picker and calendar metadata on a brief page", () => {
@@ -652,12 +654,12 @@ it("defaults picker and calendar metadata for the signed phase2 brief", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/contracts/tests/contracts.test.ts core/compiler/tests/compiler.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Add contract fields and schemas**
+- [x] **Step 3: Add contract fields and schemas**
 
 Add to `UiBriefPage`/`UiBriefPageSchema` and `PageSpec`/`PageSpecSchema`:
 
@@ -669,7 +671,7 @@ calendarWeekStart?: string;
 
 Use `PageIdSchema` for ids and a string regex `/^\d{4}-\d{2}-\d{2}$/` for the date.
 
-- [ ] **Step 4: Add compiler defaults**
+- [x] **Step 4: Add compiler defaults**
 
 In `compilePageSpec`:
 
@@ -702,7 +704,7 @@ const calendarWeekStart =
 
 Add the values to the returned Page Spec with conditional spreads.
 
-- [ ] **Step 5: Add brief gate checks**
+- [x] **Step 5: Add brief gate checks**
 
 Inside the page loop:
 
@@ -721,7 +723,7 @@ if (page.calendarWeekStart !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(page.cal
 }
 ```
 
-- [ ] **Step 6: Add the Briefer prompt rules and test**
+- [x] **Step 6: Add the Briefer prompt rules and test**
 
 Add to `ui-briefer.ts` mapping rules:
 
@@ -741,7 +743,7 @@ it("requires picker and calendar metadata", () => {
 });
 ```
 
-- [ ] **Step 7: Run tests and commit**
+- [x] **Step 7: Run tests and commit**
 
 Run: `cd pipeline && pnpm exec vitest run core/contracts/tests/contracts.test.ts core/intake/tests/briefer-prompt.test.ts core/intake/tests/gates.test.ts core/compiler/tests/compiler.test.ts`
 Expected: PASS.
@@ -767,7 +769,7 @@ git commit -m "feat(contracts): add picker and calendar metadata"
 - Consumes: `PageSpec.pickerReturnTo`, `customerPicker`, `calendarWeekStart`.
 - Produces: `data-picker-search`, `data-picker-return`, full ISO `data-slot-date`, `datetime-local` inputs, deduplicated detail/notice, tabs, search result actions, calendar legend.
 
-- [ ] **Step 1: Write failing renderer/compiler tests**
+- [x] **Step 1: Write failing renderer/compiler tests**
 
 ```ts
 it("renders picker hooks, full dates, and fidelity fixes", () => {
@@ -784,12 +786,12 @@ it("renders picker hooks, full dates, and fidelity fixes", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/renderer-html/tests/renderer.test.ts core/compiler/tests/compiler.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Compiler fidelity changes**
+- [x] **Step 3: Compiler fidelity changes**
 
 - Remove the mobile-list field-label `Row` block entirely.
 - `calendarDays`: use `calendarWeekStart`; each day `date` is full `YYYY-MM-DD`; `label` is `周一`…; `today` compares to `brief.meta.date`.
@@ -803,7 +805,7 @@ Expected: FAIL.
 - Mobile-list search (page has `searchIdleTitle`): do not emit the bottom `actions` slot (the input filters live); keep `查看详情` in the secondary actions row so the renderer can hide it until results.
 - Mobile-form: only emit the `另一模式` Row when `page.formModes === undefined`.
 
-- [ ] **Step 4: Renderer changes**
+- [x] **Step 4: Renderer changes**
 
 - Add `data-picker-search` / `data-picker-return` to the `MobileShell` root from `spec.customerPicker` / `spec.pickerReturnTo`.
 - Add `datetime-local` to the Input `inputType` handling (it already renders `type`).
@@ -863,11 +865,11 @@ if (selected) {
 
 - Form prefill: parse `date`/`time`; set `startTime` to `${date}T${time}`, `endTime` to +60 minutes.
 
-- [ ] **Step 5: Add `inputType`/badge catalog props**
+- [x] **Step 5: Add `inputType`/badge catalog props**
 
 Add `datetime-local` to the `Input` inputType enum in `b-mobile` and `b-dense`; add `badge`/`badgeTone` props to `Card` in both catalogs.
 
-- [ ] **Step 6: Run tests and commit**
+- [x] **Step 6: Run tests and commit**
 
 Run: `cd pipeline && pnpm exec vitest run core/renderer-html/tests/renderer.test.ts core/compiler/tests/compiler.test.ts core/validators/tests/validators.test.ts`
 Expected: PASS.
@@ -896,7 +898,7 @@ git commit -m "feat(renderer): wire picker, full dates, and visual fidelity fixe
 - Produces: `VisualCase`, `VisualFinding`, `VisualGateInput`, `runVisualGate`, `buildVisualMatrix`.
 - Produces: deterministic case ids and manifest expectations.
 
-- [ ] **Step 1: Write failing matrix/gate tests**
+- [x] **Step 1: Write failing matrix/gate tests**
 
 ```ts
 it("builds page, state, business-state, form-mode, and view cases", () => {
@@ -925,12 +927,12 @@ it("blocks missing screenshots, console errors, overflow, and diff", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd pipeline && pnpm exec vitest run core/visual-review/tests/matrix.test.ts core/visual-review/tests/gates.test.ts`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement contracts/matrix**
+- [x] **Step 3: Implement contracts/matrix**
 
 ```ts
 // contracts.ts
@@ -1003,7 +1005,7 @@ export function buildVisualMatrix(specs: PageSpec[]): VisualCase[] {
 }
 ```
 
-- [ ] **Step 4: Implement gates**
+- [x] **Step 4: Implement gates**
 
 ```ts
 export function runVisualGate(input: {
@@ -1032,7 +1034,7 @@ export function runVisualGate(input: {
 }
 ```
 
-- [ ] **Step 5: Add the pure status function**
+- [x] **Step 5: Add the pure status function**
 
 ```ts
 // run-visual-review.ts
@@ -1056,11 +1058,11 @@ it("derives status from gates and signoff", () => {
 });
 ```
 
-- [ ] **Step 6: Package wiring**
+- [x] **Step 6: Package wiring**
 
 Create `package.json` with name `@prd-ui/visual-review`, dependencies `@prd-ui/contracts`, `@prd-ui/agents`, `zod`; tsconfig extends root. Add it to `runtimes/standalone` dependencies and tsconfig references if needed.
 
-- [ ] **Step 7: Run tests and commit**
+- [x] **Step 7: Run tests and commit**
 
 Run: `cd pipeline && pnpm exec vitest run core/visual-review/tests`
 Expected: PASS.
@@ -1089,7 +1091,7 @@ git commit -m "feat(visual-review): add screenshot matrix and deterministic gate
 - Consumes: `VisualCase`, `buildVisualMatrix`, `runVisualGate`.
 - Produces: `captureVisualCases`, `diffPng`, CLI summaries with `status`, `cases`, `screenshots`, `diff`, `findings`, `costCny`, `usageComplete`.
 
-- [ ] **Step 1: Add dependencies and scripts**
+- [x] **Step 1: Add dependencies and scripts**
 
 `runtimes/standalone/package.json` dependencies add `playwright`, `pixelmatch`, `pngjs`; devDependencies add `@types/pixelmatch`, `@types/pngjs`. `pipeline/package.json` scripts:
 
@@ -1101,7 +1103,7 @@ git commit -m "feat(visual-review): add screenshot matrix and deterministic gate
 
 Run `pnpm install` and `pnpm exec playwright install chromium`.
 
-- [ ] **Step 2: Write failing diff test**
+- [x] **Step 2: Write failing diff test**
 
 ```ts
 it("computes diff pixels and writes a diff png", async () => {
@@ -1111,7 +1113,7 @@ it("computes diff pixels and writes a diff png", async () => {
 });
 ```
 
-- [ ] **Step 3: Implement diff**
+- [x] **Step 3: Implement diff**
 
 ```ts
 import { PNG } from "pngjs";
@@ -1126,7 +1128,7 @@ export async function diffPng(aPath: string, bPath: string, outPath: string) {
 }
 ```
 
-- [ ] **Step 4: Implement screenshots**
+- [x] **Step 4: Implement screenshots**
 
 ```ts
 export async function captureVisualCases(input: {
@@ -1197,7 +1199,7 @@ function createStaticServer(dir: string): Promise<{ url: string; close: () => Pr
 }
 ```
 
-- [ ] **Step 5: CLI**
+- [x] **Step 5: CLI**
 
 `visual-baseline-cli.ts`: parse `--project`, `--spec-run`, `--html`, `--out`; read specs; `buildVisualMatrix`; capture; write PNGs and `manifest.json`; no model.
 
@@ -1205,7 +1207,7 @@ function createStaticServer(dir: string): Promise<{ url: string; close: () => Pr
 
 `visual-sign-cli.ts`: parse `--run`, `--signoff-visual`; parse `manifestHash`/`findingsHash` from the markdown block; validate; write `signoff/visual.md`; update state to `success`.
 
-- [ ] **Step 6: Tests and commit**
+- [x] **Step 6: Tests and commit**
 
 Run: `cd pipeline && pnpm exec vitest run runtimes/standalone/tests/visual-diff.test.ts runtimes/standalone/tests/visual-cli.test.ts`
 Expected: PASS.
@@ -1236,7 +1238,7 @@ git commit -m "feat(visual-review): add Playwright screenshots, diff, and CLIs"
 - Produces: `VisualCritiqueSchema`, `buildVisualCriticPrompt`.
 - Produces: `prd-ui-visual` profile with vision model and file tools.
 
-- [ ] **Step 1: Write failing role/prompt test**
+- [x] **Step 1: Write failing role/prompt test**
 
 ```ts
 it("builds a visual critic prompt with screenshots and forbids edits", () => {
@@ -1254,7 +1256,7 @@ it("builds a visual critic prompt with screenshots and forbids edits", () => {
 });
 ```
 
-- [ ] **Step 2: Implement role**
+- [x] **Step 2: Implement role**
 
 ```ts
 export const VisualCritiqueSchema = z.object({
@@ -1295,15 +1297,15 @@ export function buildVisualCriticPrompt(input: {
 }
 ```
 
-- [ ] **Step 3: Add the role to contracts and export**
+- [x] **Step 3: Add the role to contracts and export**
 
 Add `"visual-critic"` to `AgentTaskRoleSchema`; export prompt/schema from `core/agents/src/index.ts`.
 
-- [ ] **Step 4: Add `prd-ui-visual` profile**
+- [x] **Step 4: Add `prd-ui-visual` profile**
 
 Copy `prd-ui-assets` profile files; change the comment/name; keep `defaultInput: [text, image]`, `maxTokens: 32768`, and the `@prd-ui/runtime-dsh` bundle. Add a smoke command to `dsh/README.md`.
 
-- [ ] **Step 5: Add scripted fixture and CLI path**
+- [x] **Step 5: Add scripted fixture and CLI path**
 
 `visual-critic.json` shape:
 
@@ -1321,7 +1323,7 @@ Copy `prd-ui-assets` profile files; change the comment/name; keep `defaultInput:
 
 `visual-review-cli.ts --runtime standalone` loads this fixture instead of calling dsh; `--runtime dsh` calls the visual-critic runner.
 
-- [ ] **Step 6: Tests and commit**
+- [x] **Step 6: Tests and commit**
 
 Run: `cd pipeline && pnpm exec vitest run core/agents/tests/contracts.test.ts core/agents/tests/visual-critic.test.ts runtimes/standalone/tests/visual-cli.test.ts`
 Expected: PASS.
@@ -1344,7 +1346,7 @@ git commit -m "feat(agents): add Visual Critic role and vision profile"
 - Modify: `pipeline/docs/spec-engineer-v0.md`, `pipeline/docs/agent-m1.md`
 - Modify: `docs/handoffs/2026-10-21-8page-renderer-handoff.md`
 
-- [ ] **Step 1: Run Spec Engineer with strict motion**
+- [x] **Step 1: Run Spec Engineer with strict motion**
 
 ```bash
 cd pipeline
@@ -1355,7 +1357,7 @@ pnpm spec:engineer --project samples/projects/employee-app-phase2/project.yaml \
 
 Expected: 8 Page Specs, 0 blockers, **0 `SPEC_MOTION_NODE_UNRESOLVED`**.
 
-- [ ] **Step 2: Render**
+- [x] **Step 2: Render**
 
 ```bash
 pnpm render:html --run /tmp/spec-v04/<runId> --out /tmp/html-v04
@@ -1363,7 +1365,7 @@ pnpm render:html --run /tmp/spec-v04/<runId> --out /tmp/html-v04
 
 Expected: 8 pages + index; HTML contains `data-motion-preset`, `data-node-id`, full `data-slot-date`, `data-picker-search`.
 
-- [ ] **Step 3: Create baseline**
+- [x] **Step 3: Create baseline**
 
 ```bash
 pnpm visual:baseline --project samples/projects/employee-app-phase2/project.yaml \
@@ -1373,7 +1375,7 @@ pnpm visual:baseline --project samples/projects/employee-app-phase2/project.yaml
 
 Expected: 19–24 PNGs + `manifest.json`.
 
-- [ ] **Step 4: Run Visual Review with real dsh**
+- [x] **Step 4: Run Visual Review with real dsh**
 
 ```bash
 set -a; . ./.env; set +a
@@ -1387,7 +1389,7 @@ DSH_HOME="$PWD/dsh/home" pnpm visual:review \
 
 Expected: screenshots complete, 0 console/overflow, diff within 1%, Visual Critic findings triaged; status `awaiting_signoff` or `passed`.
 
-- [ ] **Step 5: Sign and rerun**
+- [x] **Step 5: Sign and rerun**
 
 Create `/tmp/signoff-visual-v04.md` with the `manifestHash` and `findingsHash` printed by the review summary:
 
@@ -1417,7 +1419,7 @@ pnpm visual:review --project samples/projects/employee-app-phase2/project.yaml \
 
 Expected: `status=passed`, diff stable.
 
-- [ ] **Step 6: Playwright picker/date/fidelity checks**
+- [x] **Step 6: Playwright picker/date/fidelity checks**
 
 Serve `/tmp/html-v04` and verify:
 
@@ -1425,7 +1427,7 @@ Serve `/tmp/html-v04` and verify:
 2. calendar empty cell → form `startTime` prefilled `YYYY-MM-DDTHH:mm`, `endTime` +60 minutes.
 3. list page has no raw field-label row; detail/notice has no duplicate customer/status nodes; bottom tabs show 今日 + 预约列表; search idle hides 查看详情; calendar has legend and horizontal scroll.
 
-- [ ] **Step 7: Copy artifacts and update docs**
+- [x] **Step 7: Copy artifacts and update docs**
 
 Copy HTML, screenshots, visual-review JSON/findings/signoff, baseline manifest, and run summaries to `pipeline/artifacts/employee-app-phase2/`. Update docs with:
 
@@ -1435,7 +1437,7 @@ Copy HTML, screenshots, visual-review JSON/findings/signoff, baseline manifest, 
 - fidelity fixes;
 - v0.4 completion and remaining debt (Phase 3/4).
 
-- [ ] **Step 8: Full regression and commit**
+- [x] **Step 8: Full regression and commit**
 
 ```bash
 cd pipeline

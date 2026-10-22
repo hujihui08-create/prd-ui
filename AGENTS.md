@@ -8,7 +8,7 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 - `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `agents`, `spec-engineer`, `intake`, `visual-review`.
 - `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
-- `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). `pipeline/dsh/home/profiles/prd-ui-visual` — Visual Critic profile (vision provider, read/read_image/glob/grep only, 65536 maxTokens; no write/edit/bash/workflow/subagent/web). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
+- `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). `pipeline/dsh/home/profiles/prd-ui-visual` — Visual Critic profile (vision provider, 65536 maxTokens; kept tools are `read`, `read_image`, `glob`, `grep`, `skill`, `working_directory`, and session-state tools; no write/edit/bash/workflow/subagent/web; see `pipeline/dsh/README.md`). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
 - `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
 - `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page Phase 2 exit HTML, screenshots, and asset review evidence.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
@@ -70,6 +70,10 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   are separate. It writes `ui-brief.json` only on `success`; use `--resume`
   after signing. Brief signoff must carry the canonical `briefHash`. The brief
   gate runs compiler dry-run plus Phase 1 semantic validators.
+- `visual:review` has a project-local signed-critique cache keyed by visual
+  screenshot manifest hash + Page Spec hash + runtime/profile/model
+  (`pipeline/.visual-cache/`, gitignored); a signed hit reuses findings/signoff
+  with zero model calls, and any manifest/spec change misses.
 - `visual:baseline` never runs a model; only a human runs it and commits the
   PNGs + manifest. `visual:review` needs a baseline and never updates it;
   `--runtime dsh --profile prd-ui-visual` calls the real critic, whose timeout
@@ -79,7 +83,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 637 tests passing, `pnpm test:dsh` 4 passed,
+Current expected evidence: 644 tests passing, `pnpm test:dsh` 4 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -139,8 +143,8 @@ check-in, premature notice, search/list CTAs, list row density, read-only action
 row, notice label, status tones, reschedule prefill, mode lock, calendar/date
 consistency, loading/empty structures) are implemented. The final real-dsh
 review is `status=passed` after signing per the stopping rule: 24/24
-screenshots, 0 console / 0 overflow / 0 diff failures, 11 findings (6 major /
-5 minor / 0 blocker), ¥0.3260564064, `waivers=[]`. The critic verdict remains
+screenshots, 0 console / 0 overflow / 0 diff failures, 9 findings (6 major /
+3 minor / 0 blocker), ¥0 (signed-critique cache hit, 0 model calls), `waivers=[]`. The critic verdict remains
 `changes`; the 6 residual majors are v0.5 debt (today 查看全部, 3-day calendar
 cue, loading skeleton completeness, empty overlay, mode pills, reschedule
 matrix context). Failure attempts (console-error, max-tokens) and costs are

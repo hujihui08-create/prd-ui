@@ -127,7 +127,6 @@ button{font:inherit;color:inherit;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -335,7 +334,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 </nav>
   <div class="app " data-page-archetype="mobile-list" data-page-id="appointment-list" data-views="[&quot;calendar&quot;,&quot;list&quot;]" data-default-view="calendar" data-calendar-week-start="2025-11-03" data-node-id="appointment-list.page.root" data-motion-preset="enter-fade" style="--motion-duration:120ms;--motion-ease:ease-out">
   <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">预约列表</h1></header>
-  <main class="app-scroll"><section class="section" data-node-id="appointment-list.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row sr-only" style="gap:var(--space-1)"><span class="typo-label-sm">日期</span><span class="typo-label-sm">时间段</span><span class="typo-label-sm">客户</span><span class="typo-label-sm">项目</span><span class="typo-label-sm">状态</span><span class="typo-label-sm">护理师</span><span class="typo-label-sm">委派留痕</span><span class="typo-label-sm">门店</span><span class="typo-label-sm">新增预约</span><span class="typo-label-sm">切换日历/列表</span><span class="typo-label-sm">查看完整详情</span></div><div class="row filter-row" style="gap:var(--space-2)"><button class="filter" type="button">
+  <main class="app-scroll"><section class="section" data-node-id="appointment-list.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row filter-row" style="gap:var(--space-2)"><button class="filter" type="button">
   <span class="filter-label">状态</span>
   <span class="filter-value">全部</span>
   <span class="material-symbols-rounded filter-chevron">expand_more</span>
@@ -395,7 +394,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 
   <div class="empty-title">当前条件没有预约</div>
   <div class="empty-desc">调整筛选条件后重试</div>
-  <div class="empty-actions"><button class="btn secondary" type="button" data-action="清空筛选" data-node-id="appointment-list.root.content.0.children.5.children.0">清空筛选</button></div>
+  <div class="empty-actions"><button class="btn secondary" type="button" data-action="清空筛选" data-node-id="appointment-list.root.content.0.children.4.children.0">清空筛选</button></div>
 </div></section></main>
   <div class="app-actions"><button class="btn primary" type="button" data-action="新增预约" data-node-id="appointment-list.action.new-appointment" data-motion-preset="press-feedback" style="--motion-duration:120ms;--motion-ease:ease-out">新增预约</button></div>
 

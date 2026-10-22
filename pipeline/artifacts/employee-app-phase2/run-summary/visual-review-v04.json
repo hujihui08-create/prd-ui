@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T11:50:00.000Z",
+  "generatedAt": "2026-10-22T13:58:00.000Z",
   "specEngineer": {
-    "runId": "run-2026-10-22T11-38-52-733Z",
+    "runId": "run-2026-10-22T12-10-44-917Z",
     "pages": 8,
     "motionPages": 8,
     "blockers": 0,
@@ -20,10 +20,10 @@
   },
   "baseline": {
     "cases": 24,
-    "manifestHash": "sha256:c584af99d3360c033bd2f3edb9a6d06eec242088330f605a423a5cd0810214e6"
+    "manifestHash": "sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6"
   },
   "visualReview": {
-    "runId": "run-2026-10-22T11-44-01-938Z",
+    "runId": "run-2026-10-22T13-55-24-469Z",
     "status": "passed",
     "cases": 24,
     "screenshots": 24,
@@ -32,28 +32,45 @@
       "failed": 0,
       "missing": 0
     },
-    "findings": 11,
+    "findings": 9,
     "blockers": 0,
     "major": 6,
-    "minor": 5,
-    "costCny": 0.3260564064,
+    "minor": 3,
+    "costCny": 0,
     "usageComplete": true,
     "model": "deepseek-flash",
-    "manifestHash": "sha256:a113e00407c702b5463456e422ee3860a79cfbf491adb7905359a2dede18dc90",
-    "findingsHash": "sha256:92286d4b7970fa2491d2b624fa704269793233af85f7cfff3431dd798233afdc",
+    "manifestHash": "sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6",
+    "findingsHash": "sha256:70a435f32b2b0b09c9eca6f6973a9fb1879a887fd06b0a67301ba1d2936d4455",
     "signoff": {
       "valid": true,
       "signer": "Sample Reviewer",
       "date": "2026-10-22",
       "waivedFindings": []
     },
-    "stateStatus": "success"
+    "stateStatus": "passed",
+    "cache": {
+      "runtime": "dsh",
+      "profile": "prd-ui-visual",
+      "model": "deepseek-flash",
+      "budgetEnforced": true,
+      "costSource": "cache",
+      "cacheHit": true,
+      "cacheKey": "sha256:93ae567d1c3b7b2223ee109f63b4c9b976365871056bfe0990dc2771ca3bf62f",
+      "cacheSource": "signed-cache"
+    }
+  },
+  "cacheEvidence": {
+    "key": "sha256:93ae567d1c3b7b2223ee109f63b4c9b976365871056bfe0990dc2771ca3bf62f",
+    "hit": true,
+    "costSource": "cache",
+    "source": "signed-cache",
+    "entry": ".visual-cache/critiques/93ae567d1c3b7b2223ee109f63b4c9b976365871056bfe0990dc2771ca3bf62f.json"
   },
   "costs": {
     "initialTask9": 1.6415096768,
-    "followUpRound": 1.4273972928,
-    "finalFocusedRound": 0.3260564064,
-    "cumulative": 3.394963376
+    "concreteMajorRound": 1.4273972928,
+    "thisFinalRoundModelCalls": 1.8082032192,
+    "cumulative": 5.2031665952
   },
-  "note": "Final focused round signed per stopping rule with 6 major / 5 minor / 0 blocker; residual majors are v0.5 debt. The critic verdict remains changes; the run status is passed because deterministic gates passed and the signoff is valid."
+  "note": "Signed per stopping rule; critic verdict remains changes with 9 findings (6 major/3 minor/0 blocker). Cache hit served the final review at zero model cost."
 }

@@ -154,6 +154,7 @@ export interface VisualManifestCase {
   viewport: { width: number; height: number };
   file: string;
   sha256: string;
+  visualHash?: string;
 }
 
 export interface VisualManifest {
@@ -166,7 +167,8 @@ export interface VisualManifest {
 export function manifestCaseFor(
   visualCase: VisualCase,
   file: string,
-  sha256: string
+  sha256: string,
+  visualHash?: string
 ): VisualManifestCase {
   return {
     id: visualCase.id,
@@ -176,6 +178,7 @@ export function manifestCaseFor(
     viewport: { ...visualCase.viewport },
     file,
     sha256,
+    ...(visualHash === undefined ? {} : { visualHash }),
   };
 }
 
@@ -249,6 +252,9 @@ function parseManifestCase(value: unknown, source: string): VisualManifestCase {
     viewport: { width: viewport.width, height: viewport.height },
     file,
     sha256,
+    ...(typeof value.visualHash === "string"
+      ? { visualHash: value.visualHash }
+      : {}),
   };
 }
 
@@ -310,8 +316,22 @@ export function visualManifestHash(
   return hashValue({
     schemaVersion: manifest.schemaVersion,
     project: manifest.project,
-    cases: manifest.cases,
+    cases: manifest.cases.map(({ file: _file, sha256, visualHash, ...entry }) => ({
+      ...entry,
+      hash: visualHash ?? sha256,
+    })),
   });
+}
+
+/**
+ * Pixel-only manifest fingerprint for the signed-critique cache. Historically
+ * this excluded only the storage path; the manifest now carries the stable
+ * `visualHash`, so it is identical to `visualManifestHash`.
+ */
+export function visualManifestFingerprint(
+  manifest: Pick<VisualManifest, "schemaVersion" | "project" | "cases">
+): string {
+  return visualManifestHash(manifest);
 }
 
 export interface VisualDiffSummary {

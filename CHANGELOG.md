@@ -39,15 +39,15 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 637 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
+- `pnpm test`: 644 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
   (including the visual-critic mock and hardened profile tool list).
-- Spec Engineer `--strict-motion` `run-2026-10-22T11-15-21-596Z`: 8 Page Specs,
+- Spec Engineer `--strict-motion` `run-2026-10-22T12-10-44-917Z`: 8 Page Specs,
   8 motion pages, 0 blockers, 2 unused-asset warnings, 0
   `SPEC_MOTION_NODE_UNRESOLVED`.
 - `render:html`: 8 pages + index; motion, picker, full-date, and
   `datetime-local` attributes present.
 - Baseline: `pipeline/baselines/employee-app-phase2`, 24 cases / 24 PNG,
-  manifest `sha256:4f43b2f39589b777366573918dd931fb3ce12854e39a4d2e4561c866a6158b0b`.
+  visual manifest `sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6`.
 - Initial real-dsh visual review `run-2026-10-22T10-42-23-082Z` was signed
   (`passed`), then superseded by the concrete-major follow-up below.
 - Follow-up fixes (debug route chip, disabled styling, duplicate check-in,
@@ -58,11 +58,15 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   week with `日期 11-05 周三` and active-date label, calendar-shaped loading
   skeleton, empty state with retained grid/legend and 清空筛选, stronger
   disabled save contrast, and list date grouping.
-- Final real-dsh review `run-2026-10-22T11-44-01-938Z`: 24/24 screenshots,
-  0 console / 0 overflow, diff 24/0/0, 11 findings (6 major / 5 minor /
-  0 blocker), `usageComplete=true`, ¥0.3260564064. Signed per the stopping
-  rule (`waivers=[]`); `status=passed`, `state=success`. The critic verdict
-  remains `changes`; the 6 residual majors are recorded as v0.5 debt.
+- Signed-critique cache: key = visual screenshot manifest hash + Page Spec
+  hash + runtime/profile/model, stored under `pipeline/.visual-cache`; a signed
+  cache hit reuses critique/findings/signoff with 0 model calls. Evidence:
+  key `sha256:93ae567d…62f`, final review ¥0 with `cacheHit=true`.
+- Final real-dsh review `run-2026-10-22T13-55-24-469Z`: 24/24 screenshots,
+  0 console / 0 overflow, diff 24/0/0, 9 findings (6 major / 3 minor /
+  0 blocker), `usageComplete=true`, ¥0 (cache). Signed per the stopping rule
+  (`waivers=[]`); `status=passed`, `state=success`. The critic verdict remains
+  `changes`; the 6 residual majors are recorded as v0.5 debt.
 - Playwright: picker select/cancel/reload, calendar full-date prefill, tabs,
   search idle/empty/results, detail/notice dedupe, calendar legend + horizontal
   scroll, reschedule lock, reduced-motion fallback.
@@ -70,15 +74,14 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Limits
 
-- The final review has 7 major critic findings accepted as warnings (no
-  blocker): form disabled styling, reschedule `预约 appointment-form` chip,
-  duplicate check-in CTAs, premature notice action, floating search detail CTA,
-  page-level `查看完整详情` / clipped list rows, and loading skeleton structure.
-  They are recorded in `pipeline/artifacts/employee-app-phase2/README.md` for
-  Phase 3/4.
-- The critic is sampled; a re-review after signing produced a different
-  findings set, so the final run is signed on its own findings. Deterministic
-  findings replay/convergence is not implemented.
+- The final review has 6 major critic findings accepted as v0.5 debt (0
+  blockers): today 查看全部, 390px three-day calendar without a scroll cue,
+  loading skeleton completeness, empty overlay presentation, form mode pills,
+  and static reschedule screenshot context (the actual click flow is restored).
+  They are listed in the v0.4 spec §12.2 and the artifact README.
+- The critic is sampled. The signed-critique cache removes repeat model calls
+  for the same visual manifest + Page Spec + runtime/profile/model; finding
+  convergence for a changed input is still not deterministic.
 - M1 `interaction-spec.json` still says `cd.new-appointment` locks the customer,
   contradicting the signed brief (only reschedule locks); kept as debt.
 - Studio/Asset Compiler, Figma Renderer, full a11y, and real-project Phase 4

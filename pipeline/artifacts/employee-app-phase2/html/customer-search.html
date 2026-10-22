@@ -127,7 +127,6 @@ button{font:inherit;color:inherit;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -335,7 +334,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 </nav>
   <div class="app " data-page-archetype="mobile-list" data-page-id="customer-search" data-picker-return="appointment-form" data-node-id="customer-search.page.root" data-motion-preset="enter-fade" style="--motion-duration:120ms;--motion-ease:ease-out">
   <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">客户搜索</h1></header>
-  <main class="app-scroll"><section class="section" data-node-id="customer-search.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row sr-only" style="gap:var(--space-1)"><span class="typo-label-sm">姓名</span><span class="typo-label-sm">手机号</span><span class="typo-label-sm">门店</span><span class="typo-label-sm">查看详情</span></div><div class="searchbar">
+  <main class="app-scroll"><section class="section" data-node-id="customer-search.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="searchbar">
   <span class="material-symbols-rounded search-icon">search</span>
   <input class="search-input" data-search-input placeholder="输入姓名或脱敏手机号搜索客户" />
 </div><div class="empty-state" data-empty-kind="idle">

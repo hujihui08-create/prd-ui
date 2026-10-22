@@ -170,6 +170,9 @@ interface Fixture {
 
 async function makeFixture(): Promise<Fixture> {
   const root = await tempDir("prd-ui-visual-cli-");
+  // Every fixture gets its own default cache root so tests cannot reuse a
+  // signed critique from another fixture.
+  process.env.PRD_UI_VISUAL_CACHE_DIR = path.join(root, ".visual-cache");
   const projectDir = path.join(root, "project");
   await mkdir(projectDir, { recursive: true });
   await writeFile(
@@ -339,6 +342,9 @@ interface ReviewArtifact {
     model?: string;
     budgetEnforced?: boolean;
     costSource?: string;
+    cacheHit?: boolean;
+    cacheSource?: string;
+    cacheKey?: string;
   };
   signoff?: {
     valid: boolean;
@@ -1057,6 +1063,148 @@ describe("visual CLIs", () => {
       summary: "No blockers.",
     });
     expect(criticArtifact.error).toBeNull();
+  });
+
+  it("reuses a signed critique cache without a second model call", async () => {
+    const fixture = await makeFixture();
+    const cacheDir = path.join(fixture.root, "critique-cache");
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const firstCritic = fakeCriticRunner({
+      usage: {
+        inputTokens: 1000,
+        outputTokens: 200,
+        cacheReadTokens: 0,
+        totalTokens: 1200,
+      },
+      usageComplete: true,
+    });
+    const first = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture(),
+        createCriticRunner: firstCritic.create,
+        cacheDir,
+      }
+    );
+    expect(first.code).toBe(1);
+    const [firstRun] = (await runDirs(fixture.runsDir)).sort();
+    const firstArtifact = await readJson<ReviewArtifact>(
+      path.join(firstRun!, "visual-review.json")
+    );
+    expect(firstArtifact.status).toBe("awaiting_signoff");
+    expect(firstArtifact.critic?.cacheHit).toBeFalsy();
+
+    const signoffFile = path.join(fixture.root, "signoff-cache.md");
+    await writeFile(
+      signoffFile,
+      await signoffText({
+        manifestHash: firstArtifact.manifestHash,
+        findingsHash: firstArtifact.findingsHash,
+      }),
+      "utf8"
+    );
+    const signed = await runCli(
+      signMain,
+      ["--run", firstRun!, "--signoff-visual", signoffFile, "--json"],
+      { cacheDir }
+    );
+    expect(signed.code).toBe(0);
+    const signArtifact = await readJson<{ cachePersisted: boolean }>(
+      path.join(firstRun!, "visual-sign.json")
+    );
+    expect(signArtifact.cachePersisted).toBe(true);
+
+    let modelCalls = 0;
+    const second = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture(),
+        createCriticRunner: async () => {
+          modelCalls += 1;
+          throw new Error("cache hit must not create a critic runner");
+        },
+        cacheDir,
+      }
+    );
+    expect(second.code).toBe(0);
+    expect(modelCalls).toBe(0);
+    const secondRuns = (await runDirs(fixture.runsDir)).sort();
+    const secondRun = secondRuns.at(-1)!;
+    const secondArtifact = await readJson<ReviewArtifact>(
+      path.join(secondRun, "visual-review.json")
+    );
+    expect(secondArtifact.status).toBe("passed");
+    expect(secondArtifact.critic?.cacheHit).toBe(true);
+    expect(secondArtifact.critic?.cacheSource).toBe("signed-cache");
+    expect(secondArtifact.costCny).toBe(0);
+    expect(secondArtifact.usageComplete).toBe(true);
+    expect(secondArtifact.manifestHash).toBe(firstArtifact.manifestHash);
+    expect(secondArtifact.findingsHash).toBe(firstArtifact.findingsHash);
+  });
+
+  it("misses the critique cache when the screenshot manifest changes", async () => {
+    const fixture = await makeFixture();
+    const cacheDir = path.join(fixture.root, "critique-cache");
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const firstCritic = fakeCriticRunner({ usageComplete: true });
+    await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture(),
+        createCriticRunner: firstCritic.create,
+        cacheDir,
+      }
+    );
+    const [firstRun] = (await runDirs(fixture.runsDir)).sort();
+    const firstArtifact = await readJson<ReviewArtifact>(
+      path.join(firstRun!, "visual-review.json")
+    );
+    const signoffFile = path.join(fixture.root, "signoff-cache.md");
+    await writeFile(
+      signoffFile,
+      await signoffText({
+        manifestHash: firstArtifact.manifestHash,
+        findingsHash: firstArtifact.findingsHash,
+      }),
+      "utf8"
+    );
+    expect(
+      (
+        await runCli(
+          signMain,
+          ["--run", firstRun!, "--signoff-visual", signoffFile, "--json"],
+          { cacheDir }
+        )
+      ).code
+    ).toBe(0);
+
+    const changedCritic = fakeCriticRunner({ usageComplete: true });
+    const changed = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture({ colorFor: () => RED }),
+        createCriticRunner: changedCritic.create,
+        cacheDir,
+      }
+    );
+    expect(changed.code).toBe(1);
+    expect(changedCritic.calls).toHaveLength(1);
+    const latestRun = (await runDirs(fixture.runsDir)).sort().at(-1)!;
+    const changedArtifact = await readJson<ReviewArtifact>(
+      path.join(latestRun, "visual-review.json")
+    );
+    expect(changedArtifact.critic?.cacheHit).toBeFalsy();
+    expect(changedArtifact.manifestHash).not.toBe(firstArtifact.manifestHash);
   });
 
   it("blocks when a dsh critique exceeds the cost budget", async () => {

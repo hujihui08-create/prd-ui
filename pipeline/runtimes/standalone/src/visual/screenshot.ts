@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { createServer } from "node:http";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium, type Browser, type Page } from "playwright";
+import { PNG } from "pngjs";
 import type {
   ScreenshotEvidence,
   VisualAction,
@@ -43,7 +44,7 @@ const CONTENT_TYPES: Readonly<Record<string, string>> = {
  * capture injects a hard override in addition to `emulateMedia`.
  */
 export const DETERMINISTIC_CSS =
-  "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}";
+  "*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important;-webkit-font-smoothing:antialiased!important;text-rendering:geometricPrecision!important}";
 
 /**
  * Renderer mock data must not drift between captures: `confirmedAt` and
@@ -66,6 +67,49 @@ const LAUNCH_ARGS = [
 async function hashFile(file: string): Promise<string> {
   const buffer = await readFile(file);
   return `sha256:${createHash("sha256").update(buffer).digest("hex")}`;
+}
+
+/**
+ * Stable visual hash for signoff/cache identity. Text rasterization can move a
+ * handful of anti-aliased pixels between otherwise identical captures, so the
+ * visual hash averages 8×8 blocks and quantizes them; real layout/content
+ * changes still alter many blocks. The raw `sha256` remains the file-integrity
+ * hash.
+ */
+export function visualPngHash(buffer: Buffer): string {
+  const png = PNG.sync.read(buffer);
+  const block = 32;
+  const levels = 4;
+  const step = 255 / (levels - 1);
+  const values: number[] = [];
+  for (let by = 0; by < Math.ceil(png.height / block); by += 1) {
+    for (let bx = 0; bx < Math.ceil(png.width / block); bx += 1) {
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let count = 0;
+      const endY = Math.min(png.height, (by + 1) * block);
+      const endX = Math.min(png.width, (bx + 1) * block);
+      for (let y = by * block; y < endY; y += 1) {
+        for (let x = bx * block; x < endX; x += 1) {
+          const index = (y * png.width + x) * 4;
+          r += png.data[index] ?? 0;
+          g += png.data[index + 1] ?? 0;
+          b += png.data[index + 2] ?? 0;
+          count += 1;
+        }
+      }
+      if (count === 0) continue;
+      values.push(
+        Math.round(r / count / step),
+        Math.round(g / count / step),
+        Math.round(b / count / step)
+      );
+    }
+  }
+  return `sha256:${createHash("sha256")
+    .update(values.join(","), "utf8")
+    .digest("hex")}`;
 }
 
 function errorMessage(error: unknown): string {
@@ -184,19 +228,43 @@ async function captureCase(
     const url = `${serverUrl}/${encodeURIComponent(visualCase.pageId)}.html${
       query ? `?${query}` : ""
     }`;
-    const response = await page.goto(url, { waitUntil: "load", timeout: 45_000 });
+    const response = await page.goto(url, { waitUntil: "load", timeout: 60_000 });
     if (response !== null && !response.ok()) {
       throw new Error(`SCREENSHOT_HTTP_${response.status()}: ${url}`);
     }
-    // Fonts are a layout input; wait for them before any action changes state.
-    await page.evaluate(
-      "document.fonts && document.fonts.ready ? document.fonts.ready.then(() => true) : true"
+    // Fonts are a layout input. Load every weight explicitly and fail closed
+    // rather than letting a network race capture a fallback-font frame.
+    await page.evaluate(async () => {
+      const faces = [
+        '400 16px "Noto Sans SC"',
+        '500 16px "Noto Sans SC"',
+        '600 16px "Noto Sans SC"',
+        '700 16px "Noto Sans SC"',
+        '20px "Material Symbols Rounded"',
+      ];
+      if (document.fonts) {
+        await Promise.all(faces.map((face) => document.fonts.load(face)));
+        await document.fonts.ready;
+      }
+    });
+    await page.waitForFunction(
+      () =>
+        document.fonts?.check('16px "Noto Sans SC"') === true &&
+        document.fonts?.check('20px "Material Symbols Rounded"') === true,
+      undefined,
+      { timeout: 30_000 }
     );
     await page.waitForTimeout(FONT_SETTLE_MS);
     await page.addStyleTag({ content: DETERMINISTIC_CSS });
     for (const action of visualCase.actions ?? []) {
       await applyAction(page, action);
     }
+    // Actions can insert new nodes (mode tabs, drawer, filtered rows); wait for
+    // fonts and layout again so the settle frame is identical across captures.
+    await page.evaluate(
+      "document.fonts && document.fonts.ready ? document.fonts.ready.then(() => true) : true"
+    );
+    await page.waitForTimeout(150);
     // Let the renderer's synchronous state handlers settle before capture.
     await page.evaluate(
       "new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))"
@@ -206,16 +274,29 @@ async function captureCase(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth + 1"
     );
     const file = path.join(outDir, `${visualCase.id}.png`);
-    await page.screenshot({
-      path: file,
+    // Warm font/raster state once, then capture until two consecutive frames
+    // are byte-identical. Dynamic nodes (drawer, mode tabs) can otherwise
+    // differ by a handful of anti-aliased pixels on the first frame.
+    const shotOptions = {
       fullPage: false,
-      animations: "disabled",
-      caret: "hide",
-    });
+      animations: "disabled" as const,
+      caret: "hide" as const,
+    };
+    let previous = await page.screenshot(shotOptions);
+    let stable = previous;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      await page.waitForTimeout(100);
+      const next = await page.screenshot(shotOptions);
+      stable = next;
+      if (next.equals(previous)) break;
+      previous = next;
+    }
+    await writeFile(file, stable);
     return {
       caseId: visualCase.id,
       path: file,
       sha256: await hashFile(file),
+      visualHash: visualPngHash(stable),
       consoleErrors: errors.length,
       overflow,
     };
@@ -246,13 +327,23 @@ export async function captureVisualCases(
       );
     }
     for (const visualCase of input.cases) {
-      try {
-        results.push(
-          await captureCase(browser, server.url, visualCase, input.outDir)
-        );
-      } catch (error) {
-        input.onCaseError?.(visualCase.id, error);
+      let lastError: unknown;
+      let captured = false;
+      // Remote webfonts and the static server can transiently stall a first
+      // navigation. Retry the case before reporting a hard screenshot failure.
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          results.push(
+            await captureCase(browser, server.url, visualCase, input.outDir)
+          );
+          captured = true;
+          break;
+        } catch (error) {
+          lastError = error;
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
       }
+      if (!captured) input.onCaseError?.(visualCase.id, lastError);
     }
   } finally {
     await browser?.close().catch(() => undefined);

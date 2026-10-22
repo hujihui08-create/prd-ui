@@ -55,6 +55,9 @@ export interface VisualCriticRun {
   error?: string;
   budgetEnforced?: boolean;
   costSource?: string;
+  cacheHit?: boolean;
+  cacheKey?: string;
+  cacheSource?: string;
 }
 
 function errorMessage(error: unknown): string {

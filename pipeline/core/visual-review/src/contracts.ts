@@ -20,6 +20,8 @@ export interface ScreenshotEvidence {
   caseId: string;
   path: string;
   sha256: string;
+  /** Stable perceptual hash used for visual signoff/cache identity. */
+  visualHash?: string;
   consoleErrors: number;
   overflow: boolean;
 }
