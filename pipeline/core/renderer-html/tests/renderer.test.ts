@@ -5,6 +5,7 @@ import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import briefJson from "../../../samples/projects/employee-app/ui-brief.json";
 import demoBriefJson from "../../../samples/projects/demo-orders-intake/ui-brief.json";
 import appointmentsBriefJson from "../../../samples/projects/employee-app-appointments-03/ui-brief.json";
+import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
 import { renderDocument, renderIndex } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
@@ -33,6 +34,17 @@ const appointmentSpecs = compileProject(appointmentsBrief, {
 const appointmentById = new Map(
   appointmentSpecs.map((spec) => [spec.meta.pageId, spec])
 );
+const appointmentRoutes = Object.fromEntries(
+  appointmentSpecs.map((spec) => [spec.meta.pageId, spec.meta.route])
+);
+
+const phase2Brief = UiBriefSchema.parse(phase2BriefJson);
+const phase2Specs = compileProject(phase2Brief, {
+  getProfile,
+  getCatalog,
+  getArchetype,
+});
+const phase2ById = new Map(phase2Specs.map((spec) => [spec.meta.pageId, spec]));
 
 describe("employee-app HTML renderer", () => {
   it("renders the today page with content and empty-state copy", () => {
@@ -143,6 +155,58 @@ describe("generic web/mobile renderer", () => {
     const footer = html.split('class="app-actions"')[1]?.split("</div>")[0] ?? "";
     expect(footer).toContain("保存");
     expect(footer).not.toContain("保存改期");
+  });
+
+  it("emits interaction config and action hooks for the appointment detail", () => {
+    const brief = structuredClone(appointmentsBrief);
+    const page = brief.ia.pages.find((entry) => entry.id === "appointment-detail")!;
+    page.businessStates = [
+      { name: "已登记", actions: ["已到店确认", "开单"] },
+      { name: "已到店", actions: ["开单"] },
+    ];
+    const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
+    const spec = specs.find((entry) => entry.meta.pageId === "appointment-detail")!;
+    const html = renderDocument(spec, getProfile("b-mobile"), {
+      pageRoutes: Object.fromEntries(
+        specs.map((entry) => [entry.meta.pageId, entry.meta.route])
+      ),
+    });
+    expect(html).toContain('data-page-archetype="detail"');
+    expect(html).toContain('id="interaction-config"');
+    expect(html).toContain('data-action="已到店确认"');
+    expect(html).toContain("data-business-states");
+    expect(html).toContain("data-current-status");
+  });
+
+  it("emits search, view, and form hooks", () => {
+    const search = renderDocument(
+      phase2ById.get("customer-search")!,
+      getProfile("b-mobile")
+    );
+    expect(search).toContain("data-search-input");
+    expect(search).toContain('data-empty-kind="idle"');
+    expect(search).toContain('data-empty-kind="empty"');
+    expect(search).toContain("data-search-text");
+
+    const list = renderDocument(
+      appointmentById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    expect(list).toContain('data-view-panel="calendar"');
+    expect(list).toContain('data-view-panel="list"');
+    expect(list).toContain("data-view-toggle");
+    expect(list).toContain("data-slot-date");
+    expect(list).toContain("data-slot-time");
+    expect(list).toContain("data-block");
+
+    const form = renderDocument(
+      appointmentById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    expect(form).toContain("data-form-modes");
+    expect(form).toContain('data-field="customer"');
   });
 
   it("renders an index with project title and styled links", () => {

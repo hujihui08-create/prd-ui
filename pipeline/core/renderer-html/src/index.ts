@@ -3,11 +3,44 @@ import type { PageSpec, Profile, SpecNode } from "@prd-ui/contracts";
 export interface RenderOptions {
   /** page id -> display name, used for navigation labels. */
   pageNames?: Record<string, string>;
+  /** page id -> route, used to resolve linked routes to static HTML files. */
+  pageRoutes?: Record<string, string>;
 }
 
 let renderPageNames: Record<string, string> = {};
+let renderPageRoutes: Record<string, string> = {};
+let renderSpec: PageSpec | undefined;
 let renderProject = "PRD UI";
 let renderPageId = "";
+
+function routeHref(route: string | undefined): string | undefined {
+  if (route === undefined) return undefined;
+  const match = Object.entries(renderPageRoutes).find(([, value]) => value === route);
+  return match === undefined ? undefined : `${match[0]}.html`;
+}
+
+function shellInteractionAttrs(): string {
+  if (renderSpec === undefined) return "";
+  const spec = renderSpec;
+  const attrs = [
+    `data-page-archetype="${esc(spec.meta.archetype)}"`,
+    `data-page-id="${esc(spec.meta.pageId)}"`,
+  ];
+  if (spec.currentStatus !== undefined) {
+    attrs.push(`data-current-status="${esc(spec.currentStatus)}"`);
+  }
+  if (spec.businessStates !== undefined) {
+    attrs.push(`data-business-states="${esc(JSON.stringify(spec.businessStates))}"`);
+  }
+  if (spec.formModes !== undefined) {
+    attrs.push(`data-form-modes="${esc(JSON.stringify(spec.formModes))}"`);
+  }
+  if (spec.views !== undefined) {
+    attrs.push(`data-views="${esc(JSON.stringify(spec.views))}"`);
+    attrs.push(`data-default-view="${esc(spec.defaultView ?? spec.views[0] ?? "")}"`);
+  }
+  return attrs.join(" ");
+}
 
 function pageLabel(id: string): string {
   return (
@@ -201,7 +234,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           return `<div class="page-slot page-slot-${name}">${rendered}</div>`;
         })
         .join("");
-      return `<div class="page-shell">
+      return `<div class="page-shell" ${shellInteractionAttrs()}>
   <aside class="page-sidebar">
     <div class="page-brand">${esc(renderProject)}</div>
     <nav class="page-nav">${nav
@@ -259,7 +292,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           : titleSlot.length === 0
             ? `<header class="page-header"><h1 class="page-title">${esc(title)}</h1></header>`
             : "");
-      return `<div class="app ${showTabs ? "has-tabs" : ""}">
+      return `<div class="app ${showTabs ? "has-tabs" : ""}" ${shellInteractionAttrs()}>
   ${header}
   <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}</main>
   ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
@@ -371,8 +404,9 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const required = bool(props.required);
       const readOnly = bool(props.readOnly);
       const value = str(props.value);
+      const field = str(props.field);
       const hasChildren = children.length > 0;
-      return `<label class="form-field">
+      return `<label class="form-field"${field ? ` data-field="${esc(field)}"` : ""}>
   <span class="form-label">${esc(label)}${required ? `<span class="required">*</span>` : ""}</span>
   ${hasChildren ? children : `<span class="${value ? "form-value" : "form-readonly"}">${value || (readOnly ? "—" : "")}</span>`}
 </label>`;
@@ -400,7 +434,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Section": {
       const padding = str(props.padding);
       const gap = str(props.gap);
-      return `<section class="section" style="padding:${cssVar(padding)};gap:${cssVar(gap)}">${children}</section>`;
+      const viewPanel = str(props.viewPanel);
+      return `<section class="section"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""} style="padding:${cssVar(padding)};gap:${cssVar(gap)}">${children}</section>`;
     }
     case "Card": {
       const title = str(props.title);
@@ -459,8 +494,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
         .map((hour, hourIndex) => {
           const row = dayItems
             .map(
-              (_, dayIndex) =>
-                `<div class="calendar-cell" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
+              (day, dayIndex) =>
+                `<div class="calendar-cell" data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
             )
             .join("");
           return `<div class="calendar-hour" style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
@@ -478,13 +513,21 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           const rowStart = Math.max(0, Math.min(rowCount - 1, start - 9)) + 2;
           const span = Math.max(1, Math.min(duration, rowCount - (rowStart - 2)));
           const tone = str(record.tone) || "neutral";
-          return `<div class="calendar-block tone-${esc(tone)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span}" title="${esc(record.title)} ${esc(record.subtitle)}">
+          const payload = {
+            title: str(record.title),
+            subtitle: str(record.subtitle),
+            status: str(record.status),
+            date: dayItems[day]?.date ?? "",
+            time: `${String(start).padStart(2, "0")}:00`,
+          };
+          return `<div class="calendar-block tone-${esc(tone)}" data-block="${esc(JSON.stringify(payload))}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span}" title="${esc(record.title)} ${esc(record.subtitle)}">
   <span class="calendar-block-title">${esc(record.title)}</span>
   <span class="calendar-block-subtitle">${esc(record.subtitle)}</span>
 </div>`;
         })
         .join("");
-      return `<div class="calendar"><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
+      const viewPanel = str(props.viewPanel);
+      return `<div class="calendar"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
     }
     case "ListRow": {
       const title = str(props.title);
@@ -492,7 +535,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const meta = str(props.meta);
       const status = str(props.status);
       const statusTone = str(props.statusTone) || "neutral";
-      return `<div class="list-row">
+      const searchText = str(props.searchText);
+      return `<div class="list-row"${searchText ? ` data-search-text="${esc(searchText)}"` : ""}>
   <div class="list-row-main">
     <div class="list-row-title">
       <span class="row-title">${esc(title)}</span>
@@ -512,7 +556,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const placeholder = str(props.placeholder);
       return `<div class="searchbar">
   <span class="material-symbols-rounded search-icon">search</span>
-  <span class="search-placeholder">${esc(placeholder)}</span>
+  <input class="search-input" data-search-input placeholder="${esc(placeholder)}" />
 </div>`;
     }
     case "CollapsedFilter": {
@@ -573,7 +617,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const title = str(props.title);
       const description = str(props.description);
       const icon = str(props.icon);
-      return `<div class="empty-state">
+      const emptyKind = str(props.emptyKind);
+      return `<div class="empty-state"${emptyKind ? ` data-empty-kind="${esc(emptyKind)}"` : ""}>
   ${icon ? `<span class="material-symbols-rounded empty-icon">${iconName(icon)}</span>` : ""}
   <div class="empty-title">${esc(title)}</div>
   ${description ? `<div class="empty-desc">${esc(description)}</div>` : ""}
@@ -596,7 +641,9 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Button": {
       const label = str(props.label);
       const emphasis = str(props.emphasis) || "primary";
-      return `<button class="btn ${esc(emphasis)}" type="button">${esc(label)}</button>`;
+      const action = str(props.action);
+      const viewToggle = bool(props.viewToggle);
+      return `<button class="btn ${esc(emphasis)}" type="button"${action ? ` data-action="${esc(action)}"` : ""}${viewToggle ? " data-view-toggle" : ""}>${esc(label)}</button>`;
     }
     default:
       return children;
@@ -651,6 +698,7 @@ html,body{margin:0;padding:0;}
 body{min-height:100vh;}
 a{color:inherit;text-decoration:none;}
 button{font:inherit;color:inherit;}
+[hidden]{display:none!important;}
 ${typeClasses(profile)}
 .material-symbols-rounded{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:"FILL" 1,"wght" 500,"GRAD" 0,"opsz" 24;}
 .app{width:390px;height:844px;margin:0 auto;background:var(--color-surface-subtle);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 24px 64px rgba(0,0,0,.12);}
@@ -708,6 +756,7 @@ ${typeClasses(profile)}
 .searchbar{height:36px;border-radius:var(--radius-md);background:var(--color-surface-default);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-3);color:var(--color-text-tertiary);}
 .search-icon{font-size:20px;}
 .search-placeholder{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
+.search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
@@ -758,6 +807,7 @@ ${typeClasses(profile)}
 .empty-title{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);}
 .empty-desc{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .empty-actions{margin-top:var(--space-2);}
+.empty-state[data-empty-kind]{display:flex;}
 body[data-state="empty"] .empty-state{display:flex;}
 body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card,body[data-state="empty"] .calendar{display:none;}
 body[data-state="empty"] .typo-heading-3{display:none;}
@@ -840,10 +890,241 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 .state-switcher-label{font-weight:600;color:#111827;}
 .state-switcher a{padding:2px 0;}
 .state-switcher a:hover{color:#111827;}
+.mode-tabs{display:flex;gap:8px;padding:12px 16px 0;}
+.mode-tabs button{height:32px;border:1px solid var(--color-border-strong);border-radius:6px;background:#fff;font:inherit;font-size:13px;}
+.mode-tabs button.active{background:var(--color-action-primary);color:#fff;border-color:var(--color-action-primary);}
+.appointment-id{font-size:12px;color:var(--color-text-tertiary);padding:4px 16px;}
+.state-note{padding:12px 16px;font-size:13px;color:var(--color-text-secondary);}
+.detail-drawer{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.35);display:flex;align-items:flex-end;}
+.detail-drawer-card{width:100%;background:#fff;border-radius:12px 12px 0 0;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.detail-drawer-card p{margin:0;font-size:14px;color:var(--color-text-primary);}
 @keyframes fade-up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 @media (max-width:700px){body{background:var(--color-surface-subtle);}.app{box-shadow:none;height:100vh;min-height:844px;}.state-switcher{display:none;}}`;
+}
+
+function renderInteractionScript(): string {
+  return `<script>
+(() => {
+  const raw = document.getElementById("interaction-config")?.textContent;
+  if (!raw) return;
+  const config = JSON.parse(raw);
+  const qsa = (selector) => Array.from(document.querySelectorAll(selector));
+  const showHint = (message) => window.alert(message);
+
+  function applyBusinessStates() {
+    const states = config.businessStates;
+    if (!states) return;
+    let status = config.currentStatus ?? states[0]?.name;
+    const currentState = () => states.find((state) => state.name === status);
+    const allowed = () => currentState()?.actions ?? [];
+    const bar = document.querySelector(".app-actions");
+    const noteHost = document.querySelector(".app-scroll");
+    const apply = () => {
+      let visible = 0;
+      for (const button of qsa("[data-action]")) {
+        const isAllowed = allowed().includes(button.dataset.action);
+        button.hidden = !isAllowed;
+        if (isAllowed) visible += 1;
+      }
+      if (bar) bar.hidden = visible === 0;
+      const badge = document.querySelector(".app-scroll .badge");
+      if (badge) badge.textContent = status;
+      let note = document.querySelector(".state-note");
+      if (currentState()?.note) {
+        if (!note && noteHost) {
+          note = document.createElement("div");
+          note.className = "state-note";
+          noteHost.append(note);
+        }
+        if (note) note.textContent = currentState().note;
+      } else if (note) {
+        note.remove();
+      }
+    };
+    for (const button of qsa("[data-action]")) {
+      button.addEventListener("click", () => {
+        const action = button.dataset.action;
+        if (action === "改期" && config.linkedRoutes.form) {
+          location.href = config.linkedRoutes.form + "?mode=reschedule&appointmentId=" + encodeURIComponent(config.referenceId);
+          return;
+        }
+        if (action === "术后告知") {
+          if (config.linkedRoutes.notice) location.href = config.linkedRoutes.notice;
+          else showHint("当前切片没有告知页");
+          return;
+        }
+        if (action === "客户详情") {
+          if (config.linkedRoutes.customer) location.href = config.linkedRoutes.customer;
+          else showHint("当前切片没有客户详情页");
+          return;
+        }
+        if (action === "开单") {
+          showHint("开单流程不在本切片");
+          return;
+        }
+        if (action === "已到店确认" || action === "接单并确认到店") {
+          status = (states.find((state) => state.name.indexOf("到店") >= 0) ?? states[1] ?? currentState())?.name ?? status;
+        } else if (action === "取消") {
+          if (!window.confirm("确认取消本单？")) return;
+          status = (states.find((state) => state.name.indexOf("取消") >= 0) ?? states[states.length - 1])?.name ?? status;
+        }
+        apply();
+      });
+    }
+    apply();
+  }
+
+  function applyFormModes() {
+    const modes = config.formModes;
+    if (!modes) return;
+    const params = new URLSearchParams(location.search);
+    let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
+    const submit = document.querySelector(".app-actions [data-action]");
+    const customer = document.querySelector('[data-field="customer"] input');
+    const host = document.querySelector(".app-scroll");
+    const tabs = document.createElement("div");
+    tabs.className = "mode-tabs";
+    if (modes.length > 1 && host) {
+      for (const mode of modes) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = mode.label;
+        button.addEventListener("click", () => {
+          current = mode;
+          const appointmentId = params.get("appointmentId") ?? config.referenceId;
+          history.replaceState(null, "", "?mode=" + mode.name + "&appointmentId=" + encodeURIComponent(appointmentId));
+          apply();
+        });
+        tabs.append(button);
+      }
+      host.prepend(tabs);
+    }
+    const appointmentId = params.get("appointmentId") ?? config.referenceId;
+    const prefill = params.get("date") && params.get("time") ? params.get("date") + " " + params.get("time") : "";
+    const startInput = document.querySelector('input[name="startTime"]');
+    if (startInput && prefill) startInput.value = prefill;
+    const apply = () => {
+      for (const button of Array.from(tabs.children)) {
+        button.classList.toggle("active", button.textContent === current.label);
+      }
+      if (submit) {
+        submit.textContent = current.actions[0] ?? submit.textContent;
+        submit.dataset.action = current.actions[0] ?? submit.dataset.action;
+      }
+      if (customer) customer.disabled = current.customerLocked === true;
+      let id = document.querySelector(".appointment-id");
+      if (current.name === "reschedule") {
+        if (!id && host) {
+          id = document.createElement("div");
+          id.className = "appointment-id";
+          host.prepend(id);
+        }
+        if (id) id.textContent = "预约 " + appointmentId;
+      } else if (id) {
+        id.remove();
+      }
+    };
+    apply();
+  }
+
+  function applySearch() {
+    const input = document.querySelector("[data-search-input]");
+    if (!input) return;
+    const rows = qsa("[data-search-text]");
+    const idle = document.querySelector('[data-empty-kind="idle"]');
+    const empty = document.querySelector('[data-empty-kind="empty"]');
+    const apply = () => {
+      const query = input.value.trim().toLowerCase();
+      let visible = 0;
+      for (const row of rows) {
+        const text = (row.dataset.searchText ?? "").toLowerCase();
+        const match = query.length > 0 && text.indexOf(query) >= 0;
+        row.hidden = !match;
+        if (match) visible += 1;
+      }
+      if (idle) idle.hidden = query.length > 0;
+      if (empty) empty.hidden = query.length === 0 || visible > 0;
+    };
+    input.addEventListener("input", apply);
+    const clear = document.querySelector('[data-action="清空关键词"]');
+    if (clear) {
+      clear.addEventListener("click", () => {
+        input.value = "";
+        apply();
+        input.focus();
+      });
+    }
+    apply();
+  }
+
+  function applyViews() {
+    if (!config.views) return;
+    const panels = qsa("[data-view-panel]");
+    let current = config.defaultView ?? config.views[0];
+    const toggle = document.querySelector("[data-view-toggle]");
+    const apply = () => {
+      for (const panel of panels) {
+        panel.hidden = panel.dataset.viewPanel !== current;
+      }
+    };
+    if (toggle) {
+      toggle.addEventListener("click", () => {
+        current = current === "calendar" ? "list" : "calendar";
+        apply();
+      });
+    }
+    for (const cell of qsa("[data-slot-date]")) {
+      cell.addEventListener("click", () => {
+        if (!config.linkedRoutes.create) {
+          showHint("当前切片没有新增预约页");
+          return;
+        }
+        location.href = config.linkedRoutes.create + "?mode=new&date=" + encodeURIComponent(cell.dataset.slotDate ?? "") + "&time=" + encodeURIComponent(cell.dataset.slotTime ?? "");
+      });
+    }
+    for (const block of qsa("[data-block]")) {
+      block.addEventListener("click", () => {
+        let data = {};
+        try {
+          data = JSON.parse(block.dataset.block ?? "{}");
+        } catch {
+          return;
+        }
+        const labels = { title: "客户", subtitle: "项目", status: "状态", date: "日期", time: "时间" };
+        const drawer = document.createElement("div");
+        drawer.className = "detail-drawer";
+        const card = document.createElement("div");
+        card.className = "detail-drawer-card";
+        for (const key of Object.keys(labels)) {
+          if (!data[key]) continue;
+          const line = document.createElement("p");
+          line.textContent = labels[key] + "：" + data[key];
+          card.append(line);
+        }
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "btn secondary";
+        close.textContent = "关闭";
+        close.addEventListener("click", () => drawer.remove());
+        card.append(close);
+        drawer.append(card);
+        drawer.addEventListener("click", (event) => {
+          if (event.target === drawer) drawer.remove();
+        });
+        document.body.append(drawer);
+      });
+    }
+    apply();
+  }
+
+  applyBusinessStates();
+  applyFormModes();
+  applySearch();
+  applyViews();
+})();
+</script>`;
 }
 
 export function renderDocument(
@@ -852,9 +1133,38 @@ export function renderDocument(
   options: RenderOptions = {}
 ): string {
   renderPageNames = options.pageNames ?? {};
+  renderPageRoutes = options.pageRoutes ?? {};
+  renderSpec = spec;
   renderProject = spec.meta.project;
   renderPageId = spec.meta.pageId;
   const body = renderNode(spec.layout, profile);
+  const linkedRoutes: Record<string, string> = {};
+  for (const [key, route] of Object.entries(spec.linkedRoutes ?? {})) {
+    const href = routeHref(route);
+    if (href !== undefined) linkedRoutes[key] = href;
+  }
+  const config = {
+    archetype: spec.meta.archetype,
+    pageId: spec.meta.pageId,
+    businessStates: spec.businessStates ?? null,
+    formModes: spec.formModes ?? null,
+    views: spec.views ?? null,
+    defaultView: spec.defaultView ?? null,
+    searchIdleTitle: spec.searchIdleTitle ?? null,
+    currentStatus: spec.currentStatus ?? null,
+    referenceId: spec.referenceId ?? spec.meta.pageId,
+    linkedRoutes,
+  };
+  const hasInteraction =
+    spec.meta.target === "mobile" &&
+    (spec.businessStates !== undefined ||
+      spec.formModes !== undefined ||
+      spec.views !== undefined ||
+      spec.searchIdleTitle !== undefined);
+  const interactionMarkup = hasInteraction
+    ? `  <script id="interaction-config" type="application/json">${JSON.stringify(config).replace(/</g, "\\u003c")}</script>
+  ${renderInteractionScript()}`
+    : "";
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -869,6 +1179,7 @@ export function renderDocument(
 <body data-state="default">
   ${stateSwitcher()}
   ${body}
+${interactionMarkup}
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
