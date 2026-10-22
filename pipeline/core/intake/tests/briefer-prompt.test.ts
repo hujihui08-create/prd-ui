@@ -54,4 +54,9 @@ describe("UI briefer prompt", () => {
     expect(prompt).toContain("illustrative");
     expect(prompt).toContain("PII");
   });
+
+  it("constrains page profiles to the supported profile list", () => {
+    expect(prompt).toContain("b-dense, b-mobile, c-expressive");
+    expect(prompt).toContain("Never use an archetype name");
+  });
 });

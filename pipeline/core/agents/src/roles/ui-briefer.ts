@@ -63,7 +63,7 @@ export function buildUiBrieferPrompt(input: UiBrieferPromptInput): string {
     "",
     "## Mapping rules",
     `- archetype must be one of: ${archetypes.join(", ")}. If none fits, ask a blocking question.`,
-    "- profile must be a supported profile or the project default; target is web|mobile.",
+    `- profile must be exactly one of: ${input.supportedProfiles.join(", ")}. Never use an archetype name (home/detail/list/form) as profile. For a single-profile project, use the project default profile for every page; target is web|mobile.`,
     "- requiredStates must include default/loading/error and every state the PRD state matrix marks as required (empty/disabled/success are per-page).",
     "- fields/actions/filterFields come from the PRD field table and page actions.",
     "- reqRefs must use PRD requirement ids; if the PRD has no ids, create stable REQ-<MODULE>-NNN ids and record the source in traceability/assumptions.",
