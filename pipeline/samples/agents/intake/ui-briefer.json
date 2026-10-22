@@ -94,7 +94,22 @@
                 "label": "异常",
                 "value": "3"
               }
-            ]
+            ],
+            "fieldLabels": {
+              "orderNo": "订单号",
+              "customer": "客户",
+              "amount": "金额",
+              "status": "状态",
+              "createdAt": "创建时间"
+            },
+            "mockData": {
+              "listItems": [
+                "ORD-20261021-0001 · 张三 · ¥268.00 · 待处理",
+                "ORD-20261021-0002 · 李四 · ¥520.00 · 已完成",
+                "ORD-20261021-0003 · 王五 · ¥128.00 · 待处理",
+                "ORD-20261021-0004 · 赵六 · ¥860.00 · 已完成"
+              ]
+            }
           },
           {
             "id": "orders-list",
@@ -133,7 +148,46 @@
               "keyword"
             ],
             "emptyTitle": "暂无订单",
-            "emptyAssetRef": "empty-orders"
+            "emptyAssetRef": "empty-orders",
+            "fieldLabels": {
+              "orderNo": "订单号",
+              "customer": "客户",
+              "amount": "金额",
+              "status": "状态",
+              "createdAt": "创建时间"
+            },
+            "mockData": {
+              "rows": [
+                {
+                  "orderNo": "ORD-20261021-0001",
+                  "customer": "张三",
+                  "amount": "¥268.00",
+                  "status": "待处理",
+                  "createdAt": "2026-10-21 09:20"
+                },
+                {
+                  "orderNo": "ORD-20261021-0002",
+                  "customer": "李四",
+                  "amount": "¥520.00",
+                  "status": "已完成",
+                  "createdAt": "2026-10-21 09:35"
+                },
+                {
+                  "orderNo": "ORD-20261021-0003",
+                  "customer": "王五",
+                  "amount": "¥128.00",
+                  "status": "待处理",
+                  "createdAt": "2026-10-21 10:02"
+                },
+                {
+                  "orderNo": "ORD-20261021-0004",
+                  "customer": "赵六",
+                  "amount": "¥860.00",
+                  "status": "已完成",
+                  "createdAt": "2026-10-21 10:18"
+                }
+              ]
+            }
           },
           {
             "id": "order-detail",
@@ -165,7 +219,23 @@
             "actions": [
               "编辑订单"
             ],
-            "summaryTitle": "订单摘要"
+            "summaryTitle": "订单摘要",
+            "fieldLabels": {
+              "orderNo": "订单号",
+              "customer": "客户",
+              "amount": "金额",
+              "status": "状态",
+              "createdAt": "创建时间"
+            },
+            "mockData": {
+              "values": {
+                "orderNo": "ORD-20261021-0001",
+                "customer": "张三",
+                "amount": "¥268.00",
+                "status": "待处理",
+                "createdAt": "2026-10-21 09:20"
+              }
+            }
           },
           {
             "id": "order-form",
@@ -196,7 +266,14 @@
             "actions": [
               "保存",
               "取消"
-            ]
+            ],
+            "fieldLabels": {
+              "orderNo": "订单号",
+              "customer": "客户",
+              "amount": "金额",
+              "status": "状态",
+              "createdAt": "创建时间"
+            }
           },
           {
             "id": "settings",
@@ -224,7 +301,12 @@
             ],
             "actions": [
               "保存设置"
-            ]
+            ],
+            "fieldLabels": {
+              "notifications": "通知设置",
+              "language": "语言",
+              "timezone": "时区"
+            }
           },
           {
             "id": "home-feed",
@@ -251,12 +333,16 @@
             "actions": [],
             "feedItems": [
               {
-                "title": "周末去哪儿",
-                "body": "城市周边 5 个小众目的地"
+                "title": "秋季修护专题",
+                "body": "敏感肌修护组合，今日下单享 8 折"
               },
               {
-                "title": "新店开业",
-                "body": "手冲咖啡买一送一"
+                "title": "门店上新",
+                "body": "新品精华到店，欢迎到店体验"
+              },
+              {
+                "title": "会员日提醒",
+                "body": "本周六会员日，积分双倍"
               }
             ],
             "emptyAssetRef": "empty-feed"
@@ -289,7 +375,21 @@
             "actions": [
               "立即购买"
             ],
-            "summaryTitle": "商品摘要"
+            "summaryTitle": "商品摘要",
+            "fieldLabels": {
+              "title": "商品标题",
+              "price": "价格",
+              "description": "描述",
+              "status": "状态"
+            },
+            "mockData": {
+              "values": {
+                "title": "修护精华 30ml",
+                "price": "¥268.00",
+                "description": "舒缓修护，适合敏感肌。",
+                "status": "在售"
+              }
+            }
           },
           {
             "id": "auth",
@@ -318,7 +418,11 @@
             ],
             "actions": [
               "登录"
-            ]
+            ],
+            "fieldLabels": {
+              "email": "邮箱",
+              "password": "密码"
+            }
           }
         ],
         "navigation": {

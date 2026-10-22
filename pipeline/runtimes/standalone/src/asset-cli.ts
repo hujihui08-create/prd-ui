@@ -41,6 +41,7 @@ export const USAGE = `Usage: pnpm asset:review [options]
 Options:
   --project <path>           Project YAML (default: samples/projects/employee-app/project.yaml)
   --assets <dir>             Asset briefs + library (default: samples/assets/m0)
+  --briefs <dir>             Asset briefs directory (default: <assets>/briefs)
   --profile <name>           Design profile (default: the project's only manifest profile)
   --runtime standalone|dsh   Execution adapter (default: standalone)
   --reviewer scripted|model  Standalone reviewer (default: scripted)
@@ -59,6 +60,7 @@ Options:
 export interface AssetCliOptions {
   projectPath: string;
   assetsDir: string;
+  briefsDir?: string;
   runsDir: string;
   runtime: "standalone" | "dsh";
   reviewer: "scripted" | "model";
@@ -128,6 +130,9 @@ export function parseArgs(argv: string[]): AssetCliOptions {
       case "--assets":
         options.assetsDir = path.resolve(value());
         break;
+      case "--briefs":
+        options.briefsDir = path.resolve(value());
+        break;
       case "--runs":
         options.runsDir = path.resolve(value());
         break;
@@ -189,8 +194,7 @@ export function parseArgs(argv: string[]): AssetCliOptions {
   return options;
 }
 
-async function loadBriefs(assetsDir: string): Promise<AssetBrief[]> {
-  const briefsDir = path.join(assetsDir, "briefs");
+async function loadBriefs(briefsDir: string): Promise<AssetBrief[]> {
   const files = (await readdir(briefsDir)).filter((file) => file.endsWith(".json")).sort();
   const briefs: AssetBrief[] = [];
   for (const file of files) {
@@ -372,7 +376,9 @@ export async function main(
     const profile =
       options.profile ??
       (Object.keys(config.manifests).length === 1 ? Object.keys(config.manifests)[0]! : "b-mobile");
-    const briefs = await loadBriefs(options.assetsDir);
+    const briefs = await loadBriefs(
+      options.briefsDir ?? path.join(options.assetsDir, "briefs")
+    );
     const selected = options.only.length
       ? briefs.filter((brief) => options.only.includes(brief.id))
       : briefs;

@@ -34,6 +34,15 @@ pnpm asset:review \
   --runtime standalone \
   --runs /tmp/m0-runs
 
+# 评审 M1 产出的 asset briefs（Phase 2 资产链）
+pnpm asset:review \
+  --project samples/projects/employee-app-phase2/project.yaml \
+  --assets samples/assets/m0 \
+  --briefs /tmp/m1-phase2d/run-2026-10-21T10-46-02-038Z/artifacts/asset-briefs \
+  --runtime standalone \
+  --runs /tmp/assets-phase2
+# Asset review OK: 4 assets, 4 passed
+
 # 机器可读输出：stdout 只有一个 JSON 文档，人类可读摘要被抑制
 pnpm asset:review \
   --project samples/projects/employee-app/project.yaml \
@@ -138,4 +147,5 @@ jq '.usageSource, .usageComplete, .batchGates' "$RUN/manifest.review.json"
 - 只接 A 库真实文件；B/C adapter 接口和状态机已实现，真实供应商在 M2。
 - `--runtime dsh` 需要 vision key；没有 key 时 standalone + scripted 是 CI 路径，`pnpm test:dsh` 是 mock 集成路径。
 - 不把 `asset:review` 接进 phase1 主状态机；M0 是独立命令。
+- `--briefs <dir>` 指向 M1 的 `artifacts/asset-briefs/`；默认是 `<assets>/briefs`。Phase 2 8 页真实 PRD 的 4 个标准图标 briefs 已用该路径评审为 `4/4 passed`。
 - 不生成最终 handoff；只写 `runs/<id>/`。

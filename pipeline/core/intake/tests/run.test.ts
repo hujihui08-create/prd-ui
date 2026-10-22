@@ -140,6 +140,8 @@ function makeInput(
         "feed",
         "home",
         "inventory-list",
+        "mobile-list",
+        "mobile-form",
         "auth",
         "onboarding",
       ],

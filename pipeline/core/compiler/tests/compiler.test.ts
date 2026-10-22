@@ -226,6 +226,211 @@ describe("brief-driven page content", () => {
     expect(schemaFailures).toEqual([]);
   });
 
+  it("compiles a mobile-list page with filters, rows, and the primary action", () => {
+    const page: UiBriefPage = {
+      id: "appointments",
+      name: "预约列表",
+      purpose: "查看预约",
+      archetype: "mobile-list",
+      target: "mobile",
+      profile: "b-mobile",
+      route: "/appointments",
+      roles: ["admin"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-ORDER-001"],
+      fields: ["customer", "project", "time", "status", "therapist"],
+      fieldLabels: {
+        customer: "客户",
+        project: "项目",
+        time: "时间段",
+        status: "状态",
+        therapist: "护理师",
+      },
+      filterFields: ["status"],
+      actions: ["新增预约"],
+      mockData: {
+        rows: [
+          {
+            customer: "张女士",
+            project: "小气泡",
+            time: "10:00-11:00",
+            status: "已登记",
+            therapist: "王美容",
+          },
+        ],
+      },
+    };
+    const custom = structuredClone(brief);
+    custom.ia.pages.push(page);
+    const spec = compilePageSpec({
+      brief: custom,
+      page,
+      profile: getProfile("b-mobile"),
+      catalog: getCatalog("b-mobile"),
+      archetype: getArchetype("mobile-list"),
+    });
+    expect(spec.layout.type).toBe("MobileShell");
+    expect(nodesOf(spec, "CollapsedFilter")[0]?.props?.label).toBe("状态");
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toEqual(
+      expect.arrayContaining(["客户", "项目", "时间段", "状态", "护理师"])
+    );
+    expect(nodesOf(spec, "CalendarGrid")[0]?.props).toMatchObject({
+      days: expect.arrayContaining([expect.objectContaining({ label: "周三", today: true })]),
+      blocks: [
+        expect.objectContaining({
+          title: "张女士",
+          subtitle: "小气泡",
+          start: 10,
+          duration: 1,
+          tone: "warning",
+        }),
+      ],
+    });
+    expect(nodesOf(spec, "ListRow")[0]?.props).toMatchObject({
+      title: "客户：张女士",
+      subtitle: "项目：小气泡",
+      meta: "时间段：10:00-11:00",
+      status: "已登记",
+      statusTone: "warning",
+      trailing: "护理师：王美容",
+    });
+    expect(nodesOf(spec, "Button")[0]?.props?.label).toBe("新增预约");
+  });
+
+  it("compiles a mobile-form page with inputs, selects, and actions", () => {
+    const page: UiBriefPage = {
+      id: "appointment-form",
+      name: "新增预约",
+      purpose: "新增或改期预约",
+      archetype: "mobile-form",
+      target: "mobile",
+      profile: "b-mobile",
+      route: "/appointments/new",
+      roles: ["admin"],
+      requiredStates: ["default", "loading", "error", "disabled"],
+      reqRefs: ["REQ-ORDER-001"],
+      fields: ["customer", "project", "source"],
+      fieldLabels: { customer: "客户", project: "项目", source: "来源" },
+      actions: ["保存", "保存改期"],
+    };
+    const custom = structuredClone(brief);
+    custom.ia.pages.push(page);
+    const spec = compilePageSpec({
+      brief: custom,
+      page,
+      profile: getProfile("b-mobile"),
+      catalog: getCatalog("b-mobile"),
+      archetype: getArchetype("mobile-form"),
+    });
+    expect(spec.layout.type).toBe("MobileShell");
+    expect(nodesOf(spec, "FormField").map((node) => node.props?.label)).toEqual([
+      "客户",
+      "项目",
+      "来源",
+    ]);
+    expect(nodesOf(spec, "Select")[0]?.props?.options).toEqual([
+      "到店",
+      "电话",
+      "微信",
+      "企微",
+    ]);
+    expect(nodesOf(spec, "Button")).toHaveLength(1);
+    expect(nodesOf(spec, "Button")[0]?.props?.label).toBe("保存");
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain("保存改期");
+  });
+
+  it("renders per-project notice blocks instead of one notices field", () => {
+    const page: UiBriefPage = {
+      id: "treatment-notice-test",
+      name: "术后告知",
+      purpose: "当面告知客户",
+      archetype: "detail",
+      target: "mobile",
+      profile: "b-mobile",
+      route: "/notices/:id",
+      roles: ["admin"],
+      requiredStates: ["default", "loading", "error"],
+      reqRefs: ["REQ-ORDER-001"],
+      fields: ["customer", "orderNo", "status", "notices"],
+      fieldLabels: {
+        customer: "客户",
+        orderNo: "单号",
+        status: "状态",
+        notices: "告知内容",
+      },
+      noticeBlocks: [
+        { title: "小气泡", items: ["24 小时内避免沾水", "注意防晒"] },
+        { title: "补水", items: ["多饮水，做好保湿"] },
+      ],
+      mockData: {
+        values: {
+          customer: "张女士",
+          orderNo: "SO20261102001",
+          status: "未确认",
+          notices: "旧版整段话术",
+        },
+      },
+    };
+    const custom = structuredClone(brief);
+    custom.ia.pages.push(page);
+    const spec = compilePageSpec({
+      brief: custom,
+      page,
+      profile: getProfile("b-mobile"),
+      catalog: getCatalog("b-mobile"),
+      archetype: getArchetype("detail"),
+    });
+    const cards = nodesOf(spec, "Card").map((node) => node.props?.title);
+    expect(cards).toEqual(expect.arrayContaining(["小气泡", "补水"]));
+    const labels = nodesOf(spec, "FormField").map((node) => node.props?.label);
+    expect(labels).not.toContain("告知内容");
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain(
+      "告知内容"
+    );
+  });
+
+  it("compiles a mobile-list search page", () => {
+    const page: UiBriefPage = {
+      id: "customer-search",
+      name: "客户搜索",
+      purpose: "搜索客户",
+      archetype: "mobile-list",
+      target: "mobile",
+      profile: "b-mobile",
+      route: "/customers/search",
+      roles: ["admin"],
+      requiredStates: ["default", "empty", "loading", "error"],
+      reqRefs: ["REQ-ORDER-001"],
+      fields: ["name", "phone", "store"],
+      fieldLabels: { name: "姓名", phone: "手机号", store: "门店", keyword: "关键词" },
+      filterFields: ["keyword"],
+      actions: ["新建客户"],
+      mockData: {
+        rows: [{ name: "张女士", phone: "138****0000", store: "星光店" }],
+      },
+    };
+    const custom = structuredClone(brief);
+    custom.ia.pages.push(page);
+    const spec = compilePageSpec({
+      brief: custom,
+      page,
+      profile: getProfile("b-mobile"),
+      catalog: getCatalog("b-mobile"),
+      archetype: getArchetype("mobile-list"),
+    });
+    expect(nodesOf(spec, "SearchBar")[0]?.props?.placeholder).toContain("关键词");
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain(
+      "关键词"
+    );
+    expect(nodesOf(spec, "CollapsedFilter").map((node) => node.props?.label)).not.toContain(
+      "关键词"
+    );
+    expect(nodesOf(spec, "ListRow")[0]?.props).toMatchObject({
+      title: "姓名：张女士",
+      subtitle: "手机号：138****0000 · 门店：星光店",
+    });
+  });
+
   it("takes web nav and mobile tabs from the brief", () => {
     for (const spec of specs) {
       if (spec.layout.type === "PageShell") {
@@ -293,6 +498,21 @@ describe("brief-driven page content", () => {
     expect(nodesOf(specsByPageId.get("item-detail")!, "Card")[0]?.props?.title).toBe(
       "商品摘要"
     );
+  });
+
+  it("prefers brief fieldLabels over built-in settings labels", () => {
+    const custom = structuredClone(brief);
+    const settingsPage = custom.ia.pages.find((page) => page.id === "settings")!;
+    settingsPage.fieldLabels = {
+      ...(settingsPage.fieldLabels ?? {}),
+      notifications: "通知",
+    };
+    const spec = compileProject(custom, deps).find(
+      (entry) => entry.meta.pageId === "settings"
+    )!;
+    const labels = nodesOf(spec, "FormField").map((node) => node.props?.label);
+    expect(labels).toContain("通知");
+    expect(labels).not.toContain("通知设置");
   });
 
   it("renders every action for detail, form, settings, auth, and onboarding", () => {
@@ -380,9 +600,11 @@ describe("brief-driven page content", () => {
         expect(serialized, `${page.id} layout`).toContain(action);
       }
       expect(
-        nodesOf(spec, "Button").map((node) => node.props?.label),
+        nodesOf(spec, "Button")
+          .map((node) => node.props?.label)
+          .sort(),
         page.id
-      ).toEqual(page.actions);
+      ).toEqual([...(page.actions ?? [])].sort());
     }
   });
 

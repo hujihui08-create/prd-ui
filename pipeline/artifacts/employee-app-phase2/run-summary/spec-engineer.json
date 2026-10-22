@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "run-2026-10-21T10-51-44-438Z",
+  "project": "employee-app-phase2",
+  "agentRunId": "run-2026-10-21T10-46-02-038Z",
+  "generatedAt": "2026-10-21T10:51:44.445Z",
+  "pages": [
+    "today",
+    "customer-search",
+    "customer-detail",
+    "appointment-detail",
+    "appointment-form",
+    "treatment-notice",
+    "appointment-list",
+    "callback-register"
+  ],
+  "motionPages": [
+    "today",
+    "customer-search",
+    "customer-detail",
+    "appointment-detail",
+    "appointment-form",
+    "treatment-notice",
+    "appointment-list",
+    "callback-register"
+  ],
+  "assets": {
+    "referenced": [
+      "icon-plus",
+      "icon-search"
+    ],
+    "unusedBriefs": [
+      "icon-home",
+      "icon-user"
+    ],
+    "missing": []
+  },
+  "gate": {
+    "passed": true,
+    "issues": [
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node appointment-row is not present in the layout",
+        "evidence": "today#appointment-row"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node my-appointments-section is not present in the layout",
+        "evidence": "today#my-appointments-section"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node callback-item is not present in the layout",
+        "evidence": "today#callback-item"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node result-row is not present in the layout",
+        "evidence": "customer-search#result-row"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node search-results is not present in the layout",
+        "evidence": "customer-search#search-results"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node customer-summary is not present in the layout",
+        "evidence": "customer-detail#customer-summary"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node action-footer is not present in the layout",
+        "evidence": "customer-detail#action-footer"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node status-header is not present in the layout",
+        "evidence": "appointment-detail#status-header"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node action-footer is not present in the layout",
+        "evidence": "appointment-detail#action-footer"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node form-body is not present in the layout",
+        "evidence": "appointment-form#form-body"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node save-cta is not present in the layout",
+        "evidence": "appointment-form#save-cta"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node notice-blocks is not present in the layout",
+        "evidence": "treatment-notice#notice-blocks"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node confirm-cta is not present in the layout",
+        "evidence": "treatment-notice#confirm-cta"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node scope-toggle is not present in the layout",
+        "evidence": "appointment-list#scope-toggle"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node appointment-row is not present in the layout",
+        "evidence": "appointment-list#appointment-row"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node calendar-grid is not present in the layout",
+        "evidence": "appointment-list#calendar-grid"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node form-body is not present in the layout",
+        "evidence": "callback-register#form-body"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node save-cta is not present in the layout",
+        "evidence": "callback-register#save-cta"
+      },
+      {
+        "code": "SPEC_ASSET_UNUSED",
+        "severity": "warning",
+        "message": "asset brief icon-home is not referenced by any Page Spec",
+        "evidence": "icon-home"
+      },
+      {
+        "code": "SPEC_ASSET_UNUSED",
+        "severity": "warning",
+        "message": "asset brief icon-user is not referenced by any Page Spec",
+        "evidence": "icon-user"
+      }
+    ]
+  },
+  "passed": true
+}

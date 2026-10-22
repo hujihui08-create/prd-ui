@@ -102,7 +102,33 @@ export interface InteractionPromptInput {
   iaMap: IaMap;
   catalog?: unknown;
   motionTokens?: unknown;
+  catalogsByProfile?: Record<string, unknown>;
+  motionTokensByProfile?: Record<string, unknown>;
   pageSpecs?: unknown;
+}
+
+function summarizeCatalog(catalog: unknown): unknown {
+  if (typeof catalog !== "object" || catalog === null) return catalog;
+  const record = catalog as { meta?: unknown; components?: unknown };
+  const components = Array.isArray(record.components) ? record.components : [];
+  return {
+    meta: record.meta,
+    components: components.map((component) => {
+      const entry = component as Record<string, unknown>;
+      return {
+        id: entry.id,
+        category: entry.category,
+        props: Object.keys(
+          (entry.props as Record<string, unknown> | undefined) ?? {}
+        ),
+        slots: Object.keys(
+          (entry.slots as Record<string, unknown> | undefined) ?? {}
+        ),
+        variants: entry.variants,
+        states: entry.states,
+      };
+    }),
+  };
 }
 
 export function buildInteractionPrompt(input: InteractionPromptInput): string {
@@ -116,6 +142,41 @@ export function buildInteractionPrompt(input: InteractionPromptInput): string {
     fields: page.fields ?? [],
     filterFields: page.filterFields ?? [],
   }));
+  const catalogs = input.catalogsByProfile;
+  const perProfile = catalogs !== undefined && Object.keys(catalogs).length > 1;
+  const profileSections = perProfile
+    ? [
+        "## Page profiles (data)",
+        JSON.stringify(
+          input.brief.ia.pages.map((page) => ({
+            pageId: page.id,
+            profile: page.profile,
+          })),
+          null,
+          2
+        ),
+        "",
+        "## Profile catalogs (data)",
+        JSON.stringify(
+          Object.fromEntries(
+            Object.entries(catalogs).map(([profile, catalog]) => [
+              profile,
+              summarizeCatalog(catalog),
+            ])
+          ),
+          null,
+          2
+        ),
+        "",
+        "## Motion tokens by profile (data)",
+        JSON.stringify(input.motionTokensByProfile ?? {}, null, 2),
+        "",
+        "## Profile rules",
+        "- For each page, use only the components and motion tokens from that page's profile.",
+        "- Do not mix profile catalogs or tokens.",
+        "",
+      ]
+    : [];
 
   return [
     "You are the Interaction Design Agent for a PRD → UI pipeline.",
@@ -159,19 +220,26 @@ export function buildInteractionPrompt(input: InteractionPromptInput): string {
     "## IA map (data)",
     JSON.stringify(input.iaMap, null, 2),
     "",
-    "## Component contracts (data)",
-    JSON.stringify(input.catalog ?? null, null, 2),
-    "",
-    "## Motion tokens (data)",
-    JSON.stringify(
-      input.motionTokens ?? {
-        duration: { fast: "120ms", normal: "200ms", slow: "320ms" },
-        easing: { standard: "ease-out", emphasized: "cubic-bezier(0.2, 0, 0, 1)" },
-      },
-      null,
-      2
-    ),
-    "",
+    ...(perProfile
+      ? profileSections
+      : [
+          "## Component contracts (data)",
+          JSON.stringify(input.catalog ?? null, null, 2),
+          "",
+          "## Motion tokens (data)",
+          JSON.stringify(
+            input.motionTokens ?? {
+              duration: { fast: "120ms", normal: "200ms", slow: "320ms" },
+              easing: {
+                standard: "ease-out",
+                emphasized: "cubic-bezier(0.2, 0, 0, 1)",
+              },
+            },
+            null,
+            2
+          ),
+          "",
+        ]),
     "## Page Specs / prototype (data, optional)",
     JSON.stringify(input.pageSpecs ?? null, null, 2),
     "",

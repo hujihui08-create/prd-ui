@@ -337,6 +337,25 @@ export async function main(
 
     const profile = getProfile(brief.meta.profile);
     const catalog = getCatalog(brief.meta.profile);
+    const profiles = [...new Set(brief.ia.pages.map((page) => page.profile))];
+    const catalogsByProfile = Object.fromEntries(
+      profiles.map((profileName) => [profileName, getCatalog(profileName)])
+    );
+    const motionTokensByProfile = Object.fromEntries(
+      profiles.map((profileName) => {
+        const definition = getProfile(profileName);
+        return [
+          profileName,
+          {
+            duration: definition.motion,
+            easing: {
+              standard: "ease-out",
+              emphasized: "cubic-bezier(0.2, 0, 0, 1)",
+            },
+          },
+        ];
+      })
+    );
 
     const result = await runM1({
       runId,
@@ -363,6 +382,8 @@ export async function main(
           emphasized: "cubic-bezier(0.2, 0, 0, 1)",
         },
       },
+      catalogsByProfile,
+      motionTokensByProfile,
     });
 
     await store.writeJson("agent-run.json", summary(result, runDir));

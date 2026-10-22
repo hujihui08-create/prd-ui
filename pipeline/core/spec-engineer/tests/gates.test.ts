@@ -96,7 +96,7 @@ describe("Spec Engineer gates", () => {
 
   it("blocks a referenced asset without a brief", () => {
     const gate = gateFor({
-      assetBriefs: assetBriefs.filter((brief) => brief.id !== "inventory"),
+      assetBriefs: assetBriefs.filter((brief) => brief.id !== "icon-package"),
     });
     expect(gate.passed).toBe(false);
     expect(gate.issues.map((issue) => issue.code)).toContain("SPEC_ASSET_MISSING");

@@ -506,6 +506,41 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         )
       );
     }
+    const missingLabels = (page.fields ?? []).filter(
+      (field) => page.fieldLabels?.[field] === undefined
+    );
+    if (missingLabels.length > 0) {
+      issues.push(
+        issue(
+          "BRIEF_FIELD_LABELS_MISSING",
+          "warning",
+          `page ${page.id} has no display label for ${missingLabels.length} field(s)`,
+          missingLabels.join(", ")
+        )
+      );
+    }
+    const missingMockData =
+      page.archetype === "list"
+        ? page.mockData?.rows === undefined || page.mockData.rows.length === 0
+        : page.archetype === "detail"
+          ? page.mockData?.values === undefined ||
+            Object.keys(page.mockData.values).length === 0
+          : page.archetype === "overview"
+            ? page.mockData?.listItems === undefined ||
+              page.mockData.listItems.length === 0
+            : page.archetype === "feed"
+              ? (page.feedItems ?? []).length === 0
+              : false;
+    if (missingMockData) {
+      issues.push(
+        issue(
+          "BRIEF_MOCK_DATA_MISSING",
+          "warning",
+          `page ${page.id} (${page.archetype}) has no example data for rendering`,
+          page.id
+        )
+      );
+    }
     const requiredStates = new Set([
       "default",
       "loading",

@@ -30,6 +30,40 @@ function btn(label: string, emphasis = "primary"): SpecNode {
   return { type: "Button", props: { label, emphasis } };
 }
 
+const STANDARD_ICON_ASSETS: Record<string, string> = {
+  billing: "icon-plus",
+  receipt: "icon-plus",
+  order: "icon-plus",
+  appointment: "icon-plus",
+  calendar: "icon-plus",
+  "customer-search": "icon-search",
+  search: "icon-search",
+  inventory: "icon-package",
+  package: "icon-package",
+  home: "icon-home",
+  today: "icon-home",
+  user: "icon-user",
+  customer: "icon-user",
+  message: "icon-circle-alert",
+  alert: "icon-circle-alert",
+  refresh: "icon-refresh-cw",
+  retry: "icon-refresh-cw",
+  "chevron-left": "icon-chevron-left",
+  "chevron-right": "icon-chevron-right",
+};
+
+function standardIconId(icon: string): string {
+  return STANDARD_ICON_ASSETS[icon] ?? icon;
+}
+
+function primaryAction(labels: string[], fallback: string): string {
+  return (
+    labels.find((label) => /新增|保存|提交|确认|登录/.test(label)) ??
+    labels[0] ??
+    fallback
+  );
+}
+
 function text(label: string, textRole = "body.md"): SpecNode {
   return { type: "Text", props: { text: label }, textRole };
 }
@@ -273,7 +307,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                     return {
                       type: "FormField",
                       props: {
-                        label: meta?.label ?? page.fieldLabels?.[field] ?? field,
+                        label: page.fieldLabels?.[field] ?? meta?.label ?? field,
                       },
                       children: [
                         {
@@ -353,7 +387,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                         type: "QuickAction",
                         props: {
                           label: action.label,
-                          icon: action.icon,
+                          icon: standardIconId(action.icon),
                           tone: action.tone ?? "neutral",
                         },
                       })),
@@ -511,6 +545,271 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
         },
       };
     }
+    case "mobile-list": {
+      const fields = page.fields ?? [];
+      const labelFor = (field: string): string => page.fieldLabels?.[field] ?? field;
+      const rows = page.mockData?.rows ?? [];
+      const statusTone = (status: string): string => {
+        if (/已到店|已完成|已确认|成功/.test(status)) return "success";
+        if (/已登记|待确认|待到店|待处理/.test(status)) return "warning";
+        if (/爽约|已取消|失败|异常/.test(status)) return "danger";
+        return "neutral";
+      };
+      const filterFields = page.filterFields ?? ["status"];
+      const searchField = filterFields.find(
+        (field) => field === "keyword" || field === "search"
+      );
+      const listFilters = filterFields.filter((field) => field !== searchField);
+      const filters = listFilters.map((field) => ({
+        type: "CollapsedFilter" as const,
+        props: {
+          label: labelFor(field),
+          value: "全部",
+          options:
+            field === "status"
+              ? ["全部", "已登记", "已到店", "爽约", "已取消"]
+              : ["全部", "今天", "本周"],
+        },
+      }));
+      const actions = page.actions ?? [];
+      const primary = primaryAction(actions, "新增");
+      const secondaryActions = actions.filter((label) => label !== primary);
+      const textOf = (row: Record<string, string>, key: string): string | undefined =>
+        row[key] ?? undefined;
+      const labelValue = (field: string, value: string): string =>
+        fields.includes(field) ? `${labelFor(field)}：${value}` : value;
+      const parseTime = (value: string | undefined): { start: number; duration: number } => {
+        const match = /(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/.exec(value ?? "");
+        if (match === null) return { start: 9, duration: 1 };
+        const startHour = Number(match[1]);
+        const endHour = Number(match[3]);
+        return {
+          start: Math.min(20, Math.max(9, startHour)),
+          duration: Math.max(1, Math.min(3, endHour - startHour || 1)),
+        };
+      };
+      const calendarDays = ["一", "二", "三", "四", "五", "六", "日"].map(
+        (label, index) => ({
+          label: `周${label}`,
+          date: String(index + 3).padStart(2, "0"),
+          today: index === 2,
+        })
+      );
+      const calendarHours = Array.from(
+        { length: 12 },
+        (_, index) => `${String(9 + index).padStart(2, "0")}:00`
+      );
+      const showCalendar =
+        fields.includes("time") && rows.some((row) => row.time !== undefined);
+      const calendarBlocks = rows.map((row, index) => {
+        const { start, duration } = parseTime(textOf(row, "time"));
+        return {
+          day: index % 7,
+          start,
+          duration,
+          title: textOf(row, "customer") ?? textOf(row, "title") ?? "—",
+          subtitle: textOf(row, "project") ?? "",
+          status: textOf(row, "status") ?? "",
+          tone: statusTone(textOf(row, "status") ?? ""),
+        };
+      });
+      const rowProps = (row: Record<string, string>): Record<string, unknown> => {
+        const titleField = fields.includes("customer")
+          ? "customer"
+          : fields.includes("name")
+            ? "name"
+            : undefined;
+        const titleValue =
+          textOf(row, titleField ?? "") ??
+          textOf(row, "customer") ??
+          textOf(row, "name") ??
+          textOf(row, "title") ??
+          textOf(row, fields[0] ?? "") ??
+          "—";
+        const subtitleParts: string[] = [];
+        const projectValue = textOf(row, "project") ?? textOf(row, "subtitle");
+        if (projectValue !== undefined) {
+          subtitleParts.push(labelValue("project", projectValue));
+        } else {
+          if (fields.includes("phone") && row.phone !== undefined) {
+            subtitleParts.push(labelValue("phone", row.phone));
+          }
+          if (fields.includes("store") && row.store !== undefined) {
+            subtitleParts.push(labelValue("store", row.store));
+          }
+        }
+        if (fields.includes("delegation")) {
+          subtitleParts.push(
+            labelValue("delegation", textOf(row, "delegation") ?? "—")
+          );
+        }
+        const metaValue = textOf(row, "time") ?? textOf(row, "createdAt");
+        return {
+          title: titleField === undefined ? titleValue : labelValue(titleField, titleValue),
+          subtitle: subtitleParts.join(" · "),
+          ...(metaValue === undefined || !fields.includes("time")
+            ? {}
+            : { meta: labelValue("time", metaValue) }),
+          ...(row.status === undefined
+            ? {}
+            : { status: row.status, statusTone: statusTone(row.status) }),
+          ...(fields.includes("therapist")
+            ? { trailing: labelValue("therapist", textOf(row, "therapist") ?? "待分配") }
+            : {}),
+        };
+      };
+      return {
+        type: "MobileShell",
+        props: { title: page.name, back: true, showTabs: false },
+        reqRef: page.reqRefs[0] as ReqId | undefined,
+        slots: {
+          content: [
+            {
+              type: "Section",
+              props: { padding: "space.4", gap: "space.2" },
+              children: [
+                ...(searchField === undefined
+                  ? []
+                  : [
+                      {
+                        type: "SearchBar",
+                        props: { placeholder: `搜索${labelFor(searchField)}` },
+                      },
+                      {
+                        type: "Text",
+                        props: { text: labelFor(searchField) },
+                        textRole: "label.sm",
+                      },
+                    ]),
+                ...(filters.length === 0
+                  ? []
+                  : [
+                      {
+                        type: "Row",
+                        props: { gap: "space.2", variant: "filter" },
+                        children: filters,
+                      },
+                    ]),
+                {
+                  type: "Row",
+                  props: { gap: "space.2", variant: "caption" },
+                  children: fields.map((field) => ({
+                    type: "Text",
+                    props: { text: labelFor(field) },
+                    textRole: "label.sm",
+                  })),
+                },
+                ...(secondaryActions.length > 0
+                  ? [
+                      {
+                        type: "Row",
+                        props: { gap: "space.2", variant: "filter" },
+                        children: secondaryActions.map((label) =>
+                          btn(label, "secondary")
+                        ),
+                      },
+                    ]
+                  : []),
+                ...(showCalendar
+                  ? [
+                      text("日历", "heading.3"),
+                      {
+                        type: "CalendarGrid" as const,
+                        props: {
+                          days: calendarDays,
+                          hours: calendarHours,
+                          blocks: calendarBlocks,
+                        },
+                      },
+                      text("列表", "heading.3"),
+                    ]
+                  : []),
+                ...rows.map((row) => ({
+                  type: "ListRow",
+                  props: rowProps(row),
+                })),
+                {
+                  type: "EmptyState",
+                  props: {
+                    title: page.emptyTitle ?? `暂无${page.name}`,
+                    description: "调整筛选条件后重试",
+                  },
+                },
+              ],
+            },
+          ],
+          actions: [btn(primary, "primary")],
+        },
+      };
+    }
+    case "mobile-form": {
+      const fields = page.fields ?? [];
+      const labelFor = (field: string): string => page.fieldLabels?.[field] ?? field;
+      const actions = page.actions ?? ["保存"];
+      const primary = primaryAction(actions, "保存");
+      const alternateActions = actions.filter(
+        (label) => label !== primary && /保存|提交|确认/.test(label)
+      );
+      const otherActions = actions.filter(
+        (label) => label !== primary && !alternateActions.includes(label)
+      );
+      const optionsFor = (field: string): string[] | undefined => {
+        if (field === "source") return ["到店", "电话", "微信", "企微"];
+        if (field === "status") return ["已登记", "已到店", "爽约", "已取消"];
+        if (field === "result") return ["已联系", "未接", "拒绝", "稍后再联系"];
+        return undefined;
+      };
+      return {
+        type: "MobileShell",
+        props: { title: page.name, back: true, showTabs: false },
+        reqRef: page.reqRefs[0] as ReqId | undefined,
+        slots: {
+          content: [
+            {
+              type: "Section",
+              props: { padding: "space.4", gap: "space.3" },
+              children: fields.map((field) => {
+                const label = labelFor(field);
+                const options = optionsFor(field);
+                return {
+                  type: "FormField",
+                  props: { label, required: true },
+                  children: [
+                    options === undefined
+                      ? {
+                          type: "Input",
+                          props: { name: field, placeholder: `请输入${label}` },
+                        }
+                      : {
+                          type: "Select",
+                          props: { options, placeholder: `请选择${label}` },
+                        },
+                  ],
+                };
+              }),
+            },
+            ...alternateActions.map((label) => ({
+              type: "Row" as const,
+              props: { gap: "space.2" },
+              children: [
+                { type: "Text" as const, props: { text: "另一模式" }, textRole: "label.sm" },
+                { type: "Text" as const, props: { text: label }, textRole: "label.strong" },
+              ],
+            })),
+            ...(otherActions.length === 0
+              ? []
+              : [
+                  {
+                    type: "Row" as const,
+                    props: { gap: "space.2", variant: "filter" },
+                    children: otherActions.map((label) => btn(label, "ghost")),
+                  },
+                ]),
+          ],
+          actions: [btn(primary, "primary")],
+        },
+      };
+    }
     case "auth":
       return {
         type: "MobileShell",
@@ -561,13 +860,46 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
 function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNode {
   const fields = page.fields ?? [];
   const summaryTitle = page.summaryTitle ?? `${page.name}摘要`;
-  const actions = actionButtons(page, ["编辑"]);
+  const actionLabels = page.actions?.length ? page.actions : ["编辑"];
+  const primaryLabel = actionLabels[0]!;
+  const openOrderLabel = actionLabels.find((label) => label.includes("开单"));
+  const primaryLabels = [
+    primaryLabel,
+    ...(openOrderLabel !== undefined && openOrderLabel !== primaryLabel
+      ? [openOrderLabel]
+      : []),
+  ];
+  const secondaryLabels = actionLabels.filter(
+    (label) => !primaryLabels.includes(label)
+  );
+  const actions = primaryLabels.map((label, index) =>
+    btn(label, index === 0 ? "primary" : "secondary")
+  );
+  const secondaryActions = secondaryLabels.map((label) => btn(label, "ghost"));
+  const noticeBlocks = page.noticeBlocks ?? [];
+  const hasNoticeBlocks = noticeBlocks.length > 0;
+  const visibleFields = fields.filter(
+    (field) =>
+      !(hasNoticeBlocks && (field === "notices" || field === "noticeBlocks"))
+  );
   const summaryItems =
     page.mockData?.values === undefined
       ? page.mockData?.listItems
-      : Object.entries(page.mockData.values).map(
-          ([key, value]) => `${page.fieldLabels?.[key] ?? key}: ${value}`
-        );
+      : Object.entries(page.mockData.values)
+          .filter(
+            ([key]) =>
+              !(hasNoticeBlocks && (key === "notices" || key === "noticeBlocks"))
+          )
+          .map(
+            ([key, value]) => `${page.fieldLabels?.[key] ?? key}: ${value}`
+          );
+  const noticeCards = noticeBlocks.map((block) => ({
+    type: "Card" as const,
+    props: { title: block.title },
+    children: [
+      { type: "List" as const, props: { items: block.items } },
+    ],
+  }));
   const status = page.mockData?.values?.status;
   const statusTone =
     status === undefined
@@ -598,21 +930,56 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
               {
                 type: "List",
                 props: {
-                  items: summaryItems ?? Math.max(fields.length, 3),
+                  items: summaryItems ?? Math.max(visibleFields.length, 3),
                 },
               },
               ...(statusBadge === undefined ? [] : [statusBadge]),
             ],
           },
+          ...(hasNoticeBlocks
+            ? [
+                {
+                  type: "Row" as const,
+                  props: { gap: "space.2" },
+                  children: [
+                    {
+                      type: "Text" as const,
+                      props: { text: "告知内容" },
+                      textRole: "heading.3",
+                    },
+                    {
+                      type: "Text" as const,
+                      props: {
+                        text:
+                          page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
+                      },
+                      textRole: "label.sm",
+                    },
+                  ],
+                },
+                ...noticeCards,
+              ]
+            : []),
         ],
-        fields: fields.map((field) =>
-          fieldFormNode(
-            field,
-            true,
-            page.mockData?.values?.[field],
-            page.fieldLabels?.[field]
-          )
-        ),
+        fields: [
+          ...visibleFields.map((field) =>
+            fieldFormNode(
+              field,
+              true,
+              page.mockData?.values?.[field],
+              page.fieldLabels?.[field]
+            )
+          ),
+          ...(secondaryActions.length === 0
+            ? []
+            : [
+                {
+                  type: "Row" as const,
+                  props: { gap: "space.2", variant: "filter" },
+                  children: secondaryActions,
+                },
+              ]),
+        ],
         actions,
       },
     };
@@ -626,28 +993,63 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       summary: [
         {
           type: "Card",
-          props: { title: summaryTitle },
-          children: [
-            {
-              type: "List",
-              props: { items: summaryItems ?? 4 },
-            },
-            ...(statusBadge === undefined ? [] : [statusBadge]),
+            props: { title: summaryTitle },
+            children: [
+              {
+                type: "List",
+                props: { items: summaryItems ?? 4 },
+              },
+              ...(statusBadge === undefined ? [] : [statusBadge]),
+            ],
+          },
+          ...(hasNoticeBlocks
+            ? [
+                {
+                  type: "Row" as const,
+                  props: { gap: "space.2" },
+                  children: [
+                    {
+                      type: "Text" as const,
+                      props: { text: "告知内容" },
+                      textRole: "heading.3",
+                    },
+                    {
+                      type: "Text" as const,
+                      props: {
+                        text:
+                          page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
+                      },
+                      textRole: "label.sm",
+                    },
+                  ],
+                },
+                ...noticeCards,
+              ]
+            : []),
+        ],
+        fields: [
+          {
+            type: "Section",
+            props: { padding: "space.6", gap: "space.3" },
+            children: [
+              ...visibleFields.map((field) =>
+              fieldFormNode(
+                field,
+                true,
+                page.mockData?.values?.[field],
+                page.fieldLabels?.[field]
+              )
+            ),
+            ...(secondaryActions.length === 0
+              ? []
+              : [
+                  {
+                    type: "Row" as const,
+                    props: { gap: "space.2" },
+                    children: secondaryActions,
+                  },
+                ]),
           ],
-        },
-      ],
-      fields: [
-        {
-          type: "Section",
-          props: { padding: "space.6", gap: "space.3" },
-          children: fields.map((field) =>
-            fieldFormNode(
-              field,
-              true,
-              page.mockData?.values?.[field],
-              page.fieldLabels?.[field]
-            )
-          ),
         },
       ],
       actions,

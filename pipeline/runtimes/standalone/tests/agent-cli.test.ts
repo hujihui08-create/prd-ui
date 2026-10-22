@@ -12,18 +12,7 @@ const pipelineRoot = path.resolve(
 );
 const projectPath = path.join(pipelineRoot, "samples", "projects", "employee-app", "project.yaml");
 const fixtureDir = path.join(pipelineRoot, "samples", "agents", "m1");
-const iconIds = [
-  "bell",
-  "calendar",
-  "chevron-down",
-  "home",
-  "inventory",
-  "receipt",
-  "search",
-  "settings",
-  "user",
-  "workbench",
-];
+const iconIds = ["icon-home", "icon-package", "icon-search", "icon-user"];
 
 const temporaryDirs: string[] = [];
 
@@ -215,7 +204,7 @@ describe("agent:run CLI", () => {
     // The M1 acceptance criterion: asset briefs are directly consumable by M0.
     const receipt = JSON.parse(
       await readFile(
-        path.join(runDir, "artifacts", "asset-briefs", "receipt.json"),
+        path.join(runDir, "artifacts", "asset-briefs", "icon-home.json"),
         "utf8"
       )
     ) as unknown;

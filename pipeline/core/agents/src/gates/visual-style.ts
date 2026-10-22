@@ -1,4 +1,5 @@
 import type { AssetBrief, UiBrief } from "@prd-ui/contracts";
+import type { StandardAssetInventory } from "../asset-inventory.js";
 import type { GateIssue, GateResult } from "../contracts.js";
 import type { VisualStyleSpec } from "../roles/visual-style.js";
 
@@ -6,6 +7,7 @@ export interface VisualStyleGateInput {
   visualStyle: VisualStyleSpec;
   assetBriefs: AssetBrief[];
   brief: UiBrief;
+  assetInventory?: StandardAssetInventory;
 }
 
 function blocker(code: string, message: string, evidence?: string): GateIssue {
@@ -84,9 +86,13 @@ export function runVisualStyleGate(input: VisualStyleGateInput): GateResult {
   }
 
   const expected = new Map<string, "icons" | "illustrations" | "images">();
-  for (const id of input.brief.assets.icons) expected.set(id, "icons");
-  for (const id of input.brief.assets.illustrations) expected.set(id, "illustrations");
-  for (const id of input.brief.assets.images) expected.set(id, "images");
+  const effectiveIcons = input.assetInventory?.icons ?? input.brief.assets.icons;
+  const effectiveIllustrations =
+    input.assetInventory?.illustrations ?? input.brief.assets.illustrations;
+  const effectiveImages = input.assetInventory?.images ?? input.brief.assets.images;
+  for (const id of effectiveIcons) expected.set(id, "icons");
+  for (const id of effectiveIllustrations) expected.set(id, "illustrations");
+  for (const id of effectiveImages) expected.set(id, "images");
 
   for (const [id, group] of expected) {
     const brief = briefById.get(id);

@@ -3,6 +3,165 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-21 — Phase 2 exit: per-profile M1, asset chain, 8-page real PRD
+
+### Added
+
+- Per-profile M1: `catalogsByProfile` / `motionTokensByProfile` (optional maps),
+  page→profile prompt map, catalog summaries, and a hard “do not mix” rule.
+  Single-profile behavior is unchanged.
+- Deterministic `deriveStandardAssetInventory(brief)` maps semantic icons to
+  A-library ids and records unmapped icons as placeholders. Visual Style uses
+  the inventory; the visual gate validates against the same effective set.
+- `asset:review --briefs <dir>` consumes M1 `artifacts/asset-briefs/` directly.
+- `samples/projects/employee-app-phase2/`: 8-page real PRD slice (today,
+  customer-search, customer-detail, appointment-detail, appointment-form,
+  treatment-notice, appointment-list, callback-register), plus scripted
+  intake fixtures and an intake CLI regression test.
+- `mobile-list` search variant (SearchBar + exact field label) and Briefer
+  rules for `home` content, empty `fields`, and per-project `noticeBlocks`.
+
+### Verification
+
+- `pnpm test`: 510 passed; `pnpm test:dsh`: 2 passed; typecheck clean.
+- Per-profile 8-page demo-orders run:
+  `/tmp/m1-perprofile3/run-2026-10-21T10-06-55-674Z`,
+  `ia:waived / interaction:passed / visualStyle:passed`, ¥0.5105.
+- Phase2 real intake: 8 pages, PRD readiness ready, brief gate passed,
+  publish `samples/projects/employee-app-phase2/ui-brief.json`, ¥0.5249.
+  IA-001..IA-010 sample waivers and a deterministic brief patch (home fields,
+  notice route, warehouse create role, host create action) were required.
+- Phase2 M1: `/tmp/m1-phase2d/run-2026-10-21T10-46-02-038Z`,
+  `ia:waived / interaction:passed / visualStyle:passed`, `agent:sign` success,
+  ¥0.4355; 4 standard asset briefs, asset review 4/4 passed.
+- Spec Engineer: 8 Page Specs, 8 motion pages, 0 blockers, 20 warnings,
+  assets referenced=2 / unused=2 / missing=0.
+- `render:html`: 8 pages + index; `phase1:verify`: `8 pages / 0 blockers`.
+- Playwright: 8 pages + index captured under
+  `pipeline/artifacts/employee-app-phase2/`; calendar, search results, detail,
+  notice blocks, fixed action bar, and callback form render.
+- Successful Phase2 chain cost ≈¥0.96 (intake + M1; asset review standalone
+  has no model cost). Total exploration including failed review/gate attempts
+  was higher; individual run costs are recorded in the run state.
+
+### Limits
+
+- Phase 2 exit relies on sample IA waivers and a patched brief; the next
+  iteration should rerun intake so the Briefer generates the compliant
+  home/route/permission shape directly and the brief is re-signed.
+- Business-status action switching, real form mode, motion HTML, Visual Critic,
+  screenshot diff, Studio, and Asset Compiler remain open.
+
+## 2026-10-21 — Visual fidelity v0.1 (implemented)
+
+### Added
+
+- `CalendarGrid` in the b-mobile catalog and renderer: seven-day grid, hour
+  axis, today column highlight, duration-height blocks, status tones, and
+  horizontal scroll. `mobile-list` now renders a calendar above the list.
+- `UiBriefPage.noticeBlocks`: per-project notice cards for treatment/handoff
+  detail pages. The compiler hides the legacy single `notices` field when
+  blocks are present and renders `告知内容` + one `Card` per project.
+- Fixed mobile action footer: `MobileShell` renders its `actions` slot outside
+  the scroll area. Detail pages split primary actions (`已到店确认`, `开单`)
+  into the footer and secondary actions (`接单并确认到店`, `改期`, `取消`) into
+  a ghost row above it.
+- `mobile-form` renders one primary CTA plus a compact “另一模式” note for the
+  alternate action, instead of two primary buttons.
+
+### Verification
+
+- `pnpm test`: 500 passed; `pnpm test:dsh`: 2 passed; typecheck clean.
+- `phase1:verify`: 8 pages / 2 pages / 4 pages all `0 blockers`.
+- 03 HTML refreshed under `pipeline/artifacts/employee-app-appointments-03/`:
+  calendar, fixed action bar, single form CTA, per-project notice cards, and
+  a clean list empty state.
+
+### Limits
+
+- Business status (已登记/已到店/爽约/已取消) still does not switch the action
+  bar; the default state is 已登记.
+- Form mode is expressed as a note, not a real mode switch.
+- Motion is still not consumed by HTML; no Visual Critic or screenshot diff.
+
+## 2026-10-21 — Real PRD slice: 03 预约与告知 (implemented)
+
+### Added
+
+- `samples/projects/employee-app-appointments-03/`: a four-page test slice
+  derived from the real `03-预约与告知.md` plus shared rules from
+  `00-总纲.md` (预约详情、新增/改期预约、术后告知、预约列表). The source PRD
+  is not modified.
+- `mobile-list` and `mobile-form` archetypes for mobile list and form pages.
+  The `b-mobile` catalog now includes `FormField`/`Input`/`Select`/`List`/
+  `ListItem`, plus `summary`/`fields`/`actions` slots on `MobileShell`, so
+  mobile detail, list, and form pages compile and render.
+- `samples/agents/intake-appointments-03/` scripted fixtures generated from the
+  real run, and an intake CLI regression test for the four-page slice.
+
+### Verification
+
+- `pnpm test`: 500 passed; `pnpm test:dsh`: 2 passed; typecheck clean.
+- Real dsh intake (`prd-ui-intake`): 4 pages, PRD/IA 0 blockers, brief gate
+  passed, published `ui-brief.json`, **¥0.5147**, `usageComplete=true`.
+- Real dsh M1 with sample IA waivers (IA-001 route precedence, IA-002 开单-only
+  host entry): `gates={ia:waived, interaction:passed, visualStyle:passed}`,
+  `agent:sign` finalized visual-style, status `success`, **¥0.2746**,
+  `usageComplete=true`.
+- Spec Engineer: 4 Page Specs, 4 motion pages, 0 blockers, 15 warnings.
+- `render:html`: 4 pages + `index.html`; `phase1:verify`: `4 pages / 0 blockers`.
+- Playwright: appointment-list/detail/form/notice render real labels and mock
+  data; list empty state and state switcher work. Checked-in artifacts:
+  `pipeline/artifacts/employee-app-appointments-03/` (4 HTML + 5 screenshots).
+- Regression: 8-page Phase 1 `8 pages / 0 blockers`; employee-app
+  `2 pages / 0 blockers`.
+
+### Limits
+
+- The test PRD is a four-page slice, not the full 6–8-page real PRD required by
+  Task 4. Full PRD acceptance remains open.
+- `appointment-form` is a static v0 form: both `保存` and `保存改期` actions are
+  rendered because the brief has no page-mode switch. `mobile-list` secondary
+  actions wrap on narrow mobile; both are recorded as v0 visual limits.
+
+## 2026-10-21 — Briefer mock data and field labels (implemented)
+
+### Added
+
+- UI Briefer prompt now requires `fieldLabels` for every page field and
+  archetype-specific example data: `mockData.rows` for list pages,
+  `mockData.values` for detail pages, `mockData.listItems` for overview pages,
+  and `feedItems` for feed pages. Example data must derive from PRD examples,
+  be marked illustrative, and contain no real PII.
+- Intake brief gate emits non-blocking warnings `BRIEF_FIELD_LABELS_MISSING`
+  and `BRIEF_MOCK_DATA_MISSING` when a page would render skeleton content or
+  raw field ids.
+- Scripted intake fixtures now carry the same `fieldLabels` / `mockData` /
+  `feedItems` data as the signed sample briefs (8-page demo-orders and
+  employee-app).
+
+### Fixed
+
+- Settings pages now prefer `page.fieldLabels[field]` over the compiler's
+  built-in label, so a briefer-supplied label such as `通知` is rendered and
+  passes `SEMANTIC-FIELD` instead of failing against the hardcoded
+  `通知设置`.
+
+### Verification
+
+- `pnpm test`: 493 passed; `pnpm test:dsh`: 2 passed; typecheck clean.
+- Scripted intake: 8 pages / brief gate passed; `phase1:verify` 8 pages /
+  0 blockers; employee-app 2 pages / 0 blockers.
+- 8-page HTML re-render: no `请配置 feedItems`, no visible raw field ids,
+  Chinese labels present.
+- Clean real dsh 8-page intake (`prd-ui-intake`, sample waiver for PRD-001):
+  brief gate passed, 8 pages, `orders-list` 5 rows, `order-detail` 5 values,
+  overview 4 list items, feed 4 items, complete labels; status
+  `awaiting_signoff` (no brief signoff); cost **¥0.5938**, `usageComplete=true`.
+  Run: `/tmp/intake-task1-dsh-clean/run-2026-10-21T07-34-29-193Z`.
+- Earlier real dsh attempt before the settings-label fix spent ¥1.2439 across
+  three briefer attempts; its last draft passes after the fix when re-gated.
+
 ## 2026-10-21 — Phase 2 8-page exit slice (implemented)
 
 ### Added
@@ -36,8 +195,9 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - 8-page visual scan now renders real stats, rows, detail values, feed cards,
   localized labels, empty/loading states, and mobile bottom navigation.
 - Docs: implementation spec `2026-10-21-8page-renderer-mockdata-visual-fixes-design.md`,
-  remaining-work plan `2026-10-21-phase-2-remaining-work.md`, and
-  handoff `2026-10-21-8page-renderer-handoff.md`.
+  remaining-work plan `2026-10-21-phase-2-remaining-work.md`,
+  handoff `2026-10-21-8page-renderer-handoff.md`, and
+  Q&A handoff `2026-10-21-8page-renderer-handoff-dialogue.md`.
 
 ### Verification
 

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "run-2026-10-21T10-25-03-914Z",
+  "project": "employee-app-phase2",
+  "prdHash": "sha256:208dc4af4c5af562c7b872b0882c92742703aa6d7e081ce9ebe54c58b192000d",
+  "stage": "done",
+  "status": "success",
+  "signoff": {
+    "prdIa": true,
+    "brief": true
+  },
+  "gates": {
+    "prd": "passed",
+    "ia": "passed",
+    "brief": "passed"
+  },
+  "briefRounds": 0,
+  "briefHash": "sha256:15685adfb1451ab727426fc4fec42bd2cc2e7474331614bab1abe84dbb267bc5",
+  "usageComplete": true,
+  "costCny": 0.5249473056,
+  "degraded": false,
+  "error": "PRD_IA_GATE_BLOCKED",
+  "startedAt": "2026-10-21T10:25:03.916Z",
+  "updatedAt": "2026-10-21T10:34:11.059Z",
+  "finishedAt": "2026-10-21T10:34:11.059Z"
+}

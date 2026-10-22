@@ -4,6 +4,7 @@ import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import briefJson from "../../../samples/projects/employee-app/ui-brief.json";
 import demoBriefJson from "../../../samples/projects/demo-orders-intake/ui-brief.json";
+import appointmentsBriefJson from "../../../samples/projects/employee-app-appointments-03/ui-brief.json";
 import { renderDocument, renderIndex } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
@@ -21,6 +22,16 @@ const demoById = new Map(
 );
 const demoPageNames = Object.fromEntries(
   demoSpecs.map((spec) => [spec.meta.pageId, spec.meta.name])
+);
+
+const appointmentsBrief = UiBriefSchema.parse(appointmentsBriefJson);
+const appointmentSpecs = compileProject(appointmentsBrief, {
+  getProfile,
+  getCatalog,
+  getArchetype,
+});
+const appointmentById = new Map(
+  appointmentSpecs.map((spec) => [spec.meta.pageId, spec])
 );
 
 describe("employee-app HTML renderer", () => {
@@ -107,6 +118,31 @@ describe("generic web/mobile renderer", () => {
     expect(detail).toContain("¥268.00");
     expect(detail).toContain("张三");
     expect(detail).toContain("编辑订单");
+  });
+
+  it("renders the appointment calendar and a fixed primary action", () => {
+    const html = renderDocument(
+      appointmentById.get("appointment-list")!,
+      getProfile("b-mobile")
+    );
+    expect(html).toContain('class="calendar-grid"');
+    expect(html).toContain("周");
+    expect(html).toContain("张女士");
+    expect(html).toContain("小气泡");
+    expect(html).toContain('class="app-actions"');
+    expect(html).toContain("新增预约");
+  });
+
+  it("renders one primary form action plus the alternate mode note", () => {
+    const html = renderDocument(
+      appointmentById.get("appointment-form")!,
+      getProfile("b-mobile")
+    );
+    expect(html).toContain('class="app-actions"');
+    expect(html).toContain("保存改期");
+    const footer = html.split('class="app-actions"')[1]?.split("</div>")[0] ?? "";
+    expect(footer).toContain("保存");
+    expect(footer).not.toContain("保存改期");
   });
 
   it("renders an index with project title and styled links", () => {

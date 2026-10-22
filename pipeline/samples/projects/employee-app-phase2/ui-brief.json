@@ -1,0 +1,1210 @@
+{
+  "meta": {
+    "project": "employee-app-phase2",
+    "version": "0.1.0",
+    "sourcePrdHash": "sha256:208dc4af4c5af562c7b872b0882c92742703aa6d7e081ce9ebe54c58b192000d",
+    "date": "2026-10-21",
+    "profile": "b-mobile",
+    "platforms": [
+      "mobile"
+    ]
+  },
+  "product": {
+    "name": "员工端小程序",
+    "type": "微信小程序（uni-app）门店一线员工移动工作台",
+    "goals": [
+      "让门店一线员工在服务现场完成当天预约接待、客户查询、预约变更、术后告知与回访登记",
+      "在移动端提供与角色、功能点、只读档位一致的可见性与操作状态",
+      "保证客户手机号脱敏与关键写操作由系统校验"
+    ],
+    "users": [
+      "门店店长",
+      "美容师",
+      "前台",
+      "库管"
+    ],
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk",
+      "warehouse"
+    ],
+    "scope": [
+      "今日查看当天预约、快捷操作与待回访",
+      "按姓名或脱敏手机号搜索可查看客户并查看客户详情",
+      "预约详情查看与到店确认、开单入口、改期、取消",
+      "新增预约与改期预约共用 appointment-form",
+      "术后告知按项目分块查看与确认",
+      "预约列表支持我的排单/全店与日历/列表双维度",
+      "回访内容与回访结果登记",
+      "手机号脱敏、只读档位和按功能点显隐的权限表现"
+    ],
+    "nonGoals": [
+      "开单三步流程、订单详情、收款与签字",
+      "库存入库/出库/调拨、欠款还款、个人业绩、我的、消息与公告",
+      "Web 专属操作：整单作废、冲正、盘点、退卡、催收登记、客户档案编辑",
+      "爽约操作入口；爽约状态只读可见",
+      "客户 Tab 默认客户列表与客户建档完整表单",
+      "服务完成流程、工作台等宿主页面及本切片外的导航"
+    ],
+    "successMetrics": [
+      "8 页均可从 PRD 指定入口到达，并覆盖 default、loading、error 及页面标记的 empty/disabled 状态",
+      "手机号在 8 页与动作回显中保持脱敏，不出现完整号与拨号入口",
+      "只读档位下写操作置灰并被系统拦截，读操作正常",
+      "预约详情可按已登记、已到店、爽约、已取消展示状态相关动作差异"
+    ]
+  },
+  "ia": {
+    "pages": [
+      {
+        "id": "today",
+        "name": "今日",
+        "purpose": "门店一线员工当天工作台：门店与消息、快捷操作、我的预约、待回访",
+        "archetype": "home",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/today",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-TODAY-001",
+          "REQ-SHARED-001"
+        ],
+        "fields": [],
+        "fieldLabels": {
+          "storeName": "门店",
+          "hasMessage": "消息",
+          "quickActions": "快捷操作",
+          "appointments": "我的预约",
+          "callbacks": "待回访",
+          "appointmentsEmptyTitle": "预约空态",
+          "callbacksEmptyTitle": "回访空态"
+        },
+        "actions": [],
+        "content": {
+          "storeName": "星光店",
+          "hasMessage": true,
+          "quickActions": [
+            {
+              "label": "开单",
+              "icon": "billing",
+              "tone": "neutral"
+            },
+            {
+              "label": "预约",
+              "icon": "appointment",
+              "tone": "neutral"
+            },
+            {
+              "label": "客户搜索",
+              "icon": "customer-search",
+              "tone": "customer"
+            }
+          ],
+          "appointments": [
+            {
+              "customer": "张女士",
+              "item": "小气泡",
+              "time": "10:00-11:00",
+              "status": "已登记",
+              "statusTone": "neutral"
+            },
+            {
+              "customer": "李女士",
+              "item": "补水",
+              "time": "14:00-15:00",
+              "status": "已到店",
+              "statusTone": "success"
+            },
+            {
+              "customer": "王女士",
+              "item": "肩颈",
+              "time": "16:30-17:30",
+              "status": "已登记",
+              "statusTone": "neutral"
+            }
+          ],
+          "callbacks": [
+            {
+              "customer": "张女士",
+              "item": "小气泡",
+              "daysAgo": "2天前"
+            },
+            {
+              "customer": "王女士",
+              "item": "肩颈",
+              "daysAgo": "5天前"
+            }
+          ],
+          "appointmentsEmptyTitle": "今天没有预约",
+          "callbacksEmptyTitle": "暂无待回访"
+        }
+      },
+      {
+        "id": "customer-search",
+        "name": "客户搜索",
+        "purpose": "按姓名或脱敏手机号搜索当前员工可查看的客户",
+        "archetype": "mobile-list",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/customers/search",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-CUSTOMER-001",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "keyword",
+          "name",
+          "phone",
+          "store"
+        ],
+        "fieldLabels": {
+          "keyword": "关键词",
+          "name": "姓名",
+          "phone": "手机号",
+          "store": "门店"
+        },
+        "actions": [
+          "搜索",
+          "清空关键词"
+        ],
+        "filterFields": [
+          "keyword"
+        ],
+        "emptyTitle": "没有匹配的客户",
+        "mockData": {
+          "rows": [
+            {
+              "keyword": "张",
+              "name": "张女士",
+              "phone": "138****0000",
+              "store": "星光店"
+            },
+            {
+              "keyword": "李",
+              "name": "李女士",
+              "phone": "139****0000",
+              "store": "星光店"
+            },
+            {
+              "keyword": "王",
+              "name": "王女士",
+              "phone": "137****0000",
+              "store": "星光店"
+            }
+          ]
+        }
+      },
+      {
+        "id": "customer-detail",
+        "name": "客户详情",
+        "purpose": "查看客户基础信息、余额、累计消费、卡张数、标签、备注与最近一条服务记录",
+        "archetype": "detail",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/customers/detail/:id",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-CUSTOMER-002",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "name",
+          "phone",
+          "level",
+          "balance",
+          "totalSpent",
+          "cardCount",
+          "tags",
+          "notes",
+          "serviceRecord"
+        ],
+        "fieldLabels": {
+          "name": "姓名",
+          "phone": "手机号",
+          "level": "等级",
+          "balance": "余额",
+          "totalSpent": "累计消费",
+          "cardCount": "卡张数",
+          "tags": "标签",
+          "notes": "备注",
+          "serviceRecord": "服务记录"
+        },
+        "actions": [
+          "查看预约",
+          "新增预约",
+          "查看告知",
+          "回访登记"
+        ],
+        "mockData": {
+          "values": {
+            "name": "张女士",
+            "phone": "138****0000",
+            "level": "金卡会员",
+            "balance": "¥1,280.00",
+            "totalSpent": "¥8,600.00",
+            "cardCount": "3",
+            "tags": "敏感肌、老客",
+            "notes": "暂无备注",
+            "serviceRecord": "10-20 · 小气泡 · APT-1001"
+          }
+        }
+      },
+      {
+        "id": "appointment-detail",
+        "name": "预约详情",
+        "purpose": "查看预约字段、业务状态与状态相关动作",
+        "archetype": "detail",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/appointments/detail/:id",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-APPT-001",
+          "REQ-APPT-002",
+          "REQ-APPT-004",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "customer",
+          "phone",
+          "status",
+          "project",
+          "time",
+          "therapist",
+          "store",
+          "source",
+          "creator",
+          "createdAt",
+          "delegation",
+          "serviceCompleted"
+        ],
+        "fieldLabels": {
+          "customer": "客户",
+          "phone": "手机号",
+          "status": "状态",
+          "project": "项目",
+          "time": "时间段",
+          "therapist": "护理师",
+          "store": "门店",
+          "source": "来源",
+          "creator": "创建人",
+          "createdAt": "创建时间",
+          "delegation": "委派留痕",
+          "serviceCompleted": "服务完成"
+        },
+        "actions": [
+          "已到店确认",
+          "接单并确认到店",
+          "开单",
+          "改期",
+          "取消",
+          "术后告知",
+          "客户详情"
+        ],
+        "mockData": {
+          "values": {
+            "customer": "张女士",
+            "phone": "138****0000",
+            "status": "已登记",
+            "project": "小气泡",
+            "time": "11-05 周三 10:00-11:00",
+            "therapist": "王美容（我）",
+            "store": "星光店",
+            "source": "电话",
+            "creator": "李前台",
+            "createdAt": "2026-11-01 09:30",
+            "delegation": "—",
+            "serviceCompleted": "否"
+          }
+        }
+      },
+      {
+        "id": "appointment-form",
+        "name": "新增/改期预约",
+        "purpose": "新增预约或改期预约，改期时锁定客户",
+        "archetype": "mobile-form",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/appointments/form",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-APPT-003",
+          "REQ-APPT-004",
+          "REQ-LIST-003",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "customer",
+          "project",
+          "startTime",
+          "endTime",
+          "therapist",
+          "source"
+        ],
+        "fieldLabels": {
+          "customer": "客户",
+          "project": "项目",
+          "startTime": "开始时间",
+          "endTime": "结束时间",
+          "therapist": "护理师",
+          "source": "来源"
+        },
+        "actions": [
+          "选择客户",
+          "保存",
+          "保存改期"
+        ]
+      },
+      {
+        "id": "treatment-notice",
+        "name": "术后告知",
+        "purpose": "只读查看按项目分块的术后告知并确认已当面告知",
+        "archetype": "detail",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/appointments/detail/:id/notice",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-NOTICE-001",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "customer",
+          "orderNo",
+          "status",
+          "notices",
+          "noticeBlocks",
+          "confirmedBy",
+          "confirmedAt"
+        ],
+        "fieldLabels": {
+          "customer": "客户",
+          "orderNo": "单号",
+          "status": "状态",
+          "notices": "告知内容",
+          "noticeBlocks": "告知分块",
+          "confirmedBy": "确认人",
+          "confirmedAt": "确认时间"
+        },
+        "actions": [
+          "确认已当面告知"
+        ],
+        "noticeBlocks": [
+          {
+            "title": "小气泡",
+            "items": [
+              "小气泡项目：术后注意保湿与防晒，避免使用刺激性护肤品。",
+              "如出现不适，请联系门店工作人员。"
+            ]
+          },
+          {
+            "title": "补水",
+            "items": [
+              "补水项目：术后加强保湿，避免高温环境与剧烈运动。",
+              "按门店建议做好后续护理。"
+            ]
+          }
+        ],
+        "mockData": {
+          "values": {
+            "customer": "张女士",
+            "orderNo": "SO20261102001",
+            "status": "未确认",
+            "notices": "小气泡：术后注意保湿与防晒，避免使用刺激性护肤品；补水：术后加强保湿，避免高温环境。",
+            "noticeBlocks": "小气泡、补水",
+            "confirmedBy": "—",
+            "confirmedAt": "—"
+          }
+        }
+      },
+      {
+        "id": "appointment-list",
+        "name": "预约列表",
+        "purpose": "我的排单/全店双视角与日历/列表双维度的预约列表",
+        "archetype": "mobile-list",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/appointments",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-LIST-001",
+          "REQ-LIST-002",
+          "REQ-LIST-003",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "date",
+          "time",
+          "customer",
+          "project",
+          "status",
+          "therapist",
+          "delegation",
+          "store"
+        ],
+        "fieldLabels": {
+          "date": "日期",
+          "time": "时间段",
+          "customer": "客户",
+          "project": "项目",
+          "status": "状态",
+          "therapist": "护理师",
+          "delegation": "委派留痕",
+          "store": "门店"
+        },
+        "actions": [
+          "切换我的排单/全店",
+          "切换日历/列表",
+          "选择日期",
+          "选择状态",
+          "新增预约"
+        ],
+        "filterFields": [
+          "status",
+          "date"
+        ],
+        "emptyTitle": "当前条件无预约",
+        "mockData": {
+          "rows": [
+            {
+              "date": "11-05 周三",
+              "time": "10:00-11:00",
+              "customer": "张女士",
+              "project": "小气泡",
+              "status": "已登记",
+              "therapist": "王美容",
+              "delegation": "—",
+              "store": "星光店"
+            },
+            {
+              "date": "11-05 周三",
+              "time": "14:00-15:00",
+              "customer": "李女士",
+              "project": "补水",
+              "status": "已到店",
+              "therapist": "王美容",
+              "delegation": "—",
+              "store": "星光店"
+            },
+            {
+              "date": "11-05 周三",
+              "time": "16:30-17:30",
+              "customer": "王女士",
+              "project": "肩颈",
+              "status": "已登记",
+              "therapist": "赵××",
+              "delegation": "已改派给 赵××",
+              "store": "星光店"
+            },
+            {
+              "date": "11-06 周四",
+              "time": "09:30-10:30",
+              "customer": "陈女士",
+              "project": "清洁",
+              "status": "已取消",
+              "therapist": "王美容",
+              "delegation": "—",
+              "store": "星河店"
+            }
+          ]
+        }
+      },
+      {
+        "id": "callback-register",
+        "name": "回访登记",
+        "purpose": "登记回访内容与回访结果",
+        "archetype": "mobile-form",
+        "target": "mobile",
+        "profile": "b-mobile",
+        "route": "/callbacks/form",
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk"
+        ],
+        "requiredStates": [
+          "default",
+          "loading",
+          "error",
+          "disabled"
+        ],
+        "reqRefs": [
+          "REQ-CALLBACK-001",
+          "REQ-SHARED-001"
+        ],
+        "fields": [
+          "customer",
+          "service",
+          "content",
+          "result"
+        ],
+        "fieldLabels": {
+          "customer": "客户",
+          "service": "服务项目",
+          "content": "回访内容",
+          "result": "回访结果"
+        },
+        "actions": [
+          "保存回访"
+        ]
+      }
+    ],
+    "navigation": {
+      "primary": [
+        "today",
+        "customer-search",
+        "appointment-list"
+      ]
+    },
+    "flows": [
+      {
+        "id": "F-01",
+        "steps": [
+          "today",
+          "appointment-detail"
+        ]
+      },
+      {
+        "id": "F-02",
+        "steps": [
+          "appointment-detail",
+          "appointment-form",
+          "appointment-detail"
+        ]
+      },
+      {
+        "id": "F-03",
+        "steps": [
+          "today",
+          "callback-register",
+          "today"
+        ]
+      },
+      {
+        "id": "F-04",
+        "steps": [
+          "today",
+          "customer-search",
+          "customer-detail"
+        ]
+      },
+      {
+        "id": "F-05",
+        "steps": [
+          "customer-detail",
+          "treatment-notice"
+        ]
+      },
+      {
+        "id": "F-06",
+        "steps": [
+          "appointment-list",
+          "appointment-form",
+          "today"
+        ]
+      },
+      {
+        "id": "F-07",
+        "steps": [
+          "appointment-detail",
+          "treatment-notice"
+        ]
+      }
+    ],
+    "landingByRole": {
+      "store_manager": "today",
+      "beautician": "today",
+      "front_desk": "today",
+      "warehouse": "appointment-list"
+    }
+  },
+  "data": {
+    "entities": [
+      {
+        "name": "今日 content",
+        "fields": [
+          {
+            "name": "storeName",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "hasMessage",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "name": "quickActions",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "appointments",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "callbacks",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "appointmentsEmptyTitle",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "callbacksEmptyTitle",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "客户搜索",
+        "fields": [
+          {
+            "name": "keyword",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "store",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "name": "客户详情",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "level",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "balance",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "totalSpent",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "cardCount",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "tags",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "notes",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "serviceRecord",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "预约详情",
+        "fields": [
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "已登记",
+              "已到店",
+              "爽约",
+              "已取消"
+            ]
+          },
+          {
+            "name": "project",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "time",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "therapist",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "store",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "source",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "到店",
+              "电话",
+              "微信",
+              "企微"
+            ]
+          },
+          {
+            "name": "creator",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "createdAt",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "delegation",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "serviceCompleted",
+            "type": "boolean",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "新增/改期预约",
+        "fields": [
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "project",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "startTime",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "endTime",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "therapist",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "source",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "到店",
+              "电话",
+              "微信",
+              "企微"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "术后告知",
+        "fields": [
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "orderNo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "未确认",
+              "已确认"
+            ]
+          },
+          {
+            "name": "notices",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "noticeBlocks",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "confirmedBy",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "confirmedAt",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "预约列表",
+        "fields": [
+          {
+            "name": "date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "time",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "project",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "status",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "已登记",
+              "已到店",
+              "爽约",
+              "已取消"
+            ]
+          },
+          {
+            "name": "therapist",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "delegation",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "store",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "回访登记",
+        "fields": [
+          {
+            "name": "customer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "service",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "content",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "result",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "已联系",
+              "未接",
+              "拒绝",
+              "稍后再联系"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "assets": {
+    "icons": [
+      "billing",
+      "appointment",
+      "customer-search",
+      "message"
+    ],
+    "illustrations": [],
+    "images": []
+  },
+  "designDirection": {
+    "profile": "b-mobile",
+    "density": "dense",
+    "tone": "neutral",
+    "motionLevel": "low"
+  },
+  "openQuestions": [
+    {
+      "id": "Q-001",
+      "question": "员工仅有预约登记、无客户查看时，今日「预约」快捷操作应隐藏还是显示？",
+      "blocking": false
+    },
+    {
+      "id": "Q-002",
+      "question": "客户搜索页是否渲染「新建客户」入口？若渲染，是跳转宿主客户 Tab，还是打开本切片外的表单？",
+      "blocking": false
+    },
+    {
+      "id": "Q-003",
+      "question": "notices 与 noticeBlocks 的必填性和回退关系应如何解释？",
+      "blocking": false
+    },
+    {
+      "id": "Q-004",
+      "question": "库管被勾选回访登记时，是否可在客户详情看到并进入回访登记？",
+      "blocking": false
+    },
+    {
+      "id": "Q-005",
+      "question": "「下次回访」由什么字段或动作产生，待回访条目在什么条件下移出今日区块？",
+      "blocking": false
+    },
+    {
+      "id": "Q-006",
+      "question": "从客户详情进入回访登记时，服务项目是否固定取最近一条服务记录？",
+      "blocking": false
+    },
+    {
+      "id": "Q-007",
+      "question": "客户详情服务记录行是否必须展示预约 id？",
+      "blocking": false
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-001",
+      "statement": "今日「预约」快捷操作仅在员工同时具备预约登记与客户查看时显示；仅有预约登记时隐藏。"
+    },
+    {
+      "id": "A-002",
+      "statement": "客户搜索页提供「新建客户（前往客户 Tab）」入口，指向宿主客户 Tab；本切片不提供快速建档表单。"
+    },
+    {
+      "id": "A-003",
+      "statement": "术后告知按 noticeBlocks 非空则分块展示；noticeBlocks 为空时回退 notices，noticeBlocks 的必填标记按可回退字段处理。"
+    },
+    {
+      "id": "A-004",
+      "statement": "回访登记页保持 PRD 页面可见角色为店长、美容师、前台；库管即使被勾选回访登记，也不在客户详情显示回访登记入口。"
+    },
+    {
+      "id": "A-005",
+      "statement": "本切片不增加「下次回访」字段；未接、拒绝、稍后再联系保存后，条目仍留在今日待回访，移出条件由宿主回访计划处理。"
+    },
+    {
+      "id": "A-006",
+      "statement": "回访登记的服务项目从来源带入：今日待回访取该条 item，客户详情取最近一条 serviceRecord 的项目；表单内可编辑，不新增选择器。"
+    },
+    {
+      "id": "A-007",
+      "statement": "客户详情服务记录按字段表显示「日期 · 项目 · 预约 id」；示例值使用 APT-1001 作为演示预约 id。"
+    },
+    {
+      "id": "A-008",
+      "statement": "IA map 将 customer-detail→treatment-notice 与 appointment-detail→treatment-notice 标为 broken，但 PRD §3、§7 与 crossLinks 明确保留入口；brief 按跨页链接处理。"
+    },
+    {
+      "id": "A-009",
+      "statement": "未在验收示例中给出具体值的展示项，包括今日待回访、列表补充行、术后告知分块文案、客户备注，使用中性示例内容，仅作展示，不承担业务规则。"
+    },
+    {
+      "id": "A-010",
+      "statement": "今日 hasMessage 显示消息入口，未定义未读数与消息页跳转；消息页属宿主，不在本切片。"
+    }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-TODAY-001": [
+        "today"
+      ],
+      "REQ-CUSTOMER-001": [
+        "customer-search"
+      ],
+      "REQ-CUSTOMER-002": [
+        "customer-detail"
+      ],
+      "REQ-APPT-001": [
+        "appointment-detail"
+      ],
+      "REQ-APPT-002": [
+        "appointment-detail"
+      ],
+      "REQ-APPT-003": [
+        "appointment-form"
+      ],
+      "REQ-APPT-004": [
+        "appointment-detail",
+        "appointment-form"
+      ],
+      "REQ-NOTICE-001": [
+        "treatment-notice"
+      ],
+      "REQ-LIST-001": [
+        "appointment-list"
+      ],
+      "REQ-LIST-002": [
+        "appointment-list"
+      ],
+      "REQ-LIST-003": [
+        "appointment-list",
+        "appointment-form"
+      ],
+      "REQ-CALLBACK-001": [
+        "callback-register"
+      ],
+      "REQ-SHARED-001": [
+        "today",
+        "customer-search",
+        "customer-detail",
+        "appointment-detail",
+        "appointment-form",
+        "treatment-notice",
+        "appointment-list",
+        "callback-register"
+      ]
+    },
+    "unmapped": []
+  }
+}

@@ -118,6 +118,32 @@ describe("phase1 CLI", () => {
     expect(result.stdout).toContain(`Run: ${runsDir}/run-`);
   });
 
+  it("runs the 03 appointments four-page real-PRD project", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
+    const runsDir = path.join(tmpDir, "runs");
+    const project = path.join(
+      samplesDir,
+      "projects",
+      "employee-app-appointments-03",
+      "project.yaml"
+    );
+
+    const result = await runCli(["--project", project, "--runs", runsDir]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("Phase 1A OK: 4 pages, 0 blockers");
+    const runDir = await findRunDir(runsDir);
+    const specs = (await readdir(path.join(runDir, "artifacts", "page-spec"))).filter(
+      (file) => file.endsWith(".json")
+    );
+    expect(specs.sort()).toEqual([
+      "appointment-detail.json",
+      "appointment-form.json",
+      "appointment-list.json",
+      "treatment-notice.json",
+    ]);
+  });
+
   it("runs a custom brief with repeated --manifest overrides", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-cli-"));
     const runsDir = path.join(tmpDir, "runs");

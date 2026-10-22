@@ -124,8 +124,8 @@ function iconBrief(id: string): AssetBrief {
 }
 
 export const assetBriefs: AssetBrief[] = [
-  iconBrief("inventory"),
-  iconBrief("receipt"),
+  iconBrief("icon-package"),
+  iconBrief("icon-plus"),
 ];
 
 export function makeInput(

@@ -291,6 +291,25 @@ describe("visual style gate", () => {
     expect(result).toMatchObject({ passed: true, status: "passed" });
   });
 
+  it("uses the effective asset inventory when supplied", () => {
+    const brief = {
+      ...employeeBrief,
+      assets: { icons: ["semantic"], illustrations: [], images: [] },
+    };
+    const result = runVisualStyleGate({
+      visualStyle: visual.visualStyle,
+      assetBriefs: [{ ...visual.assetBriefs[0]!, id: "icon-home" }],
+      brief,
+      assetInventory: {
+        icons: ["icon-home"],
+        illustrations: [],
+        images: [],
+        placeholders: ["semantic"],
+      },
+    });
+    expect(result).toMatchObject({ passed: true, status: "passed" });
+  });
+
   it("detects missing palette, typography, and asset strategy", () => {
     for (const patch of [
       { direction: { ...visual.visualStyle.direction, palette: [] } },
@@ -310,7 +329,7 @@ describe("visual style gate", () => {
   it("detects a missing asset brief", () => {
     const result = runVisualStyleGate({
       visualStyle: visual.visualStyle,
-      assetBriefs: visual.assetBriefs.filter((brief) => brief.id !== "calendar"),
+      assetBriefs: visual.assetBriefs.filter((brief) => brief.id !== "icon-home"),
       brief: employeeBrief,
     });
     expect(result.issues.map((issue) => issue.code)).toContain("ASSET_BRIEF_MISSING");
@@ -320,7 +339,7 @@ describe("visual style gate", () => {
     const result = runVisualStyleGate({
       visualStyle: visual.visualStyle,
       assetBriefs: visual.assetBriefs.map((brief) =>
-        brief.id === "calendar" ? { ...brief, kind: "illustration" as const } : brief
+        brief.id === "icon-home" ? { ...brief, kind: "illustration" as const } : brief
       ),
       brief: employeeBrief,
     });

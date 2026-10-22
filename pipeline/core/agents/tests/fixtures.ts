@@ -52,7 +52,7 @@ export const employeeBrief: UiBrief = {
     flows: [{ id: "daily", steps: ["today", "inventory-query"] }],
   },
   data: { entities: [] },
-  assets: { icons: ["receipt", "calendar"], illustrations: [], images: [] },
+  assets: { icons: ["icon-home", "icon-plus", "icon-package"], illustrations: [], images: [] },
   designDirection: { profile: "b-mobile", density: "dense", tone: "neutral", motionLevel: "low" },
   openQuestions: [],
   assumptions: [],
@@ -172,5 +172,9 @@ export const visualOutput = {
       images: "placeholder",
     },
   },
-  assetBriefs: [iconBrief("receipt"), iconBrief("calendar")],
+  assetBriefs: [
+    iconBrief("icon-home"),
+    iconBrief("icon-plus"),
+    iconBrief("icon-package"),
+  ],
 };

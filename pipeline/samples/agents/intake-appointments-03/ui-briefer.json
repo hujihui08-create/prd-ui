@@ -1,0 +1,913 @@
+{
+  "output": {
+    "brief": {
+      "meta": {
+        "project": "employee-app-appointments-03",
+        "version": "0.1.0",
+        "sourcePrdHash": "placeholder-source-prd-hash",
+        "date": "2026-11-02",
+        "profile": "b-mobile",
+        "platforms": [
+          "mobile"
+        ]
+      },
+      "product": {
+        "name": "员工端预约与告知",
+        "type": "微信小程序（uni-app）门店一线员工移动工作台",
+        "goals": [
+          "支持员工在预约详情按状态完成到店确认、开单入口、改期与取消。",
+          "支持新增与改期复用同一表单，并校验必填项与开始/结束时间。",
+          "支持按项目分块展示术后告知话术并完成当面告知确认。",
+          "支持预约列表在「我的排单/全店」视角与「日历/列表」维度之间切换。"
+        ],
+        "users": [
+          "店长",
+          "美容师",
+          "前台",
+          "库管"
+        ],
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "scope": [
+          "预约详情：客户、状态、脱敏手机号、项目、时间段、护理师、门店、来源、创建人、创建时间、委派留痕。",
+          "新增/改期预约：客户（改期锁定）、项目、开始时间、结束时间、护理师、来源，保存或保存改期。",
+          "术后告知：客户、单号、状态、按项目分块的告知话术、确认人、确认时间。",
+          "预约列表：我的排单/全店视角、日历/列表维度、日期与状态筛选、预约行/块、新增预约。"
+        ],
+        "nonGoals": [
+          "开单三步流程本身（《05-开单与单据》§16），本切片只提供开单入口。",
+          "客户详情、回访、库存、调拨、欠款还款、个人业绩、消息与公告。",
+          "Web 专属操作：整单作废、冲正、盘点、退卡、催收登记、客户档案编辑。",
+          "爽约入口：员工端不提供爽约操作，爽约状态只读可见。",
+          "首页、工作台、客户详情、订单详情与服务完成宿主页面。"
+        ],
+        "successMetrics": [
+          "预约详情在已登记、已到店、爽约、已取消状态下展示与 PRD 一致的动作集合。",
+          "新增预约保存后回到预约详情；改期保存后详情显示新的时间段与护理师。",
+          "术后告知确认后按钮消失，页面只读并显示确认人与确认时间。",
+          "预约列表支持我的排单/全店与日历/列表组合，状态筛选与高亮符合 §4.4。"
+        ]
+      },
+      "ia": {
+        "pages": [
+          {
+            "id": "appointment-detail",
+            "name": "预约详情",
+            "purpose": "查看预约完整信息，并按业务状态执行到店确认、开单、改期或取消。",
+            "archetype": "detail",
+            "target": "mobile",
+            "profile": "b-mobile",
+            "route": "/appointments/:id",
+            "roles": [
+              "store_manager",
+              "beautician",
+              "front_desk",
+              "warehouse"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error",
+              "disabled"
+            ],
+            "reqRefs": [
+              "REQ-APPT-001",
+              "REQ-APPT-002",
+              "REQ-APPT-004",
+              "REQ-SHARED-001"
+            ],
+            "fields": [
+              "customer",
+              "phone",
+              "status",
+              "project",
+              "time",
+              "therapist",
+              "store",
+              "source",
+              "creator",
+              "createdAt",
+              "delegation"
+            ],
+            "fieldLabels": {
+              "customer": "客户",
+              "phone": "手机号",
+              "status": "状态",
+              "project": "项目",
+              "time": "时间段",
+              "therapist": "护理师",
+              "store": "门店",
+              "source": "来源",
+              "creator": "创建人",
+              "createdAt": "创建时间",
+              "delegation": "委派留痕"
+            },
+            "actions": [
+              "已到店确认",
+              "接单并确认到店",
+              "开单",
+              "改期",
+              "取消"
+            ],
+            "mockData": {
+              "values": {
+                "customer": "张女士",
+                "phone": "138****0000",
+                "status": "已登记",
+                "project": "小气泡",
+                "time": "11-05 周三 10:00-11:00",
+                "therapist": "王美容（我）",
+                "store": "星光店",
+                "source": "电话",
+                "creator": "李前台",
+                "createdAt": "2026-11-02 09:30",
+                "delegation": "—"
+              }
+            }
+          },
+          {
+            "id": "appointment-form",
+            "name": "新增/改期预约",
+            "purpose": "以同一表单完成新增预约或改期；改期时客户锁定，校验时间段与必填项后保存并回到预约详情。",
+            "archetype": "mobile-form",
+            "target": "mobile",
+            "profile": "b-mobile",
+            "route": "/appointments/new",
+            "roles": [
+              "store_manager",
+              "beautician",
+              "front_desk",
+              "warehouse"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error",
+              "disabled"
+            ],
+            "reqRefs": [
+              "REQ-APPT-003",
+              "REQ-APPT-004",
+              "REQ-LIST-003",
+              "REQ-SHARED-001"
+            ],
+            "fields": [
+              "customer",
+              "project",
+              "startTime",
+              "endTime",
+              "therapist",
+              "source"
+            ],
+            "fieldLabels": {
+              "customer": "客户",
+              "project": "项目",
+              "startTime": "开始时间",
+              "endTime": "结束时间",
+              "therapist": "护理师",
+              "source": "来源"
+            },
+            "actions": [
+              "保存",
+              "保存改期"
+            ]
+          },
+          {
+            "id": "treatment-notice",
+            "name": "术后告知",
+            "purpose": "按项目分块展示告知话术，员工当面告知客户后确认；确认后页面只读。",
+            "archetype": "detail",
+            "target": "mobile",
+            "profile": "b-mobile",
+            "route": "/notices/:id",
+            "roles": [
+              "store_manager",
+              "beautician",
+              "front_desk",
+              "warehouse"
+            ],
+            "requiredStates": [
+              "default",
+              "loading",
+              "error",
+              "disabled"
+            ],
+            "reqRefs": [
+              "REQ-NOTICE-001",
+              "REQ-SHARED-001"
+            ],
+            "fields": [
+              "customer",
+              "orderNo",
+              "status",
+              "notices",
+              "confirmedBy",
+              "confirmedAt"
+            ],
+            "fieldLabels": {
+              "customer": "客户",
+              "orderNo": "单号",
+              "status": "状态",
+              "notices": "告知内容",
+              "confirmedBy": "确认人",
+              "confirmedAt": "确认时间"
+            },
+            "actions": [
+              "已当面告知客户，确认"
+            ],
+            "mockData": {
+              "values": {
+                "customer": "张女士",
+                "orderNo": "SO20261102001",
+                "status": "未确认",
+                "notices": "小气泡：术后 24 小时内避免沾水，注意防晒；补水：加强保湿，避免辛辣刺激。",
+                "confirmedBy": "—",
+                "confirmedAt": "—"
+              }
+            },
+            "noticeBlocks": [
+              {
+                "title": "小气泡",
+                "items": [
+                  "24 小时内避免沾水",
+                  "三天内忌辛辣、忌酒",
+                  "注意防晒，避免暴晒"
+                ]
+              },
+              {
+                "title": "补水",
+                "items": [
+                  "当天不化妆",
+                  "多饮水，做好保湿"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "appointment-list",
+            "name": "预约列表",
+            "purpose": "以我的排单/全店视角和日历/列表维度查看预约，进入预约详情或新增预约。",
+            "archetype": "mobile-list",
+            "target": "mobile",
+            "profile": "b-mobile",
+            "route": "/appointments",
+            "roles": [
+              "store_manager",
+              "beautician",
+              "front_desk",
+              "warehouse"
+            ],
+            "requiredStates": [
+              "default",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "reqRefs": [
+              "REQ-LIST-001",
+              "REQ-LIST-002",
+              "REQ-LIST-003",
+              "REQ-SHARED-001"
+            ],
+            "fields": [
+              "time",
+              "customer",
+              "project",
+              "status",
+              "therapist",
+              "delegation"
+            ],
+            "fieldLabels": {
+              "time": "时间段",
+              "customer": "客户",
+              "project": "项目",
+              "status": "状态",
+              "therapist": "护理师",
+              "delegation": "委派留痕",
+              "date": "日期"
+            },
+            "actions": [
+              "新增预约",
+              "切换我的排单/全店",
+              "切换日历/列表",
+              "清空筛选"
+            ],
+            "filterFields": [
+              "status",
+              "date"
+            ],
+            "emptyTitle": "当前条件下暂无预约",
+            "mockData": {
+              "rows": [
+                {
+                  "time": "16:00-17:00",
+                  "customer": "周女士",
+                  "project": "补水",
+                  "status": "爽约",
+                  "therapist": "待分配",
+                  "delegation": "—"
+                },
+                {
+                  "time": "14:00-15:00",
+                  "customer": "陈女士",
+                  "project": "小气泡",
+                  "status": "已取消",
+                  "therapist": "王美容",
+                  "delegation": "—"
+                },
+                {
+                  "time": "11:30-12:30",
+                  "customer": "李女士",
+                  "project": "补水",
+                  "status": "已到店",
+                  "therapist": "赵××",
+                  "delegation": "已改派给 赵××"
+                },
+                {
+                  "time": "10:00-11:00",
+                  "customer": "张女士",
+                  "project": "小气泡",
+                  "status": "已登记",
+                  "therapist": "王美容",
+                  "delegation": "—"
+                }
+              ]
+            }
+          }
+        ],
+        "navigation": {
+          "primary": [
+            "appointment-list"
+          ],
+          "tabs": []
+        },
+        "flows": [
+          {
+            "id": "F1-list-detail",
+            "steps": [
+              "appointment-list",
+              "appointment-detail"
+            ]
+          },
+          {
+            "id": "F2-list-create-detail",
+            "steps": [
+              "appointment-list",
+              "appointment-form",
+              "appointment-detail"
+            ]
+          },
+          {
+            "id": "F3-detail-reschedule",
+            "steps": [
+              "appointment-detail",
+              "appointment-form",
+              "appointment-detail"
+            ]
+          },
+          {
+            "id": "F4-notice-confirm",
+            "steps": [
+              "treatment-notice"
+            ]
+          },
+          {
+            "id": "F5-detail-status-actions",
+            "steps": [
+              "appointment-detail"
+            ]
+          }
+        ],
+        "landingByRole": {
+          "store_manager": "appointment-list",
+          "beautician": "appointment-list",
+          "front_desk": "appointment-list",
+          "warehouse": "appointment-list"
+        }
+      },
+      "data": {
+        "entities": [
+          {
+            "name": "AppointmentDetail",
+            "fields": [
+              {
+                "name": "customer",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "phone",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "status",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "已登记",
+                  "已到店",
+                  "爽约",
+                  "已取消"
+                ]
+              },
+              {
+                "name": "project",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "time",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "therapist",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "store",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "source",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "到店",
+                  "电话",
+                  "微信",
+                  "企微"
+                ]
+              },
+              {
+                "name": "creator",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "createdAt",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "delegation",
+                "type": "string",
+                "required": false
+              }
+            ]
+          },
+          {
+            "name": "TreatmentNotice",
+            "fields": [
+              {
+                "name": "customer",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "orderNo",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "status",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "未确认",
+                  "已确认"
+                ]
+              },
+              {
+                "name": "notices",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "confirmedBy",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "confirmedAt",
+                "type": "string",
+                "required": false
+              }
+            ]
+          },
+          {
+            "name": "AppointmentListItem",
+            "fields": [
+              {
+                "name": "time",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "customer",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "project",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "status",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "已登记",
+                  "已到店",
+                  "爽约",
+                  "已取消"
+                ]
+              },
+              {
+                "name": "therapist",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "delegation",
+                "type": "string",
+                "required": false
+              }
+            ]
+          },
+          {
+            "name": "AppointmentForm",
+            "fields": [
+              {
+                "name": "customer",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "project",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "startTime",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "endTime",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "therapist",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "source",
+                "type": "enum",
+                "required": true,
+                "enum": [
+                  "到店",
+                  "电话",
+                  "微信",
+                  "企微"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "assets": {
+        "icons": [],
+        "illustrations": [],
+        "images": []
+      },
+      "designDirection": {
+        "profile": "b-mobile",
+        "density": "dense",
+        "tone": "neutral",
+        "motionLevel": "low"
+      },
+      "openQuestions": [
+        {
+          "id": "Q-001",
+          "question": "预约列表是否需要新增 store（门店名）字段以支持「我的排单」跨店行？该字段在哪些视角显示？",
+          "blocking": false
+        },
+        {
+          "id": "Q-002",
+          "question": "只读档位下预约列表的「新增预约」按钮是否置灰并拦截点击？列表页是否需要 disabled 状态？",
+          "blocking": false
+        },
+        {
+          "id": "Q-003",
+          "question": "预约列表的空态是否需要区分真空态、筛选无结果和视角/条件无结果？各自文案与操作是什么？",
+          "blocking": false
+        },
+        {
+          "id": "Q-004",
+          "question": "只读档位下新增/改期预约页采用哪种行为：保留表单并置灰，还是隐藏新增/改期入口？",
+          "blocking": false
+        },
+        {
+          "id": "Q-005",
+          "question": "改期模式的 URL 契约是什么？页面通过哪个参数取得预约 id？",
+          "blocking": false
+        },
+        {
+          "id": "Q-006",
+          "question": "仅勾选「开单」功能点的员工是否应能进入预约详情？预约详情的可见条件是否加入开单？",
+          "blocking": false
+        },
+        {
+          "id": "Q-007",
+          "question": "是否为预约列表补充倒序、下拉刷新、上拉加载与「没有更多」的验收示例？",
+          "blocking": false
+        }
+      ],
+      "assumptions": [
+        {
+          "id": "A-001",
+          "statement": "预约列表按 §5.3 的六个字段编译；跨店行的门店名展示由 Q-001 决定，本候选不先行增加 store 字段。"
+        },
+        {
+          "id": "A-002",
+          "statement": "预约列表的页面级必需状态沿用 §4.1 的 default、empty、loading、error；只读档位下「新增预约」按钮的禁用行为由 Q-002 明确。"
+        },
+        {
+          "id": "A-003",
+          "statement": "预约列表空态统一使用「当前条件下暂无预约」并提供清空筛选；真空态、筛选无结果和条件无结果的拆分由 Q-003 决定。"
+        },
+        {
+          "id": "A-004",
+          "statement": "只读档位下新增/改期预约保留表单并整体置灰，符合 §4.1「表单只读」；入口隐藏方案由 Q-004 决定。"
+        },
+        {
+          "id": "A-005",
+          "statement": "改期模式沿用 /appointments/new 路由，并通过页面参数传入预约 id；具体参数名由 Q-005 决定。"
+        },
+        {
+          "id": "A-006",
+          "statement": "预约详情对店长、美容师、前台、库管均可见；仅勾选「开单」功能点时的可见性由 Q-006 决定。"
+        },
+        {
+          "id": "A-007",
+          "statement": "预约列表默认按时间倒序，支持下拉刷新、上拉加载与「没有更多」，沿用 §10 共享规则；验收示例补充由 Q-007 决定。"
+        },
+        {
+          "id": "A-008",
+          "statement": "预约详情底部动作按业务状态矩阵渲染：已登记显示已到店确认、开单、改期、取消；已到店只显示开单；爽约与已取消不显示操作栏；待分配时到店确认文案为「接单并确认到店」。"
+        },
+        {
+          "id": "A-009",
+          "statement": "列表与详情中的客户手机号一律脱敏，不提供完整号或拨号入口。"
+        },
+        {
+          "id": "A-010",
+          "statement": "示例姓名、手机号、时间与告知文本均仅用于展示，不代表真实客户或业务数据。"
+        },
+        {
+          "id": "A-011",
+          "statement": "术后告知主入口来自切片外的服务完成流程或客户详情服务记录，本切片只编译告知页本身。"
+        },
+        {
+          "id": "A-012",
+          "statement": "取消操作在预约详情触发二次确认，确认后状态变为已取消并回到只读说明。"
+        }
+      ],
+      "traceability": {
+        "reqMap": {
+          "REQ-APPT-001": [
+            "appointment-detail"
+          ],
+          "REQ-APPT-002": [
+            "appointment-detail"
+          ],
+          "REQ-APPT-003": [
+            "appointment-form"
+          ],
+          "REQ-APPT-004": [
+            "appointment-detail",
+            "appointment-form"
+          ],
+          "REQ-NOTICE-001": [
+            "treatment-notice"
+          ],
+          "REQ-LIST-001": [
+            "appointment-list"
+          ],
+          "REQ-LIST-002": [
+            "appointment-list"
+          ],
+          "REQ-LIST-003": [
+            "appointment-list",
+            "appointment-form"
+          ],
+          "REQ-SHARED-001": [
+            "appointment-detail",
+            "appointment-form",
+            "treatment-notice",
+            "appointment-list"
+          ]
+        },
+        "unmapped": []
+      }
+    },
+    "questions": [
+      {
+        "id": "Q-001",
+        "question": "预约列表是否需要新增 store（门店名）字段以支持「我的排单」跨店行？该字段在哪些视角显示？",
+        "options": [
+          "仅在我的排单跨店行显示门店名",
+          "我的排单与全店视角都显示门店名",
+          "不新增字段，跨店行以其他方式标识门店"
+        ],
+        "impact": "决定预约列表字段、行布局与示例数据是否包含门店名。",
+        "owner": "data_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-001"
+      },
+      {
+        "id": "Q-002",
+        "question": "只读档位下预约列表的「新增预约」按钮是否置灰并拦截点击？列表页是否需要 disabled 状态？",
+        "options": [
+          "置灰并拦截，列表页增加 disabled 状态",
+          "保留入口但点击后提示无权限",
+          "只读档位不显示新增入口"
+        ],
+        "impact": "决定列表页必需状态、按钮可用性和点击反馈。",
+        "owner": "design_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-002"
+      },
+      {
+        "id": "Q-003",
+        "question": "预约列表的空态是否需要区分真空态、筛选无结果和视角/条件无结果？各自文案与操作是什么？",
+        "options": [
+          "三套独立空态，分别提供新增预约或清空筛选",
+          "统一空态并统一提供清空筛选",
+          "仅区分真空态与筛选无结果"
+        ],
+        "impact": "决定空态数量、文案与空态操作。",
+        "owner": "design_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-003"
+      },
+      {
+        "id": "Q-004",
+        "question": "只读档位下新增/改期预约页采用哪种行为：保留表单并置灰，还是隐藏新增/改期入口？",
+        "options": [
+          "保留表单页并整体置灰",
+          "隐藏新增/改期入口",
+          "入口隐藏，直接访问时显示只读表单"
+        ],
+        "impact": "决定表单页 disabled 状态与入口可见性。",
+        "owner": "security_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-004"
+      },
+      {
+        "id": "Q-005",
+        "question": "改期模式的 URL 契约是什么？页面通过哪个参数取得预约 id？",
+        "options": [
+          "/appointments/:id/edit?mode=reschedule",
+          "/appointments/new?mode=reschedule&id=:id",
+          "保持 /appointments/new 并通过页面参数传递 id"
+        ],
+        "impact": "决定路由、参数解析和保存后回跳对象。",
+        "owner": "product_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-005"
+      },
+      {
+        "id": "Q-006",
+        "question": "仅勾选「开单」功能点的员工是否应能进入预约详情？预约详情的可见条件是否加入开单？",
+        "options": [
+          "加入开单功能点",
+          "开单依赖预约登记或到院分配",
+          "维持现状并由后台保证组合权限"
+        ],
+        "impact": "决定详情页角色/功能点可见条件和开单入口可达性。",
+        "owner": "security_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-006"
+      },
+      {
+        "id": "Q-007",
+        "question": "是否为预约列表补充倒序、下拉刷新、上拉加载与「没有更多」的验收示例？",
+        "options": [
+          "补充完整验收示例",
+          "沿用共享规则，不单独补充",
+          "只补充分页与到底提示"
+        ],
+        "impact": "决定列表行为是否可测试及验收覆盖。",
+        "owner": "product_owner",
+        "blocking": false,
+        "sourceFindingId": "PRD-007"
+      }
+    ],
+    "assumptions": [
+      {
+        "id": "A-001",
+        "statement": "预约列表按 §5.3 的六个字段编译；跨店行的门店名展示由 Q-001 决定，本候选不先行增加 store 字段。",
+        "source": "PRD §2 数据范围与视角；review PRD-001",
+        "confidence": 0.72,
+        "blocking": false
+      },
+      {
+        "id": "A-002",
+        "statement": "预约列表的页面级必需状态沿用 §4.1 的 default、empty、loading、error；只读档位下「新增预约」按钮的禁用行为由 Q-002 明确。",
+        "source": "PRD §4.1 页面状态；§6 验收示例 13；review PRD-002",
+        "confidence": 0.7,
+        "blocking": false
+      },
+      {
+        "id": "A-003",
+        "statement": "预约列表空态统一使用「当前条件下暂无预约」并提供清空筛选；真空态、筛选无结果和条件无结果的拆分由 Q-003 决定。",
+        "source": "PRD §4.1 页面状态；§10 共享规则；review PRD-003",
+        "confidence": 0.68,
+        "blocking": false
+      },
+      {
+        "id": "A-004",
+        "statement": "只读档位下新增/改期预约保留表单并整体置灰，符合 §4.1「表单只读」；入口隐藏方案由 Q-004 决定。",
+        "source": "PRD §3 页面清单；§4.1 页面状态；review PRD-004",
+        "confidence": 0.75,
+        "blocking": false
+      },
+      {
+        "id": "A-005",
+        "statement": "改期模式沿用 /appointments/new 路由，并通过页面参数传入预约 id；具体参数名由 Q-005 决定。",
+        "source": "PRD §3 页面清单；§4.5；review PRD-005",
+        "confidence": 0.65,
+        "blocking": false
+      },
+      {
+        "id": "A-006",
+        "statement": "预约详情对店长、美容师、前台、库管均可见；仅勾选「开单」功能点时的可见性由 Q-006 决定。",
+        "source": "PRD §2 角色与权限；review PRD-006",
+        "confidence": 0.6,
+        "blocking": false
+      },
+      {
+        "id": "A-007",
+        "statement": "预约列表默认按时间倒序，支持下拉刷新、上拉加载与「没有更多」，沿用 §10 共享规则；验收示例补充由 Q-007 决定。",
+        "source": "PRD §10 共享规则；review PRD-007",
+        "confidence": 0.8,
+        "blocking": false
+      },
+      {
+        "id": "A-008",
+        "statement": "预约详情底部动作按业务状态矩阵渲染：已登记显示已到店确认、开单、改期、取消；已到店只显示开单；爽约与已取消不显示操作栏；待分配时到店确认文案为「接单并确认到店」。",
+        "source": "PRD §4.2 预约业务状态与动作",
+        "confidence": 0.9,
+        "blocking": false
+      },
+      {
+        "id": "A-009",
+        "statement": "列表与详情中的客户手机号一律脱敏，不提供完整号或拨号入口。",
+        "source": "PRD §10 共享规则；§6 验收示例 14",
+        "confidence": 0.95,
+        "blocking": false
+      },
+      {
+        "id": "A-010",
+        "statement": "示例姓名、手机号、时间与告知文本均仅用于展示，不代表真实客户或业务数据。",
+        "source": "PRD §6 验收示例；§5 字段表",
+        "confidence": 0.9,
+        "blocking": false
+      },
+      {
+        "id": "A-011",
+        "statement": "术后告知主入口来自切片外的服务完成流程或客户详情服务记录，本切片只编译告知页本身。",
+        "source": "PRD §8 导航；§9 切片边界",
+        "confidence": 0.9,
+        "blocking": false
+      },
+      {
+        "id": "A-012",
+        "statement": "取消操作在预约详情触发二次确认，确认后状态变为已取消并回到只读说明。",
+        "source": "PRD §4.5 新增/改期表单；§6 验收示例 12",
+        "confidence": 0.85,
+        "blocking": false
+      }
+    ],
+    "reviewMarkdown": "## UI Brief 候选审查\n\n- 页面集：4 页，与已签 PRD 页面清单一致，未新增或删减页面。\n- 角色：store_manager、beautician、front_desk、warehouse 均映射到全部四页；每个角色至少有可见页。\n- 状态：预约详情、新增/改期预约、术后告知覆盖 default、loading、error、disabled；预约列表覆盖 default、empty、loading、error。\n- 数据：四个实体对应 §5 字段表；fieldLabels 覆盖页面字段；详情与告知的 mockData.values 覆盖全部字段；列表 4 行示例覆盖全部行字段，并按时间倒序展示。\n- 追溯：9 个 PRD 需求 id 全部进入 reqMap，unmapped 为空。\n- 开放问题：Q-001 至 Q-007 均为 non-blocking，涉及列表门店名字段、列表只读禁用、空态拆分、表单只读、改期路由、仅开单可见性、列表分页验收。\n- 人类答复：本轮为空，开放问题已同步为 assumptions。\n- 结论：0 个 blocking question；候选可进入 signoff。"
+  },
+  "usage": {
+    "inputTokens": 21716,
+    "outputTokens": 30512,
+    "cacheReadTokens": 5632,
+    "totalTokens": 57860
+  },
+  "usageComplete": true
+}

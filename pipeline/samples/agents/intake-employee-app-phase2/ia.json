@@ -1,0 +1,520 @@
+{
+  "output": {
+    "map": {
+      "pages": [
+        {
+          "id": "today",
+          "name": "今日",
+          "route": "/today",
+          "level": 0,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk"
+          ],
+          "entryPoints": [
+            "小程序启动 / 底部「今日」Tab（宿主）"
+          ]
+        },
+        {
+          "id": "customer-search",
+          "name": "客户搜索",
+          "route": "/customers/search",
+          "parentId": "today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "今日·快捷操作「客户搜索」",
+            "客户 Tab（宿主）"
+          ]
+        },
+        {
+          "id": "customer-detail",
+          "name": "客户详情",
+          "route": "/customers/detail/:id",
+          "parentId": "customer-search",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "客户搜索结果",
+            "预约详情·客户详情（仅可查看客户时）"
+          ]
+        },
+        {
+          "id": "appointment-detail",
+          "name": "预约详情",
+          "route": "/appointments/detail/:id",
+          "parentId": "today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "今日·我的预约行",
+            "预约列表·预约行/日历块",
+            "客户详情·查看预约"
+          ]
+        },
+        {
+          "id": "appointment-form",
+          "name": "新增/改期预约",
+          "route": "/appointments/form",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表·新增预约",
+            "预约列表·日历空格",
+            "预约详情·改期",
+            "客户详情·新增预约"
+          ]
+        },
+        {
+          "id": "treatment-notice",
+          "name": "术后告知",
+          "route": "/notices/detail/:id",
+          "parentId": "appointment-detail",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "客户详情·服务记录「查看告知」",
+            "预约详情·术后告知（已到店且 serviceCompleted=true）"
+          ]
+        },
+        {
+          "id": "appointment-list",
+          "name": "预约列表",
+          "route": "/appointments",
+          "parentId": "today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "今日·我的预约卡头",
+            "工作台·客户预约（宿主，库管唯一入口）"
+          ]
+        },
+        {
+          "id": "callback-register",
+          "name": "回访登记",
+          "route": "/callbacks/form",
+          "parentId": "today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk"
+          ],
+          "entryPoints": [
+            "今日·待回访条目",
+            "客户详情·回访登记"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "today"
+        ]
+      },
+      "flows": [
+        {
+          "id": "F-01",
+          "steps": [
+            "today",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-02",
+          "steps": [
+            "appointment-detail",
+            "appointment-form",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-03",
+          "steps": [
+            "today",
+            "callback-register",
+            "today"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-04",
+          "steps": [
+            "today",
+            "customer-search",
+            "customer-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-05",
+          "steps": [
+            "customer-detail",
+            "treatment-notice"
+          ],
+          "status": "broken"
+        },
+        {
+          "id": "F-06",
+          "steps": [
+            "appointment-list",
+            "appointment-form",
+            "today"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-07",
+          "steps": [
+            "appointment-detail",
+            "treatment-notice"
+          ],
+          "status": "broken"
+        }
+      ],
+      "crossLinks": [
+        {
+          "from": "today",
+          "to": "appointment-detail",
+          "kind": "我的预约行"
+        },
+        {
+          "from": "today",
+          "to": "appointment-list",
+          "kind": "我的预约卡头"
+        },
+        {
+          "from": "today",
+          "to": "customer-search",
+          "kind": "快捷操作：客户搜索"
+        },
+        {
+          "from": "today",
+          "to": "callback-register",
+          "kind": "待回访条目"
+        },
+        {
+          "from": "customer-search",
+          "to": "customer-detail",
+          "kind": "搜索结果"
+        },
+        {
+          "from": "customer-detail",
+          "to": "appointment-detail",
+          "kind": "查看预约"
+        },
+        {
+          "from": "customer-detail",
+          "to": "appointment-form",
+          "kind": "新增预约"
+        },
+        {
+          "from": "customer-detail",
+          "to": "treatment-notice",
+          "kind": "查看告知"
+        },
+        {
+          "from": "customer-detail",
+          "to": "callback-register",
+          "kind": "回访登记"
+        },
+        {
+          "from": "appointment-list",
+          "to": "appointment-detail",
+          "kind": "预约行/日历块"
+        },
+        {
+          "from": "appointment-list",
+          "to": "appointment-form",
+          "kind": "新增预约/日历空格"
+        },
+        {
+          "from": "appointment-detail",
+          "to": "customer-detail",
+          "kind": "客户详情（仅可查看客户时）"
+        },
+        {
+          "from": "appointment-detail",
+          "to": "appointment-form",
+          "kind": "改期"
+        },
+        {
+          "from": "appointment-detail",
+          "to": "treatment-notice",
+          "kind": "术后告知（serviceCompleted=true）"
+        },
+        {
+          "from": "appointment-form",
+          "to": "appointment-detail",
+          "kind": "保存改期"
+        },
+        {
+          "from": "appointment-form",
+          "to": "today",
+          "kind": "新增保存"
+        },
+        {
+          "from": "callback-register",
+          "to": "today",
+          "kind": "保存回访（今日来源）"
+        },
+        {
+          "from": "callback-register",
+          "to": "customer-detail",
+          "kind": "保存回访（客户详情来源）"
+        }
+      ]
+    },
+    "findings": {
+      "findings": [
+        {
+          "id": "IA-001",
+          "severity": "blocker",
+          "area": "roles",
+          "evidence": "页面可见角色表将「回访登记」限定为 store_manager/beautician/front_desk；动作权限表仅要求「客户详情·回访登记」具备回访登记功能点，而客户详情对 warehouse 可见。",
+          "issue": "库管具备回访登记功能点时会看到客户详情的回访入口，但目标页不向其开放，形成权限死端。",
+          "proposal": "统一门禁：客户详情对 warehouse 隐藏回访登记动作，或在页面角色表中显式允许 warehouse；动作级与页面级使用同一角色+功能点判定。"
+        },
+        {
+          "id": "IA-002",
+          "severity": "blocker",
+          "area": "roles",
+          "evidence": "5.1 今日快捷操作「预约」仅需预约登记；动作权限表将「新增预约（列表/日历/今日）」定为预约登记+客户查看；5.5 新增时客户字段打开客户搜索选择器，而客户搜索需客户查看。",
+          "issue": "仅有预约登记而无客户查看的员工会看到今日「预约」入口，但新增预约无法选择客户，主流程中断。",
+          "proposal": "将今日「预约」与 appointment-form 新增模式的可见/可用条件统一为预约登记+客户查看；改期模式可仅保留预约登记，并在入口处区分。"
+        },
+        {
+          "id": "IA-003",
+          "severity": "blocker",
+          "area": "navigation",
+          "evidence": "客户详情 serviceRecord 格式为「日期 · 项目 · 预约 id」；术后告知路由为 /notices/detail/:id，字段表中只有 orderNo、无 notice id；两处入口均未定义 :id 是预约 id 还是告知 id。",
+          "issue": "「查看告知」链接的 :id 契约缺失，无法从客户详情或预约详情稳定构造告知路由，告知主流程不可达。",
+          "proposal": "明确 :id 语义并统一：若按预约进入，使用 /appointments/detail/:id/notice 或等价路由；在字段与入口中声明携带的 key，并补齐返回目标。"
+        },
+        {
+          "id": "IA-004",
+          "severity": "major",
+          "area": "naming",
+          "evidence": "新增与改期共用 /appointments/form，以 mode 区分；改期需要预约 id，但路由无 :id 或查询参数定义。",
+          "issue": "改期模式缺少稳定的预约标识，刷新或深链后无法恢复被改期单据；新增与改期同路由的入参契约不完整。",
+          "proposal": "为改期定义显式 appointmentId 参数（如 /appointments/form/:appointmentId? 或固定 query），并在入口契约中声明 mode 与来源。"
+        },
+        {
+          "id": "IA-005",
+          "severity": "major",
+          "area": "flow",
+          "evidence": "验收 6：新增保存后回到今日；验收 8：列表默认日历维度、日期筛选默认今天；回访保存则按来源回到今日或客户详情。",
+          "issue": "从列表/日历新增后强制回今日，丢失日期、筛选和维度上下文，与回访的按来源返回不一致，用户需重新定位刚创建的预约。",
+          "proposal": "新增保存后返回来源页并保留日期/维度/筛选；若坚持回今日，需在 PRD 中说明并接受上下文丢失。"
+        },
+        {
+          "id": "IA-006",
+          "severity": "major",
+          "area": "navigation",
+          "evidence": "今日可见角色不含 warehouse；预约列表入口为今日卡头或工作台「客户预约」；客户搜索入口为今日或客户 Tab。",
+          "issue": "库管在切片内没有任何可达的预约/客户入口，导航完全依赖宿主工作台/客户 Tab；若宿主未向库管暴露「客户预约」，库管成为孤岛。",
+          "proposal": "明确宿主工作台/客户 Tab 对 warehouse 的入口契约；或为库管提供一个切片内可见的预约列表入口。"
+        },
+        {
+          "id": "IA-007",
+          "severity": "major",
+          "area": "states",
+          "evidence": "4.5：未接/拒绝/稍后再联系保存后仍留在今日待回访，直到已联系或下次回访；今日 callbacks 字段仅有 customer/item/daysAgo，回访表单无记录 id。",
+          "issue": "保存后今日条目外观不变，无法区分未处理与已回访；重复进入会重复建记录，且没有回访历史或结果回显。",
+          "proposal": "为回访记录定义稳定 id 与状态，在今日条目回显最近结果/时间；明确重复保存是覆盖还是新增，并给出退出待回访的条件。"
+        },
+        {
+          "id": "IA-008",
+          "severity": "major",
+          "area": "scope",
+          "evidence": "第 1 节：客户搜索页只做搜索与新建入口；第 9 节：客户搜索页只提供搜索，新建客户由宿主提供；第 10 节：搜不到客户时引导到客户 Tab 新建；页面清单无新建动作。",
+          "issue": "客户搜索是否包含新建入口在三处口径冲突，影响页面动作与导航边界。",
+          "proposal": "统一为宿主新建：删除第 1 节「新建入口」表述，空态仅提供清空或去客户 Tab 的引导；若保留新建，则补页面动作与路由。"
+        },
+        {
+          "id": "IA-009",
+          "severity": "major",
+          "area": "roles",
+          "evidence": "页面可见角色表：术后告知需术后告知；动作权限表：客户详情·查看告知需术后告知且可查看对应预约。",
+          "issue": "页面级门禁未包含「可查看对应预约」，知道 URL 的用户可能越过预约数据范围直接打开告知页。",
+          "proposal": "将页面/路由门禁与动作门禁对齐为术后告知+可查看对应预约，并在入口处复用同一判定。"
+        },
+        {
+          "id": "IA-010",
+          "severity": "major",
+          "area": "hierarchy",
+          "evidence": "客户详情核心内容只有一条最近服务记录；动作表列出「查看预约（进入对应预约详情）」，但未定义对应哪条预约，页面也没有预约列表。",
+          "issue": "多预约客户点击「查看预约」时没有目标选择，动作与页面的信息能力不匹配。",
+          "proposal": "将动作限定为 serviceRecord 的预约 id，并改称「查看本次预约」；若需要全部预约历史，另立页面或明确移出本切片。"
+        },
+        {
+          "id": "IA-011",
+          "severity": "minor",
+          "area": "naming",
+          "evidence": "页面清单称术后告知为「移动端只读确认页」，4.3 与验收 7 又要求未确认时可执行「确认已当面告知」。",
+          "issue": "「只读确认页」与确认写操作自相矛盾，命名会误导页面能力。",
+          "proposal": "改称「告知确认页/术后告知页」，只读仅用于已确认状态。"
+        },
+        {
+          "id": "IA-012",
+          "severity": "minor",
+          "area": "naming",
+          "evidence": "第 3 节：预约详情动作包含「客户详情」返回入口；但预约详情主要从今日或列表进入。",
+          "issue": "「返回入口」暗示回到来源，实际是跨页跳转到客户详情，命名与导航语义不符。",
+          "proposal": "改称「查看客户详情」，仅在可查看客户时展示。"
+        },
+        {
+          "id": "IA-013",
+          "severity": "minor",
+          "area": "states",
+          "evidence": "5.6 notices 与 noticeBlocks 均标必填，同时说明 noticeBlocks 为空时回退 notices、非空时以 noticeBlocks 为准。",
+          "issue": "两个必填字段互斥回退，字段契约无法同时满足，易产生空块或重复内容。",
+          "proposal": "明确 notices 为可选兼容字段、noticeBlocks 为必填主字段；或定义二选一的校验规则。"
+        }
+      ]
+    },
+    "proposed": {
+      "pages": [
+        {
+          "id": "appointment-form",
+          "name": "新增/改期预约",
+          "route": "/appointments/form/:appointmentId?",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表·新增预约",
+            "预约列表·日历空格",
+            "预约详情·改期",
+            "客户详情·新增预约"
+          ]
+        },
+        {
+          "id": "treatment-notice",
+          "name": "术后告知",
+          "route": "/appointments/detail/:id/notice",
+          "parentId": "appointment-detail",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "客户详情·服务记录「查看告知」",
+            "预约详情·术后告知（已到店且 serviceCompleted=true）"
+          ]
+        },
+        {
+          "id": "appointment-list",
+          "name": "预约列表",
+          "route": "/appointments",
+          "parentId": "today",
+          "level": 1,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "今日·我的预约卡头",
+            "工作台·客户预约（宿主；需对 warehouse 明确可达）"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "today"
+        ]
+      },
+      "flows": [
+        {
+          "id": "F-05",
+          "steps": [
+            "customer-detail",
+            "treatment-notice"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-06",
+          "steps": [
+            "appointment-list",
+            "appointment-form",
+            "appointment-list"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F-07",
+          "steps": [
+            "appointment-detail",
+            "treatment-notice"
+          ],
+          "status": "ok"
+        }
+      ],
+      "notes": [
+        "IA-001：客户详情·回访登记只对回访登记页可见角色显示；或显式将 warehouse 加入回访登记页，二者取一。",
+        "IA-002：今日「预约」与 appointment-form 新增模式统一要求预约登记+客户查看；改期模式只要求预约登记，并在入口区分。",
+        "IA-003：术后告知统一按预约 id 进入，建议 /appointments/detail/:id/notice；客户详情 serviceRecord 已携带预约 id。",
+        "IA-004：改期路由携带 appointmentId；新增无 id，mode 显式声明。",
+        "IA-005：新增预约保存后回来源页并保留日期/维度/筛选；如保留回今日，需在 PRD 标注为有意决策。",
+        "IA-006：宿主工作台/客户 Tab 必须向 warehouse 暴露预约入口，或补一个切片内入口。",
+        "IA-007：今日待回访条目回显最近回访结果/时间；回访记录需稳定 id，明确覆盖还是新增，以及移出队列条件。",
+        "IA-008：客户搜索页不设新建入口，新建客户由宿主提供；同步修正第 1 节表述。",
+        "IA-009：术后告知页面级门禁 = 术后告知 + 可查看对应预约。",
+        "IA-010：客户详情「查看预约」绑定 serviceRecord 的预约 id，改称「查看本次预约」；多预约历史不在本切片。",
+        "IA-011/012/013：术后告知改称告知确认页或术后告知页；notices 改为可选兼容字段、noticeBlocks 为主字段；「返回入口」改称「查看客户详情」。"
+      ]
+    },
+    "reviewMarkdown": "## IA 结论\n\n8 页均已入图，today 为根；主流程可达，但存在 3 个 blocker、7 个 major、3 个 minor。\n\n### Blockers\n- IA-001 库管在客户详情可见回访入口，但回访登记页不向库管开放，权限死端。\n- IA-002 今日「预约」仅按预约登记显隐，但新增预约需要客户查看；缺客户查看时入口可见却无法选客户。\n- IA-003 术后告知路由 :id 未定义是预约 id 还是告知 id；客户详情只带预约 id，「查看告知」链路不可稳定构造。\n\n### Major\n- IA-004 改期共用 /appointments/form 但无预约 id，深链或刷新无法恢复。\n- IA-005 列表/日历新增后回今日，丢失日期、筛选与维度上下文。\n- IA-006 库管切片内无入口，完全依赖宿主工作台；可达性未定义。\n- IA-007 回访未接/拒绝/稍后再联系保存后条目无变化，无记录 id 与历史，易重复建记录。\n- IA-008 客户搜索是否含新建入口在第 1/9/10 节三处口径冲突。\n- IA-009 术后告知页面门禁缺少「可查看对应预约」，存在绕过预约数据范围的风险。\n- IA-010 客户详情「查看预约」未定义对应哪条预约，页面也只有一条服务记录。\n\n### Minor\n- IA-011「只读确认页」与确认写操作矛盾。\n- IA-012「返回入口」实为跨页跳转，命名误导。\n- IA-013 notices 与 noticeBlocks 双必填与回退规则冲突。\n\n### 待决策\n1. 库管是否可进入回访登记，还是隐藏客户详情的回访动作？\n2. 今日「预约」与新增预约统一为预约登记+客户查看，还是拆成「看列表」与「建预约」两个入口？\n3. 术后告知以预约 id 还是告知 id 为主键？\n4. 新增预约保存后回来源页还是今日？\n5. 客户搜索是否保留新建入口？\n\n宿主 Tab（客户/工作台/我的）不在切片内，导航仅声明 today；库管的宿主入口契约仍需确认。"
+  },
+  "usage": {
+    "inputTokens": 13991,
+    "outputTokens": 30288,
+    "cacheReadTokens": 6912,
+    "totalTokens": 51191
+  },
+  "usageComplete": true
+}

@@ -98,6 +98,16 @@ runs/<runId>/
   （26 个未解析 motion node、1 个 `SPEC_ASSET_BRIEFS_MISSING`）。
 - `render:html --run <spec-run>` 可直接渲染 8 页 + `index.html`；PageShell/MobileShell 的 web/mobile slots、stats/table/detail/feed、`mockData` 与 `fieldLabels` 已支持，8 页 Playwright 视觉巡检通过。
 
+## Phase 2 8 页真实 PRD（2026-10-21）
+
+- 输入：`samples/projects/employee-app-phase2` 的 8 页 brief → 真实 dsh M1
+  （IA waived、interaction/visual passed、`agent:sign` 后 `success`）。
+- 输出：8 个 Page Spec、8 个 motion pages；0 blockers、20 warnings。
+- assets：`referenced=2`（icon-plus/icon-search）、`unused=2`、`missing=0`；
+  Visual Style 的 4 个标准图标 briefs 已被 asset review `4/4 passed`。
+- 渲染：8 页 HTML + `index.html`；calendar/search/noticeBlocks/固定操作栏可见；
+  Phase 1 `8 pages / 0 blockers`。
+
 ## 真实 run（2026-10-20）
 
 - 输入：employee-app clean M1 run（`success`，2 页，10 asset briefs）。

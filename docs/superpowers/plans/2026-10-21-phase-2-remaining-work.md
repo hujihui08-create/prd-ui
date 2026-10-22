@@ -9,7 +9,9 @@
 
 ## 0. 当前基线
 
-- 488 tests、typecheck clean、`pnpm test:dsh` 2 passed。
+- 510 tests、typecheck clean、`pnpm test:dsh` 2 passed。
+- 03 真实 PRD 四页切片：intake success + publish（¥0.5147）、M1 success（¥0.2746）、Spec Engineer 4 Page Specs / 0 blockers、HTML 4 页、Phase 1 `4 pages / 0 blockers`。视觉 v0.1：七列日历、固定操作栏、detail 主/次动作拆分、表单单主 CTA、告知分块；业务状态动作切换、表单 mode、motion/Visual Critic 仍未做。
+- Phase 2 出口：`employee-app-phase2` 8 页真实 PRD（brief gate passed，sample IA waiver）、M1 `ia:waived / interaction:passed / visualStyle:passed`（¥0.4355）、Spec Engineer 8 Page Specs / 0 blockers / 20 warnings、assets referenced=2 / missing=0、HTML 8 页、Phase 1 `8/0`。per-profile 8 页 demo-orders run interaction passed（¥0.5105）；asset review `4/4 passed`。
 - `samples/project.demo-orders-intake.yaml`：Phase 1 `8 pages / 0 blockers`。
 - 真实 dsh 8 页 M1：`ia:waived / interaction:passed / visualStyle:passed`，`agent:sign` 后 `success`，成本 ¥0.3298。
 - Spec Engineer：8 Page Specs，0 blockers，27 warnings（26 motion node + asset briefs missing）。
@@ -35,16 +37,18 @@
 
 **原因**：renderer/compiler/contracts/validators/sample/文档改动约 34 个文件未提交，必须与后续任务分开。
 
-- [ ] `git status` 确认无 `.env`/密钥/`node_modules`/`.playwright-mcp` 进入暂存。
-- [ ] `pnpm test`、`pnpm typecheck`、`pnpm test:dsh` 再跑一次。
-- [ ] 提交一个 commit：`feat(renderer): generalize 8-page shells, mock data, and field labels`。
-- [ ] 按需 push；不要改写已推送历史。
+- [x] `git status` 确认无 `.env`/密钥/`node_modules`/`.playwright-mcp` 进入暂存。
+- [x] `pnpm test`、`pnpm typecheck`、`pnpm test:dsh` 再跑一次。
+- [x] 提交一个 commit：`472fcb0 feat(renderer): generalize 8-page shells, mock data, and field labels`。
+- [x] 不 push（仓库规则：local commits only）。
 
-**验收**：工作区干净；commit 包含 renderer/compiler/contracts/validators/sample/artifacts/docs/tests。
+**验收**：已完成；commit 包含 renderer/compiler/contracts/validators/sample/artifacts/docs/tests。Task 1 的改动是后续独立改动，尚未提交。
 
 ---
 
 ## Task 1: UI Briefer 自动生成 mockData/fieldLabels
+
+**状态：已完成（2026-10-21）。** 真实 dsh 干净 run：8 页、brief gate 通过、`awaiting_signoff`，¥0.5938，`usageComplete=true`；`orders-list` 5 rows、`order-detail` 5 values、overview 4 listItems、feed 4 feedItems、`fieldLabels` 完整。Run：`/tmp/intake-task1-dsh-clean/run-2026-10-21T07-34-29-193Z`。实现同时修复了 settings 页忽略 brief `fieldLabels` 的 compiler 问题，并新增 `BRIEF_FIELD_LABELS_MISSING` / `BRIEF_MOCK_DATA_MISSING` 非阻断 warning。
 
 **问题**：真实 briefer 只生成字段 id、状态、页面结构；不生成 `mockData`/`fieldLabels`。8 页 sample 是人工补齐，换真实 PRD 会退回骨架/英文标签。
 
@@ -80,6 +84,8 @@
 ---
 
 ## Task 2: M1 per-profile catalog/motion 输入
+
+**状态：已完成（2026-10-21）。** per-profile maps + catalog 摘要 + page→profile 规则；8 页 demo-orders 真实 run 含 b-dense/c-expressive，interaction passed，¥0.5105。限制：per-profile 仍是 prompt 约束，gate 不校验组件/token 归属。
 
 **问题**：`agent:run` 只传 `brief.meta.profile` 一个 catalog 和 motion token 集。8 页 brief 同时使用 `b-dense`/`c-expressive`，移动页实际拿到 b-dense 的 catalog/motion；本次通过但有质量风险。
 
@@ -119,6 +125,8 @@ interface InteractionPromptInput {
 
 ## Task 3: 8 页 asset briefs + asset review
 
+**状态：已完成（2026-10-21）。** `deriveStandardAssetInventory` + Visual Style 4 个标准图标 briefs；`asset:review --briefs` 4/4 passed；Spec Engineer assets missing=0。占位图标显式记录，不伪造 pass。
+
 **问题**：8 页 M1 的 `assetBriefs=[]`；Spec Engineer 报 `SPEC_ASSET_BRIEFS_MISSING`；8 页 asset review 未跑。当前图标走 Material Symbols/占位图，视觉可看但不是完整资产链路。
 
 **Files:**
@@ -153,6 +161,8 @@ interface InteractionPromptInput {
 
 ## Task 4: 真实 PRD 端到端验收
 
+**状态：已完成（2026-10-21，sample waiver）。** `samples/projects/employee-app-phase2` 8 页真实 PRD 已跑通 intake → M1 → Spec → HTML；brief gate passed（sample IA waivers）、M1 三 gate passed、Spec 8/0、HTML 8 页、Phase 1 8/0。限制：依赖 sample IA waivers 和一次确定性 brief patch；下一轮应重跑 intake 让 briefer 直接生成合规 brief 并重新签核。03 四页切片也已完成，详见 CHANGELOG。
+
 **问题**：目前所有 8 页验收都基于 sample PRD；Phase 2 出口要求真实 PRD 生成 6–8 页 HTML。
 
 **前提：**
@@ -181,7 +191,7 @@ interface InteractionPromptInput {
 **风险：**
 
 - 真实 PRD 质量不足：按主设计 PRD Review Gate 阻断/追问，不放宽。
-- 真实 PRD 页型超出 10 个 archetype：记录扩展需求，不硬套。
+- 真实 PRD 页型超出 12 个 archetype：记录扩展需求，不硬套。03 切片已新增 `mobile-list` / `mobile-form`。
 
 ---
 
@@ -263,5 +273,5 @@ interface InteractionPromptInput {
 - M1 支持 mixed profile；
 - 8 页 asset review 通过；
 - 视觉巡检/自动 diff 通过；
-- 488+ tests、typecheck、test:dsh、2 页/8 页回归不退化；
+- 510+ tests、typecheck、test:dsh、2 页/4 页/8 页回归不退化；
 - 所有真实 dsh 成本与 usage 有记录，key 不提交。

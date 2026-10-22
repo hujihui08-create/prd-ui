@@ -169,6 +169,8 @@ const templateComponents: Record<string, string[]> = {
     "InventoryCard",
     "EmptyState",
   ],
+  "mobile-list": ["Section", "CalendarGrid", "SearchBar", "ListRow", "CollapsedFilter", "EmptyState", "Button"],
+  "mobile-form": ["Section", "FormField", "Input", "Select", "Button"],
   auth: ["FormField", "Input", "Button"],
   onboarding: ["Image", "Button"],
 };
@@ -182,6 +184,8 @@ const expectedSlots: Record<string, string[]> = {
   feed: ["feed", "bottom-nav"],
   home: ["content", "bottom-nav"],
   "inventory-list": ["content"],
+  "mobile-list": ["content"],
+  "mobile-form": ["content"],
   auth: ["title", "fields", "actions"],
   onboarding: ["illustration", "title", "body", "actions"],
 };
@@ -195,6 +199,8 @@ const expectedStates: Record<string, string[]> = {
   feed: ["default", "empty", "loading", "error"],
   home: ["default", "empty", "loading", "error"],
   "inventory-list": ["default", "empty", "loading", "error"],
+  "mobile-list": ["default", "empty", "loading", "error"],
+  "mobile-form": ["default", "loading", "error", "disabled"],
   auth: ["default", "loading", "error", "disabled"],
   onboarding: ["default", "loading", "error"],
 };
@@ -310,8 +316,8 @@ describe("design-system baselines", () => {
     expect(mobileShell.slots?.fields?.allowed).not.toContain("Select");
   });
 
-  it("has ten archetypes", () => {
-    expect(archetypes).toHaveLength(10);
+  it("has twelve archetypes", () => {
+    expect(archetypes).toHaveLength(12);
     expect(archetypes.map((archetype) => archetype.id).sort()).toEqual([
       "auth",
       "detail",
@@ -320,6 +326,8 @@ describe("design-system baselines", () => {
       "home",
       "inventory-list",
       "list",
+      "mobile-form",
+      "mobile-list",
       "onboarding",
       "overview",
       "settings",
@@ -336,6 +344,8 @@ describe("design-system baselines", () => {
       feed: "mobile",
       home: "mobile",
       "inventory-list": "mobile",
+      "mobile-list": "mobile",
+      "mobile-form": "mobile",
       auth: "mobile",
       onboarding: "mobile",
     };
@@ -358,6 +368,8 @@ describe("design-system baselines", () => {
       onboarding: [cExpressiveCatalog],
       home: [bMobileCatalog],
       "inventory-list": [bMobileCatalog],
+      "mobile-list": [bMobileCatalog],
+      "mobile-form": [bMobileCatalog],
     };
     for (const archetype of archetypes) {
       const candidateCatalogs = catalogForArchetype[archetype.id] ?? [];

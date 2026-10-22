@@ -35,6 +35,8 @@ const supportedArchetypes = [
   "feed",
   "home",
   "inventory-list",
+  "mobile-list",
+  "mobile-form",
   "auth",
   "onboarding",
 ];
@@ -281,6 +283,24 @@ describe("brief gate", () => {
     expect(codes).toContain("BRIEF_PAGE_UNKNOWN");
     expect(codes).toContain("BRIEF_PAGE_MISSING");
     expect(codes).toContain("BRIEF_ROLE_UNDEFINED");
+  });
+
+  it("warns when mock data or field labels are missing", () => {
+    const input = briefGateInput();
+    const listPage = input.draft.brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+    delete listPage.mockData;
+    delete listPage.fieldLabels;
+    const detailPage = input.draft.brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+    delete detailPage.mockData;
+    const hash = briefHash(hashText, input.draft.brief);
+    input.briefHash = hash;
+    input.signoff = briefSignoff(hash);
+
+    const gate = runBriefGate(input);
+    const codes = gate.issues.map((issue) => issue.code);
+    expect(codes).toContain("BRIEF_MOCK_DATA_MISSING");
+    expect(codes).toContain("BRIEF_FIELD_LABELS_MISSING");
+    expect(gate.passed).toBe(true);
   });
 
   it("blocks compile failures, placeholders, and blocking questions", () => {

@@ -181,13 +181,18 @@ IA：复用 M1 `IA_*` 结构门禁，页面/角色 scope 来自 PRD extract。
 
 Brief：schema、PRD hash、页面集合、角色/路由、archetype/profile、状态矩阵、reqRefs/traceability、占位符、blocking questions/assumptions、compiler dry-run + Phase 1 语义 validators、brief signoff hash。
 
+Brief 数据完整性（warning，不阻断）：Briefer 必须为每个页面字段生成 `fieldLabels`，并按页型生成示例数据——list 用 `mockData.rows`（3–5 行）、detail 用 `mockData.values`、overview 用 `mockData.listItems`、feed 用 `feedItems`。缺失时 gate 报 `BRIEF_FIELD_LABELS_MISSING` / `BRIEF_MOCK_DATA_MISSING`，提示换真实 PRD 后会出现骨架或英文 id。示例数据必须从 PRD 验收示例/字段表派生，不得使用真实 PII。
+
 完整代码见 `core/intake/src/gates.ts`；brief 结构性 blocker 不写最终 brief。
 
 ## 样本与限制
 
-- `samples/agents/intake`：demo-orders 8 页 fixture；`samples/agents/intake-employee-app`：employee-app 2 页 fixture。
+- `samples/agents/intake`：demo-orders 8 页 fixture（含 `fieldLabels` / `mockData` / `feedItems`）；`samples/agents/intake-employee-app`：employee-app 2 页 fixture（含库存页中文标签与 home typed content）；`samples/agents/intake-appointments-03`：03 预约与告知 4 页 fixture（真实 run 固化，含 `mobile-list` / `mobile-form`）。
+- `samples/projects/employee-app-appointments-03`：从 `03-预约与告知.md` + `00-总纲.md` 共享规则整理的四页真实 PRD 切片；`intake:run` 真实 dsh 4 页、brief gate 通过、publish，¥0.5147。
+- `samples/projects/employee-app-phase2`：从 00–04 拼的 8 页真实 PRD 切片（今日、客户搜索、客户详情、预约详情、新增/改期、术后告知、预约列表、回访登记）；真实 dsh 8 页、brief gate 通过、publish，¥0.5249（IA sample waivers + 一次确定性 brief 收敛）。fixtures 在 `samples/agents/intake-employee-app-phase2`。
 - 8 页 sample PRD 的 v0 验收是 review + brief + compile dry-run；8 页 M1（真实 dsh）、Spec Engineer 与 HTML 渲染已经在 `samples/project.demo-orders-intake.yaml` 上跑通。
 - 真实 dsh：2 页 employee-app 完整跑通（success + publish，累计 ¥0.6948）；8 页 sample 使用 `prd-ui-intake` profile（65536 maxTokens），真实 findings 以 sample waiver 通过后 brief gate 通过，success + publish，累计 ¥0.90666。默认离线验收仍用 scripted fixtures。
-- `UiBrief.content` 的 `home`/`inventory-list` typed 字段仍是 employee-app 专用；其他页型使用通用字段，未知页型由 briefer 发 blocking question。
+- Task 1 真实 dsh 干净 run：8 页、brief gate 通过、`awaiting_signoff`，总成本 ¥0.5938（PRD review ¥0.1760 + IA ¥0.2050 + briefer ¥0.2128，均 1 次调用），产出 `orders-list` 5 rows、`order-detail` 5 values、overview 4 listItems、feed 4 feedItems 和完整 `fieldLabels`。Run：`/tmp/intake-task1-dsh-clean/run-2026-10-21T07-34-29-193Z`。
+- Briefer 已从 PRD 示例生成 `home` 的 `content`（quickActions/appointments/callbacks）和按项目的 `noticeBlocks`；`inventory-list` 的 typed 字段仍是 employee-app 专用。其他页型使用通用字段，未知页型由 briefer 发 blocking question。
 - 未解析的 visual/motion 细节不在 intake 范围；交给 M1 Visual Style Agent。
 - 真实 dsh 成本受 provider 定价影响；默认整 run 上限 10 CNY，usage 不完整时 fail closed。

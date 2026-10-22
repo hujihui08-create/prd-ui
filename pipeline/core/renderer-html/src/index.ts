@@ -61,6 +61,16 @@ const iconMap: Record<string, string> = {
   alert: "warning",
   error: "error",
   success: "check_circle",
+  "icon-home": "home",
+  "icon-package": "inventory_2",
+  "icon-search": "search",
+  "icon-plus": "add",
+  "icon-minus": "remove",
+  "icon-chevron-left": "arrow_back_ios_new",
+  "icon-chevron-right": "arrow_forward_ios",
+  "icon-circle-alert": "warning",
+  "icon-refresh-cw": "refresh",
+  "icon-user": "person",
   "orders-overview": "dashboard",
   "orders-list": "format_list_bulleted",
   "order-detail": "receipt_long",
@@ -127,6 +137,9 @@ const tabIcons: Record<string, string> = {
   今日: "home",
   库存查询: "inventory_2",
   客户: "person",
+  客户搜索: "search",
+  预约列表: "calendar_month",
+  回访登记: "call",
   工作台: "grid_view",
   我的: "settings",
   "orders-overview": "dashboard",
@@ -248,7 +261,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
             : "");
       return `<div class="app ${showTabs ? "has-tabs" : ""}">
   ${header}
-  <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${actions}${content}</main>
+  <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}</main>
+  ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
   ${showTabs ? `<nav class="tabbar">${nav}</nav>` : ""}
   ${statePanels()}
 </div>`;
@@ -421,6 +435,57 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   <span class="quick-label">${esc(label)}</span>
 </button>`;
     }
+    case "CalendarGrid": {
+      const days = Array.isArray(props.days) ? props.days : [];
+      const hours = stringArray(props.hours);
+      const blocks = Array.isArray(props.blocks) ? props.blocks : [];
+      const dayItems = days.map((entry) => {
+        if (typeof entry === "string") return { label: entry, date: "", today: false };
+        const record = entry as Record<string, unknown>;
+        return {
+          label: str(record.label),
+          date: str(record.date),
+          today: bool(record.today),
+        };
+      });
+      const rowCount = Math.max(hours.length, 1);
+      const header = `<div class="calendar-corner"></div>${dayItems
+        .map(
+          (day) =>
+            `<div class="calendar-day${day.today ? " today" : ""}"><span>${esc(day.label)}</span><span class="calendar-date">${esc(day.date)}</span></div>`
+        )
+        .join("")}`;
+      const cells = hours
+        .map((hour, hourIndex) => {
+          const row = dayItems
+            .map(
+              (_, dayIndex) =>
+                `<div class="calendar-cell" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
+            )
+            .join("");
+          return `<div class="calendar-hour" style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
+        })
+        .join("");
+      const blockHtml = blocks
+        .map((entry) => {
+          const record = entry as Record<string, unknown>;
+          const day =
+            typeof record.day === "number"
+              ? Math.max(0, Math.min(Math.max(dayItems.length - 1, 0), record.day))
+              : 0;
+          const start = typeof record.start === "number" ? record.start : 9;
+          const duration = typeof record.duration === "number" ? record.duration : 1;
+          const rowStart = Math.max(0, Math.min(rowCount - 1, start - 9)) + 2;
+          const span = Math.max(1, Math.min(duration, rowCount - (rowStart - 2)));
+          const tone = str(record.tone) || "neutral";
+          return `<div class="calendar-block tone-${esc(tone)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span}" title="${esc(record.title)} ${esc(record.subtitle)}">
+  <span class="calendar-block-title">${esc(record.title)}</span>
+  <span class="calendar-block-subtitle">${esc(record.subtitle)}</span>
+</div>`;
+        })
+        .join("");
+      return `<div class="calendar"><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
+    }
     case "ListRow": {
       const title = str(props.title);
       const subtitle = str(props.subtitle);
@@ -591,6 +656,9 @@ ${typeClasses(profile)}
 .app{width:390px;height:844px;margin:0 auto;background:var(--color-surface-subtle);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.04),0 24px 64px rgba(0,0,0,.12);}
 .app-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:var(--space-4);scrollbar-width:none;}
 .app-scroll::-webkit-scrollbar{display:none;}
+.app-actions{flex:0 0 auto;padding:var(--space-3) var(--space-4);background:var(--color-surface-default);border-top:1px solid var(--color-border-subtle);display:flex;gap:var(--space-2);}
+.app-actions .section{display:flex;gap:var(--space-2);width:100%;flex-wrap:nowrap;}
+.app-actions .btn{flex:1;white-space:nowrap;}
 .topbar{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;justify-content:space-between;background:var(--color-surface-subtle);position:relative;z-index:5;}
 .topbar-store{font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;gap:2px;}
 .topbar-chevron{font-size:20px;color:var(--color-text-secondary);}
@@ -640,7 +708,8 @@ ${typeClasses(profile)}
 .searchbar{height:36px;border-radius:var(--radius-md);background:var(--color-surface-default);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-3);color:var(--color-text-tertiary);}
 .search-icon{font-size:20px;}
 .search-placeholder{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
-.filter-row{display:flex;align-items:center;gap:var(--space-2);}
+.filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
+.filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -654,6 +723,23 @@ ${typeClasses(profile)}
 .switch.on .switch-thumb{transform:translateX(16px);}
 .switch-value{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .summary{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);padding:0 2px;}
+.calendar{background:var(--color-surface-default);border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(17,24,39,.04);overflow:hidden;}
+.calendar-scroll{overflow-x:auto;overflow-y:hidden;}
+.calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(44px,1fr));min-width:360px;position:relative;}
+.calendar-corner{grid-column:1;grid-row:1;background:var(--color-surface-subtle);border-bottom:1px solid var(--color-border-subtle);}
+.calendar-day{grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-secondary);background:var(--color-surface-subtle);border-left:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);}
+.calendar-day.today{background:color-mix(in srgb,var(--color-status-info) 10%,white);color:var(--color-status-info);font-weight:600;}
+.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);}
+.calendar-day.today .calendar-date{color:var(--color-status-info);}
+.calendar-hour{grid-column:1;font-size:9px;line-height:11px;color:var(--color-text-tertiary);display:flex;justify-content:flex-end;padding:2px 4px 0 0;}
+.calendar-cell{border-top:1px solid var(--color-border-subtle);border-left:1px solid var(--color-border-subtle);}
+.calendar-block{margin:1px;padding:3px 4px;border-radius:var(--radius-sm);overflow:hidden;z-index:1;background:var(--color-surface-subtle);border-left:3px solid var(--color-border-strong);font-size:9px;line-height:11px;}
+.calendar-block-title{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calendar-block-subtitle{display:block;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calendar-block.tone-success{background:color-mix(in srgb,var(--color-status-success) 10%,white);border-left-color:var(--color-status-success);}
+.calendar-block.tone-warning{background:color-mix(in srgb,var(--color-status-warning) 12%,white);border-left-color:var(--color-status-warning);}
+.calendar-block.tone-danger{background:color-mix(in srgb,var(--color-status-danger) 10%,white);border-left-color:var(--color-status-danger);}
+.calendar-block.tone-info{background:color-mix(in srgb,var(--color-status-info) 10%,white);border-left-color:var(--color-status-info);}
 .inventory-card{background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);box-shadow:0 1px 2px rgba(17,24,39,.04);animation:fade-up var(--motion-slow) ease both;}
 .inventory-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-2);}
 .inventory-name{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
@@ -673,7 +759,8 @@ ${typeClasses(profile)}
 .empty-desc{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .empty-actions{margin-top:var(--space-2);}
 body[data-state="empty"] .empty-state{display:flex;}
-body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card{display:none;}
+body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card,body[data-state="empty"] .calendar{display:none;}
+body[data-state="empty"] .typo-heading-3{display:none;}
 body[data-state="empty"] .summary{display:none;}
 .state-panel{display:none;position:absolute;left:0;right:0;top:48px;bottom:0;z-index:30;background:var(--color-surface-subtle);padding:var(--space-4);flex-direction:column;gap:var(--space-3);}
 .app.has-tabs .state-panel{bottom:64px;}

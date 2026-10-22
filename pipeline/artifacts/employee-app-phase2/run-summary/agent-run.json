@@ -1,0 +1,71 @@
+{
+  "runDir": "/tmp/m1-phase2d/run-2026-10-21T10-46-02-038Z",
+  "runId": "run-2026-10-21T10-46-02-038Z",
+  "project": "employee-app-phase2",
+  "status": "awaiting_signoff",
+  "gates": {
+    "ia": "waived",
+    "interaction": "passed",
+    "visualStyle": "passed"
+  },
+  "agents": {
+    "ia": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 224,
+        "outputTokens": 22769,
+        "cacheReadTokens": 28160,
+        "totalTokens": 51153
+      },
+      "usageComplete": true,
+      "costUsd": 0.02755896,
+      "costCny": 0.198424512,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:a88f79f4b84e7fa8bdece3c1529123c50f0cc1816880140303f142d67409387e"
+    },
+    "interaction": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 14230,
+        "outputTokens": 12498,
+        "cacheReadTokens": 7296,
+        "totalTokens": 34024
+      },
+      "usageComplete": true,
+      "costUsd": 0.019310375999999997,
+      "costCny": 0.1390347072,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:a92c84dff5b702029407432ed6ef1de56e095bff3ee5bf6c5a494bf776ecc94c"
+    },
+    "visual-style": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 10064,
+        "outputTokens": 8794,
+        "cacheReadTokens": 6528,
+        "totalTokens": 25386
+      },
+      "usageComplete": true,
+      "costUsd": 0.013611168,
+      "costCny": 0.0980004096,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:d1727637714b33c0778fb8a205e7cec9181a0fa83e4c0cf8231fca383884c470"
+    }
+  },
+  "signoff": {
+    "ia": true,
+    "visualStyle": false
+  },
+  "costCny": 0.4354596288,
+  "usageComplete": true,
+  "error": null
+}

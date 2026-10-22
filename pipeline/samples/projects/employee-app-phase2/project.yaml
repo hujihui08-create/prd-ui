@@ -1,0 +1,8 @@
+project: employee-app-phase2
+brief: ui-brief.json
+prd: prd.md
+profile: b-mobile
+platforms:
+  - mobile
+manifests:
+  b-mobile: asset-manifest.b-mobile.json

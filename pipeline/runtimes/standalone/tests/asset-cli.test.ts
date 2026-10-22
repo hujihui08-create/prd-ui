@@ -274,6 +274,39 @@ describe("asset:review CLI", () => {
     expect(result.stdout).toContain("1 assets, 1 passed");
   });
 
+  it("reads briefs from --briefs", async () => {
+    const runs = await tempRuns();
+    const briefsDir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-briefs-"));
+    temporaryDirs.push(briefsDir);
+    const icons = JSON.parse(
+      await readFile(path.join(m0, "briefs", "icons.json"), "utf8")
+    ) as Array<{ id: string }>;
+    const home = icons.find((icon) => icon.id === "icon-home");
+    expect(home).toBeDefined();
+    await writeFile(
+      path.join(briefsDir, "icons.json"),
+      JSON.stringify([home]),
+      "utf8"
+    );
+
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--assets",
+      m0,
+      "--briefs",
+      briefsDir,
+      "--only",
+      "icon-home",
+      "--runtime",
+      "standalone",
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("1 assets, 1 passed");
+  });
+
   it("appends one log line per state-machine event", async () => {
     const runs = await tempRuns();
     const result = await runCli([

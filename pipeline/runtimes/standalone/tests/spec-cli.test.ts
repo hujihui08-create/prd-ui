@@ -183,12 +183,12 @@ async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
     crossLinks: [],
   });
   await writeJson(
-    path.join(dir, "artifacts", "asset-briefs", "inventory.json"),
-    AssetBriefSchema.parse(iconBrief("inventory"))
+    path.join(dir, "artifacts", "asset-briefs", "icon-package.json"),
+    AssetBriefSchema.parse(iconBrief("icon-package"))
   );
   await writeJson(
-    path.join(dir, "artifacts", "asset-briefs", "receipt.json"),
-    AssetBriefSchema.parse(iconBrief("receipt"))
+    path.join(dir, "artifacts", "asset-briefs", "icon-plus.json"),
+    AssetBriefSchema.parse(iconBrief("icon-plus"))
   );
   return dir;
 }
@@ -242,8 +242,8 @@ describe("spec:engineer CLI", () => {
     expect(payload.status).toBe("passed");
     expect(payload.pages).toEqual(["today", "inventory-query"]);
     expect(payload.motionPages).toEqual(["today"]);
-    expect(payload.assets.referenced).toContain("inventory");
-    expect(payload.assets.unusedBriefs).toContain("receipt");
+    expect(payload.assets.referenced).toContain("icon-package");
+    expect(payload.assets.unusedBriefs).toContain("icon-plus");
 
     const runDir = await singleRunDir(runs);
     const today = JSON.parse(

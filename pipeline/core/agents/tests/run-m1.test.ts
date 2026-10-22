@@ -156,6 +156,39 @@ const blockerFinding = {
 const iaWithBlocker = { ...iaOutput, findings: { findings: [blockerFinding] } };
 
 describe("runM1", () => {
+  it("passes every page profile map to the interaction prompt", async () => {
+    const store = new MemoryStore();
+    store.files.set("signoff/ia.md", signoff());
+    store.files.set("signoff/visual-style.md", signoff());
+    const mixed = structuredClone(employeeBrief);
+    mixed.ia.pages[1]!.profile = "c-expressive";
+    const scripted = runners({ ia: [ok(iaOutput)] });
+
+    await run(store, scripted, {
+      brief: mixed,
+      catalogsByProfile: {
+        "b-mobile": { meta: { library: "b-mobile" }, components: [{ id: "ListRow" }] },
+        "c-expressive": {
+          meta: { library: "c-expressive" },
+          components: [{ id: "FeedCard" }],
+        },
+      },
+      motionTokensByProfile: {
+        "b-mobile": { duration: { fast: "120ms" }, easing: { standard: "ease-out" } },
+        "c-expressive": {
+          duration: { slow: "320ms" },
+          easing: { emphasized: "ease-in-out" },
+        },
+      },
+    });
+
+    const prompt = scripted.interaction.calls[0]?.prompt ?? "";
+    expect(prompt).toContain("b-mobile");
+    expect(prompt).toContain("c-expressive");
+    expect(prompt).toContain("ListRow");
+    expect(prompt).toContain("FeedCard");
+  });
+
   it("runs IA first, then produces the full artifact set with signoff", async () => {
     const store = new MemoryStore();
     store.files.set("signoff/ia.md", signoff());
@@ -186,8 +219,9 @@ describe("runM1", () => {
       "artifacts/motion-spec.json",
       "artifacts/interaction-review.md",
       "artifacts/visual-style.json",
-      "artifacts/asset-briefs/receipt.json",
-      "artifacts/asset-briefs/calendar.json",
+      "artifacts/asset-briefs/icon-home.json",
+      "artifacts/asset-briefs/icon-plus.json",
+      "artifacts/asset-briefs/icon-package.json",
       "agents/ia/prompt.md",
       "agents/ia/output.json",
       "agents/ia/raw.json",

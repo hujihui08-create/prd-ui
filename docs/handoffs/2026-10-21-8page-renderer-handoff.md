@@ -3,9 +3,12 @@
 - 日期：2026-10-21
 - 工作目录：`/Users/jihui/Desktop/产品、ui`
 - 当前分支：`main`
-- 当前 HEAD：`682e6d2 feat(intake): add PRD review and UI briefer pipeline`
-- 状态：**8 页端到端已跑通；renderer 泛化、mock 数据、字段标签、8 页视觉巡检完成**；本轮改动**尚未提交**
-- 下一阶段：`docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md`
+- 当前 HEAD：`472fcb0 feat(renderer): generalize 8-page shells, mock data, and field labels`
+- 状态：**8 页端到端已跑通；renderer 泛化、mock 数据、字段标签、8 页视觉巡检完成**；renderer 改动已提交，Task 1（Briefer 自动生成 mockData/fieldLabels）已完成但尚未提交
+- 下一阶段：`docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` 的 Task 2
+- 对话式交接：`docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md`
+
+> **2026-10-21 增量**：Task 1、03 四页切片、视觉 v0.1、per-profile M1、资产链、Phase 2 8 页真实 PRD 均已完成。Phase 2 出口：`employee-app-phase2` 8 页（brief gate passed，sample IA waiver）、M1 三 gate passed（¥0.4355）、Spec 8/0、HTML 8 页、Phase 1 8/0；per-profile 8 页 demo-orders run interaction passed（¥0.5105）；asset review 4/4。当前 **510 tests**。下一阶段是 v0.4（motion + 视觉回归）或 Phase 3（Figma/沙箱/Handoff）；Phase 2 出口依赖 sample waiver + brief patch，下一轮应重跑 intake 清理。
 
 ---
 
@@ -23,7 +26,7 @@
 
 还没做的：
 
-- UI Briefer 自动生成 `mockData`/`fieldLabels`（8 页 sample 是人工补齐）；
+- ~~UI Briefer 自动生成 `mockData`/`fieldLabels`~~（2026-10-21 已完成，见下方增量）；
 - M1 per-profile catalog/motion 输入（当前只传 `brief.meta.profile`）；
 - 8 页 asset briefs / asset review（`assetBriefs=[]`）；
 - motion 动画到 HTML、稳定 node id；
@@ -38,7 +41,7 @@
 
 ```bash
 cd "/Users/jihui/Desktop/产品、ui/pipeline"
-pnpm test        # 488 passed
+pnpm test        # 500 passed
 pnpm typecheck   # clean
 pnpm test:dsh    # 2 passed
 
@@ -95,7 +98,7 @@ employee-app：
 | `runtimes/standalone` | `agent:run --brief`/`--profile`；`agent:sign`；intake brief gate 跑 Phase 1 语义 validators；renderer CLI 传 pageNames |
 | `pipeline/samples` | 8 页 brief mockData/fieldLabels/stats/feedItems；employee item-detail status；`project.demo-orders-intake.yaml` |
 | `pipeline/dsh/home/profiles/prd-ui-intake` | 65536 maxTokens intake/M1 8-page profile |
-| tests | renderer 7 tests；validators 负例调整；agent-sign 4 tests；intake 5 CLI tests；总数 488 |
+| tests | renderer 7 tests；validators 负例调整；agent-sign 4 tests；intake CLI 6 tests；Task 1 与 03 切片新增 8 tests；总数 500 |
 
 ### 2.2 文档
 
@@ -245,7 +248,7 @@ samples/project.demo-orders-intake.yaml
 
 详见 `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md`。优先级：
 
-1. **P0**：提交本轮修复；briefer 自动生成 `mockData`/`fieldLabels`。
+1. **P0**：提交 Task 1 改动（briefer 自动生成 `mockData`/`fieldLabels`，已完成）。
 2. **P0**：M1 per-profile catalog/motion 输入。
 3. **P1**：8 页 asset briefs + asset review。
 4. **P1**：真实 PRD 端到端验收。

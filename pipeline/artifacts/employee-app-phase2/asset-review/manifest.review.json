@@ -1,0 +1,53 @@
+{
+  "project": "employee-app-phase2",
+  "profile": "b-mobile",
+  "assets": [
+    {
+      "id": "icon-home",
+      "status": "passed",
+      "sourceTier": "A",
+      "degraded": false,
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      }
+    },
+    {
+      "id": "icon-plus",
+      "status": "passed",
+      "sourceTier": "A",
+      "degraded": false,
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      }
+    },
+    {
+      "id": "icon-search",
+      "status": "passed",
+      "sourceTier": "A",
+      "degraded": false,
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      }
+    },
+    {
+      "id": "icon-user",
+      "status": "passed",
+      "sourceTier": "A",
+      "degraded": false,
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      }
+    }
+  ],
+  "batchGates": {
+    "iconSetPassed": true,
+    "illustrationSetPassed": true
+  },
+  "usageSource": "unavailable",
+  "usageComplete": false,
+  "complete": true
+}

@@ -57,6 +57,8 @@ export interface UiBriefPage {
   emptyTitle?: string;
   emptyAssetRef?: string;
   summaryTitle?: string;
+  /** Per-project notice blocks for treatment/handoff detail pages. */
+  noticeBlocks?: Array<{ title: string; items: string[] }>;
   feedItems?: Array<{ title: string; body: string }>;
   stats?: Array<{ label: string; value: string }>;
   mockData?: UiBriefMockData;
@@ -197,6 +199,16 @@ export const UiBriefPageSchema = z
     emptyTitle: z.string().min(1).optional(),
     emptyAssetRef: z.string().min(1).optional(),
     summaryTitle: z.string().min(1).optional(),
+    noticeBlocks: z
+      .array(
+        z
+          .object({
+            title: z.string().min(1),
+            items: z.array(z.string().min(1)).min(1),
+          })
+          .strict()
+      )
+      .optional(),
     feedItems: z
       .array(z.object({ title: z.string().min(1), body: z.string().min(1) }).strict())
       .optional(),

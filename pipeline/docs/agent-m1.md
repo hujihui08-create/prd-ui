@@ -182,6 +182,52 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
 - 产物为 8 页 IA/interaction/motion/visual spec；Spec Engineer 消费后产出 8 个
   Page Spec。
 
+## 03 真实 PRD 四页切片（2026-10-21）
+
+- 项目：`samples/projects/employee-app-appointments-03`（预约详情、新增/改期、
+  术后告知、预约列表）。
+- 真实 dsh M1：`--profile prd-ui-intake`，IA-001/002 以 sample waiver 处理；
+  `gates={ia:waived, interaction:passed, visualStyle:passed}`，¥0.2746，
+  `usageComplete=true`；`agent:sign` 完成 visual-style 签核后 `status=success`。
+- Spec Engineer 产出 4 Page Specs / 0 blockers；renderer 产出 4 页 HTML +
+  `index.html`，Phase 1 `4 pages / 0 blockers`。
+- 该切片新增 `mobile-list` / `mobile-form` archetype；renderer v0.1 已补
+  七列日历、固定操作栏、detail 主/次动作拆分、表单单主 CTA 和告知分块。
+  业务状态动作切换与真正的表单 mode 仍留待后续。
+
+## Phase 2 8 页真实 PRD（2026-10-21）
+
+- 项目：`samples/projects/employee-app-phase2`（今日、客户搜索、客户详情、
+  预约详情、新增/改期、术后告知、预约列表、回访登记）。
+- 真实 dsh intake：8 页、PRD readiness ready、brief gate passed、publish，
+  ¥0.5249；IA-001..IA-010 以 sample waiver 处理，brief 做过一次确定性收敛
+  （home fields/route/warehouse create/host create action）。
+- 真实 dsh M1：`/tmp/m1-phase2d/run-2026-10-21T10-46-02-038Z`，
+  `gates={ia:waived, interaction:passed, visualStyle:passed}`，`agent:sign`
+  后 `status=success`，¥0.4355，4 个标准图标 asset briefs。
+- Asset review：`asset:review --briefs` `4/4 passed`。
+- Spec Engineer：8 Page Specs、8 motion pages、0 blockers、20 warnings，
+  assets referenced=2 / unused=2 / missing=0；renderer 8 页 + index，
+  Phase 1 `8 pages / 0 blockers`。
+- 限制：Phase 2 出口依赖 sample IA waivers 和 brief patch；下一轮应重跑
+  intake 让 briefer 直接生成合规 brief 并重新签核。
+
+## per-profile M1（2026-10-21）
+
+- `agent:run` 从 brief 页面收集 profile，向 Interaction prompt 传
+  `catalogsByProfile` / `motionTokensByProfile`；prompt 增加 page → profile
+  映射和“每页只用自己 profile 的组件/动效”规则。
+- 单 profile 路径保持不变；`catalog` / `motionTokens` 仍表示
+  `brief.meta.profile`。
+- 真实 8 页 demo-orders run（b-dense + c-expressive）：
+  `/tmp/m1-perprofile3/run-2026-10-21T10-06-55-674Z`，
+  `gates={ia:waived, interaction:passed, visualStyle:passed}`，
+  `awaiting_signoff`，¥0.5105，`usageComplete=true`。
+- Visual Style 使用 `deriveStandardAssetInventory`；该 run 产出 4 个标准
+  图标 briefs，asset review 可直接消费。
+- per-profile 目前是 **prompt 约束**；Interaction gate 仍只校验
+  action/state/motion 语法，不校验组件/token 的 profile 归属。
+
 ## 真实 dsh 回归（2026-10-20）
 
 - Profile：`prd-ui-agents`（仅 base/headless/pi-ai，无工具插件）。

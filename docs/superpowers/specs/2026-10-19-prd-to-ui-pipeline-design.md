@@ -1,7 +1,7 @@
 # PRD → 双端 UI 交付管线 · 设计文档
 
 > 日期：2026-10-19
-> 状态：待用户审阅
+> 状态：Phase 1 + Phase 2 切片已实现（2026-10-21）；Phase 3/4 待做。实现状态见 §14.1。
 > 路线：A（语义编译 + 多端渲染）
 > 工作目录：`/Users/jihui/Desktop/产品、ui`
 
@@ -1288,6 +1288,34 @@ handoff/
 | Phase 4 · 验收 | 真实项目走查、修复、文档 | 验收标准全部满足，用户签核 |
 
 时间预估：Phase 0 为 3 天；Phase 1–4 的具体排期由实施计划给出，不在本设计文档中承诺。
+
+### 14.1 实现状态（2026-10-21）
+
+| 阶段 | 状态 | 已有证据 |
+|---|---|---|
+| Phase 0 · Spike | 完成（历史） | `spike/` 保留 Figma 写回与 HTML 验证，不作为现行实现 |
+| Phase 1 · 基础 | 完成 | `core/*` 契约/编译器/校验/renderer；**12 个 archetype**（原 10 个 + `mobile-list` / `mobile-form`）；510 tests、typecheck clean、`test:dsh` 2 passed |
+| Phase 2 · 前半段 | 完成 | `intake:run`：PRD normalize/review + IA + UI Briefer + 两道签核 + 原子发布；Briefer 自动产出 `fieldLabels` / `mockData` / `feedItems` |
+| Phase 2 · 后半段 | 完成 | M1 → Spec Engineer → HTML；per-profile M1 真实 run（b-dense + c-expressive）interaction passed；8 页 sample 出口 `8 pages / 0 blockers`；03 真实 PRD 四页切片全链路通过（intake ¥0.5147、M1 ¥0.2746、Spec 4 页 / 0 blockers、HTML 4 页） |
+| Phase 2 · 完整出口 | 完成（2026-10-21，sample waiver） | `employee-app-phase2` 8 页真实 PRD：brief gate passed（IA sample waivers）、M1 `ia:waived / interaction:passed / visualStyle:passed`（¥0.4355）、Spec Engineer 8 Page Specs / 0 blockers / 20 warnings、assets referenced=2 / missing=0、HTML 8 页、`phase1:verify` 8/0。资产链：4 个标准图标 briefs，`asset:review --briefs` 4/4 passed。限制：依赖 sample IA waivers 和一次确定性 brief patch；Studio/Asset Compiler 未做，明确后置 |
+| Phase 3 · Figma + 沙箱 | 未开始 | Figma Renderer、scratch 沙箱、测试 Subagent、Handoff 均未实现 |
+| Phase 4 · 验收 | 未开始 | 真实项目走查、用户最终签核未做 |
+
+当前 renderer 能力：
+
+- `PageShell` / `MobileShell` 全 slot；`mobile-list` 带七列日历、列表双维度；`mobile-form` 单主 CTA；detail 页底部固定操作栏；`noticeBlocks` 按项目分块；`mockData` / `fieldLabels` 全链路。
+- `CalendarGrid`、`ListRow`、`FormField`、`Input`、`Select`、`List`、`ListItem` 等已进入 `b-mobile` catalog。
+- 仍未消费 motion 到 HTML；没有 Visual Critic / 自动截图 diff；业务状态（已登记/已到店/爽约/已取消）尚未驱动动作栏切换；表单 `mode` 只用“另一模式”提示表达。
+
+版本路径（内部迭代）：
+
+| 版本 | 目标 | 主要缺口 |
+|---|---|---|
+| v0.1 | 视觉保真 | 已完成：日历、固定操作栏、单主 CTA、告知分块 |
+| v0.2 | 多 profile + 资产 | 已完成：per-profile M1、标准图标 inventory、asset review |
+| v0.3 | Phase 2 验收交付 | 已完成（sample waiver）：8 页真实 PRD、HTML/资产/视觉巡检 |
+| v0.4 | 动效 + 视觉回归 | 下一步：motion 进 HTML、稳定 node id、自动截图 diff、清理 brief patch/waiver |
+| v1.0 | 项目最终交付 | Phase 3 + Phase 4：Figma/Studio/Handoff、沙箱、真实项目用户签核 |
 
 ---
 

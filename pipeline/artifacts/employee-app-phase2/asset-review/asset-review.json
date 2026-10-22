@@ -1,0 +1,427 @@
+{
+  "runId": "run-2026-10-21T10-48-48-004Z",
+  "runDir": "/tmp/assets-phase2/run-2026-10-21T10-48-48-004Z",
+  "project": "employee-app-phase2",
+  "profile": "b-mobile",
+  "startedAt": "2026-10-21T10:48:48.007Z",
+  "finishedAt": "2026-10-21T10:48:48.022Z",
+  "assets": [
+    {
+      "assetId": "icon-home",
+      "brief": {
+        "id": "icon-home",
+        "kind": "icon",
+        "scene": "Semantic marker for the Today workspace destination in the employee mobile app.",
+        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "size": {
+          "width": 24,
+          "height": 24
+        },
+        "format": "svg",
+        "constraints": {
+          "grid": 24,
+          "strokeWidth": 1.5,
+          "currentColor": true,
+          "noText": true,
+          "noLogo": true,
+          "noScreenshot": true,
+          "safeArea": 2
+        },
+        "sourceChain": [
+          "library"
+        ],
+        "brandCritical": false,
+        "humanSignoffRequired": false,
+        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
+        "sourceHint": "Select the library home outline and normalize to the shared 24px grid, 1.5px stroke, rounded caps and joins."
+      },
+      "status": "passed",
+      "sourceTier": "A",
+      "source": "library",
+      "attempts": [
+        {
+          "assetId": "icon-home",
+          "source": "library",
+          "sourceTier": "A",
+          "attempt": 1,
+          "status": "passed",
+          "candidate": {
+            "assetId": "icon-home",
+            "source": "library",
+            "sourceTier": "A",
+            "attempt": 1,
+            "file": {
+              "path": "assets/attempts/icon-home/library-1/candidate.svg",
+              "format": "svg",
+              "hash": "sha256:b7307b0d22ce4f66d8e06021825f7a1c9653a8f64b3237572897f6cc7265d65e"
+            },
+            "producer": {
+              "tool": "library",
+              "model": "lucide",
+              "references": [
+                "icons/home.svg"
+              ]
+            },
+            "license": "ISC",
+            "costUsd": 0,
+            "producedAt": "2026-10-21T10:48:48.008Z"
+          },
+          "gate": {
+            "passed": true,
+            "issues": []
+          },
+          "review": {
+            "verdict": "pass",
+            "hardIssues": [],
+            "scores": {
+              "brandFit": 5,
+              "semantics": 5,
+              "consistency": 4,
+              "editability": 4,
+              "composition": 5
+            },
+            "suggestedChanges": [],
+            "reason": "M0 scripted pass."
+          },
+          "issues": [],
+          "timestamp": "2026-10-21T10:48:48.007Z"
+        }
+      ],
+      "degraded": false,
+      "frozen": {
+        "path": "assets/frozen/icon-home/asset.svg",
+        "format": "svg",
+        "hash": "sha256:6b1624df959d76afed894e388cd881930ebb8f7b9a8b3f1181ab0051f2b2cead"
+      },
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      },
+      "license": "ISC",
+      "files": [
+        {
+          "path": "assets/frozen/icon-home/asset.svg",
+          "format": "svg"
+        }
+      ]
+    },
+    {
+      "assetId": "icon-plus",
+      "brief": {
+        "id": "icon-plus",
+        "kind": "icon",
+        "scene": "Create/add affordance for new appointment entry and other additive actions.",
+        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "size": {
+          "width": 24,
+          "height": 24
+        },
+        "format": "svg",
+        "constraints": {
+          "grid": 24,
+          "strokeWidth": 1.5,
+          "currentColor": true,
+          "noText": true,
+          "noLogo": true,
+          "noScreenshot": true,
+          "safeArea": 2
+        },
+        "sourceChain": [
+          "library"
+        ],
+        "brandCritical": false,
+        "humanSignoffRequired": false,
+        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
+        "sourceHint": "Select the library plus outline; avoid filled badges or enclosed variants."
+      },
+      "status": "passed",
+      "sourceTier": "A",
+      "source": "library",
+      "attempts": [
+        {
+          "assetId": "icon-plus",
+          "source": "library",
+          "sourceTier": "A",
+          "attempt": 1,
+          "status": "passed",
+          "candidate": {
+            "assetId": "icon-plus",
+            "source": "library",
+            "sourceTier": "A",
+            "attempt": 1,
+            "file": {
+              "path": "assets/attempts/icon-plus/library-1/candidate.svg",
+              "format": "svg",
+              "hash": "sha256:ee8763e4744336bc6d7a976d081d5879a38f891d6de07a2d71a1bee05f76839e"
+            },
+            "producer": {
+              "tool": "library",
+              "model": "lucide",
+              "references": [
+                "icons/plus.svg"
+              ]
+            },
+            "license": "ISC",
+            "costUsd": 0,
+            "producedAt": "2026-10-21T10:48:48.016Z"
+          },
+          "gate": {
+            "passed": true,
+            "issues": []
+          },
+          "review": {
+            "verdict": "pass",
+            "hardIssues": [],
+            "scores": {
+              "brandFit": 5,
+              "semantics": 5,
+              "consistency": 4,
+              "editability": 4,
+              "composition": 5
+            },
+            "suggestedChanges": [],
+            "reason": "M0 scripted pass."
+          },
+          "issues": [],
+          "timestamp": "2026-10-21T10:48:48.015Z"
+        }
+      ],
+      "degraded": false,
+      "frozen": {
+        "path": "assets/frozen/icon-plus/asset.svg",
+        "format": "svg",
+        "hash": "sha256:7b53df9cdea38890cca1107fae5f1f675691215b8e623cd93475586b3839001b"
+      },
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      },
+      "license": "ISC",
+      "files": [
+        {
+          "path": "assets/frozen/icon-plus/asset.svg",
+          "format": "svg"
+        }
+      ]
+    },
+    {
+      "assetId": "icon-search",
+      "brief": {
+        "id": "icon-search",
+        "kind": "icon",
+        "scene": "Search affordance for customer lookup by name or masked mobile number.",
+        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "size": {
+          "width": 24,
+          "height": 24
+        },
+        "format": "svg",
+        "constraints": {
+          "grid": 24,
+          "strokeWidth": 1.5,
+          "currentColor": true,
+          "noText": true,
+          "noLogo": true,
+          "noScreenshot": true,
+          "safeArea": 2
+        },
+        "sourceChain": [
+          "library"
+        ],
+        "brandCritical": false,
+        "humanSignoffRequired": false,
+        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
+        "sourceHint": "Select the library magnifier outline; keep the handle at 45 degrees and no glyph text."
+      },
+      "status": "passed",
+      "sourceTier": "A",
+      "source": "library",
+      "attempts": [
+        {
+          "assetId": "icon-search",
+          "source": "library",
+          "sourceTier": "A",
+          "attempt": 1,
+          "status": "passed",
+          "candidate": {
+            "assetId": "icon-search",
+            "source": "library",
+            "sourceTier": "A",
+            "attempt": 1,
+            "file": {
+              "path": "assets/attempts/icon-search/library-1/candidate.svg",
+              "format": "svg",
+              "hash": "sha256:ef9dc16399dfe210911c9eba8a87830d810df631ab5d12e8f56dc365eff22f8b"
+            },
+            "producer": {
+              "tool": "library",
+              "model": "lucide",
+              "references": [
+                "icons/search.svg"
+              ]
+            },
+            "license": "ISC",
+            "costUsd": 0,
+            "producedAt": "2026-10-21T10:48:48.018Z"
+          },
+          "gate": {
+            "passed": true,
+            "issues": []
+          },
+          "review": {
+            "verdict": "pass",
+            "hardIssues": [],
+            "scores": {
+              "brandFit": 5,
+              "semantics": 5,
+              "consistency": 4,
+              "editability": 4,
+              "composition": 5
+            },
+            "suggestedChanges": [],
+            "reason": "M0 scripted pass."
+          },
+          "issues": [],
+          "timestamp": "2026-10-21T10:48:48.017Z"
+        }
+      ],
+      "degraded": false,
+      "frozen": {
+        "path": "assets/frozen/icon-search/asset.svg",
+        "format": "svg",
+        "hash": "sha256:69cb57f16bb878ea05a26d87e152ca734f99c720e82e37e202326be526276b41"
+      },
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      },
+      "license": "ISC",
+      "files": [
+        {
+          "path": "assets/frozen/icon-search/asset.svg",
+          "format": "svg"
+        }
+      ]
+    },
+    {
+      "assetId": "icon-user",
+      "brief": {
+        "id": "icon-user",
+        "kind": "icon",
+        "scene": "Customer identity marker for lookup results and customer detail context.",
+        "styleRef": "employee-app-phase2/b-mobile-neutral",
+        "size": {
+          "width": 24,
+          "height": 24
+        },
+        "format": "svg",
+        "constraints": {
+          "grid": 24,
+          "strokeWidth": 1.5,
+          "currentColor": true,
+          "noText": true,
+          "noLogo": true,
+          "noScreenshot": true,
+          "safeArea": 2
+        },
+        "sourceChain": [
+          "library"
+        ],
+        "brandCritical": false,
+        "humanSignoffRequired": false,
+        "visualRef": "employee-app-phase2/b-mobile-neutral#icons-24",
+        "sourceHint": "Select the library single-person outline; neutral silhouette with no gender or role cue."
+      },
+      "status": "passed",
+      "sourceTier": "A",
+      "source": "library",
+      "attempts": [
+        {
+          "assetId": "icon-user",
+          "source": "library",
+          "sourceTier": "A",
+          "attempt": 1,
+          "status": "passed",
+          "candidate": {
+            "assetId": "icon-user",
+            "source": "library",
+            "sourceTier": "A",
+            "attempt": 1,
+            "file": {
+              "path": "assets/attempts/icon-user/library-1/candidate.svg",
+              "format": "svg",
+              "hash": "sha256:cd71aead1fdddca7aa1bebbf9e3a63989d4c5a4d6c6973a00234d352f9382257"
+            },
+            "producer": {
+              "tool": "library",
+              "model": "lucide",
+              "references": [
+                "icons/user.svg"
+              ]
+            },
+            "license": "ISC",
+            "costUsd": 0,
+            "producedAt": "2026-10-21T10:48:48.020Z"
+          },
+          "gate": {
+            "passed": true,
+            "issues": []
+          },
+          "review": {
+            "verdict": "pass",
+            "hardIssues": [],
+            "scores": {
+              "brandFit": 5,
+              "semantics": 5,
+              "consistency": 4,
+              "editability": 4,
+              "composition": 5
+            },
+            "suggestedChanges": [],
+            "reason": "M0 scripted pass."
+          },
+          "issues": [],
+          "timestamp": "2026-10-21T10:48:48.020Z"
+        }
+      ],
+      "degraded": false,
+      "frozen": {
+        "path": "assets/frozen/icon-user/asset.svg",
+        "format": "svg",
+        "hash": "sha256:0d3270d4346b2c1e3f5ffa317206e4a9078f54a94cabbf2200584e3e557241f8"
+      },
+      "review": {
+        "agent": "asset-reviewer",
+        "status": "not-required"
+      },
+      "license": "ISC",
+      "files": [
+        {
+          "path": "assets/frozen/icon-user/asset.svg",
+          "format": "svg"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "retried": 0,
+    "unresolved": 0,
+    "degraded": 0,
+    "reviewerErrors": 0
+  },
+  "batchGates": {
+    "iconSet": {
+      "passed": true,
+      "issues": []
+    },
+    "illustrationSet": {
+      "passed": true,
+      "issues": []
+    }
+  },
+  "usageSource": "unavailable",
+  "usageComplete": false,
+  "passed": true
+}

@@ -56,6 +56,25 @@ function prdSignoff(): string {
 `;
 }
 
+function phase2PrdSignoff(): string {
+  return `# PRD/IA signoff
+
+<!-- signoff
+{
+  "signer": "Test Reviewer",
+  "date": "2026-10-20",
+  "answers": [],
+  "waivers": [
+    { "findingId": "IA-001", "owner": "Test Reviewer", "reason": "slice boundary", "expires": "2026-11-20" },
+    { "findingId": "IA-002", "owner": "Test Reviewer", "reason": "slice boundary", "expires": "2026-11-20" },
+    { "findingId": "IA-003", "owner": "Test Reviewer", "reason": "slice boundary", "expires": "2026-11-20" }
+  ],
+  "approvals": []
+}
+-->
+`;
+}
+
 function briefSignoff(hash: string, waivers: unknown[] = []): string {
   return `# Brief signoff
 
@@ -167,9 +186,21 @@ describe("intake:run CLI", () => {
     expect(payload.signoff).toEqual({ prdIa: true, brief: true });
     expect(payload.published.path).toBe(target);
     const published = JSON.parse(await readFile(target, "utf8")) as {
-      ia: { pages: unknown[] };
+      ia: {
+        pages: Array<{
+          id: string;
+          fields?: string[];
+          fieldLabels?: Record<string, string>;
+          mockData?: { rows?: unknown[]; values?: Record<string, string> };
+        }>;
+      };
     };
     expect(published.ia.pages).toHaveLength(8);
+    const listPage = published.ia.pages.find((page) => page.id === "orders-list")!;
+    expect(listPage.mockData?.rows?.length ?? 0).toBeGreaterThanOrEqual(3);
+    const detailPage = published.ia.pages.find((page) => page.id === "order-detail")!;
+    expect(Object.keys(detailPage.mockData?.values ?? {}).length).toBeGreaterThan(0);
+    expect(detailPage.fieldLabels?.orderNo).toBeTruthy();
     const final = JSON.parse(
       await readFile(
         path.join(first.payload.runDir, "artifacts", "ui-brief.json"),
@@ -201,6 +232,181 @@ describe("intake:run CLI", () => {
     };
     expect(payload.status).toBe("awaiting_signoff");
     expect(payload.brief.pages).toBe(2);
+  });
+
+  it("handles the 03 appointments four-page slice", async () => {
+    const prdSignoffPath = await writeSignoff("prd-ia.md", prdSignoff());
+    const project = path.join(
+      pipelineRoot,
+      "samples",
+      "projects",
+      "employee-app-appointments-03",
+      "project.yaml"
+    );
+    const prd = path.join(
+      pipelineRoot,
+      "samples",
+      "projects",
+      "employee-app-appointments-03",
+      "prd.md"
+    );
+    const fixtures = path.join(
+      pipelineRoot,
+      "samples",
+      "agents",
+      "intake-appointments-03"
+    );
+    const runs = await tempDir("prd-ui-intake-03-runs-");
+    const first = await runCli([
+      "--project",
+      project,
+      "--prd",
+      prd,
+      "--runs",
+      runs,
+      "--fixtures",
+      fixtures,
+      "--signoff-prd-ia",
+      prdSignoffPath,
+      "--json",
+    ]);
+    expect(first.code).toBe(1);
+    const payload = JSON.parse(first.stdout) as {
+      runDir: string;
+      status: string;
+      brief: { pages: number; hash: string };
+    };
+    expect(payload.status).toBe("awaiting_signoff");
+    expect(payload.brief.pages).toBe(4);
+
+    const briefSignoffPath = await writeSignoff(
+      "brief.md",
+      briefSignoff(payload.brief.hash)
+    );
+    const target = path.join(await tempDir("prd-ui-intake-03-publish-"), "ui-brief.json");
+    const second = await runCli([
+      "--project",
+      project,
+      "--prd",
+      prd,
+      "--resume",
+      payload.runDir,
+      "--fixtures",
+      fixtures,
+      "--signoff-prd-ia",
+      prdSignoffPath,
+      "--signoff-brief",
+      briefSignoffPath,
+      "--publish-brief",
+      target,
+      "--json",
+    ]);
+    expect(second.code).toBe(0);
+    const published = JSON.parse(await readFile(target, "utf8")) as {
+      ia: {
+        pages: Array<{
+          id: string;
+          archetype: string;
+          fieldLabels?: Record<string, string>;
+          mockData?: { rows?: unknown[] };
+        }>;
+      };
+    };
+    expect(published.ia.pages).toHaveLength(4);
+    const byId = new Map(published.ia.pages.map((page) => [page.id, page]));
+    expect(byId.get("appointment-list")?.archetype).toBe("mobile-list");
+    expect(byId.get("appointment-form")?.archetype).toBe("mobile-form");
+    expect(byId.get("appointment-list")?.mockData?.rows?.length ?? 0).toBeGreaterThan(0);
+    expect(byId.get("appointment-detail")?.fieldLabels?.customer).toBe("客户");
+  });
+
+  it("handles the 8-page employee-app phase2 slice", async () => {
+    const prdSignoffPath = await writeSignoff("prd-ia.md", phase2PrdSignoff());
+    const project = path.join(
+      pipelineRoot,
+      "samples",
+      "projects",
+      "employee-app-phase2",
+      "project.yaml"
+    );
+    const prd = path.join(
+      pipelineRoot,
+      "samples",
+      "projects",
+      "employee-app-phase2",
+      "prd.md"
+    );
+    const fixtures = path.join(
+      pipelineRoot,
+      "samples",
+      "agents",
+      "intake-employee-app-phase2"
+    );
+    const first = await runCli([
+      "--project",
+      project,
+      "--prd",
+      prd,
+      "--runs",
+      await tempDir("prd-ui-intake-phase2-runs-"),
+      "--fixtures",
+      fixtures,
+      "--signoff-prd-ia",
+      prdSignoffPath,
+      "--json",
+    ]);
+    expect(first.code).toBe(1);
+    const payload = JSON.parse(first.stdout) as {
+      runDir: string;
+      status: string;
+      brief: { pages: number; hash: string };
+    };
+    expect(payload.status).toBe("awaiting_signoff");
+    expect(payload.brief.pages).toBe(8);
+
+    const briefSignoffPath = await writeSignoff(
+      "brief.md",
+      briefSignoff(payload.brief.hash)
+    );
+    const target = path.join(await tempDir("prd-ui-intake-phase2-publish-"), "ui-brief.json");
+    const second = await runCli([
+      "--project",
+      project,
+      "--prd",
+      prd,
+      "--resume",
+      payload.runDir,
+      "--fixtures",
+      fixtures,
+      "--signoff-prd-ia",
+      prdSignoffPath,
+      "--signoff-brief",
+      briefSignoffPath,
+      "--publish-brief",
+      target,
+      "--json",
+    ]);
+    expect(second.code).toBe(0);
+    const published = JSON.parse(await readFile(target, "utf8")) as {
+      ia: {
+        pages: Array<{
+          id: string;
+          archetype: string;
+          fields?: string[];
+          actions?: string[];
+          noticeBlocks?: unknown[];
+        }>;
+      };
+    };
+    expect(published.ia.pages).toHaveLength(8);
+    const byId = new Map(published.ia.pages.map((page) => [page.id, page]));
+    expect(byId.get("today")?.archetype).toBe("home");
+    expect(byId.get("today")?.fields).toEqual([]);
+    expect(byId.get("customer-search")?.archetype).toBe("mobile-list");
+    expect(byId.get("appointment-form")?.archetype).toBe("mobile-form");
+    expect(byId.get("treatment-notice")?.noticeBlocks).toHaveLength(2);
+    expect(byId.get("appointment-list")?.archetype).toBe("mobile-list");
+    expect(byId.get("callback-register")?.archetype).toBe("mobile-form");
   });
 
   it("stays awaiting when the brief signoff hash is wrong", async () => {

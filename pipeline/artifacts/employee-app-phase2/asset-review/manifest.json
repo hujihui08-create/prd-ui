@@ -1,0 +1,64 @@
+{
+  "project": "employee-app-phase2",
+  "profile": "b-mobile",
+  "assets": [
+    {
+      "id": "icon-home",
+      "kind": "icon",
+      "library": "library",
+      "style": "employee-app-phase2/b-mobile-neutral",
+      "files": [
+        {
+          "path": "assets/frozen/icon-home/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:6b1624df959d76afed894e388cd881930ebb8f7b9a8b3f1181ab0051f2b2cead"
+    },
+    {
+      "id": "icon-plus",
+      "kind": "icon",
+      "library": "library",
+      "style": "employee-app-phase2/b-mobile-neutral",
+      "files": [
+        {
+          "path": "assets/frozen/icon-plus/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:7b53df9cdea38890cca1107fae5f1f675691215b8e623cd93475586b3839001b"
+    },
+    {
+      "id": "icon-search",
+      "kind": "icon",
+      "library": "library",
+      "style": "employee-app-phase2/b-mobile-neutral",
+      "files": [
+        {
+          "path": "assets/frozen/icon-search/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:69cb57f16bb878ea05a26d87e152ca734f99c720e82e37e202326be526276b41"
+    },
+    {
+      "id": "icon-user",
+      "kind": "icon",
+      "library": "library",
+      "style": "employee-app-phase2/b-mobile-neutral",
+      "files": [
+        {
+          "path": "assets/frozen/icon-user/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:0d3270d4346b2c1e3f5ffa317206e4a9078f54a94cabbf2200584e3e557241f8"
+    }
+  ],
+  "placeholders": [],
+  "complete": true
+}

@@ -1,0 +1,350 @@
+{
+  "output": {
+    "map": {
+      "pages": [
+        {
+          "id": "appointment-list",
+          "name": "预约列表",
+          "route": "/appointments",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "首页「我的预约」卡头（01，切片外）",
+            "工作台「客户预约」（01，切片外）"
+          ]
+        },
+        {
+          "id": "appointment-detail",
+          "name": "预约详情",
+          "route": "/appointments/:id",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表行 / 日历块",
+            "首页「我的预约」行（01，切片外）"
+          ]
+        },
+        {
+          "id": "appointment-form",
+          "name": "新增/改期预约",
+          "route": "/appointments/new",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表底部「新增预约」",
+            "日历空格（预填日期时间）",
+            "预约详情「改期」（mode=改期）"
+          ]
+        },
+        {
+          "id": "treatment-notice",
+          "name": "术后告知",
+          "route": "/notices/:id",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "服务完成流程（05，切片外，主入口）",
+            "客户详情服务记录行（02，切片外）"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "appointment-list"
+        ],
+        "tabs": []
+      },
+      "flows": [
+        {
+          "id": "F1-list-detail",
+          "steps": [
+            "appointment-list",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F2-list-create-detail",
+          "steps": [
+            "appointment-list",
+            "appointment-form",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F3-detail-reschedule",
+          "steps": [
+            "appointment-detail",
+            "appointment-form",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F4-notice-confirm",
+          "steps": [
+            "treatment-notice"
+          ],
+          "status": "orphan"
+        },
+        {
+          "id": "F5-detail-status-actions",
+          "steps": [
+            "appointment-detail"
+          ],
+          "status": "ok"
+        }
+      ],
+      "crossLinks": [
+        {
+          "from": "appointment-list",
+          "to": "appointment-detail",
+          "kind": "list-row-or-calendar-block"
+        },
+        {
+          "from": "appointment-list",
+          "to": "appointment-form",
+          "kind": "create-appointment"
+        },
+        {
+          "from": "appointment-detail",
+          "to": "appointment-form",
+          "kind": "reschedule-or-reassign"
+        },
+        {
+          "from": "appointment-form",
+          "to": "appointment-detail",
+          "kind": "save-return"
+        }
+      ]
+    },
+    "findings": {
+      "findings": [
+        {
+          "id": "IA-001",
+          "severity": "major",
+          "area": "roles",
+          "evidence": "§2 功能点表（预约登记=新增/改期/取消；到院分配=到店确认；开单=入口；术后告知=确认）与 §4.2「已登记 → 已到店确认、开单、改期、取消」之间没有动作级映射；§2 只写「缺权时入口不出现」。",
+          "issue": "详情动作栏按业务状态而非功能点决定。库管仅勾选「到院分配」时按 §2 仍可进详情，但 §4.2 会让他看到改期/取消/开单；哪些动作因缺权隐藏、哪些置灰，实现只能自行猜测。",
+          "proposal": "在状态矩阵旁补动作级权限映射：到店确认←到院分配，开单←开单，改期/取消←预约登记；未勾选的动作不出现，只读档位统一置灰并拦截。"
+        },
+        {
+          "id": "IA-002",
+          "severity": "major",
+          "area": "states",
+          "evidence": "§4.1 预约列表 disabled 写「不适用（列表只读）」，但 §2 明确只读档位下「新增」置灰并拦截；§4.1 表单 disabled 写「表单只读」，而 §2 写「只读查看或入口不出现」。",
+          "issue": "只读档位对列表新增与表单入口的描述互相矛盾：列表声明 disabled 不适用，导致「新增预约」的只读形态无处归属；表单既有「只读查看」又有「入口不出现」两种说法，页面状态无法一次落定。",
+          "proposal": "列表补 disabled 状态：仅「新增预约」置灰并拦截，列表数据仍可读；表单统一为——新增入口在只读时不出现，改期进入为只读查看且无保存按钮。"
+        },
+        {
+          "id": "IA-003",
+          "severity": "major",
+          "area": "navigation",
+          "evidence": "§3 新增/改期共用 appointment-form、路由 /appointments/new，改期以 mode=改期 区分；§4.5 改期需锁定客户并回显原单；§7 流程 2 与验收 10。",
+          "issue": "改期复用 /appointments/new 却没有定义承载原预约 id 的参数，刷新或直达时无法还原被改期单据；同时 /appointments/new 落在 /appointments/:id 命名空间内，静态段与动态段存在路由歧义。",
+          "proposal": "改为显式入参 /appointments/new?mode=reschedule&appointmentId=:id（或 /appointments/:id/edit），并要求静态段先于 /appointments/:id 注册；把 mode 与 id 写入页面入参约定。"
+        },
+        {
+          "id": "IA-004",
+          "severity": "major",
+          "area": "roles",
+          "evidence": "§2 我的排单「可含跨店行并显示门店名」；§4.2 已登记可改期/取消；§4.5 护理师候选为「本店在职员工」。",
+          "issue": "跨店单在「我的排单」可进详情，但未定义跨店写操作是否允许、改期时护理师候选取哪家门店，员工可能改到非本店单或看到空候选。",
+          "proposal": "明确跨店行详情只读或仅允许到店确认；改期/取消限当前门店单；护理师候选按单据所属门店取，并在详情标注门店以提示范围。"
+        },
+        {
+          "id": "IA-005",
+          "severity": "major",
+          "area": "states",
+          "evidence": "§4.2 已到店「底部只保留开单」；§2 开单是独立功能点，只读档位下开单入口置灰。",
+          "issue": "已到店状态的唯一动作是开单。若当前用户无开单功能点或门店只读，底部操作栏为空，页面既无动作也无说明，形成权限死角。",
+          "proposal": "为「已到店 + 无开单权限/只读」定义只读态文案（如「已到店，开单请由前台处理」），并作为已到店的变体补入状态矩阵，不留空操作栏。"
+        },
+        {
+          "id": "IA-006",
+          "severity": "minor",
+          "area": "hierarchy",
+          "evidence": "§3 术后告知入口只列服务完成流程与客户详情服务记录行，两者均属切片外（§9 明示不计断链）。",
+          "issue": "本切片四页内没有任何入边，术后告知在切片内是孤儿页，主流程 4 无法端到端走通，只能靠宿主页面兜底。",
+          "proposal": "接受为切片边界孤儿，不新增页面；IA 中登记宿主入口，验收只验页面自身。若要求切片内可走通，需产品确认是否由预约详情提供只读入口。"
+        },
+        {
+          "id": "IA-007",
+          "severity": "minor",
+          "area": "naming",
+          "evidence": "同一目的地被称为「预约列表」（§3）、「客户预约」（§8 工作台入口）、「我的预约」（首页入口/卡头）、「我的排单」（视角名）。",
+          "issue": "页面名、入口标签与视角名混用，下游容易把「我的排单」误当成独立页面，或把同一页拆成多页。",
+          "proposal": "页面名固定「预约列表」；「我的预约」「客户预约」仅作宿主入口标签；「我的排单/全店」只作视角枚举值，不产生页面或路由。"
+        },
+        {
+          "id": "IA-008",
+          "severity": "minor",
+          "area": "hierarchy",
+          "evidence": "§3 一页承载视角（我的排单/全店）× 维度（日历/列表）+ 日期 + 状态；§11 声明首版两者都保留。",
+          "issue": "四种组合共用一个页面，但未声明进入时的默认组合，下游可能拆成 2–4 个页面或各建路由，破坏「不拆页」的决策。",
+          "proposal": "IA 标注默认组合（我的排单 + 日历），四个组合为同一页面变体；「新增预约」与「日历空格」都指向同一表单路由。"
+        }
+      ]
+    },
+    "proposed": {
+      "pages": [
+        {
+          "id": "appointment-list",
+          "name": "预约列表",
+          "route": "/appointments",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "首页「我的预约」卡头（01，切片外）",
+            "工作台「客户预约」（01，切片外）"
+          ]
+        },
+        {
+          "id": "appointment-detail",
+          "name": "预约详情",
+          "route": "/appointments/:id",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表行 / 日历块",
+            "我的排单跨店行（仅只读或到店确认，见 notes）",
+            "首页「我的预约」行（01，切片外）"
+          ]
+        },
+        {
+          "id": "appointment-form",
+          "name": "新增/改期预约",
+          "route": "/appointments/new",
+          "parentId": "appointment-list",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "预约列表底部「新增预约」（只读档位不出现）",
+            "日历空格（预填日期时间）",
+            "预约详情「改期」（mode=reschedule，需带 appointmentId）"
+          ]
+        },
+        {
+          "id": "treatment-notice",
+          "name": "术后告知",
+          "route": "/notices/:id",
+          "level": 2,
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "entryPoints": [
+            "服务完成流程（05，切片外，主入口）",
+            "客户详情服务记录行（02，切片外）"
+          ]
+        }
+      ],
+      "navigation": {
+        "primary": [
+          "appointment-list"
+        ],
+        "tabs": []
+      },
+      "flows": [
+        {
+          "id": "F1-list-detail",
+          "steps": [
+            "appointment-list",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F2-list-create-detail",
+          "steps": [
+            "appointment-list",
+            "appointment-form",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F3-detail-reschedule",
+          "steps": [
+            "appointment-detail",
+            "appointment-form",
+            "appointment-detail"
+          ],
+          "status": "ok"
+        },
+        {
+          "id": "F4-notice-confirm",
+          "steps": [
+            "treatment-notice"
+          ],
+          "status": "orphan"
+        },
+        {
+          "id": "F5-detail-status-actions",
+          "steps": [
+            "appointment-detail"
+          ],
+          "status": "ok"
+        }
+      ],
+      "notes": [
+        "改期复用 /appointments/new，入参固定 mode=reschedule&appointmentId=:id；静态段先于 /appointments/:id 注册（IA-003）。",
+        "详情动作按功能点显隐：到店确认←到院分配，开单←开单，改期/取消←预约登记；未勾选不出现，只读置灰（IA-001）。",
+        "列表补 disabled：仅「新增预约」置灰，列表数据可读；表单在只读档位下新增入口不出现、改期只读（IA-002）。",
+        "跨店单详情只读或仅允许到店确认，护理师按单据所属门店取候选，需产品确认（IA-004）。",
+        "已到店且无开单权限时显示只读说明，不出现空操作栏（IA-005）。",
+        "术后告知为切片边界孤儿，宿主入口见 entryPoints，不新增页面、不新增路由（IA-006）。",
+        "预约列表 = 一页四组合，默认「我的排单 + 日历」；「我的排单/全店」为视角值，不是页面（IA-007/IA-008）。"
+      ]
+    },
+    "reviewMarkdown": "## IA 结论\n\n- 四页与 PRD 页面清单一一对应，无新增/删除页：预约列表 `/appointments` 为切片内枢纽，预约详情、新增/改期（`mode` 区分）、术后告知均为二级页。**0 blocker**，5 major、3 minor。\n- 三处合并判断正确：列表与详情同权限条件（避免「有详情无列表」死角）、新增与改期共页、日历与列表共页。\n- 唯一结构缺口：术后告知在切片内无入边。PRD §9 已声明宿主在 05/02，按边界孤儿接受，不计断链。\n\n### 需确认（major）\n1. **动作级权限**：详情动作按功能点显隐还是按角色？库管仅有「到院分配」时不应出现改期/取消/开单（IA-001）。\n2. **只读形态**：列表「新增预约」置灰还是消失？表单是「只读查看」还是「入口不出现」？两处 PRD 口径冲突（IA-002）。\n3. **改期路由**：`/appointments/new` 未携带原单 id，且与 `/appointments/:id` 同命名空间。建议 `?mode=reschedule&appointmentId=:id` 或 `/appointments/:id/edit`（IA-003）。\n4. **跨店单**：我的排单可含跨店行，但能否改期/取消、护理师候选取哪家店未定义（IA-004）。\n5. **已到店无开单权限**：唯一动作被权限隐藏后操作栏为空，需要只读说明文案（IA-005）。\n\n### 命名与层级\n- 页面名统一「预约列表」；「我的预约」「客户预约」是宿主入口标签，「我的排单/全店」是视角值，都不产生新页面（IA-007）。\n- 预约列表默认「我的排单 + 日历」，四种组合为一页变体，防止下游拆页（IA-008）。\n\n### 未纳入\n- 底部四 Tab（今日/客户/工作台/我的）与首页、工作台、客户详情、开单流程均为切片外宿主，不写入本 IA，也不作为导航断链判定。"
+  },
+  "usage": {
+    "inputTokens": 13063,
+    "outputTokens": 14748,
+    "cacheReadTokens": 5760,
+    "totalTokens": 33571
+  },
+  "usageComplete": true
+}

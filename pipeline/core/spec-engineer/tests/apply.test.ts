@@ -138,7 +138,7 @@ describe("applySpecs", () => {
     const today = applySpecs(makeInput()).find((spec) => spec.meta.pageId === "today")!;
     expect(today.traceability.designDefaults).toEqual(
       expect.arrayContaining([
-        "asset:inventory",
+        "asset:icon-package",
         "motion:list-stagger",
         "motion:page-enter",
       ])
@@ -150,11 +150,11 @@ describe("applySpecs", () => {
   it("collects QuickAction icon references and dedupes them", () => {
     const specs = applySpecs(makeInput());
     const references = collectAssetReferences(specs);
-    expect(references.map((reference) => reference.assetId)).toContain("inventory");
-    expect(references.map((reference) => reference.assetId)).not.toContain("receipt");
+    expect(references.map((reference) => reference.assetId)).toContain("icon-package");
+    expect(references.map((reference) => reference.assetId)).not.toContain("icon-plus");
 
     const duplicated = [...references, ...references];
     expect(uniqueAssetReferences(duplicated)).toHaveLength(references.length);
-    expect(assetBriefs.map((brief) => brief.id)).toContain("receipt");
+    expect(assetBriefs.map((brief) => brief.id)).toContain("icon-plus");
   });
 });

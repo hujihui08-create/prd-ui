@@ -1,0 +1,743 @@
+{
+  "output": {
+    "findings": [
+      {
+        "id": "PRD-001",
+        "ruleId": "roles.quick-action-permission-conflict",
+        "severity": "major",
+        "category": "roles",
+        "location": "sec-012 (5.1 今日 content) quickActions 行；sec-003 动作级权限表",
+        "evidence": "「按功能点显隐：开单需开单，预约需预约登记，客户搜索需客户查看」与「新增预约（列表/日历/今日） | 预约登记 + 客户查看」",
+        "issue": "今日「预约」快捷操作只声明需预约登记，而动作级权限要求预约登记 + 客户查看；仅有预约登记、无客户查看时该入口是否显示未定义。",
+        "suggestedQuestion": "员工仅有预约登记、无客户查看时，今日「预约」快捷操作应隐藏还是显示？",
+        "blocking": false,
+        "owner": "security_owner",
+        "confidence": 0.85
+      },
+      {
+        "id": "PRD-002",
+        "ruleId": "scope.customer-search-create-entry",
+        "severity": "major",
+        "category": "scope",
+        "location": "sec-002 (1. 业务范围) 不在范围内第 5 条；sec-024 (10. 首版决策)",
+        "evidence": "「客户搜索页只做搜索与新建入口」与「快速建档不在本切片，搜不到客户时引导到客户 Tab 新建」",
+        "issue": "客户搜索页是否包含「新建客户」入口不一致；§3 页面清单核心内容、§4.1 状态与验收示例 2 均未覆盖该入口，UI 无法确定是否渲染及跳转目标。",
+        "suggestedQuestion": "客户搜索页是否渲染「新建客户」入口？若渲染，是跳转宿主客户 Tab，还是打开本切片外的表单？",
+        "blocking": false,
+        "owner": "product_owner",
+        "confidence": 0.8
+      },
+      {
+        "id": "PRD-003",
+        "ruleId": "fields.required-vs-fallback",
+        "severity": "major",
+        "category": "fields",
+        "location": "sec-017 (5.6 术后告知) notices 与 noticeBlocks 行",
+        "evidence": "notices「兼容回退字段；noticeBlocks 为空时使用，非空时以 noticeBlocks 为准」；noticeBlocks 必填「是」",
+        "issue": "noticeBlocks 标为必填却又允许为空并回退 notices，字段必填性与回退规则冲突，UI 无法判断何时展示 notices 回退文案。",
+        "suggestedQuestion": "noticeBlocks 是否允许为空并回退 notices？若是，其必填标记应如何理解？",
+        "blocking": false,
+        "owner": "data_owner",
+        "confidence": 0.85
+      },
+      {
+        "id": "PRD-004",
+        "ruleId": "roles.warehouse-callback-visibility",
+        "severity": "question",
+        "category": "roles",
+        "location": "sec-003 (2. 角色与权限) 页面可见角色表回访登记行；同节动作级权限表客户详情·回访登记行",
+        "evidence": "「回访登记 | store_manager, beautician, front_desk | 需回访登记」与「客户详情·回访登记 | 回访登记」",
+        "issue": "回访登记页可见角色排除 warehouse，但动作权限仅按回访登记功能点判定；库管被勾选回访登记时，客户详情是否显示该动作、能否进入回访登记页未定义。",
+        "suggestedQuestion": "库管被勾选回访登记时，是否可在客户详情看到并进入回访登记？还是该页对库管始终不可见？",
+        "blocking": false,
+        "owner": "security_owner",
+        "confidence": 0.6
+      },
+      {
+        "id": "PRD-005",
+        "ruleId": "flows.next-callback-undefined",
+        "severity": "question",
+        "category": "flows",
+        "location": "sec-010 (4.5 回访登记) 结果分支行",
+        "evidence": "「未接 / 拒绝 / 稍后再联系保存后仍留在今日待回访区块，直到产生已联系结果或下次回访」",
+        "issue": "「下次回访」未定义触发条件、字段或时间来源，表单也没有下次回访时间字段；待回访条目因「下次回访」移出区块的规则不可测试。",
+        "suggestedQuestion": "「下次回访」指什么？由哪个字段或动作产生，待回访条目在什么条件下移出今日区块？",
+        "blocking": false,
+        "owner": "product_owner",
+        "confidence": 0.6
+      },
+      {
+        "id": "PRD-006",
+        "ruleId": "fields.callback-service-source",
+        "severity": "question",
+        "category": "fields",
+        "location": "sec-019 (5.8 回访登记) service 行；sec-010 (4.5 回访登记)",
+        "evidence": "「服务项目 | 必填，记录本单主服务项目（单个）」",
+        "issue": "从客户详情进入时未定义「本单」是哪一单；客户详情只展示最近一条服务记录，回访表单也没有预约或服务项目选择控件，服务项目取哪条记录、是否可编辑不明确。",
+        "suggestedQuestion": "从客户详情进入回访登记时，服务项目是否固定取最近一条服务记录？若否，用户如何选择？",
+        "blocking": false,
+        "owner": "data_owner",
+        "confidence": 0.55
+      },
+      {
+        "id": "PRD-007",
+        "ruleId": "fields.service-record-format",
+        "severity": "minor",
+        "category": "fields",
+        "location": "sec-014 (5.3 客户详情) serviceRecord 行；sec-020 验收示例 #3",
+        "evidence": "「格式「日期 · 项目 · 预约 id」」与「服务记录「10-20 小气泡」」",
+        "issue": "字段格式要求包含预约 id，验收示例仅展示日期与项目，服务记录的行展示口径不一致。",
+        "suggestedQuestion": "服务记录行是否必须展示预约 id？",
+        "blocking": false,
+        "owner": "data_owner",
+        "confidence": 0.85
+      }
+    ],
+    "readiness": {
+      "status": "ready",
+      "blockers": 0,
+      "majors": 3,
+      "questions": 3,
+      "summary": "8/8 页面均具备业务范围、角色、路由、必需状态、字段表和至少一条可测试验收示例，无 blocker。UI Brief 前应解决 3 个 major：今日「预约」快捷操作权限冲突、客户搜索页新建入口范围不一致、noticeBlocks 必填与回退规则冲突；另有 3 个权限/回访流程问题和 1 个展示格式 minor。"
+    },
+    "extract": {
+      "pages": [
+        {
+          "id": "today",
+          "name": "今日",
+          "purpose": "门店一线员工当天工作台：门店与消息、快捷操作、我的预约、待回访",
+          "route": "/today",
+          "target": "mobile",
+          "profile": "mobile-home",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #1；sec-003 页面可见角色"
+        },
+        {
+          "id": "customer-search",
+          "name": "客户搜索",
+          "purpose": "按姓名或脱敏手机号搜索当前员工可查看的客户",
+          "route": "/customers/search",
+          "target": "mobile",
+          "profile": "mobile-search-list",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #2；sec-003 页面可见角色"
+        },
+        {
+          "id": "customer-detail",
+          "name": "客户详情",
+          "purpose": "查看客户基础信息、余额、累计消费、卡张数、标签、备注与最近服务记录",
+          "route": "/customers/detail/:id",
+          "target": "mobile",
+          "profile": "mobile-detail",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #3；sec-003 页面可见角色"
+        },
+        {
+          "id": "appointment-detail",
+          "name": "预约详情",
+          "purpose": "查看预约字段、业务状态与状态相关动作",
+          "route": "/appointments/detail/:id",
+          "target": "mobile",
+          "profile": "mobile-detail",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #4；sec-003 页面可见角色"
+        },
+        {
+          "id": "appointment-form",
+          "name": "新增/改期预约",
+          "purpose": "新增预约或改期预约，改期时锁定客户",
+          "route": "/appointments/form",
+          "target": "mobile",
+          "profile": "mobile-form",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #5；sec-003 页面可见角色"
+        },
+        {
+          "id": "treatment-notice",
+          "name": "术后告知",
+          "purpose": "只读查看按项目分块的术后告知并确认已当面告知",
+          "route": "/notices/detail/:id",
+          "target": "mobile",
+          "profile": "mobile-detail",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #6；sec-003 页面可见角色"
+        },
+        {
+          "id": "appointment-list",
+          "name": "预约列表",
+          "purpose": "我的排单/全店双视角与日历/列表双维度的预约列表",
+          "route": "/appointments",
+          "target": "mobile",
+          "profile": "mobile-list",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk",
+            "warehouse"
+          ],
+          "requiredStates": [
+            "default",
+            "empty",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #7；sec-003 页面可见角色"
+        },
+        {
+          "id": "callback-register",
+          "name": "回访登记",
+          "purpose": "登记回访内容与回访结果",
+          "route": "/callbacks/form",
+          "target": "mobile",
+          "profile": "mobile-form",
+          "roles": [
+            "store_manager",
+            "beautician",
+            "front_desk"
+          ],
+          "requiredStates": [
+            "default",
+            "loading",
+            "error",
+            "disabled"
+          ],
+          "sourceLocation": "sec-004 (3. 页面清单) #8；sec-003 页面可见角色"
+        }
+      ],
+      "roles": [
+        {
+          "id": "store_manager",
+          "description": "店长；可见本店客户，预约列表默认具备全店视角",
+          "sourceLocation": "sec-001；sec-003 数据范围"
+        },
+        {
+          "id": "beautician",
+          "description": "美容师；客户可见范围为服务过 ∪ 当日有效委派，默认具备预约登记",
+          "sourceLocation": "sec-001；sec-003 数据范围"
+        },
+        {
+          "id": "front_desk",
+          "description": "前台；可见本店客户，预约列表默认具备全店视角",
+          "sourceLocation": "sec-001；sec-003 数据范围"
+        },
+        {
+          "id": "warehouse",
+          "description": "库管；不进入今日，客户可见范围为当日有效委派，预约列表需预约登记或到院分配",
+          "sourceLocation": "sec-001；sec-003 数据范围"
+        }
+      ],
+      "flows": [
+        {
+          "id": "flow-today-appointment",
+          "steps": [
+            "今日",
+            "我的预约行",
+            "预约详情",
+            "到店确认 / 开单 / 改期 / 取消"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 1"
+        },
+        {
+          "id": "flow-today-callback",
+          "steps": [
+            "今日",
+            "待回访",
+            "回访登记",
+            "保存回访"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 2"
+        },
+        {
+          "id": "flow-customer-search-detail",
+          "steps": [
+            "客户搜索",
+            "客户详情",
+            "预约详情 / 新增预约"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 3"
+        },
+        {
+          "id": "flow-reschedule",
+          "steps": [
+            "预约详情",
+            "改期",
+            "新增/改期预约（改期模式）",
+            "保存改期",
+            "预约详情"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 4"
+        },
+        {
+          "id": "flow-appointment-list",
+          "steps": [
+            "预约列表",
+            "日历/列表",
+            "点空格新增 / 点块或行进入详情"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 5"
+        },
+        {
+          "id": "flow-treatment-notice",
+          "steps": [
+            "服务完成",
+            "术后告知",
+            "确认已当面告知"
+          ],
+          "sourceLocation": "sec-021 (7. 主流程) 6"
+        }
+      ],
+      "entities": [
+        {
+          "name": "今日 content",
+          "fields": [
+            {
+              "name": "storeName",
+              "type": "string",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "hasMessage",
+              "type": "boolean",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "quickActions",
+              "type": "array",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "appointments",
+              "type": "array",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "callbacks",
+              "type": "array",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "appointmentsEmptyTitle",
+              "type": "string",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            },
+            {
+              "name": "callbacksEmptyTitle",
+              "type": "string",
+              "sourceLocation": "sec-012 (5.1 今日 content)"
+            }
+          ],
+          "sourceLocation": "sec-012 (5.1 今日 content)"
+        },
+        {
+          "name": "客户搜索",
+          "fields": [
+            {
+              "name": "keyword",
+              "type": "string",
+              "sourceLocation": "sec-013 (5.2 客户搜索)"
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "sourceLocation": "sec-013 (5.2 客户搜索)"
+            },
+            {
+              "name": "phone",
+              "type": "string",
+              "sourceLocation": "sec-013 (5.2 客户搜索)"
+            },
+            {
+              "name": "store",
+              "type": "string",
+              "sourceLocation": "sec-013 (5.2 客户搜索)"
+            }
+          ],
+          "sourceLocation": "sec-013 (5.2 客户搜索)"
+        },
+        {
+          "name": "客户详情",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "phone",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "level",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "balance",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "totalSpent",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "cardCount",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "tags",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "notes",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            },
+            {
+              "name": "serviceRecord",
+              "type": "string",
+              "sourceLocation": "sec-014 (5.3 客户详情)"
+            }
+          ],
+          "sourceLocation": "sec-014 (5.3 客户详情)"
+        },
+        {
+          "name": "预约详情",
+          "fields": [
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "phone",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "status",
+              "type": "enum",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "project",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "time",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "therapist",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "store",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "source",
+              "type": "enum",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "creator",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "createdAt",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "delegation",
+              "type": "string",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            },
+            {
+              "name": "serviceCompleted",
+              "type": "boolean",
+              "sourceLocation": "sec-015 (5.4 预约详情)"
+            }
+          ],
+          "sourceLocation": "sec-015 (5.4 预约详情)"
+        },
+        {
+          "name": "新增/改期预约",
+          "fields": [
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            },
+            {
+              "name": "project",
+              "type": "string",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            },
+            {
+              "name": "startTime",
+              "type": "string",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            },
+            {
+              "name": "endTime",
+              "type": "string",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            },
+            {
+              "name": "therapist",
+              "type": "string",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            },
+            {
+              "name": "source",
+              "type": "enum",
+              "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+            }
+          ],
+          "sourceLocation": "sec-016 (5.5 新增/改期预约)"
+        },
+        {
+          "name": "术后告知",
+          "fields": [
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "orderNo",
+              "type": "string",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "status",
+              "type": "enum",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "notices",
+              "type": "string",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "noticeBlocks",
+              "type": "array",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "confirmedBy",
+              "type": "string",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            },
+            {
+              "name": "confirmedAt",
+              "type": "string",
+              "sourceLocation": "sec-017 (5.6 术后告知)"
+            }
+          ],
+          "sourceLocation": "sec-017 (5.6 术后告知)"
+        },
+        {
+          "name": "预约列表",
+          "fields": [
+            {
+              "name": "date",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "time",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "project",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "status",
+              "type": "enum",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "therapist",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "delegation",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            },
+            {
+              "name": "store",
+              "type": "string",
+              "sourceLocation": "sec-018 (5.7 预约列表)"
+            }
+          ],
+          "sourceLocation": "sec-018 (5.7 预约列表)"
+        },
+        {
+          "name": "回访登记",
+          "fields": [
+            {
+              "name": "customer",
+              "type": "string",
+              "sourceLocation": "sec-019 (5.8 回访登记)"
+            },
+            {
+              "name": "service",
+              "type": "string",
+              "sourceLocation": "sec-019 (5.8 回访登记)"
+            },
+            {
+              "name": "content",
+              "type": "string",
+              "sourceLocation": "sec-019 (5.8 回访登记)"
+            },
+            {
+              "name": "result",
+              "type": "enum",
+              "sourceLocation": "sec-019 (5.8 回访登记)"
+            }
+          ],
+          "sourceLocation": "sec-019 (5.8 回访登记)"
+        }
+      ],
+      "acceptanceExamples": [
+        {
+          "pageId": "today",
+          "text": "星光店，快捷操作「开单」「预约」「客户搜索」；我的预约 3 条（张女士·小气泡·10:00-11:00·已登记；李女士·补水·14:00-15:00·已到店；王女士·肩颈·16:30-17:30·已登记）；待回访 2 条。",
+          "sourceLocation": "sec-020 (6. 验收示例) #1"
+        },
+        {
+          "pageId": "customer-search",
+          "text": "首次进入未输入关键词时显示搜索提示；输入「张」返回张女士，138****0000，星光店；无匹配时显示「没有匹配的客户」与「清空关键词」。",
+          "sourceLocation": "sec-020 (6. 验收示例) #2"
+        },
+        {
+          "pageId": "customer-detail",
+          "text": "张女士，138****0000，金卡会员，余额 ¥1,280.00，累计消费 ¥8,600.00，卡张数 3，标签「敏感肌」「老客」，服务记录「10-20 小气泡」并提供「查看告知」入口。",
+          "sourceLocation": "sec-020 (6. 验收示例) #3"
+        },
+        {
+          "pageId": "appointment-detail",
+          "text": "预约详情（已登记）：张女士，小气泡，11-05 周三 10:00-11:00，王美容（我），星光店，来源电话；底部显示「已到店确认」「开单」，「改期」「取消」在次要操作区。点「已到店确认」后状态变为已到店，底部只剩「开单」；点「取消」并二次确认后状态变为已取消，底部操作栏消失，显示「本单已取消」。",
+          "sourceLocation": "sec-020 (6. 验收示例) #4"
+        },
+        {
+          "pageId": "appointment-form",
+          "text": "客户必填，项目必填，开始时间早于结束时间，护理师默认自己，来源默认到店；从列表/日历新增时点击客户字段打开客户搜索选择器，选中返回表单；改期时客户锁定，按钮文案为「保存改期」，保存后回到预约详情并显示新时间段；把护理师改为赵××后保存，详情显示赵××并出现「已改派给 赵××」，列表全店视角显示护理师赵××；新增保存后回到今日；失败显示 Toast 并保留已填内容。",
+          "sourceLocation": "sec-020 (6. 验收示例) #6"
+        },
+        {
+          "pageId": "treatment-notice",
+          "text": "从客户详情服务记录「查看告知」或已到店且 serviceCompleted=true 的预约详情「术后告知」进入；单号 SO20261102001，按「小气泡」「补水」两块展示话术；未确认可确认，确认后显示确认人与确认时间；重新进入内容不变。",
+          "sourceLocation": "sec-020 (6. 验收示例) #7"
+        },
+        {
+          "pageId": "appointment-list",
+          "text": "默认日历七列，块高等于时长，今天列高亮；状态「已登记」时匹配块高亮、其余变淡；列表维度按日期分组，状态筛选只显示匹配行；点空格进入新增预约并预填日期时间。",
+          "sourceLocation": "sec-020 (6. 验收示例) #8"
+        },
+        {
+          "pageId": "callback-register",
+          "text": "客户张女士，服务项目「小气泡」，回访内容「已电话回访，客户满意，下次预约下周」，结果「已联系」；保存后回到今日待回访区块。若结果为未接/拒绝/稍后再联系，保存后仍留在今日待回访区块。",
+          "sourceLocation": "sec-020 (6. 验收示例) #9"
+        }
+      ]
+    },
+    "reviewMarkdown": "The 8-page slice is structurally UI-ready: every page has scope, roles, routes, required states, a field table and at least one testable acceptance example, with no blockers. Resolve the 今日「预约」quick-action permission conflict, the customer-search create entry, and the noticeBlocks required/fallback contradiction before the UI Brief; the warehouse 回访登记, 下次回访 and 回访 service-source items are non-blocking questions."
+  },
+  "usage": {
+    "inputTokens": 15176,
+    "outputTokens": 23107,
+    "cacheReadTokens": 7296,
+    "totalTokens": 45579
+  },
+  "usageComplete": true
+}

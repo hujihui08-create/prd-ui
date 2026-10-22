@@ -36,6 +36,7 @@ import {
   writePrompt,
   type HistoryEntry,
 } from "./evidence.js";
+import { deriveStandardAssetInventory } from "./asset-inventory.js";
 import { runIaGate } from "./gates/ia.js";
 import { runInteractionGate } from "./gates/interaction.js";
 import { runVisualStyleGate } from "./gates/visual-style.js";
@@ -95,6 +96,8 @@ export interface RunM1Input {
   references?: string[];
   catalog?: unknown;
   motionTokens?: unknown;
+  catalogsByProfile?: Record<string, unknown>;
+  motionTokensByProfile?: Record<string, unknown>;
   pageSpecs?: unknown;
 }
 
@@ -770,11 +773,18 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
             ...(input.motionTokens === undefined
               ? {}
               : { motionTokens: input.motionTokens }),
+            ...(input.catalogsByProfile === undefined
+              ? {}
+              : { catalogsByProfile: input.catalogsByProfile }),
+            ...(input.motionTokensByProfile === undefined
+              ? {}
+              : { motionTokensByProfile: input.motionTokensByProfile }),
             ...(input.pageSpecs === undefined ? {} : { pageSpecs: input.pageSpecs }),
           })
         : buildVisualStylePrompt({
             brief: input.brief,
             iaMap,
+            assetInventory: deriveStandardAssetInventory(input.brief),
             ...(input.brandMaterials === undefined
               ? {}
               : { brandMaterials: input.brandMaterials }),
@@ -835,6 +845,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
           visualStyle: output.visualStyle,
           assetBriefs: output.assetBriefs,
           brief: input.brief,
+          assetInventory: deriveStandardAssetInventory(input.brief),
         });
       }
 

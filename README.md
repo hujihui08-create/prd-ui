@@ -11,6 +11,8 @@
 - **Spec Engineer v0**：确定性 mapper，把 M1 的 interaction/motion/asset artifacts 写进 Page Spec；新增可选 `interactions[].nodeId` 与 `motion`，输出 gate/summary。motion 已携带、尚未动画到 HTML。
 - **PRD Review + UI Briefer**：Phase 2 前半段。`pnpm intake:run` 读 PRD，做确定性 normalize、PRD Reviewer、IA review、UI Briefer；两道人工签核后才写 `ui-brief.json`，可 resume 和原子发布。
 - **Phase 2 8 页出口**：已签核的 8 页 brief 可跑通 M1（IA/Interaction/Visual）、Spec Engineer、8 页 Page Spec 和 8 页 HTML；Phase 1 语义校验 `8 pages / 0 blockers`。
+- **Phase 2 出口（真实 PRD）**：`samples/projects/employee-app-phase2` 的 8 页真实 PRD 切片已跑通 intake、M1、Spec Engineer、8 页 HTML 和视觉巡检；per-profile M1 与标准图标 asset review 也已验证。Studio/Asset Compiler 仍后置。
+- **Renderer 视觉 v0.1**：`mobile-list` 七列日历 + 列表双维度；`mobile-form` 单主 CTA + 另一模式提示；detail 底部固定操作栏与主/次动作拆分；`noticeBlocks` 告知按项目分块；共 12 个 archetype。
 - **双运行时**：同一 core 状态机；`standalone` 用 scripted reviewer 跑 CI，`dsh` 用 headless + vision 模型跑真实评审。默认 provider 是 DeepSeek（`deepseek-flash`），没有 OpenAI fallback。
 - **dsh 适配**：项目内 pinned profile（`@deepseek-ai/dsh@0.2.1-rc.2`），插件可加载；真实评审需要配置 vision key。
 
@@ -274,7 +276,7 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 
 ## 测试与验收
 
-- `pnpm test`：488 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
+- `pnpm test`：510 tests（core + standalone + dsh adapter conformance；offline，不跑 dsh mock integration）。
 - `pnpm test:dsh`：2 tests（真实 pinned dsh CLI + 本地 OpenAI-compatible mock server；分别是 asset review 和 M1 IA；无需 key，不访问外网）。
 - `pnpm typecheck`：clean。
 - `pnpm phase1:verify`：`2 pages / 0 blockers`。
@@ -284,9 +286,14 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 - `pnpm agent:run ... --runtime dsh`（真实 `deepseek-flash`）：三 Agent 各 1 次调用，`success`，¥0.1973，`usageComplete=true`，无 waiver。
 - `pnpm spec:engineer --agent-run <clean M1 run>`：2 个增强 Page Spec，0 blockers，28 warnings（v0 预期）。
 - `pnpm intake:run --project samples/project.demo-orders.yaml --prd samples/sample-prd.md`：8 页 PRD review/IA/brief；PRD/IA 与 brief 签核后 `success`，发布 8 页 `ui-brief.json`。
+- Briefer 数据完整性：scripted 8 页 intake 产出 `fieldLabels` / `mockData.rows` / `mockData.values` / `mockData.listItems` / `feedItems`，brief gate 通过；真实 dsh 干净 run（sample PRD-001 waiver）8 页、brief gate 通过、`awaiting_signoff`，¥0.5938，`usageComplete=true`。
 - `pnpm intake:run --project samples/projects/employee-app/project.yaml --prd samples/projects/employee-app/prd.md`：2 页路径，brief gate 通过后等待签核。
 - `pnpm phase1:verify --project samples/project.demo-orders-intake.yaml`：8 页 brief 的 Phase 1 语义校验，`8 pages / 0 blockers`。
+- `pnpm phase1:verify --project samples/projects/employee-app-appointments-03/project.yaml`：03 真实 PRD 四页切片，`4 pages / 0 blockers`；真实 dsh intake `¥0.5147`、M1 `¥0.2746`（`ia:waived / interaction:passed / visualStyle:passed`）、Spec Engineer 4 Page Specs / 0 blockers、HTML 4 页。产物：[`pipeline/artifacts/employee-app-appointments-03/`](pipeline/artifacts/employee-app-appointments-03/)。
 - 8 页 M1/Spec Engineer/renderer：8 Page Specs、8 HTML + index；M1 gate `ia:waived / interaction:passed / visualStyle:passed`，Spec Engineer 0 blockers。
+- Phase 2 出口：`samples/projects/employee-app-phase2` 8 页真实 PRD 切片；brief gate passed（sample IA waiver）、M1 `ia:waived / interaction:passed / visualStyle:passed`（¥0.4355）、Spec Engineer 8 Page Specs / 0 blockers / 20 warnings、assets referenced=2 / missing=0、HTML 8 页、`phase1:verify` `8 pages / 0 blockers`。产物：[`pipeline/artifacts/employee-app-phase2/`](pipeline/artifacts/employee-app-phase2/)。
+- per-profile M1：8 页 demo-orders sample 真实 run prompt 含 b-dense + c-expressive，interaction passed（¥0.5105）。
+- 资产链：`deriveStandardAssetInventory` + Visual Style 4 个标准图标 briefs；`asset:review --briefs` `4/4 passed`。
 - `samples/assets/m0-scenarios`：`1 passed / 1 unresolved`，exit 1。
 - standalone 与 dsh-like adapter 对同一 fixtures 产出相同 decision trace；确定性资产 byte-identical。
 
@@ -299,8 +306,10 @@ profile 安装、凭据解析顺序和限制见 [`pipeline/dsh/README.md`](pipel
 | Phase 2 Spec Engineer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-spec-engineer-design.md) |
 | Phase 2 PRD Review + UI Briefer 设计 | [`docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md`](docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md) |
 | 8 页 Renderer / Mock Data 修复设计 | [`docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md`](docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md) |
+| Renderer 视觉保真 v0.1 设计 | [`docs/superpowers/specs/2026-10-21-visual-fidelity-v01-design.md`](docs/superpowers/specs/2026-10-21-visual-fidelity-v01-design.md) |
 | Phase 2 剩余工作实施计划 | [`docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md`](docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md) |
 | 8 页 Renderer 交接文档 | [`docs/handoffs/2026-10-21-8page-renderer-handoff.md`](docs/handoffs/2026-10-21-8page-renderer-handoff.md) |
+| 8 页 Renderer 对话式交接 | [`docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md`](docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md) |
 | Phase 2 Spec Engineer 计划 | [`docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md`](docs/superpowers/plans/2026-10-20-phase-2-spec-engineer.md) |
 | M1 实施计划 | [`docs/superpowers/plans/2026-10-20-m1-agent-layer.md`](docs/superpowers/plans/2026-10-20-m1-agent-layer.md) |
 | M0 使用说明 | [`pipeline/docs/asset-review-m0.md`](pipeline/docs/asset-review-m0.md) |

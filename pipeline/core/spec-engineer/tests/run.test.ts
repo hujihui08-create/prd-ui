@@ -14,8 +14,8 @@ describe("runSpecEngineer", () => {
     expect(result.gate.passed).toBe(true);
     expect(result.summary.pages).toEqual(["today", "inventory-query"]);
     expect(result.summary.motionPages).toEqual(["today", "inventory-query"]);
-    expect(result.summary.assets.referenced).toContain("inventory");
-    expect(result.summary.assets.unusedBriefs).toEqual(["receipt"]);
+    expect(result.summary.assets.referenced).toContain("icon-package");
+    expect(result.summary.assets.unusedBriefs).toEqual(["icon-plus"]);
     expect(result.summary.assets.missing).toEqual([]);
     expect(SpecEngineerSummarySchema.parse(result.summary)).toEqual(result.summary);
     for (const spec of result.specs) {
