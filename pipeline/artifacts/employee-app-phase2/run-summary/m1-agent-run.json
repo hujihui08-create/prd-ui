@@ -1,7 +1,7 @@
 {
   "runId": "run-2026-10-22T03-16-05-257Z",
   "project": "employee-app-phase2",
-  "status": "awaiting_signoff",
+  "status": "success",
   "gates": {
     "ia": "passed",
     "interaction": "passed",
@@ -62,7 +62,7 @@
   },
   "signoff": {
     "ia": true,
-    "visualStyle": false
+    "visualStyle": true
   },
   "costCny": 0.4399832736,
   "usageComplete": true,
