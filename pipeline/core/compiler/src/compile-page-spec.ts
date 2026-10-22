@@ -195,7 +195,15 @@ function assignNodeIds(page: UiBriefPage, layout: SpecNode): void {
     // Cards carry the row group context through their own title, so `children`
     // must inherit it the same way slot children do (today's 我的预约/待回访).
     const childTitle = String(node.props?.title ?? parentTitle ?? "");
-    for (const [slotName, children] of Object.entries(node.slots ?? {})) {
+    // Walk the actions slot first so canonical `<page>.action.<key>` ids land on
+    // the primary CTA rather than a repeated ghost in fields/content; slot order
+    // is otherwise preserved for deterministic assignment.
+    const slotEntries = Object.entries(node.slots ?? {});
+    const orderedSlotEntries = [
+      ...slotEntries.filter(([slotName]) => slotName === "actions"),
+      ...slotEntries.filter(([slotName]) => slotName !== "actions"),
+    ];
+    for (const [slotName, children] of orderedSlotEntries) {
       children.forEach((child, index) => walk(child, `${path}/${slotName}/${index}`, childTitle));
     }
     (node.children ?? []).forEach((child, index) => walk(child, `${path}/children/${index}`, childTitle));

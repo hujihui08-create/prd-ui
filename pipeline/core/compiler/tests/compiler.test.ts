@@ -202,12 +202,40 @@ describe("compileProject", () => {
       "today.row.callback",
     ]);
 
+    const recompiled = compileProject(phase2, deps);
     for (const spec of compiled) {
+      const again = recompiled.find(
+        (candidate) => candidate.meta.pageId === spec.meta.pageId
+      )!;
+      expect(ids(again), spec.meta.pageId).toEqual(ids(spec));
+
       const nodes = collectNodes(spec.layout);
       const pageIds = nodes.flatMap((node) => (node.id ? [node.id] : []));
       expect(pageIds, spec.meta.pageId).toHaveLength(nodes.length);
       expect(new Set(pageIds).size, spec.meta.pageId).toBe(pageIds.length);
     }
+  });
+
+  it("prefers actions-slot nodes for repeated semantic action ids", () => {
+    const phase2 = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const detail = compileProject(phase2, deps).find(
+      (spec) => spec.meta.pageId === "appointment-detail"
+    )!;
+    const nodes = collectNodes(detail.layout);
+    const canonical = nodes.find(
+      (node) => node.id === "appointment-detail.action.checkin"
+    )!;
+    expect(canonical.props?.label).toBe("已到店确认");
+    expect(detail.layout.slots?.actions).toContain(canonical);
+
+    const ghost = nodes.find(
+      (node) => node.id === "appointment-detail.action.checkin.2"
+    );
+    expect(ghost).toBeDefined();
+    expect(ghost!.props?.label).toBe("接单并确认到店");
+    expect(detail.layout.slots?.actions).not.toContain(ghost);
   });
 
   it("has at least one requirement reference per spec", () => {
