@@ -155,11 +155,14 @@ export function buildVisualMatrix(specs: PageSpec[]): VisualCase[] {
       });
     }
 
-    if (views.length > 0) {
+    // Drawer blocks only exist inside the calendar panel, so the drawer case
+    // must force `view=calendar` regardless of the page's default view.
+    if (views.includes("calendar")) {
       cases.push({
         id: `${pageId}.drawer`,
         pageId,
         state: "drawer",
+        query: { view: "calendar" },
         actions: [{ kind: "open-drawer" }],
         viewport,
       });

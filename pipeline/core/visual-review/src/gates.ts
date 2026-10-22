@@ -47,8 +47,21 @@ export function runVisualGate(input: VisualGateInput): VisualGateResult {
     }
   }
   for (const entry of input.diff) {
-    const ratio =
-      entry.totalPixels === 0 ? 0 : entry.diffPixels / entry.totalPixels;
+    if (entry.totalPixels === 0) {
+      // A zero-pixel comparison with changed pixels cannot be trusted; fail
+      // closed instead of treating it as a zero ratio.
+      if (entry.diffPixels > 0) {
+        issues.push({
+          id: `VISUAL_DIFF_EXCEEDED:${entry.caseId}`,
+          severity: "blocker",
+          code: "VISUAL_DIFF_EXCEEDED",
+          message: `${entry.caseId} diff ${entry.diffPixels}px with no comparable pixels`,
+          evidence: entry.caseId,
+        });
+      }
+      continue;
+    }
+    const ratio = entry.diffPixels / entry.totalPixels;
     if (ratio > VISUAL_DIFF_MAX_RATIO) {
       issues.push({
         id: `VISUAL_DIFF_EXCEEDED:${entry.caseId}`,

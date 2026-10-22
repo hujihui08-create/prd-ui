@@ -54,6 +54,8 @@ export const SignoffBlockSchema = z
     answers: z.array(SignoffAnswerSchema).default([]),
     approvals: z.array(SignoffApprovalSchema).default([]),
     briefHash: z.string().min(1).optional(),
+    manifestHash: z.string().min(1).optional(),
+    findingsHash: z.string().min(1).optional(),
   })
   .strict();
 export type SignoffBlock = z.infer<typeof SignoffBlockSchema>;
@@ -69,6 +71,8 @@ export interface ParsedSignoff {
   answers: SignoffAnswer[];
   approvals: SignoffApproval[];
   briefHash?: string;
+  manifestHash?: string;
+  findingsHash?: string;
   error?: string;
 }
 
@@ -128,6 +132,12 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       ...(parsed.data.briefHash === undefined
         ? {}
         : { briefHash: parsed.data.briefHash }),
+      ...(parsed.data.manifestHash === undefined
+        ? {}
+        : { manifestHash: parsed.data.manifestHash }),
+      ...(parsed.data.findingsHash === undefined
+        ? {}
+        : { findingsHash: parsed.data.findingsHash }),
       error: "SIGNOFF_DATE_INVALID",
     };
   }
@@ -143,6 +153,12 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
     ...(parsed.data.briefHash === undefined
       ? {}
       : { briefHash: parsed.data.briefHash }),
+    ...(parsed.data.manifestHash === undefined
+      ? {}
+      : { manifestHash: parsed.data.manifestHash }),
+    ...(parsed.data.findingsHash === undefined
+      ? {}
+      : { findingsHash: parsed.data.findingsHash }),
   };
 }
 

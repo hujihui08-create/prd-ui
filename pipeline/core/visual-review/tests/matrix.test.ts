@@ -297,6 +297,21 @@ describe("buildVisualMatrix", () => {
       "custom-list.drawer"
     );
 
+    // Drawer blocks render only in the calendar panel, so the case forces it.
+    const drawer = buildVisualMatrix([appointmentList]).find(
+      (entry) => entry.id === "appointment-list.drawer"
+    );
+    expect(drawer?.query).toEqual({ view: "calendar" });
+
+    const listOnly = makeSpec({
+      pageId: "list-only",
+      views: ["list"],
+      defaultView: "list",
+    });
+    expect(buildVisualMatrix([listOnly]).map((entry) => entry.id)).not.toContain(
+      "list-only.drawer"
+    );
+
     const notice = makeSpec({
       pageId: "handoff-notice",
       noticeBlocks: [{ title: "小气泡", items: ["注意防晒"] }],

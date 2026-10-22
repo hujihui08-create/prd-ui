@@ -190,18 +190,35 @@ describe("runVisualGate", () => {
     expect(gate.issues).toEqual([]);
   });
 
-  it("treats a missing baseline as zero diff and 1% as the boundary", () => {
+  it("treats an empty comparison as zero diff and 1% as the boundary", () => {
     const gate = runVisualGate({
       cases: [visualCase],
       screenshots: [screenshot({})],
       findings: [],
       diff: [
         { caseId: "a.default", diffPixels: 1, totalPixels: 100 },
-        { caseId: "a.default", diffPixels: 5, totalPixels: 0 },
+        { caseId: "a.default", diffPixels: 0, totalPixels: 0 },
       ],
     });
     expect(gate.passed).toBe(true);
     expect(gate.issues).toEqual([]);
+  });
+
+  it("fails closed when changed pixels have no comparable pixels", () => {
+    const gate = runVisualGate({
+      cases: [visualCase],
+      screenshots: [screenshot({})],
+      findings: [],
+      diff: [{ caseId: "a.default", diffPixels: 5, totalPixels: 0 }],
+    });
+    expect(gate.passed).toBe(false);
+    expect(gate.issues).toEqual([
+      expect.objectContaining({
+        id: "VISUAL_DIFF_EXCEEDED:a.default",
+        severity: "blocker",
+        message: "a.default diff 5px with no comparable pixels",
+      }),
+    ]);
   });
 
   it("appends findings and only blockers fail the gate", () => {
