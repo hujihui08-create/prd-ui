@@ -23,6 +23,9 @@ function gateFor(overrides: Partial<SpecEngineerGateInput> = {}) {
     motionSpec: input.motionSpec,
     ...(input.assetBriefs === undefined ? {} : { assetBriefs: input.assetBriefs }),
     ...(input.iaMap === undefined ? {} : { iaMap: input.iaMap }),
+    ...(overrides.strictMotionPages === undefined
+      ? {}
+      : { strictMotionPages: overrides.strictMotionPages }),
   });
 }
 
@@ -92,6 +95,58 @@ describe("Spec Engineer gates", () => {
     expect(mismatch.issues.map((issue) => issue.code)).toContain(
       "SPEC_MOTION_TOKEN_MISMATCH"
     );
+  });
+
+  it("resolves semantic ids, groups, and aliases before flagging motion", () => {
+    const gate = gateFor({
+      motionSpec: {
+        ...motionSpec,
+        bindings: [
+          ...motionSpec.bindings,
+          { pageId: "today", nodeId: "today.appointment-row", preset: "list-stagger" },
+          { pageId: "today", nodeId: "today.card.appointments", preset: "page-enter" },
+        ],
+      },
+    });
+    expect(
+      gate.issues.filter(
+        (issue) =>
+          issue.code === "SPEC_MOTION_NODE_UNRESOLVED" &&
+          issue.evidence?.startsWith("today#today.")
+      )
+    ).toEqual([]);
+  });
+
+  it("blocks unresolved motion ids for strict pages", () => {
+    const motionWithUnknownNode = {
+      ...motionSpec,
+      bindings: [
+        ...motionSpec.bindings,
+        { pageId: "today", nodeId: "appointment-detail.unknown", preset: "page-enter" },
+      ],
+    };
+    const gate = gateFor({
+      motionSpec: motionWithUnknownNode,
+      strictMotionPages: ["today"],
+    });
+    expect(gate.issues.map((entry) => entry.code)).toContain(
+      "SPEC_MOTION_NODE_UNRESOLVED"
+    );
+    expect(
+      gate.issues.find((entry) => entry.code === "SPEC_MOTION_NODE_UNRESOLVED")
+        ?.severity
+    ).toBe("blocker");
+  });
+
+  it("keeps unresolved motion warnings for non-strict pages", () => {
+    const gate = gateFor({ strictMotionPages: ["inventory-query"] });
+    const todayIssues = gate.issues.filter(
+      (entry) =>
+        entry.code === "SPEC_MOTION_NODE_UNRESOLVED" &&
+        entry.evidence?.startsWith("today#")
+    );
+    expect(todayIssues.length).toBeGreaterThan(0);
+    expect(todayIssues.every((entry) => entry.severity === "warning")).toBe(true);
   });
 
   it("blocks a referenced asset without a brief", () => {

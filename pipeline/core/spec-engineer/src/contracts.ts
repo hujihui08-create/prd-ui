@@ -60,6 +60,8 @@ export interface SpecEngineerInput {
   motionSpec: MotionSpec;
   iaMap?: IaMap;
   assetBriefs?: AssetBrief[];
+  /** Pages whose unresolved motion bindings are blockers instead of warnings. */
+  strictMotionPages?: string[];
   generatedAt: string;
 }
 

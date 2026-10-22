@@ -39,6 +39,7 @@ Options:
   --project <path>      Project YAML (default: samples/projects/employee-app/project.yaml)
   --agent-run <dir>     M1 agent run directory (required)
   --runs <dir>          Directory that receives run artifacts
+  --strict-motion       Treat unresolved motion bindings as blockers for every brief page
   --json                Print one JSON summary to stdout; suppress the human summary
   -h, --help            Print this help and exit`;
 
@@ -46,6 +47,7 @@ export interface SpecCliOptions {
   projectPath: string;
   agentRunPath?: string;
   runsDir: string;
+  strictMotion: boolean;
   json: boolean;
   help: boolean;
 }
@@ -65,6 +67,7 @@ export function parseArgs(argv: string[]): SpecCliOptions {
   const options: SpecCliOptions = {
     projectPath: path.join(pipelineRoot, "samples", "projects", "employee-app", "project.yaml"),
     runsDir: path.join(pipelineRoot, "runs"),
+    strictMotion: false,
     json: false,
     help: false,
   };
@@ -91,6 +94,9 @@ export function parseArgs(argv: string[]): SpecCliOptions {
         break;
       case "--runs":
         options.runsDir = path.resolve(value());
+        break;
+      case "--strict-motion":
+        options.strictMotion = true;
         break;
       case "--json":
         options.json = true;
@@ -377,6 +383,9 @@ export async function main(
       motionSpec: inputs.motionSpec,
       ...(inputs.iaMap === undefined ? {} : { iaMap: inputs.iaMap }),
       ...(inputs.assetBriefs === undefined ? {} : { assetBriefs: inputs.assetBriefs }),
+      ...(options.strictMotion
+        ? { strictMotionPages: brief.ia.pages.map((page) => page.id) }
+        : {}),
       generatedAt: new Date().toISOString(),
     });
 

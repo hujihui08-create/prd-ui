@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import type { PageSpec } from "@prd-ui/contracts";
 import {
   applySpecs,
   collectAssetReferences,
   uniqueAssetReferences,
 } from "../src/index.js";
+import { resolveMotionTarget } from "../src/motion-aliases.js";
 import {
   assetBriefs,
   baseSpecs,
@@ -11,6 +13,41 @@ import {
   makeInput,
   motionSpec,
 } from "./fixtures.js";
+
+describe("resolveMotionTarget", () => {
+  it("resolves exact ids, groups, and legacy aliases", () => {
+    const spec = {
+      meta: { pageId: "appointment-detail" },
+      layout: {
+        type: "MobileShell",
+        id: "appointment-detail.page.root",
+        slots: {
+          actions: [
+            { type: "Button", id: "appointment-detail.action.checkin" },
+            {
+              type: "ListRow",
+              id: "appointment-list.row.appointment.0",
+              motionGroup: "appointment-list.row.appointment",
+            },
+          ],
+        },
+      },
+    } as unknown as PageSpec;
+    expect(resolveMotionTarget(spec, "appointment-detail.action.checkin")).toEqual({
+      id: "appointment-detail.action.checkin",
+      group: false,
+    });
+    expect(resolveMotionTarget(spec, "appointment-list.row.appointment")).toEqual({
+      id: "appointment-list.row.appointment",
+      group: true,
+    });
+    expect(resolveMotionTarget(spec, "ad.footer-checkin")).toEqual({
+      id: "appointment-detail.action.checkin",
+      group: false,
+    });
+    expect(resolveMotionTarget(spec, "ad.unknown")).toBeUndefined();
+  });
+});
 
 describe("applySpecs", () => {
   it("maps transitions to navigate interactions and triggers to reactions", () => {

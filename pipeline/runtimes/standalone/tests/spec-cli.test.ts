@@ -111,6 +111,7 @@ interface M1FixtureOptions {
   omitMotion?: boolean;
   omitInteraction?: boolean;
   project?: string;
+  motionBindings?: MotionSpec["bindings"];
 }
 
 async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
@@ -156,6 +157,9 @@ async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
     await writeJson(path.join(dir, "artifacts", "motion-spec.json"), {
       ...envelope,
       ...motionSpec,
+      ...(options.motionBindings === undefined
+        ? {}
+        : { bindings: options.motionBindings }),
     });
   }
   await writeJson(path.join(dir, "artifacts", "ia-map.json"), {
@@ -282,6 +286,80 @@ describe("spec:engineer CLI", () => {
     ).resolves.toContain("SPEC_ASSET_UNUSED");
   });
 
+  it("resolves motion aliases and upgrades unresolved bindings with --strict-motion", async () => {
+    const agentRun = await makeM1Run({
+      motionBindings: [
+        { pageId: "today", nodeId: "today.appointment-row", preset: "page-enter" },
+        { pageId: "today", nodeId: "today.unknown-node", preset: "page-enter" },
+      ],
+    });
+
+    const lenientRuns = await tempDir("prd-ui-spec-out-");
+    const lenient = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      lenientRuns,
+      "--json",
+    ]);
+    expect(lenient.code).toBe(0);
+    const lenientPayload = JSON.parse(lenient.stdout) as {
+      gate: { issues: Array<{ code: string; severity: string; evidence?: string }> };
+    };
+    expect(lenientPayload.gate.issues).toContainEqual(
+      expect.objectContaining({
+        code: "SPEC_MOTION_NODE_UNRESOLVED",
+        severity: "warning",
+        evidence: "today#today.unknown-node",
+      })
+    );
+    expect(
+      lenientPayload.gate.issues.filter(
+        (issue) => issue.evidence === "today#today.appointment-row"
+      )
+    ).toEqual([]);
+
+    const runDir = await singleRunDir(lenientRuns);
+    const today = JSON.parse(
+      await readFile(path.join(runDir, "artifacts", "page-spec", "today.json"), "utf8")
+    ) as { motion?: { bindings: Array<{ nodeId?: string; preset: string }> } };
+    expect(today.motion?.bindings).toContainEqual({
+      nodeId: "today.row.appointment",
+      preset: "page-enter",
+    });
+
+    const strictRuns = await tempDir("prd-ui-spec-out-");
+    const strict = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      strictRuns,
+      "--strict-motion",
+      "--json",
+    ]);
+    expect(strict.code).toBe(1);
+    const strictPayload = JSON.parse(strict.stdout) as {
+      status: string;
+      gate: { issues: Array<{ code: string; severity: string; evidence?: string }> };
+    };
+    expect(strictPayload.status).toBe("failed");
+    expect(strictPayload.gate.issues).toContainEqual(
+      expect.objectContaining({
+        code: "SPEC_MOTION_NODE_UNRESOLVED",
+        severity: "blocker",
+        evidence: "today#today.unknown-node",
+      })
+    );
+    const strictRunDir = await singleRunDir(strictRuns);
+    await expect(
+      readFile(path.join(strictRunDir, "artifacts", "page-spec", "today.json"), "utf8")
+    ).rejects.toThrow();
+  });
+
   it("fails clearly when the M1 motion artifact is missing", async () => {
     const agentRun = await makeM1Run({ omitMotion: true });
     const runs = await tempDir("prd-ui-spec-out-");
@@ -357,11 +435,14 @@ describe("spec:engineer CLI", () => {
       "/tmp/m1",
       "--runs",
       "/tmp/out",
+      "--strict-motion",
       "--json",
     ]);
     expect(options.projectPath).toBe(path.resolve("custom.yaml"));
     expect(options.agentRunPath).toBe(path.resolve("/tmp/m1"));
     expect(options.runsDir).toBe(path.resolve("/tmp/out"));
+    expect(options.strictMotion).toBe(true);
     expect(options.json).toBe(true);
+    expect(parseArgs(["--agent-run", "/tmp/m1"]).strictMotion).toBe(false);
   });
 });

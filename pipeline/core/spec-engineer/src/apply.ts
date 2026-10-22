@@ -15,6 +15,7 @@ import type {
   MotionSpec,
 } from "@prd-ui/agents";
 import type { AssetReference, SpecEngineerInput } from "./contracts.js";
+import { resolveMotionTarget } from "./motion-aliases.js";
 
 function compact<T extends object>(value: T): T {
   return Object.fromEntries(
@@ -88,6 +89,7 @@ function mergeStates(
 }
 
 function buildMotion(
+  spec: PageSpec,
   bindings: MotionSpec["bindings"] | undefined,
   motionSpec: MotionSpec
 ): PageMotion | undefined {
@@ -102,12 +104,13 @@ function buildMotion(
 
   return {
     presets,
-    bindings: bindings.map((binding) =>
-      compact({
-        ...(binding.nodeId === undefined ? {} : { nodeId: binding.nodeId }),
-        preset: binding.preset,
-      })
-    ),
+    bindings: bindings.map((binding) => {
+      if (binding.nodeId === undefined) return { preset: binding.preset };
+      const target = resolveMotionTarget(spec, binding.nodeId);
+      return target === undefined
+        ? { nodeId: binding.nodeId, preset: binding.preset }
+        : { nodeId: target.id, preset: binding.preset };
+    }),
     reducedMotion: motionSpec.reducedMotion,
   };
 }
@@ -183,6 +186,7 @@ export function applySpecs(input: SpecEngineerInput): PageSpec[] {
     }
 
     const motion = buildMotion(
+      spec,
       motionByPage.get(spec.meta.pageId),
       input.motionSpec
     );

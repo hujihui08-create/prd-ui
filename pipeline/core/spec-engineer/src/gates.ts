@@ -2,12 +2,12 @@ import {
   PageSpecSchema,
   type AssetBrief,
   type PageSpec,
-  type SpecNode,
   type UiBrief,
 } from "@prd-ui/contracts";
 import type { IaMap, InteractionSpec, MotionSpec } from "@prd-ui/agents";
 import type { SpecEngineerGate, SpecIssue } from "./contracts.js";
 import { collectAssetReferences, uniqueAssetReferences } from "./apply.js";
+import { resolveMotionTarget } from "./motion-aliases.js";
 
 export interface SpecEngineerGateInput {
   brief: UiBrief;
@@ -16,6 +16,8 @@ export interface SpecEngineerGateInput {
   motionSpec: MotionSpec;
   iaMap?: IaMap;
   assetBriefs?: AssetBrief[];
+  /** Pages whose unresolved motion bindings are blockers instead of warnings. */
+  strictMotionPages?: string[];
 }
 
 function issue(
@@ -30,14 +32,6 @@ function issue(
     message,
     ...(evidence === undefined ? {} : { evidence }),
   };
-}
-
-function collectNodeIds(node: SpecNode, out: Set<string>): void {
-  if (node.id !== undefined) out.add(node.id);
-  for (const children of Object.values(node.slots ?? {})) {
-    for (const child of children) collectNodeIds(child, out);
-  }
-  for (const child of node.children ?? []) collectNodeIds(child, out);
 }
 
 function durationValues(tokens: Record<string, string>): Set<number> {
@@ -210,13 +204,6 @@ export function runSpecEngineerGates(
   const presets = new Set(Object.keys(input.motionSpec.presets));
   const durations = durationValues(input.motionSpec.tokens.duration);
   const easings = easingValues(input.motionSpec.tokens.easing);
-  const nodeIdsByPage = new Map<string, Set<string>>();
-  for (const spec of input.specs) {
-    const ids = new Set<string>();
-    collectNodeIds(spec.layout, ids);
-    nodeIdsByPage.set(spec.meta.pageId, ids);
-  }
-
   for (const binding of input.motionSpec.bindings) {
     if (!briefIds.has(binding.pageId)) {
       issues.push(
@@ -261,16 +248,20 @@ export function runSpecEngineerGates(
       }
     }
     if (binding.nodeId !== undefined) {
-      const nodeIds = nodeIdsByPage.get(binding.pageId);
-      if (nodeIds !== undefined && !nodeIds.has(binding.nodeId)) {
-        issues.push(
-          issue(
-            "SPEC_MOTION_NODE_UNRESOLVED",
-            "warning",
-            `motion binding node ${binding.nodeId} is not present in the layout`,
-            `${binding.pageId}#${binding.nodeId}`
-          )
-        );
+      const spec = specById.get(binding.pageId);
+      if (spec !== undefined) {
+        const target = resolveMotionTarget(spec, binding.nodeId);
+        if (target === undefined) {
+          const strict = input.strictMotionPages?.includes(binding.pageId) === true;
+          issues.push(
+            issue(
+              "SPEC_MOTION_NODE_UNRESOLVED",
+              strict ? "blocker" : "warning",
+              `motion binding node ${binding.nodeId} is not present in the layout`,
+              `${binding.pageId}#${binding.nodeId}`
+            )
+          );
+        }
       }
     }
   }

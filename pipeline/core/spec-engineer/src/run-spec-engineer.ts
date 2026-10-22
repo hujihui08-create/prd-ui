@@ -22,6 +22,9 @@ export async function runSpecEngineer(
     motionSpec: input.motionSpec,
     ...(input.iaMap === undefined ? {} : { iaMap: input.iaMap }),
     ...(input.assetBriefs === undefined ? {} : { assetBriefs: input.assetBriefs }),
+    ...(input.strictMotionPages === undefined
+      ? {}
+      : { strictMotionPages: input.strictMotionPages }),
   });
 
   const references = uniqueAssetReferences(collectAssetReferences(specs));
