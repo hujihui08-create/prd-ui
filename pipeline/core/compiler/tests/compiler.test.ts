@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   PageSpecSchema,
@@ -163,6 +164,49 @@ describe("compileProject", () => {
   it("parses with PageSpecSchema", () => {
     for (const spec of specs) {
       expect(() => PageSpecSchema.parse(spec), spec.meta.pageId).not.toThrow();
+    }
+  });
+
+  it("assigns deterministic semantic node ids and row groups", () => {
+    const phase2 = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const compiled = compileProject(phase2, deps);
+    const detail = compiled.find((spec) => spec.meta.pageId === "appointment-detail")!;
+    const list = compiled.find((spec) => spec.meta.pageId === "appointment-list")!;
+    const ids = (spec: PageSpec) =>
+      collectNodes(spec.layout).flatMap((node) => (node.id ? [node.id] : []));
+    expect(ids(detail)).toContain("appointment-detail.page.root");
+    expect(ids(detail)).toContain("appointment-detail.action.checkin");
+    expect(ids(list)).toContain("appointment-list.action.toggle-view");
+    const rows = collectNodes(list.layout).filter((node) => node.type === "ListRow");
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(row.motionGroup).toBe("appointment-list.row.appointment");
+      expect(row.id).toMatch(/^appointment-list\.row\.appointment\.\d+$/);
+    }
+    expect(ids(list)).toEqual(
+      ids(compileProject(phase2, deps).find((s) => s.meta.pageId === "appointment-list")!)
+    );
+
+    const today = compiled.find((spec) => spec.meta.pageId === "today")!;
+    expect(
+      collectNodes(today.layout)
+        .filter((node) => node.type === "ListRow")
+        .map((row) => row.motionGroup)
+    ).toEqual([
+      "today.row.appointment",
+      "today.row.appointment",
+      "today.row.appointment",
+      "today.row.callback",
+      "today.row.callback",
+    ]);
+
+    for (const spec of compiled) {
+      const nodes = collectNodes(spec.layout);
+      const pageIds = nodes.flatMap((node) => (node.id ? [node.id] : []));
+      expect(pageIds, spec.meta.pageId).toHaveLength(nodes.length);
+      expect(new Set(pageIds).size, spec.meta.pageId).toBe(pageIds.length);
     }
   });
 

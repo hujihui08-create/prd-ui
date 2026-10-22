@@ -6,6 +6,8 @@ export type Target = "web" | "mobile";
 
 export interface SpecNode {
   id?: string;
+  /** Shared semantic group for repeated rows; motion targets resolve to it. */
+  motionGroup?: string;
   type: string;
   props?: Record<string, unknown>;
   slots?: Record<string, SpecNode[]>;
@@ -54,6 +56,7 @@ const SpecNodeSchema: z.ZodType<SpecNode> = z.lazy(() =>
   z
     .object({
       id: z.string().min(1).optional(),
+      motionGroup: z.string().min(1).optional(),
       type: z.string().min(1),
       props: z.record(z.string(), z.unknown()).optional(),
       slots: z.record(z.string(), z.array(SpecNodeSchema)).optional(),

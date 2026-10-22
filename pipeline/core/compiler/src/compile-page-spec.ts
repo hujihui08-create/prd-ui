@@ -7,7 +7,13 @@ import type {
   UiBrief,
   UiBriefPage,
 } from "@prd-ui/contracts";
-import type { ArchetypeDef } from "@prd-ui/design-system";
+import {
+  ACTION_KEYS,
+  CARD_KEYS,
+  QUICK_KEYS,
+  semanticNodeId,
+  type ArchetypeDef,
+} from "@prd-ui/design-system";
 
 /** Root shell the compiler emits per page target. */
 const ROOT_SHELL = {
@@ -139,6 +145,64 @@ function linkedRoutesFor(
   };
 }
 
+function rowGroupFor(pageId: string, parentTitle: string | undefined): string {
+  if (pageId === "today") return parentTitle === "待回访" ? "callback" : "appointment";
+  if (pageId === "customer-search") return "result";
+  if (pageId === "appointment-list") return "appointment";
+  return "row";
+}
+
+function assignNodeIds(page: UiBriefPage, layout: SpecNode): void {
+  const used = new Set<string>();
+  const groupCounts = new Map<string, number>();
+  const unique = (id: string): string => {
+    let candidate = id;
+    let index = 2;
+    while (used.has(candidate)) candidate = `${id}.${index++}`;
+    used.add(candidate);
+    return candidate;
+  };
+  const walk = (node: SpecNode, path: string, parentTitle?: string): void => {
+    let id: string | undefined;
+    if (path === "root") {
+      id = semanticNodeId(page.id, "page", "root");
+    } else if (node.type === "Button") {
+      const key = ACTION_KEYS[String(node.props?.action ?? "")];
+      if (key !== undefined) id = semanticNodeId(page.id, "action", key);
+    } else if (node.type === "FormField") {
+      const field = String(node.props?.field ?? "");
+      if (field !== "") id = semanticNodeId(page.id, "field", field.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase());
+    } else if (node.type === "QuickAction") {
+      const key = QUICK_KEYS[String(node.props?.label ?? "")];
+      if (key !== undefined) id = semanticNodeId(page.id, "quick", key);
+    } else if (node.type === "Card") {
+      const key = CARD_KEYS[String(node.props?.title ?? "")];
+      if (key !== undefined) id = semanticNodeId(page.id, "card", key);
+    } else if (node.type === "CalendarGrid") {
+      id = semanticNodeId(page.id, "calendar", "grid");
+    } else if (node.type === "Section" && node.props?.viewPanel !== undefined) {
+      id = semanticNodeId(page.id, "view", String(node.props.viewPanel));
+    } else if (node.type === "EmptyState") {
+      id = semanticNodeId(page.id, "state", String(node.props?.emptyKind ?? "empty"));
+    } else if (node.type === "ListRow") {
+      const group = (node.motionGroup ??= semanticNodeId(page.id, "row", rowGroupFor(page.id, parentTitle)));
+      const index = groupCounts.get(group) ?? 0;
+      groupCounts.set(group, index + 1);
+      node.id = unique(`${group}.${index}`);
+    }
+    if (node.id === undefined && id !== undefined) node.id = unique(id);
+    if (node.id === undefined) node.id = unique(`${page.id}.${path.replace(/\//g, ".")}`);
+    // Cards carry the row group context through their own title, so `children`
+    // must inherit it the same way slot children do (today's 我的预约/待回访).
+    const childTitle = String(node.props?.title ?? parentTitle ?? "");
+    for (const [slotName, children] of Object.entries(node.slots ?? {})) {
+      children.forEach((child, index) => walk(child, `${path}/${slotName}/${index}`, childTitle));
+    }
+    (node.children ?? []).forEach((child, index) => walk(child, `${path}/children/${index}`, childTitle));
+  };
+  walk(layout, "root");
+}
+
 export function compilePageSpec(input: {
   brief: UiBrief;
   page: UiBriefPage;
@@ -193,6 +257,7 @@ export function compilePageSpec(input: {
       : undefined);
   const currentStatus = page.mockData?.values?.status;
   const layout = buildLayout(brief, page, archetype, { views, searchIdleTitle });
+  assignNodeIds(page, layout);
   const states = Object.fromEntries(
     [...new Set([...archetype.requiredStates, ...page.requiredStates])].map((name) => [
       name,
