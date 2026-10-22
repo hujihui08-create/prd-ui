@@ -363,12 +363,12 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
   - 跳转 `<searchPage>.html?mode=picker&returnTo=<formPageId>`。
 - 搜索页 `mode=picker`：
   - 标题显示「选择客户」；
-  - 行点击写入 `sessionStorage["prd-ui:picker:selected"]`，返回 `returnTo` 页；
-  - 取消/返回不写入选择结果，表单草稿保留。
+  - 行点击把客户写入 `sessionStorage["prd-ui:picker:<returnTo>"]` 的 draft.customer，返回 `returnTo` 页；
+  - 取消/返回不改写草稿，表单草稿保留。
 - 表单恢复：
-  - 读取草稿并回填字段；
-  - 读取 selected 客户并填入 customer；
-  - 清理 selected，保留草稿直到保存/取消。
+  - 只读取当前表单自己的 draft 并回填字段（含 customer）；
+  - 不使用全局 selected key，避免跨表单污染；
+  - 保留草稿直到保存/表单返回。
 - 日期：
   - `calendarWeekStart` 缺省为页面第一条 `mockData.rows[].date`（`MM-DD`）所在周的周一，年份取 `brief.meta.date`；没有可解析日期时回退到 `brief.meta.date` 所在周的周一；
   - `CalendarGrid` 每个 day 携带完整 `YYYY-MM-DD`；
@@ -486,10 +486,10 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
 form.idle
   --选择客户--> form.picking (保存草稿) -> search.picker
 search.picker
-  --选择行--> form.restored (selected + draft) -> form.idle
-  --返回/取消--> form.restored (draft, no selected) -> form.idle
+  --选择行--> form.restored (draft with customer) -> form.idle
+  --返回/取消--> form.restored (draft without new customer) -> form.idle
 form
-  --保存/取消--> 清理草稿与 selected
+  --保存/表单返回--> 清理当前表单 draft、return、origin
 ```
 
 - 草稿只保存在 sessionStorage，不写后端。
