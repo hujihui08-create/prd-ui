@@ -10,6 +10,7 @@ import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-br
 import {
   createMotionContext,
   motionAttrs,
+  readOnlyNote,
   renderDocument,
   renderIndex,
   renderMotionCss,
@@ -299,6 +300,16 @@ describe("generic web/mobile renderer", () => {
 });
 
 describe("v0.4 picker, dates, and fidelity fixes", () => {
+  it("extracts only curated read-only notes", () => {
+    expect(readOnlyNote("只读说明「爽约已记录入客户档案」；员工端不提供爽约入口")).toBe(
+      "爽约已记录入客户档案"
+    );
+    expect(readOnlyNote("只读说明「本单已取消」；底部操作栏消失")).toBe("本单已取消");
+    expect(readOnlyNote("底部保留开单；serviceCompleted=true 时显示术后告知")).toBeUndefined();
+    expect(readOnlyNote("只读，显示确认人与确认时间；内容为快照")).toBeUndefined();
+    expect(readOnlyNote(undefined)).toBeUndefined();
+  });
+
   it("renders picker hooks, full dates, and deduplicated detail fields", () => {
     const form = renderDocument(
       phase2ById.get("appointment-form")!,
@@ -352,7 +363,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(search).toContain('"appointment-form":"mobile-form"');
     expect(search).toContain('config.pageArchetypes?.[requestedReturn] === "mobile-form"');
     expect(search).toContain('const target = allowed ? requestedReturn : pickerReturn;');
-    expect(search).toContain('sessionStorage.setItem("prd-ui:picker:return", target)');
+    expect(search).toContain('sessionStorage.setItem(returnKey, target)');
   });
 
   it("renders today plus the brief tabs on the home tab bar", () => {
@@ -381,8 +392,15 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       'badge.className = "badge tone-" + toneFor(status)'
     );
     expect(detail).toContain(
-      "visibleInBar === 0 ? currentState()?.note : undefined"
+      "visibleInBar === 0 ? config.stateNotes?.[status] : undefined"
     );
+    expect(detail).toContain(
+      '"stateNotes":{"爽约":"爽约已记录入客户档案","已取消":"本单已取消"}'
+    );
+    expect(detail).toContain('back.addEventListener("click"');
+    expect(detail).toContain("history.length > 1");
+    expect(detail).toContain('location.href = "index.html"');
+    expect(detail).toContain(".back-icon{font-size:20px;cursor:pointer;}");
 
     const list = renderDocument(
       phase2ById.get("appointment-list")!,
@@ -401,11 +419,16 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(form).toContain('dateParam + "T" + timeParam');
     expect(form).toContain('"formModeLabels":{"new":"新增预约","reschedule":"改期"}');
     expect(form).toContain("config.formModeLabels?.[mode.name]");
-    expect(form).toContain('sessionStorage.setItem("prd-ui:picker:"');
-    expect(form).toContain('sessionStorage.setItem("prd-ui:picker:return", target)');
+    expect(form).toContain('sessionStorage.setItem(draftKey, JSON.stringify(draft))');
+    expect(form).toContain('sessionStorage.setItem(returnKey, config.pageId)');
+    expect(form).toContain('sessionStorage.setItem(returnKey, target)');
     expect(form).toContain('sessionStorage.getItem(returnKey) === config.pageId');
     expect(form).toContain("if (hasPrefill)");
     expect(form).toContain('sessionStorage.getItem(selectedKey)');
+    expect(form).toContain("// The draft stays until save/back; a selected customer is optional.");
+    expect(form).toContain("sessionStorage.removeItem(draftKey)");
+    expect(form).toContain("sessionStorage.removeItem(selectedKey)");
+    expect(form).toContain("sessionStorage.removeItem(returnKey)");
     expect(form).toContain('document.body.dataset.pageKind === "form"');
 
     const search = renderDocument(

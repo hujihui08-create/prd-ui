@@ -94,6 +94,15 @@ function bool(value: unknown): boolean {
   return value === true;
 }
 
+/**
+ * Curated read-only notes use the `只读说明「…」` form; only that captured text
+ * is shown to users. Other PRD/internal notes are intentionally hidden.
+ */
+export function readOnlyNote(note: string | undefined): string | undefined {
+  const match = /只读说明「(.+?)」/.exec(note ?? "");
+  return match?.[1];
+}
+
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }
@@ -768,7 +777,7 @@ ${typeClasses(profile)}
 .topbar-chevron{font-size:20px;color:var(--color-text-secondary);}
 .topbar-bell{font-size:24px;color:var(--color-text-primary);}
 .page-header{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;gap:var(--space-2);background:var(--color-surface-subtle);}
-.back-icon{font-size:20px;}
+.back-icon{font-size:20px;cursor:pointer;}
 .page-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
 .tabbar{flex:0 0 64px;height:64px;background:var(--color-surface-default);border-top:1px solid var(--color-border-subtle);}
 .tabbar-inner{height:100%;display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0);}
@@ -1069,9 +1078,9 @@ function renderInteractionScript(): string {
         }
       }
       let note = document.querySelector(".state-note");
-      // Only read-only states (no bottom-bar action) carry a note; actionable
-      // states must not show long PRD explanations.
-      const noteText = visibleInBar === 0 ? currentState()?.note : undefined;
+      // Only curated read-only notes ("只读说明「…」") render, and only when
+      // the state has no bottom-bar action.
+      const noteText = visibleInBar === 0 ? config.stateNotes?.[status] : undefined;
       if (noteText) {
         if (!note && noteHost) {
           note = document.createElement("div");
@@ -1339,6 +1348,9 @@ function renderInteractionScript(): string {
     const params = new URLSearchParams(location.search);
     const pickerSearch = config.customerPicker;
     const pickerReturn = config.pickerReturnTo;
+    const draftKey = "prd-ui:picker:" + config.pageId;
+    const selectedKey = "prd-ui:picker:selected";
+    const returnKey = "prd-ui:picker:return";
     if (params.get("mode") === "picker") {
       const title = document.querySelector(".page-title");
       if (title) title.textContent = "选择客户";
@@ -1355,7 +1367,10 @@ function renderInteractionScript(): string {
               input.closest("[data-field]")?.dataset.field;
             if (key) draft[key] = input.value;
           }
-          sessionStorage.setItem("prd-ui:picker:" + config.pageId, JSON.stringify(draft));
+          sessionStorage.setItem(draftKey, JSON.stringify(draft));
+          // The return flag survives a picker cancel/back, so the form can
+          // restore the draft on reload even without a selected customer.
+          sessionStorage.setItem(returnKey, config.pageId);
           location.href = pickerSearch + ".html?mode=picker&returnTo=" + config.pageId;
         });
       }
@@ -1371,16 +1386,13 @@ function renderInteractionScript(): string {
             config.pageArchetypes?.[requestedReturn] === "mobile-form";
           const target = allowed ? requestedReturn : pickerReturn;
           if (!target) return;
-          sessionStorage.setItem("prd-ui:picker:return", target);
-          sessionStorage.setItem("prd-ui:picker:selected", row.dataset.searchText ?? "");
+          sessionStorage.setItem(returnKey, target);
+          sessionStorage.setItem(selectedKey, row.dataset.searchText ?? "");
           location.href = target + ".html";
         });
       }
     }
     if (document.body.dataset.pageKind === "form") {
-      const draftKey = "prd-ui:picker:" + config.pageId;
-      const selectedKey = "prd-ui:picker:selected";
-      const returnKey = "prd-ui:picker:return";
       const hasPrefill = Boolean(params.get("date") && params.get("time"));
       const isPickerReturn = sessionStorage.getItem(returnKey) === config.pageId;
       if (isPickerReturn) sessionStorage.removeItem(returnKey);
@@ -1388,6 +1400,7 @@ function renderInteractionScript(): string {
         // Calendar/list prefill always wins over a stale picker draft.
         sessionStorage.removeItem(draftKey);
         sessionStorage.removeItem(selectedKey);
+        sessionStorage.removeItem(returnKey);
       } else if (isPickerReturn) {
         const draftRaw = sessionStorage.getItem(draftKey);
         if (draftRaw) {
@@ -1405,6 +1418,7 @@ function renderInteractionScript(): string {
             sessionStorage.removeItem(draftKey);
           }
         }
+        // The draft stays until save/back; a selected customer is optional.
         const selected = sessionStorage.getItem(selectedKey);
         if (selected) {
           const customer = document.querySelector('[data-field=customer] input');
@@ -1412,7 +1426,7 @@ function renderInteractionScript(): string {
           sessionStorage.removeItem(selectedKey);
         }
       }
-      // Saving or cancelling the form ends the picker drafts.
+      // Saving the form ends the picker draft (back clears it separately).
       for (const button of qsa(".app-actions [data-action]")) {
         button.addEventListener("click", () => {
           sessionStorage.removeItem(draftKey);
@@ -1460,12 +1474,18 @@ export function renderDocument(
             mode.name === "new" ? "新增预约" : mode.name === "reschedule" ? "改期" : mode.label,
           ])
         );
+  const stateNotes: Record<string, string> = {};
+  for (const state of spec.businessStates ?? []) {
+    const note = readOnlyNote(state.note);
+    if (note !== undefined) stateNotes[state.name] = note;
+  }
   const config = {
     archetype: spec.meta.archetype,
     pageId: spec.meta.pageId,
     businessStates: spec.businessStates ?? null,
     formModes: spec.formModes ?? null,
     formModeLabels,
+    stateNotes: Object.keys(stateNotes).length > 0 ? stateNotes : null,
     views: spec.views ?? null,
     defaultView: spec.defaultView ?? null,
     searchIdleTitle: spec.searchIdleTitle ?? null,
@@ -1485,6 +1505,28 @@ export function renderDocument(
       spec.customerPicker !== undefined ||
       spec.pickerReturnTo !== undefined);
   const pageKind = spec.meta.archetype === "mobile-form" ? "form" : spec.meta.archetype;
+  const hasBackControl =
+    spec.layout.type === "MobileShell" && spec.layout.props?.back === true;
+  const backScript = hasBackControl
+    ? `  <script>
+    (() => {
+      const back = document.querySelector(".back-icon");
+      if (!back) return;
+      back.addEventListener("click", () => {
+        // Form/detail back cancels the form and its picker drafts. The search
+        // page back is a picker cancel: it must leave the draft for the form.
+        const pageKind = document.body.dataset.pageKind;
+        if (pageKind === "form" || pageKind === "detail") {
+          sessionStorage.removeItem("prd-ui:picker:" + ${JSON.stringify(spec.meta.pageId)});
+          sessionStorage.removeItem("prd-ui:picker:selected");
+          sessionStorage.removeItem("prd-ui:picker:return");
+        }
+        if (history.length > 1) history.back();
+        else location.href = "index.html";
+      });
+    })();
+  </script>`
+    : "";
   const interactionMarkup = hasInteraction
     ? `  <script id="interaction-config" type="application/json">${JSON.stringify(config).replace(/</g, "\\u003c")}</script>
   ${renderInteractionScript()}`
@@ -1503,6 +1545,7 @@ export function renderDocument(
 <body data-state="default" data-page-kind="${esc(pageKind)}">
   ${stateSwitcher()}
   ${body}
+${backScript}
 ${interactionMarkup}
   <script>
     (() => {
