@@ -4,7 +4,7 @@
       "meta": {
         "project": "employee-app-phase2",
         "version": "0.1.0",
-        "sourcePrdHash": "sha256:e2fbf06461083e3a61f2af578cd25b04f45dcd8acefc00d538efc893d52ec01e",
+        "sourcePrdHash": "sha256:2f442a07f0ba51952fa76a6d6aaac383a3255712056a44a85df81d85ecddf24b",
         "date": "2026-10-22",
         "profile": "b-mobile",
         "platforms": [
@@ -12,17 +12,19 @@
         ]
       },
       "product": {
-        "name": "员工端小程序",
-        "type": "微信小程序（uni-app），门店一线员工移动工作台",
+        "name": "员工端门店工作台小程序（Phase 2 8 页切片）",
+        "type": "微信小程序（uni-app）· 门店一线员工移动工作台",
         "goals": [
-          "让门店一线员工在服务现场完成客户查找、预约接待、术后告知与回访登记",
-          "通过业务状态与动作的强约束保证预约操作与当前状态一致",
-          "在移动端提供日历与列表两种预约查看维度，兼顾排单节奏与逐条查看"
+          "在服务现场完成今日接待：查看当天预约与待回访",
+          "按姓名或脱敏手机号查找可查看客户并查看客户详情",
+          "完成预约到店确认、开单入口、改期、取消与术后告知",
+          "以日历与列表双维度查看预约并新增预约",
+          "登记回访内容与结果，保存后回到来源区块"
         ],
         "users": [
-          "店长",
-          "美容师",
-          "前台"
+          "店长（store_manager）",
+          "美容师（beautician）",
+          "前台（front_desk）"
         ],
         "roles": [
           "store_manager",
@@ -30,25 +32,28 @@
           "front_desk"
         ],
         "scope": [
-          "今日：门店与消息、快捷操作、我的预约、待回访",
-          "客户搜索与客户详情：按姓名或脱敏手机号搜索、查看客户基础信息、卡项与消费摘要",
-          "预约：预约详情、到店确认、改期、取消、新增、日历与列表双维度、术后告知",
-          "回访：登记回访内容与结果",
-          "全链路手机号脱敏与只读档位下写操作置灰拦截"
+          "今日：门店与快捷操作、我的预约、待回访",
+          "客户搜索：姓名或脱敏手机号搜索，支持 standalone 与 picker",
+          "客户详情：基础信息、消费摘要、标签备注、最近服务记录",
+          "预约详情：完整预约信息、状态相关动作、脱敏手机号",
+          "新增/改期预约：客户、项目、开始/结束时间、护理师、来源",
+          "术后告知：按项目分块展示告知快照并确认已当面告知",
+          "预约列表：我的排单/全店、日历/列表、日期与状态筛选",
+          "回访登记：客户、服务项目、回访内容、回访结果"
         ],
         "nonGoals": [
           "开单三步流程、订单详情、收款与签字",
-          "库存入库、出库、调拨、欠款还款、个人业绩、我的、消息与公告",
+          "库存入库/出库/调拨、欠款还款、个人业绩、我的、消息与公告",
           "Web 专属操作：整单作废、冲正、盘点、退卡、催收登记、客户档案编辑",
           "爽约入口：员工端不提供爽约操作，爽约状态只读可见",
           "客户 Tab 默认客户列表与新建客户表单，由宿主提供",
-          "工作台、库存、客户 Tab 默认列表等宿主页面"
+          "库管工作台与库存入口，由宿主承载"
         ],
         "successMetrics": [
-          "8 页主流程可在移动端完成接待、查客户、到店确认、改期或取消、术后告知与回访登记",
-          "手机号在所有页面与动作回显中保持脱敏，不出现完整号与拨号入口",
-          "只读档位下全部写操作置灰并由系统拦截，读操作正常",
-          "无权限动作不出现，页面可见性与角色表一致"
+          "8 页主流程可走通：今日→预约详情→到店/改期/取消；今日→待回访→回访登记；客户搜索→客户详情→预约/告知",
+          "所有页面与动作回显的手机号均为脱敏格式，无完整号与拨号入口",
+          "只读档位下所有写操作置灰并被系统拦截，读操作正常",
+          "预约列表默认日历、七列、09:00–20:00 按 60 分钟分格，状态高亮与列表筛选符合验收示例"
         ]
       },
       "ia": {
@@ -56,7 +61,7 @@
           {
             "id": "today",
             "name": "今日",
-            "purpose": "门店首页：展示门店、快捷操作、我的预约与待回访，作为接待、开单与预约入口；快捷操作与区块按功能点显隐。",
+            "purpose": "门店首页：展示门店名、快捷操作、我的预约与待回访；消息入口固定不显示；我的预约区块与行跳转需预约登记或到院分配，缺权时不显示。",
             "archetype": "home",
             "target": "mobile",
             "profile": "b-mobile",
@@ -78,22 +83,19 @@
               "REQ-SHARED-001"
             ],
             "fields": [],
-            "fieldLabels": {},
-            "actions": [],
-            "emptyTitle": "今天没有预约",
             "content": {
               "storeName": "星光店",
               "hasMessage": false,
               "quickActions": [
                 {
                   "label": "开单",
-                  "icon": "open-order",
+                  "icon": "billing",
                   "tone": "neutral"
                 },
                 {
                   "label": "预约",
-                  "icon": "appointment",
-                  "tone": "customer"
+                  "icon": "appointment-create",
+                  "tone": "neutral"
                 },
                 {
                   "label": "客户搜索",
@@ -133,7 +135,7 @@
                 {
                   "customer": "李女士",
                   "item": "补水",
-                  "daysAgo": "5 天前"
+                  "daysAgo": "7 天前"
                 }
               ],
               "appointmentsEmptyTitle": "今天没有预约",
@@ -143,7 +145,7 @@
           {
             "id": "customer-search",
             "name": "客户搜索",
-            "purpose": "按姓名或脱敏手机号搜索当前员工可查看的客户；首次进入未输入关键词时只显示搜索提示，不返回默认客户列表；无匹配时提供清空关键词。",
+            "purpose": "按姓名或脱敏手机号搜索当前员工可查看的客户；首次进入未输入关键词时不返回客户列表，仅显示搜索提示；无匹配时显示空态与「清空关键词」；支持 standalone 与 picker 两种模式，picker 从新增/改期表单客户字段进入，选择后返回表单并保留已填内容。",
             "archetype": "mobile-list",
             "target": "mobile",
             "profile": "b-mobile",
@@ -164,7 +166,6 @@
               "REQ-SHARED-001"
             ],
             "fields": [
-              "keyword",
               "name",
               "phone",
               "store"
@@ -177,7 +178,7 @@
             },
             "actions": [
               "搜索",
-              "清空关键词"
+              "查看详情"
             ],
             "filterFields": [
               "keyword"
@@ -187,19 +188,16 @@
             "mockData": {
               "rows": [
                 {
-                  "keyword": "张",
                   "name": "张女士",
                   "phone": "138****0000",
                   "store": "星光店"
                 },
                 {
-                  "keyword": "李",
                   "name": "李女士",
                   "phone": "139****0000",
                   "store": "星光店"
                 },
                 {
-                  "keyword": "王",
                   "name": "王女士",
                   "phone": "137****0000",
                   "store": "星光店"
@@ -210,7 +208,7 @@
           {
             "id": "customer-detail",
             "name": "客户详情",
-            "purpose": "查看客户基础信息、余额、累计消费、卡张数、标签备注与最近服务记录，并提供查看预约、新增预约、查看告知与回访登记入口。",
+            "purpose": "查看客户基础信息、消费摘要、标签备注与最近一条服务记录；查看预约/查看告知依赖该条服务记录与告知快照，无记录或无快照时不显示对应入口；新增预约预填客户；回访登记进入表单。",
             "archetype": "detail",
             "target": "mobile",
             "profile": "b-mobile",
@@ -265,17 +263,17 @@
                 "level": "金卡会员",
                 "balance": "¥1,280.00",
                 "totalSpent": "¥8,600.00",
-                "cardCount": "3 张",
+                "cardCount": "3",
                 "tags": "敏感肌、老客",
-                "notes": "暂无备注",
-                "serviceRecord": "10-20 · 小气泡 · APT-0001"
+                "notes": "—",
+                "serviceRecord": "10-20 · 小气泡 · A1020"
               }
             }
           },
           {
             "id": "appointment-detail",
             "name": "预约详情",
-            "purpose": "查看预约字段、业务状态与委派留痕，按状态执行到店确认、开单、改期、取消，并进入客户详情或术后告知。",
+            "purpose": "查看预约完整信息与状态相关动作；底部固定操作栏按业务状态切换；客户详情入口在可查看该客户时显示链接，否则只显示客户姓名文本。",
             "archetype": "detail",
             "target": "mobile",
             "profile": "b-mobile",
@@ -342,9 +340,10 @@
                   "接单并确认到店",
                   "开单",
                   "改期",
-                  "取消"
+                  "取消",
+                  "客户详情"
                 ],
-                "note": "待分配时「已到店确认」文案为「接单并确认到店」；只有已登记可执行到店、改期与取消。"
+                "note": "待分配时「已到店确认」文案为「接单并确认到店」；仅「已登记」可到店、改期、取消，由系统硬校验；「改期」入口需预约登记 + 客户查看。"
               },
               {
                 "name": "已到店",
@@ -353,17 +352,21 @@
                   "术后告知",
                   "客户详情"
                 ],
-                "note": "serviceCompleted=true 时显示「术后告知」；底部保留开单；改期与取消不出现。"
+                "note": "底部保留开单；serviceCompleted=true 且告知快照存在时显示「术后告知」；改期与取消不出现。"
               },
               {
                 "name": "爽约",
-                "actions": [],
-                "note": "只读说明：爽约已记录入客户档案；员工端不提供爽约操作。"
+                "actions": [
+                  "客户详情"
+                ],
+                "note": "只读说明「爽约已记录入客户档案」；员工端不提供爽约入口；客户详情链接仅在可查看该客户时显示。"
               },
               {
                 "name": "已取消",
-                "actions": [],
-                "note": "只读说明：本单已取消。"
+                "actions": [
+                  "客户详情"
+                ],
+                "note": "只读说明「本单已取消」；底部操作栏消失；客户详情链接仅在可查看该客户时显示。"
               }
             ],
             "mockData": {
@@ -376,8 +379,8 @@
                 "therapist": "王美容",
                 "store": "星光店",
                 "source": "电话",
-                "creator": "李店长",
-                "createdAt": "2026-11-01 09:15",
+                "creator": "王美容",
+                "createdAt": "2026-11-01 15:20",
                 "delegation": "—",
                 "serviceCompleted": "否"
               }
@@ -386,7 +389,7 @@
           {
             "id": "appointment-form",
             "name": "新增/改期预约",
-            "purpose": "新增或改期预约，校验客户、项目、起止时间、护理师与来源；改期模式使用 query 参数 mode=reschedule 与 appointmentId 恢复单据并锁定客户，保存后回到预约详情；新增保存后回到进入来源页。",
+            "purpose": "新增或改期预约：客户、项目、开始时间、结束时间、护理师、来源；new 模式客户可编辑，从列表/日历进入时客户字段打开客户搜索（mode=picker）并保留已填内容；reschedule 模式通过 `?mode=reschedule&appointmentId=<预约 id>` 恢复单据并锁定客户，按钮文案「保存改期」；开始时间须早于结束时间。",
             "archetype": "mobile-form",
             "target": "mobile",
             "profile": "b-mobile",
@@ -427,7 +430,7 @@
             "actions": [
               "保存",
               "保存改期",
-              "打开客户搜索选择器"
+              "选择客户"
             ],
             "formModes": [
               {
@@ -435,7 +438,7 @@
                 "label": "保存",
                 "actions": [
                   "保存",
-                  "打开客户搜索选择器"
+                  "选择客户"
                 ],
                 "customerLocked": false
               },
@@ -452,7 +455,7 @@
           {
             "id": "treatment-notice",
             "name": "术后告知",
-            "purpose": "只读展示按项目分块的术后告知话术并确认已当面告知；noticeBlocks 非空时优先展示，noticeBlocks 与 notices 皆空时只读显示「暂无告知内容」且不显示确认按钮。",
+            "purpose": "只读展示按项目分块的术后告知快照；未确认时可「确认已当面告知」，已确认后只读显示确认人与确认时间；notices 与 noticeBlocks 皆空时显示「暂无告知内容」且不显示确认按钮。",
             "archetype": "detail",
             "target": "mobile",
             "profile": "b-mobile",
@@ -464,6 +467,7 @@
             ],
             "requiredStates": [
               "default",
+              "empty",
               "loading",
               "error",
               "disabled"
@@ -493,20 +497,19 @@
             "actions": [
               "确认已当面告知"
             ],
-            "emptyTitle": "暂无告知内容",
             "noticeBlocks": [
               {
                 "title": "小气泡",
                 "items": [
-                  "术后 24 小时内避免沾水，保持治疗区域清洁干燥。",
-                  "注意防晒，避免高温环境与剧烈运动。"
+                  "术后 6 小时内避免沾水与化妆",
+                  "当日避免剧烈运动与高温环境"
                 ]
               },
               {
                 "title": "补水",
                 "items": [
-                  "当日避免使用含酸类或刺激性护肤品。",
-                  "如出现持续泛红或不适，及时联系门店。"
+                  "术后加强保湿与防晒",
+                  "24 小时内避免桑拿与高温环境"
                 ]
               }
             ],
@@ -516,12 +519,12 @@
                 "actions": [
                   "确认已当面告知"
                 ],
-                "note": "展示分块话术与确认按钮。"
+                "note": "展示分块话术与确认按钮；notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮。"
               },
               {
                 "name": "已确认",
                 "actions": [],
-                "note": "只读，显示确认人与确认时间。"
+                "note": "只读，显示确认人与确认时间；内容为快照，重新进入不变。"
               }
             ],
             "mockData": {
@@ -529,8 +532,8 @@
                 "customer": "张女士",
                 "orderNo": "SO20261102001",
                 "status": "未确认",
-                "notices": "小气泡项目术后注意事项；补水项目护理须知",
-                "noticeBlocks": "2 个告知分块：小气泡、补水",
+                "notices": "—",
+                "noticeBlocks": "小气泡、补水（共 2 块）",
                 "confirmedBy": "—",
                 "confirmedAt": "—"
               }
@@ -539,7 +542,7 @@
           {
             "id": "appointment-list",
             "name": "预约列表",
-            "purpose": "以我的排单/全店与日历/列表双维度查看预约，按日期与状态筛选；日历块先打开只读详情抽屉，再由「查看完整详情」进入预约详情，列表行直接进入详情，并支持新增预约。",
+            "purpose": "以日历或列表查看预约：默认日历七列（09:00–20:00，60 分钟分格，今天列高亮），可切换列表（按日期分组）；日期默认今天；同时具备我的排单与全店时默认我的排单；支持状态筛选与新增预约。",
             "archetype": "mobile-list",
             "target": "mobile",
             "profile": "b-mobile",
@@ -583,12 +586,9 @@
               "store": "门店"
             },
             "actions": [
-              "切换日历/列表",
               "新增预约",
-              "查看完整详情",
-              "切换我的排单/全店",
-              "选择日期",
-              "选择状态"
+              "切换日历/列表",
+              "查看完整详情"
             ],
             "filterFields": [
               "status",
@@ -629,15 +629,15 @@
                   "project": "肩颈",
                   "status": "已登记",
                   "therapist": "赵××",
-                  "delegation": "已改派给 赵××",
+                  "delegation": "—",
                   "store": "星光店"
                 },
                 {
                   "date": "11-05 周三",
                   "time": "18:00-19:00",
-                  "customer": "陈女士",
-                  "project": "抗衰",
-                  "status": "已取消",
+                  "customer": "赵女士",
+                  "project": "补水",
+                  "status": "爽约",
                   "therapist": "赵××",
                   "delegation": "—",
                   "store": "星光店"
@@ -648,7 +648,7 @@
           {
             "id": "callback-register",
             "name": "回访登记",
-            "purpose": "登记回访客户、服务项目、回访内容与结果；保存后回到今日待回访区块，从客户详情进入时回到客户详情。",
+            "purpose": "登记回访内容与结果；客户可从今日待回访区块、客户详情带入或表单内客户选择器选择；保存成功回到来源（今日待回访区块或客户详情）；未接/拒绝/稍后再联系保存后仍保留在今日待回访。",
             "archetype": "mobile-form",
             "target": "mobile",
             "profile": "b-mobile",
@@ -682,7 +682,7 @@
             },
             "actions": [
               "保存回访",
-              "打开客户搜索选择器"
+              "选择客户"
             ]
           }
         ],
@@ -703,27 +703,32 @@
             ]
           },
           {
-            "id": "flow-callback",
+            "id": "flow-today-callback",
             "steps": [
               "today",
-              "callback-register",
-              "today"
+              "callback-register"
+            ]
+          },
+          {
+            "id": "flow-search-customer",
+            "steps": [
+              "today",
+              "customer-search",
+              "customer-detail"
             ]
           },
           {
             "id": "flow-customer-appointment",
             "steps": [
-              "customer-search",
               "customer-detail",
               "appointment-detail"
             ]
           },
           {
-            "id": "flow-customer-new-appointment",
+            "id": "flow-customer-new",
             "steps": [
               "customer-detail",
-              "appointment-form",
-              "customer-detail"
+              "appointment-form"
             ]
           },
           {
@@ -735,7 +740,7 @@
             ]
           },
           {
-            "id": "flow-list-entry",
+            "id": "flow-list-browse",
             "steps": [
               "appointment-list",
               "appointment-detail"
@@ -745,22 +750,44 @@
             "id": "flow-list-new",
             "steps": [
               "appointment-list",
-              "appointment-form",
-              "appointment-list"
+              "appointment-form"
             ]
           },
           {
-            "id": "flow-notice-from-detail",
+            "id": "flow-notice",
             "steps": [
               "appointment-detail",
               "treatment-notice"
             ]
           },
           {
-            "id": "flow-notice-from-customer",
+            "id": "flow-notice-customer",
             "steps": [
               "customer-detail",
               "treatment-notice"
+            ]
+          },
+          {
+            "id": "flow-picker",
+            "steps": [
+              "appointment-form",
+              "customer-search",
+              "appointment-form"
+            ]
+          },
+          {
+            "id": "flow-today-new",
+            "steps": [
+              "today",
+              "appointment-form",
+              "today"
+            ]
+          },
+          {
+            "id": "flow-callback-customer",
+            "steps": [
+              "customer-detail",
+              "callback-register"
             ]
           }
         ],
@@ -773,7 +800,7 @@
       "data": {
         "entities": [
           {
-            "name": "TodayContent",
+            "name": "今日 content",
             "fields": [
               {
                 "name": "storeName",
@@ -813,7 +840,7 @@
             ]
           },
           {
-            "name": "CustomerSearch",
+            "name": "客户搜索",
             "fields": [
               {
                 "name": "keyword",
@@ -838,7 +865,7 @@
             ]
           },
           {
-            "name": "CustomerDetail",
+            "name": "客户详情",
             "fields": [
               {
                 "name": "name",
@@ -872,7 +899,7 @@
               },
               {
                 "name": "tags",
-                "type": "string",
+                "type": "array",
                 "required": false
               },
               {
@@ -888,7 +915,7 @@
             ]
           },
           {
-            "name": "AppointmentDetail",
+            "name": "预约详情",
             "fields": [
               {
                 "name": "customer",
@@ -965,7 +992,7 @@
             ]
           },
           {
-            "name": "AppointmentForm",
+            "name": "新增/改期预约",
             "fields": [
               {
                 "name": "customer",
@@ -1006,7 +1033,7 @@
             ]
           },
           {
-            "name": "TreatmentNotice",
+            "name": "术后告知",
             "fields": [
               {
                 "name": "customer",
@@ -1030,12 +1057,12 @@
               {
                 "name": "notices",
                 "type": "string",
-                "required": false
+                "required": true
               },
               {
                 "name": "noticeBlocks",
                 "type": "array",
-                "required": false
+                "required": true
               },
               {
                 "name": "confirmedBy",
@@ -1050,7 +1077,7 @@
             ]
           },
           {
-            "name": "AppointmentList",
+            "name": "预约列表",
             "fields": [
               {
                 "name": "date",
@@ -1101,7 +1128,7 @@
             ]
           },
           {
-            "name": "CallbackRegister",
+            "name": "回访登记",
             "fields": [
               {
                 "name": "customer",
@@ -1135,8 +1162,8 @@
       },
       "assets": {
         "icons": [
-          "open-order",
-          "appointment",
+          "billing",
+          "appointment-create",
           "customer-search"
         ],
         "illustrations": [],
@@ -1151,84 +1178,57 @@
       "openQuestions": [
         {
           "id": "Q-001",
-          "question": "客户详情页的「查看预约」入口放在哪里、进入哪一条预约详情？客户有多条预约时是只允许看最近一条，还是需要预约列表？",
+          "question": "术后告知在 notices 与 noticeBlocks 皆空时，是否作为显式空态处理：只读显示「暂无告知内容」且不显示确认按钮？",
           "blocking": false
         },
         {
           "id": "Q-002",
-          "question": "术后告知的「暂无告知内容」是否应作为 empty 或独立内容态纳入状态矩阵？",
+          "question": "当 serviceCompleted=true 但没有告知快照时，预约详情的「术后告知」入口是否隐藏？",
           "blocking": false
         },
         {
           "id": "Q-003",
-          "question": "日历块点击后应直接进入 appointment-detail，还是先打开只读抽屉再由「查看完整详情」进入？以哪条为准？",
+          "question": "预约详情的「客户详情」入口是否与预约业务状态无关，仅在可查看该客户时显示链接？",
           "blocking": false
         },
         {
           "id": "Q-004",
-          "question": "回访登记的服务项目从哪里取值（待回访条目带入、预约项目选择或自由填写）？本切片回访是否绑定具体预约？",
-          "blocking": false
-        },
-        {
-          "id": "Q-005",
-          "question": "项目与护理师字段的候选数据来自哪里（项目目录、门店员工列表）？首版是否允许自由输入？",
-          "blocking": false
-        },
-        {
-          "id": "Q-006",
-          "question": "今日「我的预约」是否与预约列表「我的排单」同口径（含跨店行）？若是，门店名在今日行内如何展示？",
-          "blocking": false
-        },
-        {
-          "id": "Q-007",
-          "question": "取消预约是否统一使用二次确认弹窗？弹窗标题、正文与确认、取消按钮文案是什么？",
+          "question": "验收示例 3 的服务记录能否补充预约 id，以支撑「查看告知」跳转？",
           "blocking": false
         }
       ],
       "assumptions": [
         {
-          "id": "A-001",
-          "statement": "客户详情「查看预约」入口置于最近服务记录行，打开该记录关联的预约详情并携带 appointmentId；无关联预约时不显示该入口。"
+          "id": "ASM-001",
+          "statement": "术后告知在 notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮；该空态纳入页面 requiredStates。"
         },
         {
-          "id": "A-002",
-          "statement": "术后告知不新增页面状态；noticeBlocks 与 notices 皆空时按内容空态只读显示「暂无告知内容」，不显示确认按钮。"
+          "id": "ASM-002",
+          "statement": "预约详情「术后告知」入口仅在 serviceCompleted=true 且告知快照存在、且对应预约可查看时显示；无快照时不显示入口。"
         },
         {
-          "id": "A-003",
-          "statement": "预约列表日历块点击先打开只读详情抽屉，抽屉内「查看完整详情」进入预约详情；列表行直接进入预约详情。"
+          "id": "ASM-003",
+          "statement": "「客户详情」入口按 §10 与「可查看客户」判定，与预约业务状态无关；§12.1 的「无」按业务写动作理解，不屏蔽客户详情读取穿透。"
         },
         {
-          "id": "A-004",
-          "statement": "回访登记的服务项目由来源待回访条目带入，并可在表单内改选；本切片回访不绑定 appointmentId。"
+          "id": "ASM-004",
+          "statement": "服务记录按「日期 · 项目 · 预约 id」展示，示意数据补一个预约 id 以支撑「查看告知」跳转。"
         },
         {
-          "id": "A-005",
-          "statement": "新增与改期表单的项目、护理师为选择器，候选分别来自门店项目目录与门店员工列表；首版不允许自由输入。"
+          "id": "ASM-005",
+          "statement": "今日不渲染消息入口，hasMessage 固定 false；页面清单中的「消息」视为宿主能力。"
         },
         {
-          "id": "A-006",
-          "statement": "今日「我的预约」与预约列表「我的排单」同口径并可含跨店行；门店名作为行内附加文案展示，不新增字段。"
+          "id": "ASM-006",
+          "statement": "预约列表日历展示 09:00–20:00，按 60 分钟分格；空格点击预填该格的日期与开始时间。"
         },
         {
-          "id": "A-007",
-          "statement": "取消预约统一使用二次确认弹窗，标题「取消预约」，正文「确认取消该预约？」，按钮「确认取消」「再想想」。"
+          "id": "ASM-007",
+          "statement": "示例客户、金额、脱敏手机号、待回访天数、列表第 4 条爽约行与告知话术条目均为示意展示内容，非真实数据；实际以 PRD 字段表与告知快照为准。"
         },
         {
-          "id": "A-008",
-          "statement": "今日待回访的客户、项目与天数示例为示意数据，用于展示区块结构，不代表真实业务记录。"
-        },
-        {
-          "id": "A-009",
-          "statement": "术后告知的分块话术为示意文案，实际展示以服务完成时冻结的告知快照为准。"
-        },
-        {
-          "id": "A-010",
-          "statement": "客户详情无备注时显示「暂无备注」；有备注时按备注原文展示。"
-        },
-        {
-          "id": "A-011",
-          "statement": "所有页面与动作回显的手机号一律脱敏，演示数据使用 138****0000 等掩码格式，不出现完整号与拨号入口。"
+          "id": "ASM-008",
+          "statement": "今日示例按店长全权限展示「开单」「预约」「客户搜索」三个快捷操作；缺权角色按功能点显隐，读操作不受只读档位影响。"
         }
       ],
       "traceability": {
@@ -1288,176 +1288,114 @@
     "questions": [
       {
         "id": "Q-001",
-        "question": "客户详情页的「查看预约」入口放在哪里、进入哪一条预约详情？客户有多条预约时是只允许看最近一条，还是需要预约列表？",
+        "question": "术后告知在 notices 与 noticeBlocks 皆空时，是否作为显式空态处理：只读显示「暂无告知内容」且不显示确认按钮？",
         "options": [
-          "放在最近服务记录行，进入该记录关联的预约详情",
-          "增加预约列表区域，由员工选择目标预约",
-          "仅在有唯一关联预约时显示入口"
+          "是，声明 empty 空态且隐藏确认按钮",
+          "否，沿用状态矩阵的 empty 不适用"
         ],
-        "impact": "决定客户详情页的动作入口位置、预约详情路由参数来源与空态处理。",
-        "owner": "product_owner",
+        "impact": "决定 treatment-notice 的 requiredStates、确认按钮显隐与验收覆盖。",
+        "owner": "design_owner",
         "blocking": false,
         "sourceFindingId": "PRD-001"
       },
       {
         "id": "Q-002",
-        "question": "术后告知的「暂无告知内容」是否应作为 empty 或独立内容态纳入状态矩阵？",
+        "question": "当 serviceCompleted=true 但没有告知快照时，预约详情的「术后告知」入口是否隐藏？",
         "options": [
-          "作为内容空态，不新增页面状态",
-          "纳入页面 empty 状态",
-          "作为独立内容态并在状态矩阵中单列"
+          "隐藏，需快照存在",
+          "显示，进入后展示暂无告知内容"
         ],
-        "impact": "影响术后告知页的状态集合与空内容时的按钮显隐。",
-        "owner": "design_owner",
+        "impact": "决定 appointment-detail 已到店状态的 actions 与 treatment-notice 空态入口。",
+        "owner": "product_owner",
         "blocking": false,
         "sourceFindingId": "PRD-002"
       },
       {
         "id": "Q-003",
-        "question": "日历块点击后应直接进入 appointment-detail，还是先打开只读抽屉再由「查看完整详情」进入？以哪条为准？",
+        "question": "预约详情的「客户详情」入口是否与预约业务状态无关，仅在可查看该客户时显示链接？",
         "options": [
-          "先打开只读详情抽屉，再由「查看完整详情」进入",
-          "直接进入 appointment-detail",
-          "按角色区分两种进入方式"
+          "与状态无关",
+          "仅已到店显示",
+          "仅已登记与已到店显示"
         ],
-        "impact": "影响预约列表页的抽屉状态、点击路径与验收脚本。",
+        "impact": "决定 appointment-detail 四个 businessStates 的 actions 与不可查看客户时的姓名文本降级。",
         "owner": "product_owner",
         "blocking": false,
         "sourceFindingId": "PRD-003"
       },
       {
         "id": "Q-004",
-        "question": "回访登记的服务项目从哪里取值（待回访条目带入、预约项目选择或自由填写）？本切片回访是否绑定具体预约？",
+        "question": "验收示例 3 的服务记录能否补充预约 id，以支撑「查看告知」跳转？",
         "options": [
-          "从来源待回访条目带入，可在表单内改选",
-          "打开预约项目选择器选择",
-          "允许自由填写"
+          "补充预约 id",
+          "保持现状并由实现按最近一条预约解析"
         ],
-        "impact": "决定回访登记服务项目字段的控件形态、数据来源与保存契约。",
+        "impact": "决定 customer-detail 服务记录展示格式与查看告知的跳转可测性。",
         "owner": "data_owner",
         "blocking": false,
         "sourceFindingId": "PRD-004"
-      },
-      {
-        "id": "Q-005",
-        "question": "项目与护理师字段的候选数据来自哪里（项目目录、门店员工列表）？首版是否允许自由输入？",
-        "options": [
-          "项目来自项目目录选择器，护理师来自门店员工列表选择器，不允许自由输入",
-          "两者均为选择器但允许追加自由输入",
-          "两者均为自由文本"
-        ],
-        "impact": "决定新增与改期表单两个字段的控件选型、校验与候选加载。",
-        "owner": "data_owner",
-        "blocking": false,
-        "sourceFindingId": "PRD-005"
-      },
-      {
-        "id": "Q-006",
-        "question": "今日「我的预约」是否与预约列表「我的排单」同口径（含跨店行）？若是，门店名在今日行内如何展示？",
-        "options": [
-          "同一口径，跨店行在行内追加门店名",
-          "今日仅展示本店预约",
-          "同一口径但门店名仅在跨店时以标签展示"
-        ],
-        "impact": "影响今日预约区块的数据范围与行内信息密度。",
-        "owner": "product_owner",
-        "blocking": false,
-        "sourceFindingId": "PRD-006"
-      },
-      {
-        "id": "Q-007",
-        "question": "取消预约是否统一使用二次确认弹窗？弹窗标题、正文与确认、取消按钮文案是什么？",
-        "options": [
-          "统一二次确认，标题「取消预约」，正文「确认取消该预约？」，按钮「确认取消」「再想想」",
-          "统一二次确认，但文案另行提供",
-          "仅对已登记预约二次确认"
-        ],
-        "impact": "影响预约详情取消动作的确认弹窗与验收断言。",
-        "owner": "product_owner",
-        "blocking": false,
-        "sourceFindingId": "PRD-007"
       }
     ],
     "assumptions": [
       {
-        "id": "A-001",
-        "statement": "客户详情「查看预约」入口置于最近服务记录行，打开该记录关联的预约详情并携带 appointmentId；无关联预约时不显示该入口。",
-        "source": "PRD-001 / PRD sec-004、sec-014、sec-022",
-        "confidence": 0.72,
-        "blocking": false
-      },
-      {
-        "id": "A-002",
-        "statement": "术后告知不新增页面状态；noticeBlocks 与 notices 皆空时按内容空态只读显示「暂无告知内容」，不显示确认按钮。",
-        "source": "PRD-002 / PRD sec-006、sec-017",
-        "confidence": 0.8,
-        "blocking": false
-      },
-      {
-        "id": "A-003",
-        "statement": "预约列表日历块点击先打开只读详情抽屉，抽屉内「查看完整详情」进入预约详情；列表行直接进入预约详情。",
-        "source": "PRD-003 / PRD sec-022、sec-029",
-        "confidence": 0.8,
-        "blocking": false
-      },
-      {
-        "id": "A-004",
-        "statement": "回访登记的服务项目由来源待回访条目带入，并可在表单内改选；本切片回访不绑定 appointmentId。",
-        "source": "PRD-004 / PRD sec-010、sec-019",
-        "confidence": 0.62,
-        "blocking": false
-      },
-      {
-        "id": "A-005",
-        "statement": "新增与改期表单的项目、护理师为选择器，候选分别来自门店项目目录与门店员工列表；首版不允许自由输入。",
-        "source": "PRD-005 / PRD sec-016",
-        "confidence": 0.6,
-        "blocking": false
-      },
-      {
-        "id": "A-006",
-        "statement": "今日「我的预约」与预约列表「我的排单」同口径并可含跨店行；门店名作为行内附加文案展示，不新增字段。",
-        "source": "PRD-006 / PRD sec-012、sec-003",
-        "confidence": 0.58,
-        "blocking": false
-      },
-      {
-        "id": "A-007",
-        "statement": "取消预约统一使用二次确认弹窗，标题「取消预约」，正文「确认取消该预约？」，按钮「确认取消」「再想想」。",
-        "source": "PRD-007 / PRD sec-020 #4、sec-007",
-        "confidence": 0.7,
-        "blocking": false
-      },
-      {
-        "id": "A-008",
-        "statement": "今日待回访的客户、项目与天数示例为示意数据，用于展示区块结构，不代表真实业务记录。",
-        "source": "PRD sec-020 #1",
-        "confidence": 0.85,
-        "blocking": false
-      },
-      {
-        "id": "A-009",
-        "statement": "术后告知的分块话术为示意文案，实际展示以服务完成时冻结的告知快照为准。",
-        "source": "PRD sec-020 #7、sec-010",
-        "confidence": 0.8,
-        "blocking": false
-      },
-      {
-        "id": "A-010",
-        "statement": "客户详情无备注时显示「暂无备注」；有备注时按备注原文展示。",
-        "source": "PRD sec-014 客户详情字段表",
+        "id": "ASM-001",
+        "statement": "术后告知在 notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮；该空态纳入页面 requiredStates。",
+        "source": "PRD §5.6 + review PRD-001",
         "confidence": 0.9,
         "blocking": false
       },
       {
-        "id": "A-011",
-        "statement": "所有页面与动作回显的手机号一律脱敏，演示数据使用 138****0000 等掩码格式，不出现完整号与拨号入口。",
-        "source": "PRD sec-003、sec-020 #11",
+        "id": "ASM-002",
+        "statement": "预约详情「术后告知」入口仅在 serviceCompleted=true 且告知快照存在、且对应预约可查看时显示；无快照时不显示入口。",
+        "source": "PRD §10 首版决策 + review PRD-002",
+        "confidence": 0.9,
+        "blocking": false
+      },
+      {
+        "id": "ASM-003",
+        "statement": "「客户详情」入口按 §10 与「可查看客户」判定，与预约业务状态无关；§12.1 的「无」按业务写动作理解，不屏蔽客户详情读取穿透。",
+        "source": "PRD §10 首版决策 + review PRD-003",
+        "confidence": 0.88,
+        "blocking": false
+      },
+      {
+        "id": "ASM-004",
+        "statement": "服务记录按「日期 · 项目 · 预约 id」展示，示意数据补一个预约 id 以支撑「查看告知」跳转。",
+        "source": "PRD §5.3 + review PRD-004",
+        "confidence": 0.85,
+        "blocking": false
+      },
+      {
+        "id": "ASM-005",
+        "statement": "今日不渲染消息入口，hasMessage 固定 false；页面清单中的「消息」视为宿主能力。",
+        "source": "PRD §5.1 + §10 + review PRD-005",
+        "confidence": 0.9,
+        "blocking": false
+      },
+      {
+        "id": "ASM-006",
+        "statement": "预约列表日历展示 09:00–20:00，按 60 分钟分格；空格点击预填该格的日期与开始时间。",
+        "source": "人工答复（产品决策）",
         "confidence": 0.98,
+        "blocking": false,
+        "acceptedBy": "产品决策"
+      },
+      {
+        "id": "ASM-007",
+        "statement": "示例客户、金额、脱敏手机号、待回访天数、列表第 4 条爽约行与告知话术条目均为示意展示内容，非真实数据；实际以 PRD 字段表与告知快照为准。",
+        "source": "PRD §6 验收示例 + 脱敏规则",
+        "confidence": 0.8,
+        "blocking": false
+      },
+      {
+        "id": "ASM-008",
+        "statement": "今日示例按店长全权限展示「开单」「预约」「客户搜索」三个快捷操作；缺权角色按功能点显隐，读操作不受只读档位影响。",
+        "source": "PRD §2 角色与权限 + §6 验收示例 1",
+        "confidence": 0.86,
         "blocking": false
       }
     ],
-    "reviewMarkdown": "# UI Brief 候选复核（employee-app-phase2，8 页）\n\n## 页面覆盖\n- 页面与 PRD 页面清单一致：今日、客户搜索、客户详情、预约详情、新增/改期预约、术后告知、预约列表、回访登记，共 8 页。\n- 目标与画像：mobile / b-mobile，8 页统一；路由沿用 PRD。\n- 角色：store_manager、beautician、front_desk 均可见全部 8 页，落点均为 today。\n\n## 原型与交互元数据\n- 今日：home；fields 为空，门店、快捷操作、我的预约、待回访与两类空态均放在 content。\n- 客户搜索：mobile-list；首次进入显示 searchIdleTitle，不返回默认客户列表；filterFields=keyword。\n- 客户详情：detail；9 个字段均提供 fieldLabels 与 mockData.values；动作含查看预约、新增预约、查看告知、回访登记。\n- 预约详情：detail；按状态矩阵输出已登记、已到店、爽约、已取消四个 businessStates，所有状态动作均为 page.actions 子集，只读状态带说明。\n- 新增/改期预约：mobile-form；formModes 覆盖 new 与 reschedule，reschedule 锁定客户并使用 mode=reschedule 与 appointmentId 恢复单据。\n- 术后告知：detail；输出按项目分块的 noticeBlocks，未确认可确认，已确认只读；两字段皆空时只读显示暂无告知内容且不显示确认按钮。\n- 预约列表：mobile-list；具备 date/time 字段，输出 views=[calendar,list] 且 defaultView=calendar；filterFields=status、date；4 行示例覆盖已登记、已到店、已登记改派、已取消。\n- 回访登记：mobile-form；字段与枚举结果来自 PRD，动作含保存回访与打开客户搜索选择器。\n\n## 数据与脱敏\n- 客户、门店、项目、时间、状态等示例值均取自 PRD 验收示例；无示例的字段使用中性展示值并记录假设。\n- 手机号全部为掩码格式，无完整号、无拨号入口。\n- 所有含字段页面均提供 fieldLabels；列表页每行覆盖全部字段键，详情页每个字段均有展示字符串。\n\n## 门禁修复\n上一轮 brief 编译在 today 的 ListRow.statusTone 使用了枚举外的值。本轮 statusTone 仅使用 catalog 枚举中的 info 与 success，未出现 pending 或其他越界值；其余枚举字段均取自 PRD 状态与选项表。\n\n## 问题与假设\n7 个问题均为非阻塞并已给出对应假设，阻塞问题为 0，可进入签收与编译。"
+    "reviewMarkdown": "# UI Brief 评审摘要\n\n## 1. 范围与一致性\n- 页面数：8，与 PRD §3 页面清单、IA map 完全一致：today、customer-search、customer-detail、appointment-detail、appointment-form、treatment-notice、appointment-list、callback-register。\n- 角色：store_manager、beautician、front_desk；8 页均对三角色可见，未新增角色。\n- 单档 profile：b-mobile 应用于全部 8 页，target=mobile。\n- 未指定配色、字体、插画与视觉方向；designDirection 仅使用项目 profile 的默认密度/语气/动效。\n\n## 2. 页面映射\n| 页面 | archetype | requiredStates | reqRefs |\n|---|---|---|---|\n| 今日 | home | default/empty/loading/error/disabled | REQ-TODAY-001, REQ-SHARED-001 |\n| 客户搜索 | mobile-list | default/empty/loading/error | REQ-CUSTOMER-001, REQ-SHARED-001 |\n| 客户详情 | detail | default/loading/error/disabled | REQ-CUSTOMER-002, REQ-SHARED-001 |\n| 预约详情 | detail | default/loading/error/disabled | REQ-APPT-001, REQ-APPT-002, REQ-APPT-004, REQ-SHARED-001 |\n| 新增/改期预约 | mobile-form | default/loading/error/disabled | REQ-APPT-003, REQ-APPT-004, REQ-LIST-003, REQ-SHARED-001 |\n| 术后告知 | detail | default/empty/loading/error/disabled | REQ-NOTICE-001, REQ-SHARED-001 |\n| 预约列表 | mobile-list | default/empty/loading/error/disabled | REQ-LIST-001, REQ-LIST-002, REQ-LIST-003, REQ-SHARED-001 |\n| 回访登记 | mobile-form | default/loading/error/disabled | REQ-CALLBACK-001, REQ-SHARED-001 |\n\n## 3. 交互元数据\n- appointment-detail：4 个 businessStates（已登记/已到店/爽约/已取消），动作均为 page.actions 子集；只读态附说明；待分配时「已到店确认」文案为「接单并确认到店」。\n- appointment-form：new（保存，客户可编辑，可打开 picker）/ reschedule（保存改期，客户锁定，appointmentId 走 query 契约）。\n- appointment-list：views=calendar/list，defaultView=calendar；日历 09:00–20:00、60 分钟分格（人工答复）；状态筛选与日历高亮并存。\n- customer-search：searchIdleTitle 明确，未输入关键词不返回客户列表；picker 返回保留已填内容。\n- treatment-notice：noticeBlocks 按小气泡/补水两块展示，notices 仅作回退；空内容进入只读空态。\n\n## 4. 数据与脱敏\n- 8 个 data.entities 与 PRD §5 字段表一一对应，必填与枚举一致。\n- 详情页 mockData.values 覆盖全部字段；列表页 mockData.rows 覆盖全部字段键（客户搜索 3 行、预约列表 4 行）；今日 content 含 3 条预约、2 条待回访与两个空态标题。\n- 手机号统一脱敏为 138****0000 形式，无完整号与拨号入口。\n\n## 5. 未决问题与假设\n- 非阻断问题 4 条（Q-001…Q-004，对应 PRD-001…PRD-004）；阻断问题 0 条。\n- 假设 8 条，均已写入 brief.assumptions 与独立 assumptions 数组。\n- 人工答复 PRD-005 实际给出的是日历分格规则，已按 ASM-006 采纳；今日消息入口按 §5.1/§10 固定不渲染（ASM-005）。\n\n## 6. 门禁自检\n- 每页均含 id/name/purpose/archetype/target/profile/route/roles/requiredStates/reqRefs。\n- 所有 page.roles ∈ product.roles，且每个角色至少可见一页。\n- 所有 reqRefs 均出现在 traceability.reqMap，unmapped 为空。\n- fields 与 fieldLabels 全覆盖；mockData 形态符合页面类型；无宿主动作、无 TBD/TODO 字符串。\n- blocking 问题 0，brief 可签名。"
   },
   "usage": {
     "inputTokens": 26729,
