@@ -12,6 +12,7 @@ import {
   motionAttrs,
   renderDocument,
   renderIndex,
+  renderMotionCss,
 } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
@@ -300,6 +301,8 @@ describe("renderer motion", () => {
     expect(html).toMatch(/data-motion-group="appointment-list\.row\.appointment"/);
     expect(html).toContain('data-motion-index="0"');
     expect(html).toContain('data-motion-index="1"');
+    expect(html).toContain("--motion-index:0");
+    expect(html).toContain("--motion-index:1");
     expect(html).toContain("--motion-stagger:24ms");
     expect(html).toContain("@keyframes motion-enter-fade");
     expect(html).toContain("prefers-reduced-motion");
@@ -371,6 +374,7 @@ describe("renderer motion", () => {
     expect(rowAttrs.attrs).toContain('data-motion-preset="list-stagger"');
     expect(rowAttrs.attrs).not.toContain("toast-in");
     expect(rowAttrs.style).toContain("--motion-stagger:24ms");
+    expect(rowAttrs.style).toContain("--motion-index:0");
     expect(rowAttrs.attrs).toContain('data-motion-index="0"');
 
     const root: SpecNode = { type: "MobileShell", id: "appointment-list.page.root" };
@@ -386,6 +390,78 @@ describe("renderer motion", () => {
 
     expect(motionAttrs(toggle, undefined)).toEqual({ attrs: "", style: "" });
   });
+
+  it("falls back to state-swap for preset names the renderer has no CSS for", () => {
+    const html = renderDocument(
+      appointmentListWithMotion({
+        presets: {
+          "page-enter": { durationMs: 200, easing: "ease-out" },
+          "empty-fade": { durationMs: 320, easing: "ease-out" },
+        },
+        bindings: [
+          { preset: "page-enter" },
+          { nodeId: "appointment-list.action.toggle-view", preset: "empty-fade" },
+        ],
+        reducedMotion: { fallback: "fade" },
+      }),
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    expect(rootTag(html)).toContain('data-motion-preset="state-swap"');
+    expect(rootTag(html)).toContain('style="--motion-duration:200ms;--motion-ease:ease-out"');
+    expect(html).toContain(
+      'data-node-id="appointment-list.action.toggle-view" data-motion-preset="state-swap" style="--motion-duration:320ms;--motion-ease:ease-out"'
+    );
+    expect(html).not.toContain('data-motion-preset="page-enter"');
+    expect(html).not.toContain('data-motion-preset="empty-fade"');
+  });
+
+  it("disables motion and press feedback and limits fade fallbacks in CSS", () => {
+    const css = renderMotionCss();
+    expect(css).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(css).toContain(
+      "[data-motion-preset]{animation:none!important;transition:none!important}"
+    );
+    expect(css).toContain(
+      '[data-motion-preset="press-feedback"]:active{transform:none!important}'
+    );
+    expect(css).toContain(
+      "animation-delay:calc(var(--motion-stagger,40ms) * var(--motion-index,0))"
+    );
+    for (const preset of [
+      "enter-fade",
+      "page-push",
+      "sheet-up",
+      "state-swap",
+      "toast-in",
+      "list-stagger",
+    ]) {
+      expect(css).toContain(`[data-motion-fallback="fade"] [data-motion-preset="${preset}"]`);
+    }
+    expect(css).not.toContain(
+      '[data-motion-fallback="fade"] [data-motion-preset="press-feedback"]'
+    );
+    expect(css).not.toContain(
+      '[data-motion-fallback="fade"] [data-motion-preset="confirm-collapse"]'
+    );
+  });
+
+  it.each(["none", "fade", "instant"] as const)(
+    "emits the %s reduced-motion fallback on the document element",
+    (fallback) => {
+      const html = renderDocument(
+        appointmentListWithMotion({
+          ...appointmentMotion(),
+          reducedMotion: { fallback },
+        }),
+        getProfile("b-mobile"),
+        { pageRoutes: appointmentRoutes }
+      );
+      expect(html).toContain(
+        `document.documentElement.dataset.motionFallback = "${fallback}";`
+      );
+    }
+  );
 
   it("defaults the reduced-motion fallback to none without a motion spec", () => {
     const html = renderDocument(

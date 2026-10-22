@@ -14,6 +14,20 @@ export interface MotionContext {
   groupCounts: Map<string, number>;
 }
 
+/** Presets the renderer has CSS for; anything else falls back to state-swap. */
+export const SUPPORTED_MOTION_PRESETS: ReadonlySet<string> = new Set([
+  "enter-fade",
+  "page-push",
+  "sheet-up",
+  "state-swap",
+  "list-stagger",
+  "press-feedback",
+  "confirm-collapse",
+  "toast-in",
+]);
+
+const FALLBACK_MOTION_PRESET = "state-swap";
+
 function esc(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -43,13 +57,14 @@ export function createMotionContext(spec: PageSpec): MotionContext {
   };
   walk(spec.layout);
   for (const binding of motion.bindings) {
-    const preset = motion.presets[binding.preset];
-    if (preset === undefined) continue;
+    const declared = motion.presets[binding.preset];
+    if (declared === undefined) continue;
+    const supported = SUPPORTED_MOTION_PRESETS.has(binding.preset);
     const entry: MotionTarget = {
-      preset: binding.preset,
-      durationMs: preset.durationMs,
-      easing: preset.easing,
-      ...(preset.staggerMs === undefined ? {} : { staggerMs: preset.staggerMs }),
+      preset: supported ? binding.preset : FALLBACK_MOTION_PRESET,
+      durationMs: declared.durationMs,
+      easing: declared.easing,
+      ...(supported && declared.staggerMs !== undefined ? { staggerMs: declared.staggerMs } : {}),
     };
     if (binding.nodeId === undefined) {
       if (ctx.pagePreset === undefined) ctx.pagePreset = entry;
@@ -89,6 +104,7 @@ export function motionAttrs(
       const index = ctx.groupCounts.get(node.motionGroup) ?? 0;
       ctx.groupCounts.set(node.motionGroup, index + 1);
       attrs.push(`data-motion-index="${index}"`);
+      style += `;--motion-index:${index}`;
     }
   }
   return { attrs: attrs.length === 0 ? "" : ` ${attrs.join(" ")}`, style };
@@ -118,7 +134,13 @@ export function renderMotionCss(): string {
 [data-motion-preset="press-feedback"]:active{transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){
   [data-motion-preset]{animation:none!important;transition:none!important}
-  [data-motion-fallback="fade"] [data-motion-preset]{animation-name:motion-state-swap!important;animation-duration:120ms!important}
+  [data-motion-preset="press-feedback"]:active{transform:none!important}
+  [data-motion-fallback="fade"] [data-motion-preset="enter-fade"],
+  [data-motion-fallback="fade"] [data-motion-preset="page-push"],
+  [data-motion-fallback="fade"] [data-motion-preset="sheet-up"],
+  [data-motion-fallback="fade"] [data-motion-preset="state-swap"],
+  [data-motion-fallback="fade"] [data-motion-preset="toast-in"],
+  [data-motion-fallback="fade"] [data-motion-preset="list-stagger"]{animation-name:motion-state-swap!important;animation-duration:120ms!important}
 }
 `;
 }
