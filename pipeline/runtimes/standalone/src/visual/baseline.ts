@@ -1,12 +1,13 @@
-import { access } from "node:fs/promises";
 import path from "node:path";
-import type {
-  ScreenshotEvidence,
-  VisualCase,
-  VisualDiffEntry,
-  VisualFinding,
+import {
+  VISUAL_DIFF_MAX_RATIO,
+  type ScreenshotEvidence,
+  type VisualCase,
+  type VisualDiffEntry,
+  type VisualFinding,
 } from "@prd-ui/visual-review";
 import {
+  hashFile,
   readVisualManifest,
   type VisualDiffSummary,
   type VisualManifest,
@@ -75,9 +76,23 @@ export async function loadBaseline(
   const byId = new Map<string, VisualManifestCase>();
   const validIds: string[] = [];
   for (const entry of manifest.cases) {
+    let actual: string;
     try {
-      await access(path.join(baselineDir, entry.file));
+      actual = await hashFile(path.join(baselineDir, entry.file));
     } catch {
+      // A manifest entry without its PNG is a missing baseline, not a diff.
+      continue;
+    }
+    if (actual !== entry.sha256) {
+      findings.push({
+        id: `VISUAL_BASELINE_HASH_MISMATCH:${entry.id}`,
+        severity: "blocker",
+        code: "VISUAL_BASELINE_HASH_MISMATCH",
+        pageId: entry.pageId,
+        state: entry.state,
+        message: `baseline ${entry.id} sha256 ${actual} != manifest ${entry.sha256}`,
+        evidence: entry.file,
+      });
       continue;
     }
     byId.set(entry.id, entry);
@@ -132,7 +147,7 @@ export async function computeDiffs(input: {
       const exceeded =
         result.totalPixels === 0
           ? result.diffPixels > 0
-          : result.diffPixels / result.totalPixels > 0.01;
+          : result.diffPixels / result.totalPixels > VISUAL_DIFF_MAX_RATIO;
       if (exceeded) failed += 1;
       else passed += 1;
     } catch (error) {

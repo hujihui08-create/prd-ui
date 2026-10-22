@@ -8,6 +8,7 @@ import {
   hashValue,
   parseVisualRunState,
   readVisualManifest,
+  verifyManifestFiles,
   visualManifestHash,
   type VisualRunState,
 } from "./visual/manifest.js";
@@ -139,6 +140,35 @@ export async function main(
       path.join(runDir, "state.json")
     );
 
+    // Evidence integrity is checked for every status, including the
+    // already-successful early return: a signed run with a tampered PNG must
+    // not report success.
+    const manifest = await readVisualManifest(
+      path.join(runDir, "screenshots", "manifest.json")
+    );
+    if (manifest === undefined) {
+      throw new Error("STATE_INCONSISTENT: screenshots/manifest.json is missing");
+    }
+    const mismatches = await verifyManifestFiles(runDir, manifest);
+    if (mismatches.length > 0) {
+      const detail = mismatches.slice(0, 5).join("; ");
+      const more =
+        mismatches.length > 5 ? ` (+${mismatches.length - 5} more)` : "";
+      throw new Error(`VISUAL_MANIFEST_HASH_MISMATCH: ${detail}${more}`);
+    }
+    const manifestHash = visualManifestHash(manifest);
+    if (manifestHash !== state.manifestHash) {
+      throw new Error(
+        `STATE_INCONSISTENT: screenshot manifest changed (${manifestHash} != ${state.manifestHash})`
+      );
+    }
+    const findingsHash = hashValue(state.findings);
+    if (findingsHash !== state.findingsHash) {
+      throw new Error(
+        `STATE_INCONSISTENT: findings changed (${findingsHash} != ${state.findingsHash})`
+      );
+    }
+
     if (state.status === "success" || state.status === "passed") {
       if (!state.signoff.visual || !(await store.exists("signoff/visual.md"))) {
         throw new Error(`STATE_INCONSISTENT: ${state.status} without a visual signoff`);
@@ -158,25 +188,6 @@ export async function main(
       !(await store.exists("signoff/visual.md"))
     ) {
       throw new Error("RUN_BLOCKED: deterministic gates or critic blockers remain");
-    }
-
-    const manifest = await readVisualManifest(
-      path.join(runDir, "screenshots", "manifest.json")
-    );
-    if (manifest === undefined) {
-      throw new Error("STATE_INCONSISTENT: screenshots/manifest.json is missing");
-    }
-    const manifestHash = visualManifestHash(manifest);
-    if (manifestHash !== state.manifestHash) {
-      throw new Error(
-        `STATE_INCONSISTENT: screenshot manifest changed (${manifestHash} != ${state.manifestHash})`
-      );
-    }
-    const findingsHash = hashValue(state.findings);
-    if (findingsHash !== state.findingsHash) {
-      throw new Error(
-        `STATE_INCONSISTENT: findings changed (${findingsHash} != ${state.findingsHash})`
-      );
     }
 
     let text: string;

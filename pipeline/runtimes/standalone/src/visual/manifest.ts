@@ -45,6 +45,33 @@ export function hashValue(value: unknown): string {
   return hashText(canonicalJson(value));
 }
 
+export async function hashFile(file: string): Promise<string> {
+  const buffer = await readFile(file);
+  return `sha256:${createHash("sha256").update(buffer).digest("hex")}`;
+}
+
+/**
+ * Re-hash every manifest file and return `<case>: <detail>` entries for
+ * missing files or bytes that no longer match the manifest.
+ */
+export async function verifyManifestFiles(
+  rootDir: string,
+  manifest: Pick<VisualManifest, "cases">
+): Promise<string[]> {
+  const mismatches: string[] = [];
+  for (const entry of manifest.cases) {
+    try {
+      const actual = await hashFile(path.join(rootDir, entry.file));
+      if (actual !== entry.sha256) {
+        mismatches.push(`${entry.id}: ${actual} != ${entry.sha256}`);
+      }
+    } catch (error) {
+      mismatches.push(`${entry.id}: ${errorMessage(error)}`);
+    }
+  }
+  return mismatches;
+}
+
 /**
  * Load the project brief and the Page Specs written by `spec:engineer`. Specs
  * are ordered by the signed brief's page order, not by file name, so the
@@ -156,6 +183,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/** Mirror the static-server guard: only relative paths inside the root. */
+function isUnsafeManifestFile(file: string): boolean {
+  if (file.length === 0 || file.includes("\0")) return true;
+  if (file.startsWith("/") || file.startsWith("\\")) return true;
+  if (/^[A-Za-z]:[\\/]/.test(file)) return true;
+  const segments = file.split(/[\\/]/);
+  if (segments.some((segment) => segment === "..")) return true;
+  const normalized = path.posix.normalize(file.replace(/\\/g, "/"));
+  return normalized === "." || normalized === ".." || normalized.startsWith("../");
+}
+
 function stringField(
   value: Record<string, unknown>,
   key: string,
@@ -199,13 +237,17 @@ function parseManifestCase(value: unknown, source: string): VisualManifestCase {
   if (!sha256.startsWith("sha256:")) {
     throw new Error(`MANIFEST_INVALID: ${source}: sha256 must be sha256:<hex>`);
   }
+  const file = stringField(value, "file", source);
+  if (isUnsafeManifestFile(file)) {
+    throw new Error(`MANIFEST_INVALID: ${source}: unsafe file path ${file}`);
+  }
   return {
     id: stringField(value, "id", source),
     pageId: stringField(value, "pageId", source),
     state: stringField(value, "state", source),
     ...(query === undefined ? {} : { query }),
     viewport: { width: viewport.width, height: viewport.height },
-    file: stringField(value, "file", source),
+    file,
     sha256,
   };
 }

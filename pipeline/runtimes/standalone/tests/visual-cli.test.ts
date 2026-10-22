@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import {
+  access,
   mkdir,
   mkdtemp,
   readFile,
@@ -13,6 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { PNG } from "pngjs";
+import { chromium } from "playwright";
 import type { ScreenshotEvidence } from "@prd-ui/visual-review";
 import { main as baselineMain } from "../src/visual-baseline-cli.js";
 import { main as reviewMain } from "../src/visual-review-cli.js";
@@ -33,6 +35,20 @@ const sampleBrief = path.join(
   "employee-app-phase2",
   "ui-brief.json"
 );
+
+/**
+ * The default suite must stay offline. Playwright's executable path is enough
+ * to detect an installed Chromium without launching it; the browser test is
+ * skipped when it is absent (or PLAYWRIGHT_BROWSERS_PATH points elsewhere).
+ */
+const hasChromium = await (async (): Promise<boolean> => {
+  try {
+    await access(chromium.executablePath());
+    return true;
+  } catch {
+    return false;
+  }
+})();
 
 const temporaryDirs: string[] = [];
 
@@ -79,6 +95,8 @@ async function sha256(file: string): Promise<string> {
 
 interface FakeCaptureOptions {
   colorFor?: (caseId: string) => Rgba;
+  failFor?: (caseId: string) => boolean;
+  removeFileFor?: (caseId: string) => boolean;
 }
 
 function fakeCapture(options: FakeCaptureOptions = {}) {
@@ -88,12 +106,20 @@ function fakeCapture(options: FakeCaptureOptions = {}) {
     await mkdir(input.outDir, { recursive: true });
     const results: ScreenshotEvidence[] = [];
     for (const visualCase of input.cases) {
+      if (options.failFor?.(visualCase.id)) {
+        input.onCaseError?.(visualCase.id, new Error(`capture failed: ${visualCase.id}`));
+        continue;
+      }
       const file = path.join(input.outDir, `${visualCase.id}.png`);
       await writeFile(file, pngBuffer(options.colorFor?.(visualCase.id) ?? BLACK));
+      const fileSha = await sha256(file);
+      if (options.removeFileFor?.(visualCase.id)) {
+        await rm(file, { force: true });
+      }
       results.push({
         caseId: visualCase.id,
         path: file,
-        sha256: await sha256(file),
+        sha256: fileSha,
         consoleErrors: 0,
         overflow: false,
       });
@@ -300,6 +326,7 @@ interface ReviewArtifact {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
+  critic?: { budgetEnforced?: boolean; costSource?: string };
 }
 
 async function signoffText(hashes: {
@@ -397,6 +424,8 @@ describe("visual CLIs", () => {
     expect(artifact.usageComplete).toBe(true);
     expect(artifact.manifestHash).toMatch(/^sha256:/);
     expect(artifact.findingsHash).toMatch(/^sha256:/);
+    expect(artifact.critic?.budgetEnforced).toBe(false);
+    expect(artifact.critic?.costSource).toBe("scripted-placeholder");
 
     await expect(
       stat(path.join(runDir, "screenshots", "manifest.json"))
@@ -453,6 +482,15 @@ describe("visual CLIs", () => {
     await expect(
       stat(path.join(rerunDir!, "signoff", "visual.md"))
     ).resolves.toBeTruthy();
+
+    // The terminated (success) early-return path must still verify evidence.
+    await writeFile(
+      path.join(runDir, "screenshots", "today.default.png"),
+      pngBuffer(RED)
+    );
+    const tampered = await runCli(signMain, ["--run", runDir, "--json"]);
+    expect(tampered.code).toBe(1);
+    expect(tampered.stdout).toContain("VISUAL_MANIFEST_HASH_MISMATCH");
   });
 
   it("blocks when a baseline screenshot is missing", async () => {
@@ -476,6 +514,145 @@ describe("visual CLIs", () => {
     expect(artifact.findings.map((finding) => finding.id)).toContain(
       "VISUAL_BASELINE_MISSING:today.default"
     );
+  });
+
+  it("rejects baseline manifest paths that escape the baseline directory", async () => {
+    for (const unsafe of ["../evil.png", "/tmp/evil.png"]) {
+      const fixture = await makeFixture();
+      await writeCriticFixture(fixture.fixturesDir);
+      await runCli(baselineMain, baselineArgs(fixture), {
+        captureVisualCases: fakeCapture(),
+      });
+      const manifestFile = path.join(fixture.baselineDir, "manifest.json");
+      const manifest = await readJson<{ cases: Array<{ file: string }> }>(
+        manifestFile
+      );
+      manifest.cases[0]!.file = unsafe;
+      await writeJson(manifestFile, manifest);
+
+      const review = await runCli(reviewMain, reviewArgs(fixture), {
+        captureVisualCases: fakeCapture(),
+      });
+      expect(review.code).toBe(1);
+      const runDir = await onlyRunDir(fixture.runsDir);
+      const artifact = await readJson<ReviewArtifact>(
+        path.join(runDir, "visual-review.json")
+      );
+      expect(artifact.status).toBe("blocked");
+      expect(artifact.findings.map((finding) => finding.code)).toContain(
+        "VISUAL_BASELINE_MANIFEST_INVALID"
+      );
+    }
+  });
+
+  it("blocks a baseline whose PNG does not match its manifest hash", async () => {
+    const fixture = await makeFixture();
+    await writeCriticFixture(fixture.fixturesDir);
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+    await writeFile(
+      path.join(fixture.baselineDir, "today.default.png"),
+      pngBuffer(RED)
+    );
+
+    const review = await runCli(reviewMain, reviewArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.diff.missing).toBe(1);
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_BASELINE_HASH_MISMATCH"
+    );
+  });
+
+  it("leaves the previous baseline usable when an update fails mid-commit", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+    const manifestFile = path.join(fixture.baselineDir, "manifest.json");
+    const beforeManifest = await readFile(manifestFile, "utf8");
+    const before = await readJson<{
+      cases: Array<{ id: string; file: string; sha256: string }>;
+    }>(manifestFile);
+    const beforeHashes = new Map(
+      await Promise.all(
+        before.cases.map(async (entry) => [
+          entry.file,
+          await sha256(path.join(fixture.baselineDir, entry.file)),
+        ] as const)
+      )
+    );
+
+    const result = await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture({
+        colorFor: () => RED,
+        removeFileFor: (caseId) => caseId === "appointment-list.drawer",
+      }),
+    });
+    expect(result.code).toBe(1);
+
+    expect(await readFile(manifestFile, "utf8")).toBe(beforeManifest);
+    for (const entry of before.cases) {
+      expect(
+        await sha256(path.join(fixture.baselineDir, entry.file))
+      ).toBe(beforeHashes.get(entry.file));
+    }
+    expect(
+      (await readdir(fixture.baselineDir)).filter((name) => name.startsWith("."))
+    ).toEqual([]);
+  });
+
+  it("maps capture failures to VISUAL_SCREENSHOT_FAILED", async () => {
+    const fixture = await makeFixture();
+    await writeCriticFixture(fixture.fixturesDir);
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const review = await runCli(reviewMain, reviewArgs(fixture), {
+      captureVisualCases: fakeCapture({
+        failFor: (caseId) => caseId === "today.default",
+      }),
+    });
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.screenshots).toBe(3);
+    const codes = artifact.findings.map((finding) => finding.code);
+    expect(codes).toContain("VISUAL_SCREENSHOT_FAILED");
+    expect(codes).toContain("VISUAL_SCREENSHOT_MISSING");
+  });
+
+  it("returns a complete JSON summary on failure", async () => {
+    const fixture = await makeFixture();
+    const review = await runCli(
+      reviewMain,
+      [
+        ...reviewArgs(fixture),
+        "--html",
+        path.join(fixture.root, "missing-html"),
+      ],
+      { captureVisualCases: fakeCapture() }
+    );
+    expect(review.code).toBe(1);
+    const summary = JSON.parse(review.stdout) as Record<string, unknown>;
+    expect(summary.status).toBe("blocked");
+    expect(summary.cases).toBe(4);
+    expect(summary.screenshots).toBe(0);
+    expect(summary.diff).toEqual({ passed: 0, failed: 0, missing: 0 });
+    expect(Array.isArray(summary.findings)).toBe(true);
+    expect(summary.costCny).toBe(0);
+    expect(summary.usageComplete).toBe(false);
   });
 
   it("blocks a baseline-less review for every matrix case", async () => {
@@ -690,7 +867,7 @@ describe("visual CLIs", () => {
     expect(review.stdout).toContain("Task 8");
   });
 
-  it("captures deterministic screenshots with animations disabled", async () => {
+  it.skipIf(!hasChromium)("captures deterministic screenshots with animations disabled", async () => {
     const root = await tempDir("prd-ui-visual-capture-");
     const htmlDir = path.join(root, "html");
     await mkdir(htmlDir, { recursive: true });

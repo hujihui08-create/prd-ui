@@ -123,6 +123,66 @@ async function assertHtmlFiles(htmlDir: string, pageIds: string[]): Promise<void
   }
 }
 
+/**
+ * Commit a fully captured baseline: back up existing PNGs, rename staged PNGs
+ * into place, rename the manifest last, and roll every file back if any step
+ * fails. The previous manifest/PNGs stay usable on a partial update.
+ */
+async function commitBaseline(input: {
+  tempDir: string;
+  outDir: string;
+  manifest: VisualManifest;
+}): Promise<void> {
+  const nonce = `${process.pid}-${Date.now()}`;
+  const backupDir = path.join(input.outDir, `.backup-${nonce}`);
+  const manifestTemp = path.join(input.outDir, `.manifest-${nonce}.json`);
+  await writeFile(
+    manifestTemp,
+    `${JSON.stringify(input.manifest, null, 2)}\n`,
+    "utf8"
+  );
+  const committed: Array<{ file: string; hadBackup: boolean }> = [];
+
+  try {
+    await mkdir(backupDir, { recursive: true });
+    for (const entry of input.manifest.cases) {
+      const finalPath = path.join(input.outDir, entry.file);
+      const backupPath = path.join(backupDir, entry.file);
+      await mkdir(path.dirname(backupPath), { recursive: true });
+      let hadBackup = false;
+      try {
+        await rename(finalPath, backupPath);
+        hadBackup = true;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
+      try {
+        await rename(path.join(input.tempDir, entry.file), finalPath);
+      } catch (error) {
+        if (hadBackup) {
+          await rename(backupPath, finalPath).catch(() => undefined);
+        }
+        throw error;
+      }
+      committed.push({ file: entry.file, hadBackup });
+    }
+    await rename(manifestTemp, path.join(input.outDir, "manifest.json"));
+  } catch (error) {
+    for (const entry of committed.reverse()) {
+      const finalPath = path.join(input.outDir, entry.file);
+      const backupPath = path.join(backupDir, entry.file);
+      await rm(finalPath, { force: true }).catch(() => undefined);
+      if (entry.hadBackup) {
+        await rename(backupPath, finalPath).catch(() => undefined);
+      }
+    }
+    await rm(manifestTemp, { force: true }).catch(() => undefined);
+    throw error;
+  } finally {
+    await rm(backupDir, { recursive: true, force: true }).catch(() => undefined);
+  }
+}
+
 function failureSummary(
   baselineDir: string | null,
   cases: number,
@@ -222,10 +282,6 @@ export async function main(
       const manifestCases: VisualManifestCase[] = [];
       for (const visualCase of cases) {
         const entry = byCase.get(visualCase.id)!;
-        await rename(
-          entry.path,
-          path.join(outDir, `${visualCase.id}.png`)
-        );
         manifestCases.push(
           manifestCaseFor(visualCase, `${visualCase.id}.png`, entry.sha256)
         );
@@ -239,26 +295,26 @@ export async function main(
       };
       const manifestHash = visualManifestHash(manifest);
 
-      // Remove stale PNGs from a previous baseline only after the new capture
-      // succeeded, so a failed run never destroys the current baseline.
+      let previous: VisualManifest | undefined;
       try {
-        const previous = await readVisualManifest(path.join(outDir, "manifest.json"));
-        if (previous !== undefined) {
-          const keep = new Set(manifest.cases.map((entry) => entry.file));
-          for (const entry of previous.cases) {
-            if (keep.has(entry.file)) continue;
-            await rm(path.join(outDir, entry.file), { force: true });
-          }
-        }
+        previous = await readVisualManifest(path.join(outDir, "manifest.json"));
       } catch {
         // An unreadable old manifest is not a reason to fail a new baseline.
       }
 
-      await writeFile(
-        path.join(outDir, "manifest.json"),
-        `${JSON.stringify(manifest, null, 2)}\n`,
-        "utf8"
-      );
+      // Stage every PNG by renaming, write the manifest last, then remove stale
+      // files; any commit failure rolls back to the previous baseline.
+      await commitBaseline({ tempDir, outDir, manifest });
+
+      if (previous !== undefined) {
+        const keep = new Set(manifest.cases.map((entry) => entry.file));
+        for (const entry of previous.cases) {
+          if (keep.has(entry.file)) continue;
+          await rm(path.join(outDir, entry.file), { force: true }).catch(
+            () => undefined
+          );
+        }
+      }
 
       const summary = redactValue({
         baselineDir: outDir,

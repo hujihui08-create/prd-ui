@@ -58,7 +58,7 @@ Options:
   --runtime standalone|dsh  Critic runtime (default: standalone)
   --profile <name>       dsh profile; required for --runtime dsh
   --fixtures <dir>       Standalone critic fixture directory
-  --max-cost-cny <n>     Visual Critic budget in CNY (default: 3)
+  --max-cost-cny <n>     Visual Critic budget in CNY (Task 8 dsh runner; default: 3)
   --json                 Print one JSON summary to stdout
   -h, --help             Print this help and exit`;
 
@@ -222,20 +222,14 @@ async function runCritic(input: {
       message: "the Visual Critic fixture reported incomplete usage",
     });
   }
-  const costCny = 0;
-  if (costCny > input.options.maxCostCny) {
-    findings.push({
-      id: "VISUAL_BUDGET_EXCEEDED",
-      severity: "blocker",
-      code: "VISUAL_BUDGET_EXCEEDED",
-      message: `cost ${costCny.toFixed(4)} CNY exceeds limit ${input.options.maxCostCny}`,
-    });
-  }
+  // Task 8: the real prd-ui-visual runner reports usage and pricing. Scripted
+  // fixtures make no model call, so 0 is a placeholder and --max-cost-cny is
+  // not enforced on this path.
   return {
     findings,
     critique: fixture.output,
     ...(fixture.usage === undefined ? {} : { usage: fixture.usage }),
-    costCny,
+    costCny: 0,
     usageComplete,
     model: "scripted",
   };
@@ -255,7 +249,13 @@ interface ReviewArtifacts {
   manifestHash: string;
   findingsHash: string;
   signoff: { valid: boolean; signer?: string; date?: string; waivedFindings?: string[] };
-  critic: { runtime: string; profile?: string; model?: string };
+  critic: {
+    runtime: string;
+    profile?: string;
+    model?: string;
+    budgetEnforced?: boolean;
+    costSource?: string;
+  };
   error?: string;
 }
 
@@ -430,17 +430,32 @@ export async function main(
       profile: options.profile ?? null,
     });
 
-    const caseErrors: string[] = [];
+    const caseFailures: Array<{ caseId: string; message: string }> = [];
     const rawScreenshots = await capture({
       htmlDir: options.htmlPath!,
       cases,
       outDir: path.join(runDir, "screenshots"),
       onCaseError: (caseId, error) => {
-        caseErrors.push(`${caseId}: ${errorMessage(error)}`);
+        caseFailures.push({ caseId, message: errorMessage(error) });
       },
     });
-    for (const entry of caseErrors) {
-      await log({ type: "screenshot_failed", error: entry });
+    for (const failure of caseFailures) {
+      const visualCase = cases.find((entry) => entry.id === failure.caseId);
+      await log({
+        type: "screenshot_failed",
+        caseId: failure.caseId,
+        error: failure.message,
+      });
+      deterministicFindings.push({
+        id: `VISUAL_SCREENSHOT_FAILED:${failure.caseId}`,
+        severity: "blocker",
+        code: "VISUAL_SCREENSHOT_FAILED",
+        ...(visualCase === undefined
+          ? {}
+          : { pageId: visualCase.pageId, state: visualCase.state }),
+        message: failure.message,
+        evidence: `screenshots/${failure.caseId}.png`,
+      });
     }
     screenshots = rawScreenshots.map((entry) => {
       const relative = path.relative(runDir!, entry.path).split(path.sep).join("/");
@@ -452,7 +467,7 @@ export async function main(
     await log({
       type: "screenshots_captured",
       screenshots: screenshots.length,
-      failed: caseErrors.length,
+      failed: caseFailures.length,
     });
 
     const shotByCase = new Map(
@@ -500,6 +515,9 @@ export async function main(
     };
     const critic = await runCritic({ options, criticInput });
     const criticFindings = critic.findings;
+    // Task 8 activates pricing/budget enforcement with the real dsh runner.
+    const costSource =
+      options.runtime === "dsh" ? "unavailable" : "scripted-placeholder";
     await store.writeJson("findings/visual-critic.json", {
       schemaVersion: "1.0",
       project,
@@ -510,6 +528,8 @@ export async function main(
       usageComplete: critic.usageComplete,
       usage: critic.usage ?? null,
       costCny: critic.costCny,
+      costSource,
+      budgetEnforced: false,
       critique: critic.critique ?? null,
       error: critic.error ?? null,
     });
@@ -519,6 +539,7 @@ export async function main(
       model: critic.model ?? null,
       findings: criticFindings.length,
       costCny: critic.costCny,
+      costSource,
       usageComplete: critic.usageComplete,
     });
 
@@ -588,6 +609,8 @@ export async function main(
         runtime: options.runtime,
         ...(options.profile === undefined ? {} : { profile: options.profile }),
         ...(critic.model === undefined ? {} : { model: critic.model }),
+        budgetEnforced: false,
+        costSource,
       },
     };
     const state = buildState({
@@ -641,18 +664,18 @@ export async function main(
     return status === "passed" ? 0 : 1;
   } catch (error) {
     const message = redactValue(errorMessage(error)) as string;
+    const failure = failureSummary({
+      runDir,
+      runId,
+      project,
+      cases: cases.length,
+      screenshots: screenshots.length,
+      diff: diffSummary,
+      message,
+    });
     if (store !== undefined && runDir !== null && runId !== null && project !== null) {
-      const summary = failureSummary({
-        runDir,
-        runId,
-        project,
-        cases: cases.length,
-        screenshots: screenshots.length,
-        diff: diffSummary,
-        message,
-      });
       try {
-        await store.writeJson("visual-review.json", summary);
+        await store.writeJson("visual-review.json", failure);
         await store.writeJson(
           "state.json",
           buildState({
@@ -662,11 +685,11 @@ export async function main(
             cases: cases.length,
             screenshots: screenshots.length,
             diff: diffSummary,
-            findings: summary.findings as VisualFinding[],
+            findings: failure.findings as VisualFinding[],
             costCny: 0,
             usageComplete: false,
-            manifestHash: summary.manifestHash as string,
-            findingsHash: summary.findingsHash as string,
+            manifestHash: failure.manifestHash as string,
+            findingsHash: failure.findingsHash as string,
             signoffValid: false,
             startedAt,
             finishedAt: new Date().toISOString(),
@@ -676,31 +699,15 @@ export async function main(
           schemaVersion: "1.0",
           project,
           generatedAt: new Date().toISOString(),
-          gate: { passed: false, issues: summary.findings },
+          gate: { passed: false, issues: failure.findings },
         });
         await log({ type: "run_failed", error: message });
       } catch {
         // Preserve the original error; a failed artifact write must not mask it.
       }
     }
-    const failure =
-      store === undefined
-        ? failureSummary({
-            runDir,
-            runId,
-            project,
-            cases: cases.length,
-            screenshots: screenshots.length,
-            diff: diffSummary,
-            message,
-          })
-        : undefined;
-    if (options.json) {
-      if (failure !== undefined) io.stdout(JSON.stringify(failure));
-      else io.stdout(JSON.stringify({ runDir, status: "blocked", error: message }));
-    } else {
-      io.stderr(`Visual review FAILED: ${message}`);
-    }
+    if (options.json) io.stdout(JSON.stringify(failure));
+    else io.stderr(`Visual review FAILED: ${message}`);
     return 1;
   }
 }
