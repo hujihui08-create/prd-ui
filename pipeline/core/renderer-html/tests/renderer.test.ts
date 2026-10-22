@@ -176,6 +176,10 @@ describe("generic web/mobile renderer", () => {
     expect(html).toContain('data-action="已到店确认"');
     expect(html).toContain("data-business-states");
     expect(html).toContain("data-current-status");
+    expect(html).toContain('[data-field="status"] .form-value');
+    expect(html).toContain("bar.contains(button)");
+    expect(html).toContain('"状态: " + status');
+    expect(html).toContain('action === "确认已当面告知"');
   });
 
   it("emits search, view, and form hooks", () => {
@@ -207,6 +211,7 @@ describe("generic web/mobile renderer", () => {
     );
     expect(form).toContain("data-form-modes");
     expect(form).toContain('data-field="customer"');
+    expect(form).toContain('<label class="form-field" data-field="customer">');
   });
 
   it("binds the calendar drawer and list detail action to the linked detail route", () => {

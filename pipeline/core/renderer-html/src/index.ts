@@ -922,15 +922,20 @@ function renderInteractionScript(): string {
     const bar = document.querySelector(".app-actions");
     const noteHost = document.querySelector(".app-scroll");
     const apply = () => {
-      let visible = 0;
+      let visibleInBar = 0;
       for (const button of qsa("[data-action]")) {
         const isAllowed = allowed().includes(button.dataset.action);
         button.hidden = !isAllowed;
-        if (isAllowed) visible += 1;
+        if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
       }
-      if (bar) bar.hidden = visible === 0;
+      if (bar) bar.hidden = visibleInBar === 0;
       const badge = document.querySelector(".app-scroll .badge");
       if (badge) badge.textContent = status;
+      const statusField = document.querySelector('[data-field="status"] .form-value, [data-field="status"] .form-readonly');
+      if (statusField) statusField.textContent = status;
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if ((row.textContent ?? "").indexOf("状态:") === 0) row.textContent = "状态: " + status;
+      }
       let note = document.querySelector(".state-note");
       if (currentState()?.note) {
         if (!note && noteHost) {
@@ -969,6 +974,8 @@ function renderInteractionScript(): string {
         } else if (action === "取消") {
           if (!window.confirm("确认取消本单？")) return;
           status = (states.find((state) => state.name.indexOf("取消") >= 0) ?? states[states.length - 1])?.name ?? status;
+        } else if (action === "确认已当面告知") {
+          status = (states.find((state) => state.name.indexOf("已确认") >= 0) ?? states[states.length - 1])?.name ?? status;
         }
         apply();
       });
