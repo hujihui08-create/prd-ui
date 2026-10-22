@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { UiBriefSchema } from "@prd-ui/contracts";
+import type { PageSpec, SpecNode } from "@prd-ui/contracts";
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import briefJson from "../../../samples/projects/employee-app/ui-brief.json";
 import demoBriefJson from "../../../samples/projects/demo-orders-intake/ui-brief.json";
 import appointmentsBriefJson from "../../../samples/projects/employee-app-appointments-03/ui-brief.json";
 import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
-import { renderDocument, renderIndex } from "../src/index.js";
+import {
+  createMotionContext,
+  motionAttrs,
+  renderDocument,
+  renderIndex,
+} from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
 const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
@@ -45,6 +51,40 @@ const phase2Specs = compileProject(phase2Brief, {
   getArchetype,
 });
 const phase2ById = new Map(phase2Specs.map((spec) => [spec.meta.pageId, spec]));
+
+type PageMotion = NonNullable<PageSpec["motion"]>;
+
+const motionPresets: PageMotion["presets"] = {
+  "enter-fade": { durationMs: 120, easing: "ease-out" },
+  "press-feedback": { durationMs: 120, easing: "ease-out" },
+  "list-stagger": { durationMs: 200, easing: "ease-out", staggerMs: 24 },
+  "sheet-up": { durationMs: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+  "state-swap": { durationMs: 120, easing: "ease-out" },
+  "toast-in": { durationMs: 200, easing: "ease-out" },
+  "page-push": { durationMs: 200, easing: "ease-out" },
+};
+
+function appointmentMotion(bindings?: PageMotion["bindings"]): PageMotion {
+  return {
+    presets: motionPresets,
+    bindings: bindings ?? [
+      { preset: "enter-fade" },
+      { nodeId: "appointment-list.action.toggle-view", preset: "press-feedback" },
+      { nodeId: "appointment-list.row.appointment", preset: "list-stagger" },
+    ],
+    reducedMotion: { fallback: "fade" },
+  };
+}
+
+/** Compiled specs do not carry motion; attach it in memory for renderer tests. */
+function appointmentListWithMotion(motion?: PageMotion): PageSpec {
+  const spec = structuredClone(appointmentById.get("appointment-list")!);
+  return { ...spec, motion: motion ?? appointmentMotion() };
+}
+
+function rootTag(html: string): string {
+  return html.match(/<div class="app [^"]*"[^>]*>/)?.[0] ?? "";
+}
 
 describe("employee-app HTML renderer", () => {
   it("renders the today page with content and empty-state copy", () => {
@@ -218,7 +258,7 @@ describe("generic web/mobile renderer", () => {
     );
     expect(form).toContain("data-form-modes");
     expect(form).toContain('data-field="customer"');
-    expect(form).toContain('<label class="form-field" data-field="customer">');
+    expect(form).toContain('<label class="form-field" data-field="customer"');
   });
 
   it("binds the calendar drawer and list detail action to the linked detail route", () => {
@@ -245,5 +285,117 @@ describe("generic web/mobile renderer", () => {
     expect(index).toContain("8 个页面");
     expect(index).toContain('href="orders-list.html"');
     expect(index).toContain("color:#111827;text-decoration:none;");
+  });
+});
+
+describe("renderer motion", () => {
+  it("renders node and group motion attributes plus reduced-motion fallback", () => {
+    const html = renderDocument(
+      appointmentListWithMotion(),
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    expect(html).toContain('data-node-id="appointment-list.action.toggle-view"');
+    expect(html).toContain('data-motion-preset="press-feedback"');
+    expect(html).toMatch(/data-motion-group="appointment-list\.row\.appointment"/);
+    expect(html).toContain('data-motion-index="0"');
+    expect(html).toContain('data-motion-index="1"');
+    expect(html).toContain("--motion-stagger:24ms");
+    expect(html).toContain("@keyframes motion-enter-fade");
+    expect(html).toContain("prefers-reduced-motion");
+    expect(html).toContain('document.documentElement.dataset.motionFallback = "fade";');
+  });
+
+  it("applies the page-level preset to the root shell", () => {
+    const html = renderDocument(
+      appointmentListWithMotion(),
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    const root = rootTag(html);
+    expect(root).toContain('data-node-id="appointment-list.page.root"');
+    expect(root).toContain('data-motion-preset="enter-fade"');
+    expect(root).toContain('style="--motion-duration:120ms;--motion-ease:ease-out"');
+  });
+
+  it("merges motion custom properties into the existing Section style attribute", () => {
+    const html = renderDocument(
+      appointmentListWithMotion(
+        appointmentMotion([
+          { nodeId: "appointment-list.view.list", preset: "sheet-up" },
+        ])
+      ),
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    const tag =
+      html.match(/<section class="section" data-view-panel="list"[^>]*>/)?.[0] ?? "";
+    expect(tag).toContain('data-node-id="appointment-list.view.list"');
+    expect(tag).toContain('data-motion-preset="sheet-up"');
+    expect(tag.match(/style=/g)?.length).toBe(1);
+    expect(tag).toContain(
+      'style="padding:var(--space-1);gap:var(--space-2);--motion-duration:200ms;--motion-ease:cubic-bezier(0.2, 0, 0, 1)"'
+    );
+  });
+
+  it("lets the first duplicate binding win for node, group, and page targets", () => {
+    const spec = appointmentListWithMotion(
+      appointmentMotion([
+        { nodeId: "appointment-list.action.toggle-view", preset: "press-feedback" },
+        { nodeId: "appointment-list.action.toggle-view", preset: "state-swap" },
+        { nodeId: "appointment-list.row.appointment", preset: "list-stagger" },
+        { nodeId: "appointment-list.row.appointment", preset: "toast-in" },
+        { nodeId: "appointment-list.page.root", preset: "state-swap" },
+        { nodeId: "appointment-list.page.root", preset: "toast-in" },
+        { preset: "enter-fade" },
+        { preset: "page-push" },
+      ])
+    );
+    const ctx = createMotionContext(spec);
+
+    const toggle: SpecNode = { type: "Button", id: "appointment-list.action.toggle-view" };
+    const toggleAttrs = motionAttrs(toggle, ctx);
+    expect(toggleAttrs.attrs).toContain(
+      'data-node-id="appointment-list.action.toggle-view"'
+    );
+    expect(toggleAttrs.attrs).toContain('data-motion-preset="press-feedback"');
+    expect(toggleAttrs.attrs).not.toContain("state-swap");
+    expect(toggleAttrs.style).toBe("--motion-duration:120ms;--motion-ease:ease-out");
+
+    const row: SpecNode = {
+      type: "ListRow",
+      id: "appointment-list.row.appointment.0",
+      motionGroup: "appointment-list.row.appointment",
+    };
+    const rowAttrs = motionAttrs(row, ctx);
+    expect(rowAttrs.attrs).toContain('data-motion-preset="list-stagger"');
+    expect(rowAttrs.attrs).not.toContain("toast-in");
+    expect(rowAttrs.style).toContain("--motion-stagger:24ms");
+    expect(rowAttrs.attrs).toContain('data-motion-index="0"');
+
+    const root: SpecNode = { type: "MobileShell", id: "appointment-list.page.root" };
+    const pageAttrs = motionAttrs(root, ctx, true);
+    expect(pageAttrs.attrs).toContain('data-motion-preset="enter-fade"');
+    expect(pageAttrs.attrs).not.toContain("page-push");
+
+    // Two legacy aliases can resolve to the page root: the first node-level
+    // binding still wins when the root is addressed as a node.
+    const rootNodeAttrs = motionAttrs(root, ctx, false);
+    expect(rootNodeAttrs.attrs).toContain('data-motion-preset="state-swap"');
+    expect(rootNodeAttrs.attrs).not.toContain("toast-in");
+
+    expect(motionAttrs(toggle, undefined)).toEqual({ attrs: "", style: "" });
+  });
+
+  it("defaults the reduced-motion fallback to none without a motion spec", () => {
+    const html = renderDocument(
+      appointmentById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: appointmentRoutes }
+    );
+    expect(html).toContain('document.documentElement.dataset.motionFallback = "none";');
+    const root = rootTag(html);
+    expect(root).toContain('data-node-id="appointment-list.page.root"');
+    expect(root).not.toContain("data-motion-preset");
   });
 });

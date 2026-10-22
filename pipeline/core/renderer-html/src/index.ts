@@ -1,4 +1,13 @@
 import type { PageSpec, Profile, SpecNode } from "@prd-ui/contracts";
+import {
+  createMotionContext,
+  motionAttrs,
+  renderMotionCss,
+  type MotionContext,
+} from "./motion.js";
+
+export { createMotionContext, motionAttrs, renderMotionCss };
+export type { MotionContext } from "./motion.js";
 
 export interface RenderOptions {
   /** page id -> display name, used for navigation labels. */
@@ -9,9 +18,16 @@ export interface RenderOptions {
 
 let renderPageNames: Record<string, string> = {};
 let renderPageRoutes: Record<string, string> = {};
+let renderMotionContext: MotionContext | undefined;
 let renderSpec: PageSpec | undefined;
 let renderProject = "PRD UI";
 let renderPageId = "";
+
+/** Append motion custom properties to an existing inline style declaration list. */
+function inlineStyle(base: string, motionStyle: string): string {
+  const declarations = [base, motionStyle].filter((part) => part.length > 0);
+  return declarations.length === 0 ? "" : ` style="${declarations.join(";")}"`;
+}
 
 function routeHref(route: string | undefined): string | undefined {
   if (route === undefined) return undefined;
@@ -224,6 +240,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "PageShell": {
       const title = str(props.title);
       const nav = stringArray(props.nav);
+      const motion = motionAttrs(node, renderMotionContext, depth === 0);
       const blocks = ["summary", "content", "groups", "fields", "actions"]
         .map((name) => {
           const children = slot(node, name);
@@ -234,7 +251,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           return `<div class="page-slot page-slot-${name}">${rendered}</div>`;
         })
         .join("");
-      return `<div class="page-shell" ${shellInteractionAttrs()}>
+      return `<div class="page-shell" ${shellInteractionAttrs()}${motion.attrs}${inlineStyle("", motion.style)}>
   <aside class="page-sidebar">
     <div class="page-brand">${esc(renderProject)}</div>
     <nav class="page-nav">${nav
@@ -253,6 +270,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     }
     case "MobileShell": {
       const title = str(props.title);
+      const motion = motionAttrs(node, renderMotionContext, depth === 0);
       const top = slot(node, "top-bar")
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
@@ -292,7 +310,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           : titleSlot.length === 0
             ? `<header class="page-header"><h1 class="page-title">${esc(title)}</h1></header>`
             : "");
-      return `<div class="app ${showTabs ? "has-tabs" : ""}" ${shellInteractionAttrs()}>
+      return `<div class="app ${showTabs ? "has-tabs" : ""}" ${shellInteractionAttrs()}${motion.attrs}${inlineStyle("", motion.style)}>
   ${header}
   <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}</main>
   ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
@@ -406,7 +424,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const value = str(props.value);
       const field = str(props.field);
       const hasChildren = children.length > 0;
-      return `<label class="form-field"${field ? ` data-field="${esc(field)}"` : ""}>
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<label class="form-field"${field ? ` data-field="${esc(field)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="form-label">${esc(label)}${required ? `<span class="required">*</span>` : ""}</span>
   ${hasChildren ? children : `<span class="${value ? "form-value" : "form-readonly"}">${value || (readOnly ? "—" : "")}</span>`}
 </label>`;
@@ -435,12 +454,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const padding = str(props.padding);
       const gap = str(props.gap);
       const viewPanel = str(props.viewPanel);
-      return `<section class="section"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""} style="padding:${cssVar(padding)};gap:${cssVar(gap)}">${children}</section>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<section class="section"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}${motion.attrs}${inlineStyle(`padding:${cssVar(padding)};gap:${cssVar(gap)}`, motion.style)}>${children}</section>`;
     }
     case "Card": {
       const title = str(props.title);
       const art = illustrationSvg(str(props.illustration));
-      return `<section class="card">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<section class="card"${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="card-head">
     <h2 class="card-title">${esc(title)}</h2>
     ${art}
@@ -465,7 +486,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const label = str(props.label);
       const icon = str(props.icon);
       const tone = str(props.tone) || "neutral";
-      return `<button class="quick-action tone-${esc(tone)}" type="button">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<button class="quick-action tone-${esc(tone)}" type="button"${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="material-symbols-rounded quick-icon">${iconName(icon)}</span>
   <span class="quick-label">${esc(label)}</span>
 </button>`;
@@ -527,7 +549,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
         })
         .join("");
       const viewPanel = str(props.viewPanel);
-      return `<div class="calendar"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="calendar"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
     }
     case "ListRow": {
       const title = str(props.title);
@@ -536,7 +559,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const status = str(props.status);
       const statusTone = str(props.statusTone) || "neutral";
       const searchText = str(props.searchText);
-      return `<div class="list-row"${searchText ? ` data-search-text="${esc(searchText)}"` : ""}>
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="list-row"${searchText ? ` data-search-text="${esc(searchText)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="list-row-main">
     <div class="list-row-title">
       <span class="row-title">${esc(title)}</span>
@@ -643,7 +667,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const emphasis = str(props.emphasis) || "primary";
       const action = str(props.action);
       const viewToggle = bool(props.viewToggle);
-      return `<button class="btn ${esc(emphasis)}" type="button"${action ? ` data-action="${esc(action)}"` : ""}${viewToggle ? " data-view-toggle" : ""}>${esc(label)}</button>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<button class="btn ${esc(emphasis)}" type="button"${action ? ` data-action="${esc(action)}"` : ""}${viewToggle ? " data-view-toggle" : ""}${motion.attrs}${inlineStyle("", motion.style)}>${esc(label)}</button>`;
     }
     default:
       return children;
@@ -1200,6 +1225,7 @@ export function renderDocument(
   renderPageNames = options.pageNames ?? {};
   renderPageRoutes = options.pageRoutes ?? {};
   renderSpec = spec;
+  renderMotionContext = createMotionContext(spec);
   renderProject = spec.meta.project;
   renderPageId = spec.meta.pageId;
   const body = renderNode(spec.layout, profile);
@@ -1239,7 +1265,7 @@ export function renderDocument(
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
-  <style>${renderCss(profile)}</style>
+  <style>${renderCss(profile)}${renderMotionCss()}</style>
 </head>
 <body data-state="default">
   ${stateSwitcher()}
@@ -1247,6 +1273,7 @@ export function renderDocument(
 ${interactionMarkup}
   <script>
     (() => {
+      document.documentElement.dataset.motionFallback = ${JSON.stringify(spec.motion?.reducedMotion.fallback ?? "none")};
       const params = new URLSearchParams(location.search);
       const state = params.get("state");
       if (state) document.body.dataset.state = state;
