@@ -739,6 +739,7 @@ ${typeClasses(profile)}
 .quick-action.tone-inventory .quick-icon{color:var(--color-accent-inventory);}
 .quick-label{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
 .list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:10px 0;}
+.list-row[data-row-link]{cursor:pointer;}
 .list-row-main{flex:1;min-width:0;}
 .list-row-title{display:flex;align-items:center;gap:6px;min-width:0;}
 .row-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -936,6 +937,27 @@ function renderInteractionScript(): string {
       for (const row of qsa(".app-scroll .list-text-row")) {
         if ((row.textContent ?? "").indexOf("状态:") === 0) row.textContent = "状态: " + status;
       }
+      if (status === "已确认") {
+        const confirmedBy = document.querySelector('[data-field="confirmedBy"] .form-value');
+        const confirmedAt = document.querySelector('[data-field="confirmedAt"] .form-value');
+        const byValue = confirmedBy && (confirmedBy.textContent ?? "").trim() !== "—"
+          ? confirmedBy.textContent
+          : "当前员工";
+        const atValue = confirmedAt && (confirmedAt.textContent ?? "").trim() !== "—"
+          ? confirmedAt.textContent
+          : new Date().toLocaleString("zh-CN", { hour12: false });
+        if (confirmedBy && (confirmedBy.textContent ?? "").trim() === "—") {
+          confirmedBy.textContent = byValue;
+        }
+        if (confirmedAt && (confirmedAt.textContent ?? "").trim() === "—") {
+          confirmedAt.textContent = atValue;
+        }
+        for (const row of qsa(".app-scroll .list-text-row")) {
+          const text = row.textContent ?? "";
+          if (text.indexOf("确认人:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认人: " + byValue;
+          if (text.indexOf("确认时间:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认时间: " + atValue;
+        }
+      }
       let note = document.querySelector(".state-note");
       if (currentState()?.note) {
         if (!note && noteHost) {
@@ -1066,6 +1088,27 @@ function renderInteractionScript(): string {
     apply();
   }
 
+  function applyRowLinks() {
+    const target =
+      config.pageId === "customer-search"
+        ? config.linkedRoutes.customer
+        : config.pageId === "appointment-list"
+          ? config.linkedRoutes.detail
+          : undefined;
+    if (!target) return;
+    for (const row of qsa(".app-scroll .list-row")) {
+      row.dataset.rowLink = "true";
+      row.addEventListener("click", () => {
+        location.href = target;
+      });
+    }
+    for (const button of qsa('[data-action="查看详情"]')) {
+      button.addEventListener("click", () => {
+        location.href = target;
+      });
+    }
+  }
+
   function applyViews() {
     if (!config.views) return;
     const panels = qsa("[data-view-panel]");
@@ -1143,6 +1186,7 @@ function renderInteractionScript(): string {
   applyBusinessStates();
   applyFormModes();
   applySearch();
+  applyRowLinks();
   applyViews();
 })();
 </script>`;

@@ -180,6 +180,9 @@ describe("generic web/mobile renderer", () => {
     expect(html).toContain("bar.contains(button)");
     expect(html).toContain('"状态: " + status');
     expect(html).toContain('action === "确认已当面告知"');
+    expect(html).toContain('[data-field="confirmedBy"] .form-value');
+    expect(html).toContain('"当前员工"');
+    expect(html).toContain('"确认人: " + byValue');
   });
 
   it("emits search, view, and form hooks", () => {
@@ -191,6 +194,10 @@ describe("generic web/mobile renderer", () => {
     expect(search).toContain('data-empty-kind="idle"');
     expect(search).toContain('data-empty-kind="empty"');
     expect(search).toContain("data-search-text");
+    expect(search).toContain('data-action="清空关键词"');
+    expect(search).toContain(".list-row[data-row-link]{cursor:pointer;}");
+    expect(search).toContain('row.dataset.rowLink = "true"');
+    expect(search).toContain('config.pageId === "customer-search"');
 
     const list = renderDocument(
       appointmentById.get("appointment-list")!,
