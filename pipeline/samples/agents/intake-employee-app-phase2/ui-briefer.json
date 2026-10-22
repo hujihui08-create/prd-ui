@@ -196,6 +196,7 @@
               "keyword"
             ],
             "emptyTitle": "没有匹配的客户",
+            "searchIdleTitle": "输入姓名或脱敏手机号搜索客户",
             "mockData": {
               "rows": [
                 {
@@ -348,6 +349,36 @@
               "术后告知",
               "客户详情"
             ],
+            "businessStates": [
+              {
+                "name": "已登记",
+                "actions": [
+                  "已到店确认",
+                  "接单并确认到店",
+                  "开单",
+                  "改期",
+                  "取消"
+                ]
+              },
+              {
+                "name": "已到店",
+                "actions": [
+                  "开单",
+                  "术后告知",
+                  "客户详情"
+                ]
+              },
+              {
+                "name": "爽约",
+                "actions": [],
+                "note": "爽约已记录入客户档案"
+              },
+              {
+                "name": "已取消",
+                "actions": [],
+                "note": "本单已取消"
+              }
+            ],
             "mockData": {
               "values": {
                 "customer": "张女士",
@@ -410,6 +441,23 @@
               "选择客户",
               "保存",
               "保存改期"
+            ],
+            "formModes": [
+              {
+                "name": "new",
+                "label": "新增预约",
+                "actions": [
+                  "保存"
+                ]
+              },
+              {
+                "name": "reschedule",
+                "label": "改期",
+                "actions": [
+                  "保存改期"
+                ],
+                "customerLocked": true
+              }
             ]
           },
           {
@@ -543,6 +591,11 @@
               "status",
               "date"
             ],
+            "views": [
+              "calendar",
+              "list"
+            ],
+            "defaultView": "calendar",
             "emptyTitle": "当前条件无预约",
             "mockData": {
               "rows": [

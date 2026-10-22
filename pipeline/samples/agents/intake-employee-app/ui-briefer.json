@@ -68,9 +68,7 @@
             "reqRefs": [
               "REQ-EMP-001"
             ],
-            "actions": [
-              "库存查询"
-            ],
+            "actions": [],
             "emptyTitle": "今天没有预约",
             "content": {
               "storeName": "星光店",

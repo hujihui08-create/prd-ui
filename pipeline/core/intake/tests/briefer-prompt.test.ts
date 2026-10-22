@@ -37,6 +37,19 @@ describe("UI briefer prompt", () => {
     expect(prompt).toContain("`fields` must be empty");
   });
 
+  it("requires interaction metadata for stateful pages", () => {
+    expect(prompt).toContain("businessStates");
+    expect(prompt).toContain("formModes");
+    expect(prompt).toContain("views");
+    expect(prompt).toContain("searchIdleTitle");
+    expect(prompt).toContain("must be a subset of page.actions");
+  });
+
+  it("forbids host actions and home fields", () => {
+    expect(prompt).toContain("Never emit host actions");
+    expect(prompt).toContain("前往客户 Tab");
+  });
+
   it("requires illustrative, PII-free example data", () => {
     expect(prompt).toContain("illustrative");
     expect(prompt).toContain("PII");
