@@ -9,6 +9,27 @@ import {
 import type { VisualFinding } from "@prd-ui/visual-review";
 import { parseVisualRunState } from "./manifest.js";
 
+export interface UnwaivedGate {
+  passed: boolean;
+  blockers: VisualFinding[];
+}
+
+/**
+ * The deterministic gate result after applying the signoff waivers. The raw
+ * gate artifact keeps `passed: false` for the unwaived finding set; this is
+ * the effective result the run status is based on.
+ */
+export function unwaivedGate(
+  findings: VisualFinding[],
+  waivedFindings: readonly string[]
+): UnwaivedGate {
+  const waived = new Set(waivedFindings);
+  const blockers = findings.filter(
+    (finding) => finding.severity === "blocker" && !waived.has(finding.id)
+  );
+  return { passed: blockers.length === 0, blockers };
+}
+
 export interface VisualSignoffValidation {
   ok: boolean;
   waivedFindings: string[];

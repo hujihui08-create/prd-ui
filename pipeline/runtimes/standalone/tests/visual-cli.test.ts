@@ -897,6 +897,15 @@ describe("visual CLIs", () => {
     );
     expect(state.status).toBe("success");
 
+    const signedGate = await readJson<{
+      gate: { passed: boolean };
+      waivedFindings: string[];
+      unwaivedGate: { passed: boolean; blockers: unknown[] };
+    }>(path.join(runDir, "findings", "visual-gate.json"));
+    expect(signedGate.gate.passed).toBe(false);
+    expect(signedGate.waivedFindings).toEqual(["VC-001"]);
+    expect(signedGate.unwaivedGate).toEqual({ passed: true, blockers: [] });
+
     // A re-review whose critic blocker is covered by that signoff passes; the
     // waived blocker stays in the recorded findings.
     const rerun = await runCli(reviewMain, reviewArgs(fixture), {
@@ -918,6 +927,14 @@ describe("visual CLIs", () => {
     expect(rerunArtifact.findings.map((finding) => finding.code)).toContain(
       "VISUAL_CRITIC_BLOCKER"
     );
+    const rerunGate = await readJson<{
+      gate: { passed: boolean };
+      waivedFindings: string[];
+      unwaivedGate: { passed: boolean; blockers: unknown[] };
+    }>(path.join(rerunDir!, "findings", "visual-gate.json"));
+    expect(rerunGate.gate.passed).toBe(false);
+    expect(rerunGate.waivedFindings).toEqual(["VC-001"]);
+    expect(rerunGate.unwaivedGate).toEqual({ passed: true, blockers: [] });
     const rerunState = await readJson<{ status: string; signoff: { visual: boolean } }>(
       path.join(rerunDir!, "state.json")
     );

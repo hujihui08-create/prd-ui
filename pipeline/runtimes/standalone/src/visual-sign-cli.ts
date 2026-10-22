@@ -12,7 +12,7 @@ import {
   visualManifestHash,
   type VisualRunState,
 } from "./visual/manifest.js";
-import { validateVisualSignoff } from "./visual/signoff.js";
+import { validateVisualSignoff, unwaivedGate } from "./visual/signoff.js";
 
 export const USAGE = `Usage: pnpm visual:sign --run <dir> [options]
 
@@ -244,6 +244,24 @@ export async function main(
       }
     } catch {
       // The state is authoritative; a missing summary does not block signing.
+    }
+
+    // The raw gate stays `passed: false` for the deterministic record; record
+    // the waived findings and the effective unwaived result beside it so the
+    // artifact cannot be read as contradicting the signed status.
+    try {
+      const raw = JSON.parse(
+        await store.readText("findings/visual-gate.json")
+      ) as unknown;
+      if (isRecord(raw)) {
+        await store.writeJson("findings/visual-gate.json", {
+          ...raw,
+          waivedFindings: validation.waivedFindings,
+          unwaivedGate: unwaivedGate(state.findings, validation.waivedFindings),
+        });
+      }
+    } catch {
+      // The state is authoritative; a missing gate artifact does not block signing.
     }
 
     await store.writeJson("visual-sign.json", {

@@ -207,9 +207,6 @@ importers:
       '@deepseek-ai/dsh-llm-pi-ai':
         specifier: 0.2.1-rc.2
         version: 0.2.1-rc.2(07a42147e1bc3e4c509868cb5a9bf9a7)
-      '@prd-ui/runtime-dsh':
-        specifier: workspace:*
-        version: link:../../../../runtimes/dsh
 
   runtimes/dsh:
     dependencies:

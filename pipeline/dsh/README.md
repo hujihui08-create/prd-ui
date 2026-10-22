@@ -23,9 +23,9 @@ dsh/
       cordis.yml                        # []
       cordis.patch.yml                  # vision provider, default model, 65536 maxTokens
     profiles/prd-ui-visual/
-      package.json                      # pinned bundles + @prd-ui/runtime-dsh
+      package.json                      # base + headless + pi-ai; no project plugin
       cordis.yml                        # []
-      cordis.patch.yml                  # vision provider, default model, 32768 maxTokens
+      cordis.patch.yml                  # vision provider, 32768 maxTokens, read-only tool surface
 ```
 
 `node_modules/`, `.credentials.yaml`, `.env`, and logs inside `home/` are gitignored.
@@ -77,11 +77,24 @@ sample waivers (`success`, ¥0.90666), both `usageComplete=true`.
 ## Visual critic profile
 
 `prd-ui-visual` is the profile used by `visual:review --runtime dsh`. It has
-the same vision provider and `@prd-ui/runtime-dsh` bundle as `prd-ui-assets`.
+the same vision provider as `prd-ui-assets` but no project plugin bundle
+(`@prd-ui/runtime-dsh` is removed); the base `read_image` tool is enough.
 `maxTokens` is 32768 because the critique JSON is small and all 24 screenshots
-plus Page Specs fit comfortably in the 128K input window. The profile keeps
-`read_image` but disables the `tool-fs` write/edit tools and the bash/pwsh
-shell, so the critic cannot modify files even if the prompt is ignored.
+plus Page Specs fit comfortably in the 128K input window.
+
+The model-facing tool surface is deliberately reduced:
+
+- kept: `read`, `read_image`, `glob`, `grep`, `skill`, `working_directory`, and
+  session-state tools (`todo_write`, goals, job listing/output); `read_image`
+  is the screenshot path;
+- removed: `write`, `edit`, `bash`, `pwsh`, `workflow`/PTC, subagent tools, and
+  `web_search`/`web_fetch`; the sandbox policy is `read-only`.
+
+This is not read confinement: dsh's filesystem sandbox applies the policy only
+to mutations, so `read`/`read_image`/`glob`/`grep` can still read any path the
+dsh process can read. The critic prompt only lists the run-directory
+screenshots, but treat the residual read surface as process-wide.
+
 `--max-cost-cny` (default 3) is enforced from `pricing.json`; incomplete usage
 is a blocker.
 

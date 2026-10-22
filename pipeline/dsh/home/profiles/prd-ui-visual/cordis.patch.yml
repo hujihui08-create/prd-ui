@@ -1,9 +1,11 @@
 # Project-local dsh profile for the Visual Critic.
 # The critic needs a vision model (screenshots are read with read_image) and the
-# read side of tool-fs. write/edit tools and bash/pwsh are disabled below, so
-# the model cannot modify files even if the prompt is ignored. This profile
-# never modifies ~/.dsh; DSH_HOME points here and --profile prd-ui-visual
-# selects it.
+# read side of tool-fs. write/edit tools, shells, workflow/PTC, subagent tools,
+# and web tools are disabled below; the sandbox policy is read-only. Reads are
+# not confined by dsh's fs sandbox, so the residual read surface is `read`,
+# `read_image`, `glob`/`grep`, and skill reads over the process's filesystem.
+# This profile never modifies ~/.dsh; DSH_HOME points here and --profile
+# prd-ui-visual selects it.
 
 - insert:
     - id: llm-pi-ai
@@ -27,12 +29,8 @@
     provider: prd-ui-vision
     model: !!js process.env.PRD_UI_VISION_MODEL
 
-- insert:
-    - id: prd-ui-visual
-      name: '@prd-ui/runtime-dsh'
-
-# The critic only reads screenshots and Page Spec data. Remove every mutating
-# surface from the base bundle: no write/edit tools and no shell.
+# The critic only reads screenshots and Page Spec data. Remove every mutating,
+# orchestration, delegation, and network surface from the base bundle.
 - id: tool-fs
   config:
     write: false
@@ -41,3 +39,30 @@
   disabled: true
 - id: tool-pwsh
   disabled: true
+- id: tool-workflow
+  disabled: true
+- id: workflow-ptc
+  disabled: true
+- id: ptc-runtime
+  disabled: true
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
+- id: tool-web
+  disabled: true
+- id: web
+  disabled: true
+- id: web-search-deepseek
+  disabled: true
+- id: web-deepseek-api
+  disabled: true
+- id: web-fetch-http
+  disabled: true
+- id: sandbox-policy
+  config:
+    mode: read-only

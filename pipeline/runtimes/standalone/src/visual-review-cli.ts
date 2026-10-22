@@ -39,7 +39,7 @@ import {
   type VisualCriticInput,
   type VisualCriticRun,
 } from "./visual/critic.js";
-import { findMatchingSignoff } from "./visual/signoff.js";
+import { findMatchingSignoff, unwaivedGate } from "./visual/signoff.js";
 
 const pipelineRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -593,15 +593,14 @@ export async function main(
       await store.writeText("signoff/visual.md", matchedSignoff.text);
     }
     const signoffValid = matchedSignoff !== undefined;
-    // A valid signoff can waive VISUAL_CRITIC_BLOCKER findings. The status is
-    // based on unwaived blockers only; the full findings list stays recorded.
-    const waivedFindings = new Set(matchedSignoff?.waivedFindings ?? []);
-    const hasBlockingFinding = findings.some(
-      (finding) =>
-        finding.severity === "blocker" && !waivedFindings.has(finding.id)
-    );
+    // A valid signoff can waive VISUAL_CRITIC_BLOCKER findings. The status and
+    // the effective gate use unwaived blockers only; the raw gate artifact and
+    // the findings list keep the complete deterministic record.
+    const waivedFindings = matchedSignoff?.waivedFindings ?? [];
+    const effectiveGate = unwaivedGate(findings, waivedFindings);
+    const hasBlockingFinding = !effectiveGate.passed;
     const status = visualReviewStatus({
-      gatePassed: !hasBlockingFinding,
+      gatePassed: effectiveGate.passed,
       hasBlockingFinding,
       signoffValid,
     });
@@ -612,6 +611,8 @@ export async function main(
       project,
       generatedAt: finishedAt,
       gate,
+      waivedFindings,
+      unwaivedGate: effectiveGate,
     });
 
     const artifact: ReviewArtifacts = {
