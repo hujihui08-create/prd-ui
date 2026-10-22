@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T02:57:01.019Z",
+  "model": "deepseek-flash",
+  "promptHash": "sha256:68f760efa83f3e1d8235e6c71d0e28a1a066a0db7d1d8413062a4f4969dd7e96",
+  "role": "ia",
+  "gate": {
+    "passed": false,
+    "status": "failed",
+    "issues": [
+      {
+        "code": "IA_BLOCKER_UNWAIVED",
+        "severity": "blocker",
+        "message": "blocker IA-001 has no human waiver",
+        "evidence": "IA-001: 新增预约有两种客户规则（列表/日历可搜索选择；客户详情预填并锁定），但 IA 只有可编辑的 new 与改期的 reschedule。用 new 会破坏客户详情入口的锁定，用 reschedule 会显示错误 CTA；同时客户搜索缺少 picker 模式与返回路径，列表/日历新增无法完成客户选择。"
+      }
+    ]
+  }
+}

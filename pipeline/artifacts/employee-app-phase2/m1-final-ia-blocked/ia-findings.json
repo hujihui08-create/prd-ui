@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T02:57:01.016Z",
+  "model": "deepseek-flash",
+  "promptHash": "sha256:68f760efa83f3e1d8235e6c71d0e28a1a066a0db7d1d8413062a4f4969dd7e96",
+  "findings": [
+    {
+      "id": "IA-001",
+      "severity": "blocker",
+      "area": "flow",
+      "evidence": "PRD §5.5: 从列表/日历新增时客户字段打开客户搜索选择器（mode=picker），从客户详情进入时预填客户并锁定；PRD §10 repeats 预填并锁定。Brief appointment-form.formModes only has new (customerLocked=false, 保存) and reschedule (customerLocked=true, 保存改期); customer-search has no picker mode and no form→search→form flow.",
+      "issue": "新增预约有两种客户规则（列表/日历可搜索选择；客户详情预填并锁定），但 IA 只有可编辑的 new 与改期的 reschedule。用 new 会破坏客户详情入口的锁定，用 reschedule 会显示错误 CTA；同时客户搜索缺少 picker 模式与返回路径，列表/日历新增无法完成客户选择。",
+      "proposal": "将 mode（new/reschedule）与 customerLocked（由入口来源决定）拆开，新增 new-from-customer 变体（预填、锁定、CTA 保存）；customer-search 增加 standalone/picker 双模式，并补 appointment-form/callback-register → customer-search → 来源表单的 picker 流程，返回时保留表单。"
+    },
+    {
+      "id": "IA-002",
+      "severity": "major",
+      "area": "flow",
+      "evidence": "PRD §10: 预约详情的「客户详情」入口只在可查看该客户时显示链接，与预约业务状态无关。Existing IA businessStates puts 客户详情 under 已到店 only; 已登记/爽约/已取消 action lists omit it.",
+      "issue": "已登记、爽约、已取消时客户详情交叉入口消失，即使员工具备客户查看权限；这与权限规则冲突，也让这些状态缺少回客户详情的路径。",
+      "proposal": "把 客户详情 建模为与业务状态无关、仅受客户可见性约束的 crossLink；businessStates 只保留会改变状态的动作（到店、开单、改期、取消、术后告知）。"
+    },
+    {
+      "id": "IA-003",
+      "severity": "major",
+      "area": "hierarchy",
+      "evidence": "PRD §3: 客户详情动作「查看预约」进入对应预约详情；§5.3 serviceRecord 只有一条最近服务记录且可为空；Q-001 asks which appointment; A-001 binds it to the latest record.",
+      "issue": "「查看预约」标签像预约列表，但 IA 只能指向最近服务记录关联的一条预约；多预约客户无法从客户详情看到其他预约，无服务记录时入口消失，flow-customer-appointment 并非常态可用。",
+      "proposal": "明确改为「查看最近预约」，只绑定 serviceRecord.appointmentId，无记录时隐藏；其他预约统一从预约列表进入。若客户级预约列表是需求，应作为切片外新页面另行决策。"
+    },
+    {
+      "id": "IA-004",
+      "severity": "major",
+      "area": "navigation",
+      "evidence": "PRD §8: 四 Tab 含工作台/客户/我的与第四个「预约」，今日是首页；brief navigation.primary=[today], tabs=[appointment-list], landingByRole=today. Existing IA has same.",
+      "issue": "today 是落地页却没有 Tab 锚点；切到预约后没有建模返回今日的 Tab 路径，也无法判断今日是否就是工作台 Tab。Slice shell 可能只剩一个 Tab。",
+      "proposal": "确认今日=工作台 Tab 落地；在切片内把 tabs 表示为 today + appointment-list（客户/我的保持宿主），或在 IA 中显式声明非 Tab 首页及返回路径。landingByRole 维持 today。"
+    },
+    {
+      "id": "IA-005",
+      "severity": "major",
+      "area": "flow",
+      "evidence": "PRD §2 action table permits 新增预约 from 今日; §8 says 回访登记 from 客户详情服务记录; brief flows omit today→appointment-form→today and customer-detail→callback-register→customer-detail.",
+      "issue": "两条已声明的入口没有 flow，保存后的回跳来源与表单保留规则无法被验证；今日「预约」快捷操作与客户详情「回访登记」在流程层不可见。",
+      "proposal": "补 flow-today-new-appointment 与 flow-callback-from-customer；保存后分别回今日/客户详情，并保留来源页状态。"
+    },
+    {
+      "id": "IA-006",
+      "severity": "major",
+      "area": "hierarchy",
+      "evidence": "PRD §4.5: 服务项目记录本单主服务项目; §8: 回访登记从今日待回访或客户详情服务记录进入; Q-004 asks source; A-004 says service comes from 待回访条目, can be changed, no appointmentId binding.",
+      "issue": "回访表单没有「本单」可指，服务项目在今日入口与客户详情入口的来源不同；IA 未定义随客户带入的 callback task / service 字段，页面可能以空服务项目打开。",
+      "proposal": "定义回访来源载荷（customer + service + 可选来源预约/任务 id）并在两个入口预填；若回访不绑定预约，将字段契约改为「服务项目」并提供目录选择器，记录 Q-004 决策。"
+    },
+    {
+      "id": "IA-007",
+      "severity": "major",
+      "area": "states",
+      "evidence": "PRD §5.6/§10: noticeBlocks 与 notices 皆空时只读显示「暂无告知内容」，不显示确认按钮; A-002; Q-002. Brief treatment-notice requiredStates lacks empty.",
+      "issue": "唯一必须隐藏确认按钮的内容态未进入状态矩阵；下游可能渲染空白告知内容但保留确认 CTA。",
+      "proposal": "treatment-notice 增加 empty/content-empty 状态；该状态展示「暂无告知内容」并隐藏确认，保持只读。"
+    },
+    {
+      "id": "IA-008",
+      "severity": "major",
+      "area": "roles",
+      "evidence": "PRD §2 page visibility is feature-point based (客户查看/预约登记/到院分配/术后告知/回访登记/开单), and beautician customer scope is 服务过 ∪ 当日有效委派; brief lists all three roles on all 8 pages and no permission gate.",
+      "issue": "角色数组是外层超集，无法区分「缺功能点→入口不出现」与「只读门店→可见但置灰」；beautician 对非服务/非委派客户也可能被渲染出搜索或详情入口，形成权限层缺口。",
+      "proposal": "在 IA/brief 契约中增加页面级 requiredFeatures 与动作级 gate，roles 仅作外层包络；保持 hidden（缺功能点）与 disabled（只读档位）两种不同语义。"
+    },
+    {
+      "id": "IA-009",
+      "severity": "minor",
+      "area": "naming",
+      "evidence": "PRD §10 route keys: customerId, appointmentId. Brief routes: /customers/detail/:id, /appointments/detail/:id, /appointments/detail/:id/notice.",
+      "issue": "同一个 :id 占位符承载客户与预约两种实体，嵌套告知路由又依赖 appointmentId；容易把 customerId 传入预约/告知路由或丢失预约主键。",
+      "proposal": "改为 :customerId/:appointmentId，或为每条路由写明参数映射；告知路由必须携带 appointmentId。"
+    }
+  ]
+}

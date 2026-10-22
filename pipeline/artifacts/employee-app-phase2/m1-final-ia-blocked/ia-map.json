@@ -1,0 +1,357 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T02:57:01.016Z",
+  "model": "deepseek-flash",
+  "promptHash": "sha256:68f760efa83f3e1d8235e6c71d0e28a1a066a0db7d1d8413062a4f4969dd7e96",
+  "pages": [
+    {
+      "id": "today",
+      "name": "今日",
+      "route": "/today",
+      "level": 0,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "小程序启动 / landingByRole 默认落地",
+        "底部工作台 Tab（宿主壳）"
+      ]
+    },
+    {
+      "id": "customer-search",
+      "name": "客户搜索",
+      "route": "/customers/search",
+      "parentId": "today",
+      "level": 1,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "today · 快捷操作「客户搜索」",
+        "宿主客户 Tab 入口",
+        "appointment-form · 客户字段（picker）",
+        "callback-register · 客户字段（picker）"
+      ]
+    },
+    {
+      "id": "customer-detail",
+      "name": "客户详情",
+      "route": "/customers/detail/:id",
+      "parentId": "customer-search",
+      "level": 2,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "customer-search · 搜索结果行",
+        "appointment-detail · 客户详情（可查看客户时）"
+      ]
+    },
+    {
+      "id": "appointment-list",
+      "name": "预约列表",
+      "route": "/appointments",
+      "level": 0,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "底部 Tab「预约」",
+        "today · 我的预约卡片头部",
+        "宿主工作台 · 客户预约"
+      ]
+    },
+    {
+      "id": "appointment-detail",
+      "name": "预约详情",
+      "route": "/appointments/detail/:id",
+      "parentId": "appointment-list",
+      "level": 1,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "today · 我的预约行",
+        "appointment-list · 列表行",
+        "appointment-list · 日历块 → 只读抽屉 → 查看完整详情",
+        "customer-detail · 查看最近预约"
+      ]
+    },
+    {
+      "id": "appointment-form",
+      "name": "新增/改期预约",
+      "route": "/appointments/form",
+      "parentId": "appointment-list",
+      "level": 1,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "today · 快捷操作「预约」",
+        "appointment-list · 新增预约",
+        "appointment-list · 日历空格",
+        "appointment-detail · 改期",
+        "customer-detail · 新增预约（预填并锁定）"
+      ]
+    },
+    {
+      "id": "treatment-notice",
+      "name": "术后告知",
+      "route": "/appointments/detail/:id/notice",
+      "parentId": "appointment-detail",
+      "level": 2,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "appointment-detail · 术后告知（已到店且 serviceCompleted=true）",
+        "customer-detail · 服务记录「查看告知」（快照存在且预约可查看）"
+      ]
+    },
+    {
+      "id": "callback-register",
+      "name": "回访登记",
+      "route": "/callbacks/form",
+      "parentId": "today",
+      "level": 1,
+      "roles": [
+        "store_manager",
+        "beautician",
+        "front_desk"
+      ],
+      "entryPoints": [
+        "today · 待回访条目",
+        "customer-detail · 回访登记"
+      ]
+    }
+  ],
+  "navigation": {
+    "primary": [
+      "today"
+    ],
+    "tabs": [
+      "appointment-list"
+    ]
+  },
+  "flows": [
+    {
+      "id": "flow-today-appointment",
+      "steps": [
+        "today",
+        "appointment-detail"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-callback",
+      "steps": [
+        "today",
+        "callback-register",
+        "today"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-customer-appointment",
+      "steps": [
+        "customer-search",
+        "customer-detail",
+        "appointment-detail"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-customer-new-appointment",
+      "steps": [
+        "customer-detail",
+        "appointment-form",
+        "customer-detail"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-reschedule",
+      "steps": [
+        "appointment-detail",
+        "appointment-form",
+        "appointment-detail"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-list-entry",
+      "steps": [
+        "appointment-list",
+        "appointment-detail"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-list-new",
+      "steps": [
+        "appointment-list",
+        "appointment-form",
+        "appointment-list"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-notice-from-detail",
+      "steps": [
+        "appointment-detail",
+        "treatment-notice"
+      ],
+      "status": "ok"
+    },
+    {
+      "id": "flow-notice-from-customer",
+      "steps": [
+        "customer-detail",
+        "treatment-notice"
+      ],
+      "status": "ok"
+    }
+  ],
+  "crossLinks": [
+    {
+      "from": "today",
+      "to": "appointment-list",
+      "kind": "我的预约卡片头部"
+    },
+    {
+      "from": "today",
+      "to": "customer-search",
+      "kind": "快捷操作·客户搜索"
+    },
+    {
+      "from": "today",
+      "to": "appointment-form",
+      "kind": "快捷操作·预约（新增）"
+    },
+    {
+      "from": "today",
+      "to": "callback-register",
+      "kind": "待回访条目"
+    },
+    {
+      "from": "today",
+      "to": "appointment-detail",
+      "kind": "我的预约行"
+    },
+    {
+      "from": "customer-search",
+      "to": "customer-detail",
+      "kind": "搜索结果行"
+    },
+    {
+      "from": "customer-detail",
+      "to": "appointment-detail",
+      "kind": "查看最近预约"
+    },
+    {
+      "from": "customer-detail",
+      "to": "appointment-form",
+      "kind": "新增预约（客户预填并锁定）"
+    },
+    {
+      "from": "customer-detail",
+      "to": "treatment-notice",
+      "kind": "查看告知（快照存在且预约可查看）"
+    },
+    {
+      "from": "customer-detail",
+      "to": "callback-register",
+      "kind": "回访登记"
+    },
+    {
+      "from": "appointment-detail",
+      "to": "customer-detail",
+      "kind": "客户详情（可查看客户时）"
+    },
+    {
+      "from": "appointment-detail",
+      "to": "appointment-form",
+      "kind": "改期"
+    },
+    {
+      "from": "appointment-detail",
+      "to": "treatment-notice",
+      "kind": "术后告知（已到店且 serviceCompleted=true）"
+    },
+    {
+      "from": "appointment-list",
+      "to": "appointment-detail",
+      "kind": "列表行 / 日历抽屉·查看完整详情"
+    },
+    {
+      "from": "appointment-list",
+      "to": "appointment-form",
+      "kind": "新增预约 / 日历空格"
+    },
+    {
+      "from": "appointment-form",
+      "to": "customer-search",
+      "kind": "客户字段·picker 模式"
+    },
+    {
+      "from": "callback-register",
+      "to": "customer-search",
+      "kind": "客户字段·picker 模式"
+    },
+    {
+      "from": "callback-register",
+      "to": "today",
+      "kind": "保存后返回待回访"
+    },
+    {
+      "from": "callback-register",
+      "to": "customer-detail",
+      "kind": "从客户详情进入时保存返回"
+    },
+    {
+      "from": "appointment-form",
+      "to": "today",
+      "kind": "从今日新增保存后返回"
+    },
+    {
+      "from": "appointment-form",
+      "to": "appointment-list",
+      "kind": "从列表/日历新增保存后返回"
+    },
+    {
+      "from": "appointment-form",
+      "to": "appointment-detail",
+      "kind": "保存改期后返回"
+    },
+    {
+      "from": "appointment-form",
+      "to": "customer-detail",
+      "kind": "从客户详情新增保存后返回"
+    },
+    {
+      "from": "treatment-notice",
+      "to": "appointment-detail",
+      "kind": "返回预约详情"
+    },
+    {
+      "from": "treatment-notice",
+      "to": "customer-detail",
+      "kind": "从客户详情进入时返回"
+    }
+  ]
+}

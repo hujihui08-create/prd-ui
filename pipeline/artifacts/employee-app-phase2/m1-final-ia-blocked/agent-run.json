@@ -1,0 +1,49 @@
+{
+  "runId": "run-2026-10-22T02-54-02-782Z",
+  "project": "employee-app-phase2",
+  "status": "failed",
+  "gates": {
+    "ia": "failed",
+    "interaction": "pending",
+    "visualStyle": "pending"
+  },
+  "agents": {
+    "ia": {
+      "status": "failed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 17614,
+        "outputTokens": 37906,
+        "cacheReadTokens": 12928,
+        "totalTokens": 68448
+      },
+      "usageComplete": true,
+      "costUsd": 0.050848968,
+      "costCny": 0.3661125696,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:68f760efa83f3e1d8235e6c71d0e28a1a066a0db7d1d8413062a4f4969dd7e96",
+      "error": "IA_GATE_FAILED"
+    },
+    "interaction": {
+      "status": "skipped",
+      "attempts": 0,
+      "repairAttempts": 0,
+      "gateRounds": 0
+    },
+    "visual-style": {
+      "status": "skipped",
+      "attempts": 0,
+      "repairAttempts": 0,
+      "gateRounds": 0
+    }
+  },
+  "signoff": {
+    "ia": false,
+    "visualStyle": false
+  },
+  "costCny": 0.3661125696,
+  "usageComplete": true,
+  "error": "IA_GATE_FAILED"
+}
