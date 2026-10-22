@@ -46,6 +46,22 @@ v0.4 只做“Phase 2 已跑通、但视觉/动效还没闭环”的部分：
 - 新页面、新业务规则、新后端接口。
 - motion 的 JS 物理动画/复杂编排；v0.4 使用 CSS keyframes/transition。
 
+### 2.3 设计系统与项目切换
+
+设计系统、项目、Agent runtime 是三条独立轴，切换时不要混用：
+
+| 轴 | 决定因素 | 切换方式 |
+|---|---|---|
+| 设计系统 | `page.profile` + `page.target`；Profile/Catalog/Archetype | 改 brief 的 profile/target；新系统需补 profile/catalog/asset manifest |
+| 项目 | `project.yaml` + brief + PRD + manifests | 只换 `--project`，不改代码 |
+| Agent runtime | dsh profile（`prd-ui-agents` / `prd-ui-intake` / `prd-ui-visual`） | CLI `--profile`；与设计系统 profile 无关 |
+
+- 单 profile 项目：`brief.meta.profile` 与每页 `page.profile` 一致；`project.yaml.manifests` 提供对应资产 manifest。
+- 混合项目：每页各自 `profile`；M1 的 `catalogsByProfile` / `motionTokensByProfile` 按页传入，compiler 逐页取 catalog。
+- 新设计系统：在 `core/design-system` 增加 profile/catalog（必须提供 `PageShell` 或 `MobileShell`，以及页面用到的组件/槽位），在项目 manifests 注册；否则 compiler 直接报错，不会静默降级。
+- 组件复用：通用组件进 catalog，跨项目复用；页面特有组合留在 compiler。切到缺少该组件的 catalog 时，validators 会阻断，需在目标 catalog 实现或改用允许的组件。
+- 切项目不改变设计系统；切设计系统不改变项目，只改 brief 的 profile/target 与资产映射。
+
 ## 3. Motion 链路
 
 ### 3.1 语义 node id 注册表
@@ -80,9 +96,9 @@ export function semanticNodeId(
 | customer-search | `customer-search.input.keyword`、`customer-search.row.result`、`customer-search.action.clear`、`customer-search.action.view-detail` |
 | customer-detail | `customer-detail.action.view-appointment`、`.new-appointment`、`.view-notice`、`.callback` |
 | appointment-detail | `appointment-detail.action.checkin`、`.open-order`、`.reschedule`、`.cancel`、`.notice`、`.customer` |
-| appointment-form | `appointment-form.field.customer`、`.start-time`、`.end-time`、`.therapist`、`.source`、`appointment-form.action.save`、`.save-reschedule`、`.pick-customer`、`appointment-form.mode.new`、`.reschedule` |
+| appointment-form | `appointment-form.field.customer`、`.start-time`、`.end-time`、`.therapist`、`.source`、`appointment-form.action.save`、`.pick-customer`；`new`/`reschedule` 是 JS 模式标签，不是 motion 节点 |
 | treatment-notice | `treatment-notice.action.confirm`、`treatment-notice.row.notice` |
-| appointment-list | `appointment-list.action.create`、`.toggle-view`、`.view-detail`、`appointment-list.row.appointment`、`appointment-list.calendar`、`appointment-list.view.list` |
+| appointment-list | `appointment-list.action.new-appointment`、`.toggle-view`、`.view-detail`、`appointment-list.row.appointment`、`appointment-list.calendar`、`appointment-list.view.list` |
 | callback-register | `callback-register.field.customer`、`.service`、`.content`、`.result`、`callback-register.action.save`、`.pick-customer` |
 
 规则：
@@ -191,7 +207,7 @@ interface VisualCase {
 }
 ```
 
-8 页 clean 切片目标 19–24 张；矩阵数量必须与 manifest 一致。
+截图通过 query 驱动状态：`state`（页面状态）、`status`（business state）、`mode`（form mode）、`view`（calendar/list）；搜索/抽屉/告知确认通过 `actions` 执行。8 页 clean 切片目标 19–24 张；矩阵数量必须与 manifest 一致。
 
 ### 4.3 确定性检查（硬门禁）
 
@@ -354,7 +370,7 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
   - 读取 selected 客户并填入 customer；
   - 清理 selected，保留草稿直到保存/取消。
 - 日期：
-  - `calendarWeekStart` 缺省为 `brief.meta.date` 所在周的周一；
+  - `calendarWeekStart` 缺省为页面第一条 `mockData.rows[].date`（`MM-DD`）所在周的周一，年份取 `brief.meta.date`；没有可解析日期时回退到 `brief.meta.date` 所在周的周一；
   - `CalendarGrid` 每个 day 携带完整 `YYYY-MM-DD`；
   - 空格点击传 `date=YYYY-MM-DD&time=HH:mm`；
   - 表单 `startTime` 预填 `YYYY-MM-DD HH:mm`，`endTime` 默认 +60 分钟。
@@ -369,6 +385,8 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
 
 ## 6. 渲染保真度修复
 
+组件复用规则：**只有跨两个以上 archetype/页面复用、且有稳定语义契约的能力才进 catalog；页面特定的组合留在 compiler，页面特定的行为留在 renderer，不新增一次性组件。** 本轮的 `datetime-local` 是 `Input` 的通用类型，`badge`/`badgeTone` 是 `Card` 的通用 prop；日历图例用现有 `Row` + `Badge` 组合，picker 复用 `Input`/`Button`/`ListRow`。
+
 这些是 v0.4 的硬验收项：
 
 | 页面 | 修复 |
@@ -378,7 +396,7 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
 | home | 底部 Tab 至少包含「今日」+「预约列表」：compiler 将 `page.id` 并入 `navigation.tabs`，并按 pageNames 解析标签；不伪造宿主页面；只有一个 Tab 时不渲染空 TabBar |
 | customer-search | idle 状态隐藏结果依赖的页面级「查看详情」；底部主 CTA「搜索」保留；只有有结果时显示「查看详情」；空态显示「清空关键词」 |
 | mobile-form | `startTime`/`endTime` 使用 `datetime-local`；客户字段接 picker；有 formModes 时移除重复的「另一模式」文案 |
-| calendar | 标题显示完整日期；390px 下横向滚动，最小列宽；增加状态色图例；块文字保持可读 |
+| calendar | 标题显示完整日期；390px 下横向滚动，最小列宽；增加状态色图例；按 `mockData.rows[].date` 的「周X」把块放到正确列，块文字保持可读 |
 | 全局 | 列表行/搜索结果行有 hover/active 反馈；按钮 disabled/readonly 有可辨识样式 |
 
 ## 7. 错误处理、预算与人工门禁
@@ -470,7 +488,7 @@ core/renderer-html/src/index.ts                 motion、picker、保真修复
 runtimes/standalone/src/visual-review-cli.ts
 runtimes/standalone/src/visual-sign-cli.ts
 runtimes/standalone/src/visual/baseline-cli.ts
-runtimes/dsh/home/profiles/prd-ui-visual/       vision profile
+dsh/home/profiles/prd-ui-visual/                vision profile
 pipeline/baselines/employee-app-phase2/         baseline PNG + manifest
 pipeline/artifacts/employee-app-phase2/visual-review/  证据
 ```
