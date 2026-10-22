@@ -1,7 +1,7 @@
 # PRD → 双端 UI 交付管线 · 设计文档
 
 > 日期：2026-10-19
-> 状态：Phase 1 + Phase 2 切片已实现（2026-10-22，v0.3.1 clean 收尾）；Phase 3/4 待做。实现状态见 §14.1。
+> 状态：Phase 1 + Phase 2 切片已实现（2026-10-22，v0.4 动效/视觉回归验收完成）；Phase 3/4 待做。实现状态见 §14.1。
 > 路线：A（语义编译 + 多端渲染）
 > 工作目录：`/Users/jihui/Desktop/产品、ui`
 
@@ -1294,10 +1294,10 @@ handoff/
 | 阶段 | 状态 | 已有证据 |
 |---|---|---|
 | Phase 0 · Spike | 完成（历史） | `spike/` 保留 Figma 写回与 HTML 验证，不作为现行实现 |
-| Phase 1 · 基础 | 完成 | `core/*` 契约/编译器/校验/renderer；**12 个 archetype**（原 10 个 + `mobile-list` / `mobile-form`）；529 tests、typecheck clean、`test:dsh` 2 passed |
+| Phase 1 · 基础 | 完成 | `core/*` 契约/编译器/校验/renderer；**12 个 archetype**（原 10 个 + `mobile-list` / `mobile-form`）；632 tests、typecheck clean、`test:dsh` 4 passed |
 | Phase 2 · 前半段 | 完成 | `intake:run`：PRD normalize/review + IA + UI Briefer + 两道签核 + 原子发布；Briefer 自动产出 `fieldLabels` / `mockData` / `feedItems` |
 | Phase 2 · 后半段 | 完成 | M1 → Spec Engineer → HTML；per-profile M1 真实 run（b-dense + c-expressive）interaction passed；8 页 sample 出口 `8 pages / 0 blockers`；03 真实 PRD 四页切片全链路通过（intake ¥0.5147、M1 ¥0.2746、Spec 4 页 / 0 blockers、HTML 4 页） |
-| Phase 2 · 完整出口 | 完成（2026-10-22，clean v0.3.1） | `employee-app-phase2` 8 页真实 PRD：intake `run-2026-10-22T03-09-28-544Z` success，8 页全 `b-mobile`，brief hash `sha256:b558b57a…b8335`，PRD/IA 与 brief gate passed，**0 waivers / 0 手工 brief patch**（IA 原 blocker 已在 PRD 层解决），¥0.8978；M1 `run-2026-10-22T03-16-05-257Z` `gates={ia:passed, interaction:passed, visualStyle:passed}`、0 waivers、`agent:sign` 后 success，¥0.43998；Spec Engineer 8 Page Specs / 0 blockers / 36 warnings（34 motion node + 2 unused asset）；assets missing=0，referenced `icon-plus` / `icon-search`；asset review 对 clean M1 的 4 个标准图标 brief 为 4/4 passed（¥0.1698）；HTML 8 页 + index，`phase1:verify` 8/0；Playwright 交互（搜索 idle/过滤/清空/空态、日历/列表切换、空格预填、详情抽屉、new/reschedule、状态动作栏、告知确认）19 张截图。2026-10-21 的 sample-waiver + brief patch 出口已被本轮替代。限制：customer picker 未接入静态 renderer、日历预填为 day-of-month；Studio/Asset Compiler 仍后置 |
+| Phase 2 · 完整出口 | 完成（2026-10-22，clean v0.4） | `employee-app-phase2` 8 页真实 PRD：intake `run-2026-10-22T03-09-28-544Z` success，8 页全 `b-mobile`，brief hash `sha256:b558b57a…b8335`，0 waivers / 0 手工 brief patch，¥0.8978；M1 `run-2026-10-22T03-16-05-257Z` `gates={ia:passed, interaction:passed, visualStyle:passed}`、0 waivers、`agent:sign` 后 success，¥0.43998；Spec Engineer v0.4 `run-2026-10-22T10-22-51-461Z` 8 Page Specs / 8 motion pages / 0 blockers / 0 motion unresolved（2 unused asset warnings）；HTML 8 页 + index，`phase1:verify` 8/0；v0.4 Visual Review：baseline 24 cases，最终 `run-2026-10-22T10-42-23-082Z` 24/24 截图、0 console / 0 overflow、diff 24/0/0、10 findings（7 major / 3 minor / 0 blocker）、`usageComplete=true`、¥0.2939536224，`visual:sign` 后 `status=passed`、signoff valid、waivers=[]。Motion node id / picker / 完整日期 / 6 项保真修复已进 HTML；critic major 作为 Phase 3/4 视觉债记录。Studio/Asset Compiler 仍后置 |
 | Phase 3 · Figma + 沙箱 | 未开始 | Figma Renderer、scratch 沙箱、测试 Subagent、Handoff 均未实现 |
 | Phase 4 · 验收 | 未开始 | 真实项目走查、用户最终签核未做 |
 
@@ -1305,8 +1305,10 @@ handoff/
 
 - `PageShell` / `MobileShell` 全 slot；`mobile-list` 带七列日历、列表双维度；`mobile-form` 单主 CTA；detail 页底部固定操作栏；`noticeBlocks` 按项目分块；`mockData` / `fieldLabels` 全链路。
 - `CalendarGrid`、`ListRow`、`FormField`、`Input`、`Select`、`List`、`ListItem` 等已进入 `b-mobile` catalog。
-- 轻量 vanilla JS 控制器（v0.3.1）：`businessStates` 驱动详情页状态与动作栏、`formModes`（new/reschedule）驱动 CTA 与客户锁定、`views` 切换日历/列表、搜索 idle/过滤/清空/空态、空格预填、详情抽屉。PageShell 页面不注入交互。
-- 仍未消费 motion 到 HTML；没有 Visual Critic / 自动截图 diff；customer picker 未接入静态 renderer，日历预填只到 day-of-month。
+- 轻量 vanilla JS 控制器（v0.4）：`businessStates` 驱动详情页状态与动作栏、`formModes`（new/reschedule）驱动 CTA 与客户锁定、`views` 切换日历/列表、搜索 idle/过滤/清空/空态、空格预填、详情抽屉、customer picker 草稿恢复（sessionStorage）、完整日期预填。PageShell 页面不注入交互。
+- Motion：compiler 写语义 `node.id`，Spec Engineer 解析 M1 binding（legacy alias + group 展开），renderer 输出 `data-motion-*` CSS 动效并按 `prefers-reduced-motion` 回退。
+- Visual Review：`core/visual-review` 构建 24 项截图矩阵，Playwright 截图 + pixelmatch baseline diff，Visual Critic 走 `prd-ui-visual`（vision、只读工具、65536 maxTokens、900s timeout），人工 `visual:sign` 后才 `passed`。
+- 仍后置：critic major 视觉债（disabled 样式、双 check-in CTA、术后告知时序、搜索/列表行卡片化、calendar loading/empty 结构）、确定性 critic replay、Figma/Studio/Asset Compiler、完整 a11y。
 
 版本路径（内部迭代）：
 
@@ -1316,7 +1318,7 @@ handoff/
 | v0.2 | 多 profile + 资产 | 已完成：per-profile M1、标准图标 inventory、asset review |
 | v0.3 | Phase 2 验收交付 | 已完成（sample waiver）：8 页真实 PRD、HTML/资产/视觉巡检 |
 | v0.3.1 | Clean Phase 2 收尾 | 已完成：0 waiver / 0 brief patch、状态动作栏、表单 mode、日历/搜索交互、529 tests、19 张交互截图 |
-| v0.4 | 动效 + 视觉回归 | 下一步：motion 进 HTML、稳定 node id、自动截图 diff、customer picker 与完整日期预填 |
+| v0.4 | 动效 + 视觉回归 | 已完成：motion node id / CSS 动效、picker、完整日期、24 项截图 baseline、真实 Visual Critic + signoff、632 tests、`test:dsh` 4、Phase 1 8/2/4/8 全 0；critic major 转入 Phase 3/4 视觉债 |
 | v1.0 | 项目最终交付 | Phase 3 + Phase 4：Figma/Studio/Handoff、沙箱、真实项目用户签核 |
 
 ---

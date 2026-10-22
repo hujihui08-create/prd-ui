@@ -20,6 +20,7 @@ pnpm spec:engineer \
 | `--project <path>` | 项目 YAML；默认 employee-app |
 | `--agent-run <dir>` | 必填；M1 run 目录 |
 | `--runs <dir>` | 输出目录 |
+| `--strict-motion` | 未解析的 motion binding 对所有 brief 页升级为 blocker |
 | `--json` | stdout 只输出一个 JSON summary |
 | `--help` | usage |
 
@@ -55,7 +56,7 @@ runs/<runId>/
 - **Transition** → `{ trigger, action: "navigate", target: route, reqRef }`
 - **Trigger** → `{ trigger: action, action: reaction, nodeId?, reqRef }`
 - **States** → 合并 interaction 的 default/loading/empty/error/disabled/success，写入 `description`；base state 保留。
-- **Motion** → 只保留 `pageId` 匹配的 bindings；解析用到的 presets；写入 `reducedMotion`。
+- **Motion** → 只保留 `pageId` 匹配的 bindings；按 `node.id` 精确匹配、group id 展开、legacy alias 映射后写入 `nodeIds` / `groupIds`；解析用到的 presets；写入 `reducedMotion`。
 - **Assets** → 扫描 `assetRef`、`props.assetRef`、QuickAction `icon`、Icon `name`；与 asset briefs 对齐。
 - **Traceability** → `designDefaults` 追加 `motion:<preset>` / `asset:<id>`。
 
@@ -74,7 +75,7 @@ runs/<runId>/
 | `SPEC_MOTION_BINDING_PAGE_UNKNOWN` | blocker | binding page 不存在 |
 | `SPEC_MOTION_PRESET_UNKNOWN` | blocker | binding preset 不存在 |
 | `SPEC_MOTION_TOKEN_MISMATCH` | blocker | preset duration/easing 不是 token |
-| `SPEC_MOTION_NODE_UNRESOLVED` | warning | binding nodeId 不在 layout（v0 编译器还没有稳定 node id） |
+| `SPEC_MOTION_NODE_UNRESOLVED` | warning / blocker | binding nodeId 不在 layout；`--strict-motion` 下为 blocker |
 | `SPEC_ASSET_MISSING` | blocker | Page Spec 引用的 asset 没有 brief |
 | `SPEC_ASSET_UNUSED` | warning | asset brief 没有被引用 |
 | `SPEC_ASSET_BRIEFS_MISSING` | warning | 没有 asset briefs |
@@ -140,3 +141,16 @@ runs/<runId>/
 - Spec Engineer 不做 Spec Repair；gate 失败时只写 findings。
 - 不解决 M1 UAT 中与 Spec Engineer 无关的 6 条 findings（搜索建模、forbidden 状态、在途字段、命名、回程 flow、空态文案）。
 - 资产评审仍是独立的 M0 步骤；v0 只校验 brief 引用。
+
+## v0.4 clean 8 页验收
+
+`employee-app-phase2` 的 clean M1 run
+`run-2026-10-22T03-16-05-257Z` 在 `--strict-motion` 下输出：
+
+- 8 个 Page Spec（today / customer-search / customer-detail /
+  appointment-detail / appointment-form / treatment-notice /
+  appointment-list / callback-register）；
+- 8 个 motion page，0 blockers，0 `SPEC_MOTION_NODE_UNRESOLVED`；
+- 2 个 `SPEC_ASSET_UNUSED` warning（`icon-home` / `icon-user`）。
+
+其他未迁移项目不传 `--strict-motion` 时，未解析 motion 仍保持 warning。

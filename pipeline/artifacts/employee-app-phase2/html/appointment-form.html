@@ -75,7 +75,7 @@ button{font:inherit;color:inherit;}
 .topbar-chevron{font-size:20px;color:var(--color-text-secondary);}
 .topbar-bell{font-size:24px;color:var(--color-text-primary);}
 .page-header{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;gap:var(--space-2);background:var(--color-surface-subtle);}
-.back-icon{font-size:20px;}
+.back-icon{font-size:20px;cursor:pointer;}
 .page-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
 .tabbar{flex:0 0 64px;height:64px;background:var(--color-surface-default);border-top:1px solid var(--color-border-subtle);}
 .tabbar-inner{height:100%;display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0);}
@@ -90,7 +90,8 @@ button{font:inherit;color:inherit;}
 .card{background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-4);box-shadow:0 1px 2px rgba(17,24,39,.04);}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);}
 .card-illustration{width:80px;height:56px;flex:0 0 80px;display:block;}
-.card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
+.card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;}
+.card-title .badge{margin-left:8px;}
 .card-body{margin-top:var(--space-2);display:flex;flex-direction:column;gap:0;}
 .card-body>.list-row:not(:last-child){border-bottom:1px solid var(--color-border-subtle);}
 .quick-action{flex:1;height:56px;border:0;border-radius:var(--radius-md);background:var(--color-surface-subtle);display:flex;align-items:center;justify-content:center;gap:var(--space-2);transition:transform var(--motion-fast) ease,background var(--motion-normal) ease;}
@@ -103,6 +104,8 @@ button{font:inherit;color:inherit;}
 .quick-label{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
 .list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:10px 0;}
 .list-row[data-row-link]{cursor:pointer;}
+.list-row[data-row-link]{transition:background var(--motion-fast) ease;}
+.list-row[data-row-link]:hover,.list-row[data-row-link]:active{background:var(--color-surface-subtle);}
 .list-row-main{flex:1;min-width:0;}
 .list-row-title{display:flex;align-items:center;gap:6px;min-width:0;}
 .row-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -138,11 +141,11 @@ button{font:inherit;color:inherit;}
 .summary{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);padding:0 2px;}
 .calendar{background:var(--color-surface-default);border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(17,24,39,.04);overflow:hidden;}
 .calendar-scroll{overflow-x:auto;overflow-y:hidden;}
-.calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(44px,1fr));min-width:360px;position:relative;}
+.calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(88px,1fr));min-width:720px;position:relative;}
 .calendar-corner{grid-column:1;grid-row:1;background:var(--color-surface-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day{grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-secondary);background:var(--color-surface-subtle);border-left:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day.today{background:color-mix(in srgb,var(--color-status-info) 10%,white);color:var(--color-status-info);font-weight:600;}
-.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);}
+.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);white-space:nowrap;}
 .calendar-day.today .calendar-date{color:var(--color-status-info);}
 .calendar-hour{grid-column:1;font-size:9px;line-height:11px;color:var(--color-text-tertiary);display:flex;justify-content:flex-end;padding:2px 4px 0 0;}
 .calendar-cell{border-top:1px solid var(--color-border-subtle);border-left:1px solid var(--color-border-subtle);}
@@ -191,6 +194,8 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.primary{background:var(--color-action-primary);color:var(--color-text-onAction);}
 .btn.secondary{background:#fff;border:1px solid #CBD5E1;color:var(--color-text-primary);}
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
+.btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
+.btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -212,8 +217,11 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .stat-value{font-size:24px;line-height:32px;font-weight:600;color:#0F172A;}
 .list-placeholder{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
 .list-text{display:flex;flex-direction:column;gap:0;padding:4px 0;}
-.list-text-row{padding:10px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#334155;}
+.list-text-row{padding:10px 0;border-bottom:1px solid var(--color-border-subtle);font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);color:var(--color-text-primary);}
 .list-text-row:last-child{border-bottom:0;}
+.list-text-row.summary-row{display:flex;align-items:baseline;gap:var(--space-3);}
+.list-text-label{flex:0 0 auto;color:var(--color-text-tertiary);}
+.list-text-value{flex:1;min-width:0;font-weight:var(--type-body-md-weight);word-break:break-word;}
 .list-placeholder-row{display:grid;grid-template-columns:2fr 1fr 60px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9;}
 .skeleton-line{display:block;height:10px;border-radius:6px;background:#E7E9ED;}
 .skeleton-line.wide{width:80%;}
@@ -239,6 +247,9 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .form-value{display:block;min-height:20px;padding:8px 10px;border-radius:6px;background:#F8FAFC;color:#0F172A;font-size:14px;}
 .input,.select{height:36px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;padding:0 10px;font:inherit;font-size:14px;color:#0F172A;width:100%;}
 .input:focus,.select:focus{outline:2px solid #BFDBFE;border-color:#2563EB;}
+.form-field .row{align-items:center;}
+.form-field .row .input{flex:1;min-width:0;}
+.form-field .row .btn{flex:0 0 auto;}
 .app-scroll>.form-field{margin:0 var(--space-4) var(--space-3);}
 .app-scroll>.btn{margin:var(--space-4);}
 .app-scroll>.card{margin:var(--space-4);}
@@ -265,9 +276,35 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 @keyframes fade-up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
-@media (max-width:700px){body{background:var(--color-surface-subtle);}.app{box-shadow:none;height:100vh;min-height:844px;}.state-switcher{display:none;}}</style>
+@media (max-width:700px){body{background:var(--color-surface-subtle);}.app{box-shadow:none;height:100vh;min-height:844px;}.state-switcher{display:none;}}
+@keyframes motion-enter-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes motion-page-push{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes motion-sheet-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes motion-state-swap{from{opacity:0}to{opacity:1}}
+@keyframes motion-confirm-collapse{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.98)}}
+@keyframes motion-toast-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+[data-motion-preset]{animation-duration:var(--motion-duration,200ms);animation-timing-function:var(--motion-ease,ease-out);animation-fill-mode:both;}
+[data-motion-preset="enter-fade"]{animation-name:motion-enter-fade}
+[data-motion-preset="page-push"]{animation-name:motion-page-push}
+[data-motion-preset="sheet-up"]{animation-name:motion-sheet-up}
+[data-motion-preset="state-swap"]{animation-name:motion-state-swap}
+[data-motion-preset="toast-in"]{animation-name:motion-toast-in}
+[data-motion-preset="confirm-collapse"]{animation-name:motion-confirm-collapse}
+[data-motion-preset="list-stagger"]{animation-name:motion-enter-fade;animation-delay:calc(var(--motion-stagger,40ms) * var(--motion-index,0))}
+[data-motion-preset="press-feedback"]:active{transform:scale(.98)}
+@media (prefers-reduced-motion: reduce){
+  [data-motion-preset]{animation:none!important;transition:none!important}
+  [data-motion-preset="press-feedback"]:active{transform:none!important}
+  [data-motion-fallback="fade"] [data-motion-preset="enter-fade"],
+  [data-motion-fallback="fade"] [data-motion-preset="page-push"],
+  [data-motion-fallback="fade"] [data-motion-preset="sheet-up"],
+  [data-motion-fallback="fade"] [data-motion-preset="state-swap"],
+  [data-motion-fallback="fade"] [data-motion-preset="toast-in"],
+  [data-motion-fallback="fade"] [data-motion-preset="list-stagger"]{animation-name:motion-state-swap!important;animation-duration:120ms!important}
+}
+</style>
 </head>
-<body data-state="default">
+<body data-state="default" data-page-kind="form">
   <nav class="state-switcher" aria-label="预览状态">
   <span class="state-switcher-label">状态</span>
   <a href="?state=default">默认</a>
@@ -275,30 +312,30 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   <a href="?state=loading">加载</a>
   <a href="?state=error">失败</a>
 </nav>
-  <div class="app " data-page-archetype="mobile-form" data-page-id="appointment-form" data-form-modes="[{&quot;name&quot;:&quot;new&quot;,&quot;label&quot;:&quot;保存&quot;,&quot;actions&quot;:[&quot;保存&quot;,&quot;选择客户&quot;],&quot;customerLocked&quot;:false},{&quot;name&quot;:&quot;reschedule&quot;,&quot;label&quot;:&quot;保存改期&quot;,&quot;actions&quot;:[&quot;保存改期&quot;],&quot;customerLocked&quot;:true}]">
+  <div class="app " data-page-archetype="mobile-form" data-page-id="appointment-form" data-form-modes="[{&quot;name&quot;:&quot;new&quot;,&quot;label&quot;:&quot;保存&quot;,&quot;actions&quot;:[&quot;保存&quot;,&quot;选择客户&quot;],&quot;customerLocked&quot;:false},{&quot;name&quot;:&quot;reschedule&quot;,&quot;label&quot;:&quot;保存改期&quot;,&quot;actions&quot;:[&quot;保存改期&quot;],&quot;customerLocked&quot;:true}]" data-picker-search="customer-search" data-node-id="appointment-form.page.root" data-motion-preset="enter-fade" style="--motion-duration:120ms;--motion-ease:ease-out">
   <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">新增/改期预约</h1></header>
-  <main class="app-scroll"><section class="section" style="padding:var(--space-4);gap:var(--space-3)"><label class="form-field" data-field="customer">
+  <main class="app-scroll"><section class="section" data-node-id="appointment-form.root.content.0" style="padding:var(--space-4);gap:var(--space-3)"><label class="form-field" data-field="customer" data-node-id="appointment-form.field.customer" data-motion-preset="press-feedback" style="--motion-duration:120ms;--motion-ease:ease-out">
   <span class="form-label">客户<span class="required">*</span></span>
-  <input class="input" name="customer" type="text" placeholder="请输入客户" />
-</label><label class="form-field" data-field="project">
+  <div class="row" style="gap:var(--space-2)"><input class="input" name="customer" type="text" placeholder="请输入客户" /><button class="btn ghost" type="button" data-action="选择客户" data-node-id="appointment-form.action.pick-customer" data-motion-preset="page-push" style="--motion-duration:200ms;--motion-ease:cubic-bezier(0.2, 0, 0, 1)">选择</button></div>
+</label><label class="form-field" data-field="project" data-node-id="appointment-form.field.project">
   <span class="form-label">项目<span class="required">*</span></span>
   <input class="input" name="project" type="text" placeholder="请输入项目" />
-</label><label class="form-field" data-field="startTime">
+</label><label class="form-field" data-field="startTime" data-node-id="appointment-form.field.start-time">
   <span class="form-label">开始时间<span class="required">*</span></span>
-  <input class="input" name="startTime" type="text" placeholder="请输入开始时间" />
-</label><label class="form-field" data-field="endTime">
+  <input class="input" name="startTime" type="datetime-local" placeholder="请输入开始时间" />
+</label><label class="form-field" data-field="endTime" data-node-id="appointment-form.field.end-time">
   <span class="form-label">结束时间<span class="required">*</span></span>
-  <input class="input" name="endTime" type="text" placeholder="请输入结束时间" />
-</label><label class="form-field" data-field="therapist">
+  <input class="input" name="endTime" type="datetime-local" placeholder="请输入结束时间" />
+</label><label class="form-field" data-field="therapist" data-node-id="appointment-form.field.therapist">
   <span class="form-label">护理师<span class="required">*</span></span>
   <input class="input" name="therapist" type="text" placeholder="请输入护理师" />
-</label><label class="form-field" data-field="source">
+</label><label class="form-field" data-field="source" data-node-id="appointment-form.field.source">
   <span class="form-label">来源<span class="required">*</span></span>
   <select class="select"><option>到店</option><option>电话</option><option>微信</option><option>企微</option></select>
-</label></section><div class="row " style="gap:var(--space-2)"><span class="typo-label-sm">另一模式</span><span class="typo-label-strong">保存改期</span></div><div class="row filter-row" style="gap:var(--space-2)"><button class="btn ghost" type="button" data-action="选择客户">选择客户</button></div></main>
-  <div class="app-actions"><button class="btn primary" type="button" data-action="保存">保存</button></div>
-  
-  
+</label></section></main>
+  <div class="app-actions"><button class="btn primary" type="button" data-action="保存" data-node-id="appointment-form.action.save" data-motion-preset="press-feedback" style="--motion-duration:120ms;--motion-ease:ease-out">保存</button></div>
+
+
   <div class="state-panel loading" aria-hidden="true">
     <div class="skeleton short"></div>
     <div class="skeleton card"></div>
@@ -313,7 +350,41 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     </div>
   </div>
 </div>
-  <script id="interaction-config" type="application/json">{"archetype":"mobile-form","pageId":"appointment-form","businessStates":null,"formModes":[{"name":"new","label":"保存","actions":["保存","选择客户"],"customerLocked":false},{"name":"reschedule","label":"保存改期","actions":["保存改期"],"customerLocked":true}],"views":null,"defaultView":null,"searchIdleTitle":null,"currentStatus":null,"referenceId":"appointment-form","linkedRoutes":{"create":"appointment-form.html","detail":"appointment-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
+  <script>
+    (() => {
+      const back = document.querySelector(".back-icon");
+      if (!back) return;
+      const pickerPrefix = "prd-ui:picker:";
+      const originPrefix = "prd-ui:form:origin:";
+      const formDraftKey = "prd-ui:picker:appointment-form";
+      const pickerReturnKey = "prd-ui:picker:return";
+      const formOriginKey = "prd-ui:form:origin:appointment-form";
+      back.addEventListener("click", () => {
+        const pageKind = document.body.dataset.pageKind;
+        if (pageKind === "form") {
+          // Form back returns to its recorded origin, never to the picker.
+          const origin = sessionStorage.getItem(formOriginKey) || "index.html";
+          sessionStorage.removeItem(formDraftKey);
+          sessionStorage.removeItem(pickerReturnKey);
+          sessionStorage.removeItem(formOriginKey);
+          location.href = origin;
+          return;
+        }
+        if (pageKind === "detail") {
+          // Detail back cancels every pending picker draft and form origin.
+          for (const key of Object.keys(sessionStorage)) {
+            if (key.indexOf(pickerPrefix) === 0) sessionStorage.removeItem(key);
+          }
+          for (const key of Object.keys(sessionStorage)) {
+            if (key.indexOf(originPrefix) === 0) sessionStorage.removeItem(key);
+          }
+        }
+        if (history.length > 1) history.back();
+        else location.href = "index.html";
+      });
+    })();
+  </script>
+  <script id="interaction-config" type="application/json">{"archetype":"mobile-form","pageId":"appointment-form","businessStates":null,"formModes":[{"name":"new","label":"保存","actions":["保存","选择客户"],"customerLocked":false},{"name":"reschedule","label":"保存改期","actions":["保存改期"],"customerLocked":true}],"formModeLabels":{"new":"新增预约","reschedule":"改期"},"stateNotes":null,"views":null,"defaultView":null,"searchIdleTitle":null,"currentStatus":null,"customerPicker":"customer-search","pickerReturnTo":null,"pageArchetypes":{"appointment-detail":"detail","appointment-form":"mobile-form","appointment-list":"mobile-list","callback-register":"mobile-form","customer-detail":"detail","customer-search":"mobile-list","today":"home","treatment-notice":"detail"},"referenceId":"appointment-form","linkedRoutes":{"create":"appointment-form.html","detail":"appointment-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
   <script>
 (() => {
   const raw = document.getElementById("interaction-config")?.textContent;
@@ -325,11 +396,22 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   function applyBusinessStates() {
     const states = config.businessStates;
     if (!states) return;
-    let status = config.currentStatus ?? states[0]?.name;
+    let status =
+      new URLSearchParams(location.search).get("status") ??
+      config.currentStatus ??
+      states[0]?.name;
     const currentState = () => states.find((state) => state.name === status);
     const allowed = () => currentState()?.actions ?? [];
+    const toneFor = (value) => {
+      if (/已到店|已完成|已确认|成功|在售/.test(value)) return "success";
+      if (/已登记|待确认|未确认|待到店|待处理|进行|加载/.test(value)) return "warning";
+      if (/爽约|已取消|失败|异常|缺货/.test(value)) return "danger";
+      return "neutral";
+    };
     const bar = document.querySelector(".app-actions");
     const noteHost = document.querySelector(".app-scroll");
+    const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
+    const rowValue = (row) => row.querySelector(".list-text-value");
     const apply = () => {
       let visibleInBar = 0;
       for (const button of qsa("[data-action]")) {
@@ -339,21 +421,45 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       }
       if (bar) bar.hidden = visibleInBar === 0;
       const badge = document.querySelector(".app-scroll .badge");
-      if (badge) badge.textContent = status;
+      if (badge) {
+        badge.textContent = status;
+        badge.className = "badge tone-" + toneFor(status);
+      }
       const statusField = document.querySelector('[data-field="status"] .form-value, [data-field="status"] .form-readonly');
       if (statusField) statusField.textContent = status;
       for (const row of qsa(".app-scroll .list-text-row")) {
-        if ((row.textContent ?? "").indexOf("状态:") === 0) row.textContent = "状态: " + status;
+        if (rowLabel(row) === "状态") {
+          const value = rowValue(row);
+          if (value) value.textContent = status;
+        } else if ((row.textContent ?? "").indexOf("状态:") === 0) {
+          row.textContent = "状态: " + status;
+        }
       }
       if (status === "已确认") {
         const confirmedBy = document.querySelector('[data-field="confirmedBy"] .form-value');
         const confirmedAt = document.querySelector('[data-field="confirmedAt"] .form-value');
-        const byValue = confirmedBy && (confirmedBy.textContent ?? "").trim() !== "—"
-          ? confirmedBy.textContent
-          : "当前员工";
-        const atValue = confirmedAt && (confirmedAt.textContent ?? "").trim() !== "—"
-          ? confirmedAt.textContent
-          : new Date().toLocaleString("zh-CN", { hour12: false });
+        const summaryText = (label) => {
+          for (const row of qsa(".app-scroll .list-text-row")) {
+            if (rowLabel(row) !== label) continue;
+            const value = rowValue(row);
+            if (value) return (value.textContent ?? "").trim();
+          }
+          return "";
+        };
+        const bySummary = summaryText("确认人");
+        const atSummary = summaryText("确认时间");
+        const byValue =
+          confirmedBy && (confirmedBy.textContent ?? "").trim() !== "—"
+            ? confirmedBy.textContent
+            : bySummary !== "" && bySummary !== "—"
+              ? bySummary
+              : "当前员工";
+        const atValue =
+          confirmedAt && (confirmedAt.textContent ?? "").trim() !== "—"
+            ? confirmedAt.textContent
+            : atSummary !== "" && atSummary !== "—"
+              ? atSummary
+              : new Date().toLocaleString("zh-CN", { hour12: false });
         if (confirmedBy && (confirmedBy.textContent ?? "").trim() === "—") {
           confirmedBy.textContent = byValue;
         }
@@ -361,19 +467,30 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
           confirmedAt.textContent = atValue;
         }
         for (const row of qsa(".app-scroll .list-text-row")) {
+          const label = rowLabel(row);
+          if (label === "确认人" || label === "确认时间") {
+            const value = rowValue(row);
+            if (value && (value.textContent ?? "").trim() === "—") {
+              value.textContent = label === "确认人" ? byValue : atValue;
+            }
+            continue;
+          }
           const text = row.textContent ?? "";
           if (text.indexOf("确认人:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认人: " + byValue;
           if (text.indexOf("确认时间:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认时间: " + atValue;
         }
       }
       let note = document.querySelector(".state-note");
-      if (currentState()?.note) {
+      // Only curated read-only notes ("只读说明「…」") render, and only when
+      // the state has no bottom-bar action.
+      const noteText = visibleInBar === 0 ? config.stateNotes?.[status] : undefined;
+      if (noteText) {
         if (!note && noteHost) {
           note = document.createElement("div");
           note.className = "state-note";
           noteHost.append(note);
         }
-        if (note) note.textContent = currentState().note;
+        if (note) note.textContent = noteText;
       } else if (note) {
         note.remove();
       }
@@ -419,7 +536,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const params = new URLSearchParams(location.search);
     let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
     const submit = document.querySelector(".app-actions [data-action]");
-    const customer = document.querySelector('[data-field="customer"] input');
+    const customer = document.querySelector('[data-field=customer] input');
     const host = document.querySelector(".app-scroll");
     const tabs = document.createElement("div");
     tabs.className = "mode-tabs";
@@ -427,7 +544,8 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       for (const mode of modes) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = mode.label;
+        button.dataset.mode = mode.name;
+        button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
         button.addEventListener("click", () => {
           current = mode;
           const appointmentId = params.get("appointmentId") ?? config.referenceId;
@@ -439,18 +557,45 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       host.prepend(tabs);
     }
     const appointmentId = params.get("appointmentId") ?? config.referenceId;
-    const prefill = params.get("date") && params.get("time") ? params.get("date") + " " + params.get("time") : "";
+    const dateParam = params.get("date");
+    const timeParam = params.get("time");
     const startInput = document.querySelector('input[name="startTime"]');
-    if (startInput && prefill) startInput.value = prefill;
+    const endInput = document.querySelector('input[name="endTime"]');
+    if (dateParam && timeParam) {
+      const start = new Date(dateParam + "T" + timeParam + ":00");
+      if (!Number.isNaN(start.getTime())) {
+        if (startInput) startInput.value = dateParam + "T" + timeParam;
+        if (endInput) {
+          const end = new Date(start.getTime() + 60 * 60 * 1000);
+          const pad = (value) => String(value).padStart(2, "0");
+          endInput.value =
+            end.getFullYear() +
+            "-" +
+            pad(end.getMonth() + 1) +
+            "-" +
+            pad(end.getDate()) +
+            "T" +
+            pad(end.getHours()) +
+            ":" +
+            pad(end.getMinutes());
+        }
+      }
+    }
+    const customerPickerButton = document.querySelector(
+      '[data-field=customer] [data-action="选择客户"]'
+    );
     const apply = () => {
       for (const button of Array.from(tabs.children)) {
-        button.classList.toggle("active", button.textContent === current.label);
+        button.classList.toggle("active", button.dataset.mode === current.name);
       }
       if (submit) {
         submit.textContent = current.actions[0] ?? submit.textContent;
         submit.dataset.action = current.actions[0] ?? submit.dataset.action;
       }
       if (customer) customer.disabled = current.customerLocked === true;
+      if (customerPickerButton) {
+        customerPickerButton.disabled = current.customerLocked === true;
+      }
       let id = document.querySelector(".appointment-id");
       if (current.name === "reschedule") {
         if (!id && host) {
@@ -472,6 +617,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const rows = qsa("[data-search-text]");
     const idle = document.querySelector('[data-empty-kind="idle"]');
     const empty = document.querySelector('[data-empty-kind="empty"]');
+    const pickerMode = new URLSearchParams(location.search).get("mode") === "picker";
     const apply = () => {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
@@ -483,6 +629,11 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
+      // The detail entry depends on results; picker mode never navigates to
+      // the customer detail page.
+      for (const button of qsa('[data-action="查看详情"]')) {
+        button.hidden = pickerMode || visible === 0;
+      }
     };
     input.addEventListener("input", apply);
     const clear = document.querySelector('[data-action="清空关键词"]');
@@ -497,6 +648,8 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   }
 
   function applyRowLinks() {
+    // In picker mode a row click selects a customer instead of navigating.
+    if (new URLSearchParams(location.search).get("mode") === "picker") return;
     const target =
       config.pageId === "customer-search"
         ? config.linkedRoutes.customer
@@ -520,7 +673,10 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   function applyViews() {
     if (!config.views) return;
     const panels = qsa("[data-view-panel]");
-    let current = config.defaultView ?? config.views[0];
+    let current =
+      new URLSearchParams(location.search).get("view") ??
+      config.defaultView ??
+      config.views[0];
     const toggle = document.querySelector("[data-view-toggle]");
     const apply = () => {
       for (const panel of panels) {
@@ -591,15 +747,133 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     apply();
   }
 
+  function applyPicker() {
+    const params = new URLSearchParams(location.search);
+    const pickerSearch = config.customerPicker;
+    const pickerReturn = config.pickerReturnTo;
+    const pickerPrefix = "prd-ui:picker:";
+    const originPrefix = "prd-ui:form:origin:";
+    const draftKey = pickerPrefix + config.pageId;
+    const returnKey = pickerPrefix + "return";
+    const originKey = originPrefix + config.pageId;
+    if (document.body.dataset.pageKind === "form" && !sessionStorage.getItem(originKey)) {
+      // Per-form origin: a picker is never an origin, cross-origin referrers
+      // are ignored, and a direct open falls back to the index page.
+      const referrer = document.referrer;
+      let origin = "index.html";
+      if (referrer && referrer.indexOf("mode=picker") < 0) {
+        try {
+          if (new URL(referrer, location.href).origin === location.origin) {
+            origin = referrer;
+          }
+        } catch {
+          // keep the index fallback
+        }
+      }
+      sessionStorage.setItem(originKey, origin);
+    }
+    if (params.get("mode") === "picker") {
+      const title = document.querySelector(".page-title");
+      if (title) title.textContent = "选择客户";
+    }
+    if (pickerSearch && document.body.dataset.pageKind === "form") {
+      const button = document.querySelector('[data-action="选择客户"]');
+      if (button) {
+        button.addEventListener("click", () => {
+          const draft = {};
+          for (const input of qsa(".app-scroll input, .app-scroll select")) {
+            const key =
+              input.name ||
+              input.id ||
+              input.closest("[data-field]")?.dataset.field;
+            if (key) draft[key] = input.value;
+          }
+          sessionStorage.setItem(draftKey, JSON.stringify(draft));
+          // The return flag survives a picker cancel/back, so the form can
+          // restore the draft on reload even without a selected customer.
+          sessionStorage.setItem(returnKey, config.pageId);
+          location.href = pickerSearch + ".html?mode=picker&returnTo=" + config.pageId;
+        });
+      }
+    }
+    if (params.get("mode") === "picker" && pickerReturn) {
+      for (const row of qsa("[data-search-text]")) {
+        row.addEventListener("click", () => {
+          // Only return to a page that is actually a mobile form; otherwise
+          // fall back to the compiler-derived return target.
+          const requestedReturn = params.get("returnTo");
+          const allowed =
+            requestedReturn !== null &&
+            config.pageArchetypes?.[requestedReturn] === "mobile-form";
+          const target = allowed ? requestedReturn : pickerReturn;
+          if (!target) return;
+          const selectedName = (row.dataset.searchText ?? "").split(" ")[0] ?? "";
+          const targetDraftKey = pickerPrefix + target;
+          const targetDraftRaw = sessionStorage.getItem(targetDraftKey);
+          if (targetDraftRaw) {
+            try {
+              const draft = JSON.parse(targetDraftRaw);
+              draft.customer = selectedName;
+              sessionStorage.setItem(targetDraftKey, JSON.stringify(draft));
+            } catch {
+              // keep the draft as-is
+            }
+          }
+          // The picker:return flag was set when the picker opened; leave it
+          // for the form load. There is no global selected key.
+          location.href = target + ".html";
+        });
+      }
+    }
+    if (document.body.dataset.pageKind === "form") {
+      const hasPrefill = Boolean(params.get("date") && params.get("time"));
+      const isPickerReturn = sessionStorage.getItem(returnKey) === config.pageId;
+      if (hasPrefill) {
+        // Calendar/list prefill always wins over a stale picker draft.
+        sessionStorage.removeItem(draftKey);
+        sessionStorage.removeItem(returnKey);
+      } else if (isPickerReturn) {
+        const draftRaw = sessionStorage.getItem(draftKey);
+        if (draftRaw) {
+          try {
+            const draft = JSON.parse(draftRaw);
+            for (const [name, value] of Object.entries(draft)) {
+              const input =
+                document.querySelector('[name="' + name + '"]') ||
+                document.querySelector(
+                  '[data-field="' + name + '"] input, [data-field="' + name + '"] select'
+                );
+              if (input) input.value = value;
+            }
+          } catch {
+            sessionStorage.removeItem(draftKey);
+          }
+        }
+        // The draft and return flag stay until save, form back, or a
+        // calendar prefill; a reload restores the same draft again.
+      }
+      // Saving the form ends its own picker draft and origin.
+      for (const button of qsa(".app-actions [data-action]")) {
+        button.addEventListener("click", () => {
+          sessionStorage.removeItem(draftKey);
+          sessionStorage.removeItem(returnKey);
+          sessionStorage.removeItem(originKey);
+        });
+      }
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
   applyRowLinks();
   applyViews();
+  applyPicker();
 })();
 </script>
   <script>
     (() => {
+      document.documentElement.dataset.motionFallback = "fade";
       const params = new URLSearchParams(location.search);
       const state = params.get("state");
       if (state) document.body.dataset.state = state;

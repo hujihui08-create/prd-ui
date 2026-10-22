@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "run-2026-10-22T10-22-51-461Z",
+  "project": "employee-app-phase2",
+  "agentRunId": "run-2026-10-22T03-16-05-257Z",
+  "generatedAt": "2026-10-22T10:22:51.468Z",
+  "pages": [
+    "today",
+    "customer-search",
+    "customer-detail",
+    "appointment-detail",
+    "appointment-form",
+    "treatment-notice",
+    "appointment-list",
+    "callback-register"
+  ],
+  "motionPages": [
+    "today",
+    "customer-search",
+    "customer-detail",
+    "appointment-detail",
+    "appointment-form",
+    "treatment-notice",
+    "appointment-list",
+    "callback-register"
+  ],
+  "assets": {
+    "referenced": [
+      "icon-plus",
+      "icon-search"
+    ],
+    "unusedBriefs": [
+      "icon-home",
+      "icon-user"
+    ],
+    "missing": []
+  },
+  "gate": {
+    "passed": true,
+    "issues": [
+      {
+        "code": "SPEC_ASSET_UNUSED",
+        "severity": "warning",
+        "message": "asset brief icon-home is not referenced by any Page Spec",
+        "evidence": "icon-home"
+      },
+      {
+        "code": "SPEC_ASSET_UNUSED",
+        "severity": "warning",
+        "message": "asset brief icon-user is not referenced by any Page Spec",
+        "evidence": "icon-user"
+      }
+    ]
+  },
+  "passed": true
+}

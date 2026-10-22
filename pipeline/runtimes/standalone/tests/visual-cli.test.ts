@@ -24,7 +24,7 @@ import {
 import type { AgentUsage } from "@prd-ui/contracts";
 import type { ScreenshotEvidence } from "@prd-ui/visual-review";
 import { main as baselineMain } from "../src/visual-baseline-cli.js";
-import { main as reviewMain } from "../src/visual-review-cli.js";
+import { main as reviewMain, parseArgs as parseReviewArgs } from "../src/visual-review-cli.js";
 import { main as signMain } from "../src/visual-sign-cli.js";
 import {
   captureVisualCases,
@@ -415,6 +415,17 @@ ${JSON.stringify({
 -->
 `;
 }
+
+describe("visual review CLI arguments", () => {
+  it("defaults the critic timeout to 900000ms and accepts an override", () => {
+    expect(parseReviewArgs(["--runtime", "dsh", "--profile", "prd-ui-visual"]).criticTimeoutMs).toBe(
+      900_000
+    );
+    expect(
+      parseReviewArgs(["--critic-timeout-ms", "1200000"]).criticTimeoutMs
+    ).toBe(1_200_000);
+  });
+});
 
 describe("visual CLIs", () => {
   it("creates a deterministic baseline manifest", async () => {

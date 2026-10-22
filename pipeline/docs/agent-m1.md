@@ -1,6 +1,8 @@
 # M1 Agent 层（IA / Interaction / Visual Style）
 
-M1 在确定性管线之上增加三个只读设计 Agent，产物是结构化 spec 与 findings，供人工决策和 Phase 2 的 Spec Engineer 消费。M1 **不修改 Page Spec、HTML、Figma 或 renderer**。
+M1 在确定性管线之上增加三个只读设计 Agent（IA / Interaction / Visual Style），产物是结构化 spec 与 findings，供人工决策和 Phase 2 的 Spec Engineer 消费。M1 **不修改 Page Spec、HTML、Figma 或 renderer**。
+
+v0.4 另有一个独立的 **Visual Critic** 角色：它不属于 `agent:run` 的三 Agent 流水线，由 `visual:review --runtime dsh --profile prd-ui-visual` 在渲染后调用，对 24 张截图做主观视觉评审；findings 只作 advisory，blocker 需要人工 waiver。
 
 ## 命令
 
@@ -40,7 +42,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run \
 | `--prd <path>` | PRD 原文/摘要；默认取 `project.yaml` 的 `prd` |
 | `--runs <dir>` | run 产物目录 |
 | `--runtime standalone\|dsh` | 执行适配器；默认 standalone |
-| `--profile <name>` | dsh profile；默认 `prd-ui-agents`；8 页 M1 可用 `prd-ui-intake`（65536 maxTokens） |
+| `--profile <name>` | dsh profile；默认 `prd-ui-agents`；8 页 M1 可用 `prd-ui-intake`（65536 maxTokens）；Visual Critic 用 `prd-ui-visual`（同样是 65536 maxTokens，只读工具面） |
 | `--fixtures <dir>` | standalone fixtures；默认 `samples/agents/m1` |
 | `--only-role <role>` | 只跑某个 design role；IA 始终运行 |
 | `--max-cost-cny <n>` | 整 run 成本上限；默认 10 |
@@ -231,6 +233,25 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
   保留不改，留给 v0.4 对齐 prompt/schema。详见
   `docs/superpowers/specs/2026-10-22-clean-phase-2-finish-design.md` §9。
 
+## Visual Critic（v0.4）
+
+- 角色与 schema：`core/agents/src/roles/visual-critic.ts`；`AgentTaskRoleSchema`
+  包含 `visual-critic`。
+- 输入：截图 manifest（24 张，相对 run 目录）、Page Spec、profile / visual
+  style、确定性 findings；输出 `VisualCritique`（verdict + findings）。
+- 规则：只做主观视觉判断（层级、留白、对齐、密度、视觉平衡、品牌一致性），
+  不重复 console/overflow/diff；`blocker` 必须有 owner/reason/expires 的人工
+  waiver 才能通过，`major` 为 warning，`minor` 记录不阻断。
+- 运行时：`prd-ui-visual`（vision provider；`read` / `read_image` / `glob` /
+  `grep`；无 write/edit/bash/workflow/subagent/web；`maxTokens=65536`）。
+  `visual:review` 的 critic 超时默认 900000ms，`--max-cost-cny 3`，
+  usage fail-closed，一次 schema repair。
+- 真实 8 页 run：`run-2026-10-22T10-42-23-082Z`，24 张截图、0 console /
+  0 overflow / diff 24/0/0、10 findings（7 major / 3 minor / 0 blocker）、
+  `usageComplete=true`、¥0.2939536224；签核后 `visual-review.json.status=passed`。
+- 采样波动：首次 run 12 findings，签核后重跑得到另一组 10 findings；最终 run
+  以自身 findings 签核。确定性 findings replay 尚未实现。
+
 ## per-profile M1（2026-10-21）
 
 - `agent:run` 从 brief 页面收集 profile，向 Interaction prompt 传
@@ -263,7 +284,8 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
 ## 限制
 
 - M1 不编译 Page Spec、不渲染 HTML、不跑资产评审；`asset-briefs/*` 供 M0 流程或 Phase 2 消费。
-- Spec Engineer v0 已把 interaction/motion/asset 写进 Page Spec；motion 尚未动画到 HTML（v0.1）。
+- Spec Engineer v0 已把 interaction/motion/asset 写进 Page Spec；v0.4 clean 8 页 motion 已动画到 HTML，其他项目未迁移 motion 仍是 warning。
 - 没有签核 UI；CLI 只校验文件内容。
 - `--allow-unreviewed` 仅用于开发冒烟，不会产生 `success`。
 - `prd-ui-agents` profile 没有工具插件，但 dsh base 自身的能力边界不属于 M1 的沙箱范围。
+- Visual Critic 是 advisory；真实模型的 findings 有采样波动，不能当作确定性 gate。

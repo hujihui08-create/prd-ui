@@ -62,6 +62,7 @@ Options:
   --profile <name>       dsh profile; required for --runtime dsh
   --fixtures <dir>       Standalone critic fixture directory
   --max-cost-cny <n>     Visual Critic budget in CNY (default: 3)
+  --critic-timeout-ms <n>  dsh critic timeout in ms (default: 900000)
   --json                 Print one JSON summary to stdout
   -h, --help             Print this help and exit`;
 
@@ -75,6 +76,7 @@ export interface VisualReviewOptions {
   profile?: string;
   fixturesDir: string;
   maxCostCny: number;
+  criticTimeoutMs: number;
   json: boolean;
   help: boolean;
 }
@@ -121,6 +123,7 @@ export function parseArgs(argv: string[]): VisualReviewOptions {
     runtime: "standalone",
     fixturesDir: path.join(pipelineRoot, "samples", "agents", "visual-critic"),
     maxCostCny: 3,
+    criticTimeoutMs: 900_000,
     json: false,
     help: false,
   };
@@ -173,6 +176,9 @@ export function parseArgs(argv: string[]): VisualReviewOptions {
       case "--max-cost-cny":
         options.maxCostCny = parseNumber(flag, value());
         break;
+      case "--critic-timeout-ms":
+        options.criticTimeoutMs = parseNumber(flag, value());
+        break;
       case "--json":
         options.json = true;
         break;
@@ -220,6 +226,7 @@ async function runCritic(input: {
       dshProfile: profile,
       maxCostCny: input.options.maxCostCny,
       pricing,
+      timeoutMs: input.options.criticTimeoutMs,
       ...(input.deps.createCriticRunner === undefined
         ? {}
         : { createRunner: input.deps.createCriticRunner }),

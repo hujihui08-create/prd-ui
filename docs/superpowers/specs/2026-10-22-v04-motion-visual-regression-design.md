@@ -1,7 +1,7 @@
 # v0.4 动效与视觉回归设计
 
 - 日期：2026-10-22
-- 状态：Approved（设计已确认，待实现）
+- 状态：Completed（2026-10-22 实现并验收；结果见 §12）
 - 输入：Phase 2 clean 出口（v0.3.1，0 waiver / 0 patch）、主设计文档、v0.4 版本路径
 - 关联：[主设计文档](2026-10-19-prd-to-ui-pipeline-design.md)、[Clean Phase 2 收尾](2026-10-22-clean-phase-2-finish-design.md)
 
@@ -260,7 +260,7 @@ interface VisualCritique {
 - 不重复确定性检查（console/overflow/diff）。
 - 不修改文件、不写最终交付目录。
 - blocker 必须有人工 waiver 才能通过；major 是 warning；minor 记录不阻断。
-- 真实 dsh 使用新 profile `prd-ui-visual`（vision + 只读工具面 read/read_image/glob/grep；无 write/edit/bash/workflow/subagent/web；dsh fs 沙箱只限制写入、不限制读取范围；maxTokens 32768，critic 输出 JSON 很小，24 张截图 + Page Spec 仍在 128K 输入窗口内）；standalone 使用 scripted critic 做测试。
+- 真实 dsh 使用新 profile `prd-ui-visual`（vision + 只读工具面 read/read_image/glob/grep；无 write/edit/bash/workflow/subagent/web；dsh fs 沙箱只限制写入、不限制读取范围；maxTokens 65536，24 张截图 + Page Spec 仍在 128K 输入窗口内，输出预算覆盖逐图 reasoning；`visual:review` 的 critic 超时默认 900000ms）；standalone 使用 scripted critic 做测试。
 - 预算：`--max-cost-cny 3`，usage fail-closed；一次 schema repair。
 
 ### 4.5 Gate 与签核
@@ -589,3 +589,38 @@ dsh/home/profiles/prd-ui-visual/                vision profile
 pipeline/baselines/employee-app-phase2/         baseline PNG + manifest
 pipeline/artifacts/employee-app-phase2/visual-review/  证据
 ```
+
+## 12. 实施结果（2026-10-22）
+
+v0.4 的 8 项端到端验收全部通过，最终视觉证据在
+`pipeline/artifacts/employee-app-phase2/`：
+
+| 项 | 结果 |
+|---|---|
+| Spec Engineer（`--strict-motion`） | `run-2026-10-22T10-22-51-461Z`：8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
+| Render | 8 页 + `index.html`；8 页均带 `data-motion-preset` / `data-node-id`；日历 `data-slot-date` 为完整 `YYYY-MM-DD`；form 为 `datetime-local` |
+| Baseline | `pipeline/baselines/employee-app-phase2`：24 cases / 24 PNG；manifest `sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184` |
+| Visual review（最终） | `run-2026-10-22T10-42-23-082Z`：24/24 截图，0 console、0 overflow、diff 24 passed / 0 failed / 0 missing；10 findings（7 major / 3 minor / 0 blocker）；`usageComplete=true`；¥0.2939536224 |
+| Signoff | `Sample Reviewer`，2026-10-22，`waivers=[]`；manifest `sha256:7340ff7f586453a63b56355dcea22d99c10819ede2b919669bec618da1a0a885`；findings `sha256:5533502404e7f9c67ebb096f8751df3a5329fc18007c08970447b69686fbccb1`；`visual-review.json.status=passed`，`state.json.status=success` |
+| Picker | form → 选择 → customer-search（picker）→ 张女士 → 返回 form，customer 回填且 project/start/end/therapist 保留；取消/返回/reload 保留草稿；reschedule 锁定客户 |
+| 日期 | 日历空格 `2026-11-02 09:00` → `startTime=2026-11-02T09:00`、`endTime=2026-11-02T10:00` |
+| 保真 | 列表无字段标题 Row；detail/notice 客户与状态各出现一次；Tab 今日/预约列表；搜索 idle 无「查看详情」/底部「搜索」，空态有「清空关键词」；日历图例 + 720px 横向滚动 |
+| 回归 | `pnpm test` 632+、typecheck clean、`pnpm test:dsh` 4、Phase 1 `8 / 2 / 4 / 8` all 0 blockers |
+
+### 12.1 真实 critic 结果与后续债
+
+最终 run 无 blocker；7 major / 3 minor 作为 warning 记录并签核，不进入 waiver。主要
+未修复项：form disabled 预览无禁用样式、reschedule 内部 `预约 appointment-form`
+chip、detail 双 check-in CTA、已到店仍显示术后告知、customer-search 浮动的
+「查看详情」、appointment-list 页面级「查看完整详情」与列表截断、loading 保留结构、
+只读「客户详情」按钮感、`告知分块` 内部标签、native 日期占位。这些进入 Phase 3/4
+视觉债。
+
+真实 critic 存在采样波动：首次 review（`run-2026-10-22T10-35-22-301Z`）12 findings，
+签核后重跑得到 10 findings；最终 run 以自身 findings 签核，因此 `passed` 成立，但
+“同输入二次评审 findings 收敛”尚未实现为确定性 replay。
+
+真实 critic 的首个 8 页 run（`run-2026-10-22T10-24-11-704Z`）在 32768 maxTokens /
+300s 下超时（¥0.9835，`usageComplete=false`，`VISUAL_CRITIC_UNAVAILABLE`）；
+将 `prd-ui-visual` 提升到 65536 maxTokens，并给 `visual:review` 增加默认 900000ms
+的 `--critic-timeout-ms` 后完成。v0.4 visual critic 累计真实调用成本 ¥1.6415。

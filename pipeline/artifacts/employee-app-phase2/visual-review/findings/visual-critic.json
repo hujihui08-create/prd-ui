@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T10:46:13.118Z",
+  "runtime": "dsh",
+  "profile": "prd-ui-visual",
+  "model": "deepseek-flash",
+  "usageComplete": true,
+  "usage": {
+    "inputTokens": 20793,
+    "outputTokens": 27388,
+    "cacheReadTokens": 287232,
+    "totalTokens": 335413
+  },
+  "costCny": 0.2939536224,
+  "costSource": "pricing",
+  "budgetEnforced": true,
+  "critique": {
+    "verdict": "changes",
+    "findings": [
+      {
+        "id": "VC-001",
+        "severity": "major",
+        "pageId": "appointment-form",
+        "state": "disabled",
+        "evidence": "screenshots/appointment-form.state.disabled.png — all fields from 客户 through 来源 and the fixed bottom 保存 button.",
+        "issue": "The read-only/disabled state still presents every field as editable (white surfaces, normal borders) and the 保存 CTA as a solid primary action, with no lock indicator or permission explanation. The screen does not communicate that editing and saving are unavailable.",
+        "proposal": "Apply a visibly disabled treatment to all fields and the save button (muted surfaces, subdued text, disabled styling) and add a short inline banner or helper text explaining why the form is locked."
+      },
+      {
+        "id": "VC-002",
+        "severity": "major",
+        "pageId": "appointment-form",
+        "state": "reschedule",
+        "evidence": "screenshots/appointment-form.mode.reschedule.png — the gray '预约 appointment-form' line between the header title 新增/改期预约 and the 新增预约/改期 mode tabs.",
+        "issue": "An internal English route/debug string is exposed in the UI. It reads as an unshipped developer artifact and breaks the otherwise consistent Chinese product copy.",
+        "proposal": "Remove the '预约 appointment-form' string; if a mode descriptor is needed, use a user-facing Chinese label such as '改期' without exposing route metadata."
+      },
+      {
+        "id": "VC-003",
+        "severity": "major",
+        "pageId": "appointment-detail",
+        "state": "default",
+        "evidence": "screenshots/appointment-detail.default.png — the mid-page action strip containing 接单并确认到店 and the fixed footer containing 已到店确认 plus 开单, all while the status is 已登记.",
+        "issue": "Two differently worded check-in CTAs appear in separate action regions for the same record. The primary next action is ambiguous and the duplication suggests conflicting state transitions.",
+        "proposal": "Show one primary check-in CTA in the footer, with its label chosen by the current business state, and remove the duplicate from the text action strip. Keep secondary actions (改期/取消/客户详情) in one consistent secondary area."
+      },
+      {
+        "id": "VC-004",
+        "severity": "major",
+        "pageId": "appointment-detail",
+        "state": "已到店",
+        "evidence": "screenshots/appointment-detail.business.已到店.png — the left action 术后告知 below the summary card while the last summary row reads 服务完成 否.",
+        "issue": "The screen offers 术后告知 while simultaneously stating the service is not complete. The contradictory cues make the state model untrustworthy and imply the notice can be handled prematurely.",
+        "proposal": "Hide 术后告知 until 服务完成 is true and a notice snapshot exists; if it must remain visible, disable it with a concrete reason such as '服务完成后可确认'."
+      },
+      {
+        "id": "VC-005",
+        "severity": "minor",
+        "pageId": "appointment-detail",
+        "state": "爽约",
+        "evidence": "screenshots/appointment-detail.business.爽约.png — 客户详情 rendered as isolated small gray text at the left below the summary card, above 爽约已记录入客户档案.",
+        "issue": "The only available action is visually indistinguishable from body copy: it is ungrouped, lacks a link/button affordance or chevron, and floats in empty space. The 已取消 state repeats the same orphan placement.",
+        "proposal": "Place 客户详情 in a reserved action region with a consistent tappable treatment, and move the state note into a clearly labeled banner or supporting slot."
+      },
+      {
+        "id": "VC-006",
+        "severity": "major",
+        "pageId": "customer-search",
+        "state": "default",
+        "evidence": "screenshots/customer-search.search.results.png — the outlined 查看详情 button directly below the search field and above the sole result 姓名：张女士; the result itself has no card boundary or chevron.",
+        "issue": "The detail CTA precedes the result it operates on and is not visually bound to it, so it reads like a toolbar action with an unclear target. The ungrouped result row further weakens the action/result relationship.",
+        "proposal": "Make each result a full-width tappable row/card with its own affordance, or place 查看详情 inside or immediately after the selected result. Separate it visually from the search field."
+      },
+      {
+        "id": "VC-007",
+        "severity": "major",
+        "pageId": "appointment-list",
+        "state": "default",
+        "evidence": "screenshots/appointment-list.default.png — the top action row below the 状态/日期 filters: 切换日历/列表 and 查看完整详情 appear as equal outlined buttons with no appointment selected.",
+        "issue": "The page-level 查看完整详情 control has no visible target and competes with the view toggle. Users cannot tell what will open or whether they must first select a calendar block.",
+        "proposal": "Remove the global detail button until an appointment is selected, or make calendar blocks and list rows the only entry points to detail. Keep the toolbar limited to filtering and view switching."
+      },
+      {
+        "id": "VC-008",
+        "severity": "major",
+        "pageId": "appointment-list",
+        "state": "list",
+        "evidence": "screenshots/appointment-list.view.list.png — the 张女士 and 李女士 rows under the filters: each subtitle is clipped after '委…' and no 护理师 value is visible.",
+        "issue": "The list rows pack project, store, and delegation metadata into one line while the right-aligned time competes for the same width. Important row information is lost, making the list hard to scan.",
+        "proposal": "Restructure rows into a stable two- or three-line layout: name/status, project/time, and therapist/store metadata. Reserve the right edge for one primary value and remove redundant labels to free space."
+      },
+      {
+        "id": "VC-009",
+        "severity": "minor",
+        "pageId": "appointment-list",
+        "state": "loading",
+        "evidence": "screenshots/appointment-list.state.loading.png — three generic rounded skeleton blocks below the title; the filters, legend, and calendar/list controls are absent.",
+        "issue": "The loading skeleton does not resemble either the calendar grid or the list rows, and it drops the page controls. The page will restructure sharply when data arrives instead of loading in place.",
+        "proposal": "Use a grid-shaped skeleton in calendar view and a row-shaped skeleton in list view, keep the date/status filters and view toggle visible, and reserve the footer area."
+      },
+      {
+        "id": "VC-010",
+        "severity": "minor",
+        "pageId": "treatment-notice",
+        "state": "default",
+        "evidence": "screenshots/treatment-notice.default.png — the 告知内容 heading and the smaller 告知分块 label side by side above the 小气泡 card.",
+        "issue": "The header mixes a user-facing section title with an internal schema-like label. 告知分块 has no value or action, so it reads as leaked implementation terminology and weakens the content hierarchy.",
+        "proposal": "Remove 告知分块 or replace it with meaningful user-facing metadata such as '2 个项目'; keep a single clear section heading."
+      }
+    ],
+    "summary": "The typography, neutral palette, and card rhythm are generally consistent, but the set is not ready for acceptance. The disabled form still looks editable, a debug route label is visible, appointment-detail presents duplicate or contradictory actions, and the list/search layouts lose clear action and row structure. Fix the major issues before acceptance; the remaining items are polish."
+  },
+  "error": null
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T10:48:00.000Z",
+  "specEngineer": {
+    "runId": "run-2026-10-22T10-22-51-461Z",
+    "pages": 8,
+    "motionPages": 8,
+    "blockers": 0,
+    "warnings": 2,
+    "motionUnresolved": 0
+  },
+  "render": {
+    "pages": 8,
+    "index": true,
+    "motionAttributes": true,
+    "pickerAttributes": true,
+    "fullDateAttributes": true,
+    "datetimeLocal": true
+  },
+  "baseline": {
+    "cases": 24,
+    "manifestHash": "sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184"
+  },
+  "visualReview": {
+    "runId": "run-2026-10-22T10-42-23-082Z",
+    "status": "passed",
+    "cases": 24,
+    "screenshots": 24,
+    "diff": {
+      "passed": 24,
+      "failed": 0,
+      "missing": 0
+    },
+    "findings": 10,
+    "blockers": 0,
+    "major": 7,
+    "minor": 3,
+    "costCny": 0.2939536224,
+    "usageComplete": true,
+    "model": "deepseek-flash",
+    "manifestHash": "sha256:7340ff7f586453a63b56355dcea22d99c10819ede2b919669bec618da1a0a885",
+    "findingsHash": "sha256:5533502404e7f9c67ebb096f8751df3a5329fc18007c08970447b69686fbccb1",
+    "signoff": {
+      "valid": true,
+      "signer": "Sample Reviewer",
+      "date": "2026-10-22",
+      "waivedFindings": []
+    },
+    "stateStatus": "success"
+  },
+  "earlierReview": {
+    "runId": "run-2026-10-22T10-35-22-301Z",
+    "findings": 12,
+    "blockers": 0,
+    "costCny": 0.36412459199999997,
+    "note": "first real critic run; signed, then the re-review produced a different findings set, so the final run was signed on its own findings"
+  }
+}

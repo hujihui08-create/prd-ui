@@ -22,7 +22,9 @@
               - id: !!js process.env.PRD_UI_VISION_MODEL
                 name: PRD UI Vision
                 contextWindow: 128000
-                maxTokens: 32768
+                # 24 screenshots need more than 32K output tokens: the model
+                # reasons over every image before emitting the critique JSON.
+                maxTokens: 65536
 
 - id: agent-default-model
   config:

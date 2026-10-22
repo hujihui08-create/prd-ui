@@ -25,7 +25,7 @@ dsh/
     profiles/prd-ui-visual/
       package.json                      # base + headless + pi-ai; no project plugin
       cordis.yml                        # []
-      cordis.patch.yml                  # vision provider, 32768 maxTokens, read-only tool surface
+      cordis.patch.yml                  # vision provider, 65536 maxTokens, read-only tool surface
 ```
 
 `node_modules/`, `.credentials.yaml`, `.env`, and logs inside `home/` are gitignored.
@@ -79,8 +79,11 @@ sample waivers (`success`, ¥0.90666), both `usageComplete=true`.
 `prd-ui-visual` is the profile used by `visual:review --runtime dsh`. It has
 the same vision provider as `prd-ui-assets` but no project plugin bundle
 (`@prd-ui/runtime-dsh` is removed); the base `read_image` tool is enough.
-`maxTokens` is 32768 because the critique JSON is small and all 24 screenshots
-plus Page Specs fit comfortably in the 128K input window.
+`maxTokens` is 65536: the critic reads and reasons over all 24 screenshots before
+emitting the critique JSON, and 32768 output tokens truncated the final answer.
+The 24 screenshots plus Page Specs still fit comfortably in the 128K input
+window. `visual:review` defaults the critic timeout to 900000ms; real reviews
+take roughly 3–6 minutes.
 
 The model-facing tool surface is deliberately reduced:
 
@@ -97,6 +100,15 @@ screenshots, but treat the residual read surface as process-wide.
 
 `--max-cost-cny` (default 3) is enforced from `pricing.json`; incomplete usage
 is a blocker.
+
+Real 8-page visual reviews (2026-10-22): the first run timed out at 300s with
+32768 maxTokens (¥0.9835, `usageComplete=false`); after raising the profile to
+65536 and the default CLI timeout to 900s, the next run produced 12 findings
+(¥0.3641); the final signed run `run-2026-10-22T10-42-23-082Z` produced 10
+findings (7 major / 3 minor / 0 blocker), `usageComplete=true`, ¥0.2939536224,
+24/24 screenshots, 0 console / 0 overflow, diff 24/0/0. Findings are sampled:
+a signed re-review produced a different findings set, so the final run was
+signed on its own findings (`status=passed`, `waivers=[]`).
 
 ```bash
 cd pipeline

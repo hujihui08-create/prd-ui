@@ -3,6 +3,77 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-22 — Motion, Visual Review, picker, and fidelity (v0.4)
+
+### Added
+
+- Stable semantic node ids in `core/design-system/src/semantic-ids.ts`; the
+  compiler writes `node.id` / motion group ids, and Spec Engineer resolves M1
+  motion bindings (exact ids, groups, legacy aliases). `--strict-motion` turns
+  unresolved bindings into blockers for the clean 8 pages.
+- Renderer motion: `data-motion-preset` / duration / easing, CSS presets
+  (`enter-fade`, `page-push`, `sheet-up`, `state-swap`, `list-stagger`,
+  `press-feedback`, `confirm-collapse`, `toast-in`), and
+  `prefers-reduced-motion` fallback (`none`/`fade`/`instant`).
+- Visual Review pipeline: `core/visual-review` matrix + deterministic gates,
+  Playwright 390×844 screenshots, pixelmatch baseline diff, `visual:baseline`,
+  `visual:review`, `visual:sign`.
+- Visual Critic role (`core/agents/src/roles/visual-critic.ts`) and
+  `prd-ui-visual` dsh profile (vision, read/read_image/glob/grep only).
+- Customer picker contract + renderer state machine: `customerPicker` /
+  `pickerReturnTo`, sessionStorage draft, select/cancel/back/reload flows;
+  `calendarWeekStart` full `YYYY-MM-DD` cells and `datetime-local` form
+  prefill (`startTime`, `endTime` +60 minutes).
+- Fidelity fixes: mobile-list field-caption row removed, detail/notice summary
+  dedupe + status badge, home tabs (今日 / 预约列表), search idle/empty/results
+  behavior, calendar legend/scroll, disabled/readonly styling.
+
+### Changed
+
+- `prd-ui-visual` maxTokens 32768 → 65536: 24 screenshots need output budget for
+  per-image reasoning; `visual:review --critic-timeout-ms` defaults to 900000.
+- `visual:sign` finalizes the signed run as `visual-review.json.status=passed`
+  when deterministic gates pass and no unwaived blocker remains.
+- M1 remains on `prd-ui-agents` (32768); the 8-page M1 run uses
+  `prd-ui-intake` (65536).
+
+### Verification
+
+- `pnpm test`: 632 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
+  (including the visual-critic mock and hardened profile tool list).
+- Spec Engineer `--strict-motion` `run-2026-10-22T10-22-51-461Z`: 8 Page Specs,
+  8 motion pages, 0 blockers, 2 unused-asset warnings, 0
+  `SPEC_MOTION_NODE_UNRESOLVED`.
+- `render:html`: 8 pages + index; motion, picker, full-date, and
+  `datetime-local` attributes present.
+- Baseline: `pipeline/baselines/employee-app-phase2`, 24 cases / 24 PNG,
+  manifest `sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184`.
+- Final real-dsh visual review `run-2026-10-22T10-42-23-082Z`:
+  `status=passed`, 24/24 screenshots, 0 console / 0 overflow, diff 24 passed /
+  0 failed / 0 missing, 10 findings (7 major / 3 minor / 0 blocker),
+  `usageComplete=true`, ¥0.2939536224; signed by `Sample Reviewer`, `waivers=[]`,
+  findings hash `sha256:55335024…fbccb1`.
+- Playwright: picker select/cancel/reload, calendar full-date prefill, tabs,
+  search idle/empty/results, detail/notice dedupe, calendar legend + horizontal
+  scroll, reschedule lock, reduced-motion fallback.
+- Phase 1: `8 / 2 / 4 / 8` pages, all 0 blockers.
+
+### Limits
+
+- The final review has 7 major critic findings accepted as warnings (no
+  blocker): form disabled styling, reschedule `预约 appointment-form` chip,
+  duplicate check-in CTAs, premature notice action, floating search detail CTA,
+  page-level `查看完整详情` / clipped list rows, and loading skeleton structure.
+  They are recorded in `pipeline/artifacts/employee-app-phase2/README.md` for
+  Phase 3/4.
+- The critic is sampled; a re-review after signing produced a different
+  findings set, so the final run is signed on its own findings. Deterministic
+  findings replay/convergence is not implemented.
+- M1 `interaction-spec.json` still says `cd.new-appointment` locks the customer,
+  contradicting the signed brief (only reschedule locks); kept as debt.
+- Studio/Asset Compiler, Figma Renderer, full a11y, and real-project Phase 4
+  acceptance remain future work.
+
 ## 2026-10-22 — Clean Phase 2 finish (v0.3.1)
 
 ### Added

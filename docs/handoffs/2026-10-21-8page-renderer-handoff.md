@@ -12,6 +12,8 @@
 >
 > **2026-10-22 增量（v0.3.1 clean 收尾，已提交）**：`employee-app-phase2` 8 页真实 PRD 已干净跑通：intake `run-2026-10-22T03-09-28-544Z` success，PRD/IA gate + brief gate passed，**0 waiver / 0 手工 brief patch**，brief hash `sha256:b558b57a…b8335`（¥0.8978）；M1 `run-2026-10-22T03-16-05-257Z` `ia:passed / interaction:passed / visualStyle:passed`（0 waiver，¥0.43998，visual signoff 由 `agent:sign` 完成）；Spec Engineer `run-2026-10-22T03-23-54-618Z` 8 Page Specs / 0 blockers / 36 warnings；HTML 8 页 + index，Phase 1 `8/0`。Renderer 新增业务状态动作栏、new/reschedule 表单 mode、日历/列表切换、搜索过滤与详情抽屉；Playwright 交互验收 19 张截图。当前 **529 tests**、typecheck clean、`test:dsh` 2 passed；Phase 1 `8/2/4/8` 全 0 blockers。最终链路成本 ¥1.3378（含早前重试 ¥2.9358）。下一步是 v0.4：motion 进 HTML、稳定 node id、Visual Critic/截图 diff、customer picker、完整日期预填；Phase 3（Figma/沙箱/Handoff）仍未开始。v0.4 债务清单见 `docs/superpowers/specs/2026-10-22-clean-phase-2-finish-design.md` §9。
 
+> **2026-10-22 增量（v0.4 动效 + 视觉回归，已完成）**：motion 语义 node id、Spec Engineer `--strict-motion`（8 Page Specs / 0 blockers / **0 motion unresolved**）、renderer CSS 动效 + reduced-motion、customer picker（select/cancel/back/reload）、完整日期 `datetime-local` 预填、24 项 visual baseline、`core/visual-review` 确定性 gate/pixel diff、真实 dsh Visual Critic（`prd-ui-visual`，65536 maxTokens，900s timeout）与 `visual:sign` 全部落地。最终视觉 run `run-2026-10-22T10-42-23-082Z`：`status=passed`，24/24 截图、0 console / 0 overflow、diff 24/0/0、10 findings（7 major / 3 minor / **0 blocker**）、¥0.2939536224；签核 `waivers=[]`。当前 **632 tests**、typecheck clean、`test:dsh` 4 passed、Phase 1 `8/2/4/8` 全 0 blockers。证据在 `pipeline/artifacts/employee-app-phase2/visual-review/`；baseline 在 `pipeline/baselines/employee-app-phase2/`。剩余是 critic major 视觉债（disabled 样式、reschedule 内部 chip、detail 双 CTA、术后告知时序、搜索/列表行 affordance、loading 结构）、确定性 critic replay，以及 Phase 3/4（Figma/Studio/Asset Compiler/a11y/真实项目验收）。
+
 ---
 
 ## 0. 快速摘要
@@ -254,8 +256,8 @@ samples/project.demo-orders-intake.yaml
 2. **P0**：M1 per-profile catalog/motion 输入。
 3. **P1**：8 页 asset briefs + asset review。
 4. **P1**：真实 PRD 端到端验收。
-5. **P2**：motion HTML + 稳定 node id；自动截图 diff。
-6. **Phase 3**：Figma/Studio/Handoff。
+5. ~~P2：motion HTML + 稳定 node id；自动截图 diff~~（v0.4 已完成）。
+6. **Phase 3**：Figma/Studio/Handoff/a11y；critic major 视觉债与确定性 replay。
 
 ---
 
@@ -267,7 +269,7 @@ samples/project.demo-orders-intake.yaml
 - **签核**：`signoff/ia.md`、`signoff/visual-style.md` 的机器可读块是审计事实源；不要手改 `state.json` 伪造签核，用 `agent:sign`。
 - **brief 数据**：`mockData`/`fieldLabels` 是可选字段；真实 briefer 尚未稳定生成，当前 8 页 sample 是人工补齐。
 - **source of truth**：`ui-brief.json` / M1 `state.json` / Page Specs 分别是各阶段事实源；不要从 HTML 反推。
-- **视觉验收**：当前是 Playwright 手工巡检；M1 visual-style signoff 签的是视觉方向/资产策略，不是 HTML 最终视觉。
+- **视觉验收**：v0.4 起是 `visual:baseline` + 24 项确定性截图/diff + Visual Critic + `visual:sign`；M1 visual-style signoff 签的是视觉方向/资产策略，不是 HTML 最终视觉。critic 是 advisory，blocker 才需要 waiver。
 - **`/tmp`**：run 产物会丢失；需要证据时复制到 `pipeline/artifacts/` 或重新跑。
 - **`.playwright-mcp/`**：已加入 `.gitignore`，截图/日志不要提交。
 
