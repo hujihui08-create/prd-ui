@@ -608,6 +608,172 @@ describe("brief-driven page content", () => {
     }
   });
 
+  function compileMobilePage(
+    page: UiBriefPage,
+    extraPages: UiBriefPage[] = []
+  ): PageSpec {
+    const custom = structuredClone(brief);
+    custom.ia.pages.push(...extraPages, page);
+    for (const req of page.reqRefs) {
+      custom.traceability.reqMap[req] = [...(custom.traceability.reqMap[req] ?? []), page.id];
+    }
+    return compilePageSpec({
+      brief: custom,
+      page,
+      profile: getProfile("b-mobile"),
+      catalog: getCatalog("b-mobile"),
+      archetype: getArchetype(page.archetype),
+    });
+  }
+
+  const mobileBase = {
+    target: "mobile" as const,
+    profile: "b-mobile",
+    roles: ["admin"],
+    requiredStates: ["default", "loading", "error"],
+    reqRefs: ["REQ-ORDER-001"],
+  };
+
+  it("carries business states, current status, reference id, and linked routes", () => {
+    const formPage: UiBriefPage = {
+      ...mobileBase,
+      id: "appointment-form",
+      name: "新增预约",
+      purpose: "新增或改期预约",
+      archetype: "mobile-form",
+      route: "/appointments/form",
+      fields: ["customer"],
+      actions: ["保存", "保存改期"],
+    };
+    const customerPage: UiBriefPage = {
+      ...mobileBase,
+      id: "customer-detail",
+      name: "客户详情",
+      purpose: "查看客户",
+      archetype: "detail",
+      route: "/customers/:id",
+      fields: ["name"],
+      actions: ["查看预约"],
+    };
+    const noticePage: UiBriefPage = {
+      ...mobileBase,
+      id: "treatment-notice",
+      name: "术后告知",
+      purpose: "告知客户",
+      archetype: "detail",
+      route: "/appointments/detail/:id/notice",
+      fields: ["customer"],
+      actions: ["确认已当面告知"],
+      noticeBlocks: [{ title: "小气泡", items: ["注意防晒"] }],
+    };
+    const detailPage: UiBriefPage = {
+      ...mobileBase,
+      id: "appointment-detail",
+      name: "预约详情",
+      purpose: "查看预约",
+      archetype: "detail",
+      route: "/appointments/detail/:id",
+      fields: ["customer", "status"],
+      fieldLabels: { customer: "客户", status: "状态" },
+      actions: ["已到店确认", "接单并确认到店", "开单", "改期", "取消", "术后告知", "客户详情"],
+      businessStates: [
+        { name: "已登记", actions: ["已到店确认", "接单并确认到店", "开单", "改期", "取消"] },
+        { name: "已到店", actions: ["开单", "术后告知", "客户详情"] },
+        { name: "爽约", actions: [], note: "爽约已记录入客户档案" },
+        { name: "已取消", actions: [], note: "本单已取消" },
+      ],
+      mockData: {
+        values: { customer: "张女士", status: "已登记", appointmentId: "A-001" },
+      },
+    };
+
+    const spec = compileMobilePage(detailPage, [formPage, customerPage, noticePage]);
+    expect(spec.businessStates).toHaveLength(4);
+    expect(spec.currentStatus).toBe("已登记");
+    expect(spec.referenceId).toBe("A-001");
+    expect(spec.linkedRoutes).toMatchObject({
+      form: "/appointments/form",
+      customer: "/customers/:id",
+      notice: "/appointments/detail/:id/notice",
+      detail: "/appointments/detail/:id",
+    });
+    expect(nodesOf(spec, "Button").map((node) => node.props?.action)).toEqual(
+      expect.arrayContaining(["已到店确认", "开单", "取消"])
+    );
+    expect(nodesOf(spec, "FormField").map((node) => node.props?.field)).toEqual([
+      "customer",
+      "status",
+    ]);
+  });
+
+  it("defaults form modes and calendar/list views", () => {
+    const formPage: UiBriefPage = {
+      ...mobileBase,
+      id: "appointment-form",
+      name: "新增/改期预约",
+      purpose: "新增或改期预约",
+      archetype: "mobile-form",
+      route: "/appointments/new",
+      fields: ["customer"],
+      actions: ["保存", "保存改期"],
+    };
+    const formSpec = compileMobilePage(formPage);
+    expect(formSpec.formModes?.map((mode) => mode.name)).toEqual(["new", "reschedule"]);
+    expect(formSpec.formModes?.[1]?.customerLocked).toBe(true);
+
+    const listPage: UiBriefPage = {
+      ...mobileBase,
+      id: "appointment-list",
+      name: "预约列表",
+      purpose: "查看预约",
+      archetype: "mobile-list",
+      route: "/appointments",
+      fields: ["time", "customer"],
+      fieldLabels: { time: "时间段", customer: "客户" },
+      actions: ["新增预约", "切换日历/列表"],
+      mockData: { rows: [{ time: "10:00-11:00", customer: "张女士" }] },
+    };
+    const listSpec = compileMobilePage(listPage);
+    expect(listSpec.views).toEqual(["calendar", "list"]);
+    expect(listSpec.defaultView).toBe("calendar");
+    expect(nodesOf(listSpec, "CalendarGrid")[0]?.props?.viewPanel).toBe("calendar");
+    expect(
+      nodesOf(listSpec, "Section").find((node) => node.props?.viewPanel === "list")
+    ).toBeDefined();
+    const toggle = nodesOf(listSpec, "Button").find(
+      (node) => node.props?.label === "切换日历/列表"
+    );
+    expect(toggle?.props?.viewToggle).toBe(true);
+  });
+
+  it("adds search idle, row search text, and empty-state hooks", () => {
+    const page: UiBriefPage = {
+      ...mobileBase,
+      id: "customer-search",
+      name: "客户搜索",
+      purpose: "搜索客户",
+      archetype: "mobile-list",
+      route: "/customers/search",
+      fields: ["name", "phone", "store"],
+      fieldLabels: { name: "姓名", phone: "手机号", store: "门店" },
+      filterFields: ["keyword"],
+      searchIdleTitle: "输入姓名或脱敏手机号搜索客户",
+      actions: ["清空关键词"],
+      mockData: { rows: [{ name: "张女士", phone: "138****0000", store: "星光店" }] },
+    };
+    const spec = compileMobilePage(page);
+    expect(spec.searchIdleTitle).toBe("输入姓名或脱敏手机号搜索客户");
+    expect(nodesOf(spec, "ListRow")[0]?.props?.searchText).toContain("张女士");
+    const emptyStates = nodesOf(spec, "EmptyState");
+    expect(emptyStates.map((node) => node.props?.emptyKind)).toEqual(
+      expect.arrayContaining(["idle", "empty"])
+    );
+    expect(
+      emptyStates.find((node) => node.props?.emptyKind === "idle")?.props?.title
+    ).toBe("输入姓名或脱敏手机号搜索客户");
+    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("清空关键词");
+  });
+
   it("compiles a custom customers-list page with its own content", () => {
     const customersPage: UiBriefPage = {
       id: "customers-list",

@@ -167,6 +167,7 @@ export const bDenseCatalog: Catalog = {
         size: { type: "enum", enum: ["sm", "md", "lg"] },
         disabled: { type: "boolean" },
         loading: { type: "boolean" },
+        action: { type: "string" },
       },
       variants: ["primary", "secondary", "ghost", "danger"],
       states: ["default", "hover", "active", "focus", "disabled", "loading"],
@@ -209,6 +210,7 @@ export const bDenseCatalog: Catalog = {
       category: "form",
       props: {
         label: { type: "string", required: true },
+        field: { type: "string" },
         required: { type: "boolean" },
         readOnly: { type: "boolean" },
         value: { type: "string" },

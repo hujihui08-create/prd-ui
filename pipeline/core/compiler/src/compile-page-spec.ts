@@ -26,8 +26,8 @@ const settingsFieldMeta: Record<string, { label: string; options: string[] }> = 
   timezone: { label: "时区", options: ["Asia/Shanghai", "UTC"] },
 };
 
-function btn(label: string, emphasis = "primary"): SpecNode {
-  return { type: "Button", props: { label, emphasis } };
+function btn(label: string, emphasis = "primary", action = label): SpecNode {
+  return { type: "Button", props: { label, emphasis, action } };
 }
 
 const STANDARD_ICON_ASSETS: Record<string, string> = {
@@ -78,6 +78,7 @@ function fieldFormNode(
     type: "FormField",
     props: {
       label: label ?? field,
+      field,
       readOnly,
       ...(value === undefined ? {} : { value }),
     },
@@ -95,13 +96,46 @@ function actionButtons(page: UiBriefPage, defaults: string[]): SpecNode[] {
 }
 
 /** Empty state with an illustration only when the brief explicitly supplies one. */
-function emptyStateNode(page: UiBriefPage, title: string, description?: string): SpecNode {
+function emptyStateNode(
+  page: UiBriefPage,
+  title: string,
+  description?: string,
+  emptyKind?: "idle" | "empty"
+): SpecNode {
   const node: SpecNode = {
     type: "EmptyState",
-    props: description === undefined ? { title } : { title, description },
+    props:
+      description === undefined
+        ? { title, ...(emptyKind === undefined ? {} : { emptyKind }) }
+        : { title, description, ...(emptyKind === undefined ? {} : { emptyKind }) },
   };
   if (page.emptyAssetRef !== undefined) node.assetRef = page.emptyAssetRef;
   return node;
+}
+
+type InteractionView = "calendar" | "list";
+
+function linkedRoutesFor(
+  brief: UiBrief,
+  page: UiBriefPage
+): NonNullable<PageSpec["linkedRoutes"]> {
+  const moduleKey = page.id.split("-")[0] ?? page.id;
+  const detailPages = brief.ia.pages.filter((entry) => entry.archetype === "detail");
+  const detailRoute =
+    page.archetype === "detail"
+      ? page.route
+      : (detailPages.find((entry) => entry.id.includes(moduleKey)) ?? detailPages[0])?.route;
+  const formPages = brief.ia.pages.filter((entry) => entry.archetype === "mobile-form");
+  const formRoute =
+    (formPages.find((entry) => entry.id.includes(moduleKey)) ?? formPages[0])?.route;
+  const customerPage = brief.ia.pages.find((entry) => entry.id === "customer-detail");
+  const noticePage = brief.ia.pages.find((entry) => (entry.noticeBlocks ?? []).length > 0);
+  return {
+    ...(formRoute === undefined ? {} : { create: formRoute, form: formRoute }),
+    ...(detailRoute === undefined ? {} : { detail: detailRoute }),
+    ...(customerPage === undefined ? {} : { customer: customerPage.route }),
+    ...(noticePage === undefined ? {} : { notice: noticePage.route }),
+  };
 }
 
 export function compilePageSpec(input: {
@@ -129,7 +163,35 @@ export function compilePageSpec(input: {
     );
   }
 
-  const layout = buildLayout(brief, page, archetype);
+  const fields = page.fields ?? [];
+  const views: InteractionView[] | undefined =
+    page.views ??
+    (page.archetype === "mobile-list" &&
+    (fields.includes("time") || fields.includes("date"))
+      ? ["calendar", "list"]
+      : undefined);
+  const formModes: PageSpec["formModes"] =
+    page.formModes ??
+    (page.archetype === "mobile-form" &&
+    (page.actions ?? []).includes("保存") &&
+    (page.actions ?? []).includes("保存改期")
+      ? [
+          { name: "new", label: "新增预约", actions: ["保存"] },
+          {
+            name: "reschedule",
+            label: "改期",
+            actions: ["保存改期"],
+            customerLocked: true,
+          },
+        ]
+      : undefined);
+  const searchIdleTitle =
+    page.searchIdleTitle ??
+    ((page.filterFields ?? []).some((field) => field === "keyword" || field === "search")
+      ? "输入姓名或脱敏手机号搜索客户"
+      : undefined);
+  const currentStatus = page.mockData?.values?.status;
+  const layout = buildLayout(brief, page, archetype, { views, searchIdleTitle });
   const states = Object.fromEntries(
     [...new Set([...archetype.requiredStates, ...page.requiredStates])].map((name) => [
       name,
@@ -159,10 +221,27 @@ export function compilePageSpec(input: {
       designDefaults: [],
       unmapped: [],
     },
+    ...(page.businessStates === undefined ? {} : { businessStates: page.businessStates }),
+    ...(formModes === undefined ? {} : { formModes }),
+    ...(views === undefined
+      ? {}
+      : { views, defaultView: page.defaultView ?? views[0]! }),
+    ...(searchIdleTitle === undefined ? {} : { searchIdleTitle }),
+    ...(currentStatus === undefined ? {} : { currentStatus }),
+    referenceId:
+      page.mockData?.values?.orderNo ??
+      page.mockData?.values?.appointmentId ??
+      page.id,
+    linkedRoutes: linkedRoutesFor(brief, page),
   };
 }
 
-function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef): SpecNode {
+function buildLayout(
+  brief: UiBrief,
+  page: UiBriefPage,
+  archetype: ArchetypeDef,
+  interaction: { views?: InteractionView[]; searchIdleTitle?: string }
+): SpecNode {
   const nav = brief.ia.navigation.primary;
   const tabs = brief.ia.navigation.tabs ?? nav;
 
@@ -647,6 +726,7 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
         return {
           title: titleField === undefined ? titleValue : labelValue(titleField, titleValue),
           subtitle: subtitleParts.join(" · "),
+          searchText: Object.values(row).join(" "),
           ...(metaValue === undefined || !fields.includes("time")
             ? {}
             : { meta: labelValue("time", metaValue) }),
@@ -699,42 +779,94 @@ function buildLayout(brief: UiBrief, page: UiBriefPage, archetype: ArchetypeDef)
                     textRole: "label.sm",
                   })),
                 },
+                ...(searchField !== undefined && interaction.searchIdleTitle !== undefined
+                  ? [
+                      {
+                        type: "EmptyState" as const,
+                        props: {
+                          title: interaction.searchIdleTitle,
+                          description: "输入关键词后显示匹配结果",
+                          emptyKind: "idle",
+                        },
+                      },
+                    ]
+                  : []),
                 ...(secondaryActions.length > 0
                   ? [
                       {
                         type: "Row",
                         props: { gap: "space.2", variant: "filter" },
-                        children: secondaryActions.map((label) =>
-                          btn(label, "secondary")
-                        ),
+                        children: secondaryActions.map((label) => {
+                          const button = btn(label, "secondary");
+                          if (
+                            interaction.views !== undefined &&
+                            /日历.*列表/.test(label)
+                          ) {
+                            return {
+                              ...button,
+                              props: { ...button.props, viewToggle: true },
+                            };
+                          }
+                          return button;
+                        }),
                       },
                     ]
                   : []),
                 ...(showCalendar
                   ? [
-                      text("日历", "heading.3"),
                       {
-                        type: "CalendarGrid" as const,
-                        props: {
-                          days: calendarDays,
-                          hours: calendarHours,
-                          blocks: calendarBlocks,
-                        },
+                        type: "Section" as const,
+                        props:
+                          interaction.views === undefined
+                            ? { padding: "space.1", gap: "space.2" }
+                            : {
+                                padding: "space.1",
+                                gap: "space.2",
+                                viewPanel: "calendar",
+                              },
+                        children: [
+                          text("日历", "heading.3"),
+                          {
+                            type: "CalendarGrid" as const,
+                            props: {
+                              days: calendarDays,
+                              hours: calendarHours,
+                              blocks: calendarBlocks,
+                              ...(interaction.views === undefined
+                                ? {}
+                                : { viewPanel: "calendar" }),
+                            },
+                          },
+                          text("列表", "heading.3"),
+                        ],
                       },
-                      text("列表", "heading.3"),
                     ]
                   : []),
-                ...rows.map((row) => ({
-                  type: "ListRow",
-                  props: rowProps(row),
-                })),
-                {
-                  type: "EmptyState",
-                  props: {
-                    title: page.emptyTitle ?? `暂无${page.name}`,
-                    description: "调整筛选条件后重试",
-                  },
-                },
+                ...(interaction.views === undefined
+                  ? rows.map((row) => ({
+                      type: "ListRow" as const,
+                      props: rowProps(row),
+                    }))
+                  : [
+                      {
+                        type: "Section" as const,
+                        props: {
+                          padding: "space.1",
+                          gap: "space.2",
+                          viewPanel: "list",
+                        },
+                        children: rows.map((row) => ({
+                          type: "ListRow" as const,
+                          props: rowProps(row),
+                        })),
+                      },
+                    ]),
+                emptyStateNode(
+                  page,
+                  page.emptyTitle ?? `暂无${page.name}`,
+                  "调整筛选条件后重试",
+                  searchField === undefined ? undefined : "empty"
+                ),
               ],
             },
           ],

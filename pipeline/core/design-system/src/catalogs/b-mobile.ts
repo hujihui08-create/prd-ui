@@ -107,6 +107,7 @@ export const bMobileCatalog: Catalog = {
       props: {
         padding: { type: "string", required: true },
         gap: { type: "string", required: true },
+        viewPanel: { type: "enum", enum: ["calendar", "list"] },
       },
       variants: ["default"],
       states: ["default"],
@@ -155,6 +156,7 @@ export const bMobileCatalog: Catalog = {
         status: { type: "string" },
         statusTone: { type: "enum", enum: toneEnum },
         trailing: { type: "string" },
+        searchText: { type: "string" },
       },
       variants: ["default", "two-line"],
       states: ["default", "hover"],
@@ -211,6 +213,7 @@ export const bMobileCatalog: Catalog = {
       category: "form",
       props: {
         label: { type: "string", required: true },
+        field: { type: "string" },
         required: { type: "boolean" },
         readOnly: { type: "boolean" },
         value: { type: "string" },
@@ -308,6 +311,7 @@ export const bMobileCatalog: Catalog = {
         days: { type: "array", required: true },
         hours: { type: "array", required: true },
         blocks: { type: "array", required: true },
+        viewPanel: { type: "enum", enum: ["calendar", "list"] },
       },
       variants: ["week"],
       states: ["default", "empty"],
@@ -350,6 +354,7 @@ export const bMobileCatalog: Catalog = {
         title: { type: "string", required: true },
         description: { type: "string" },
         icon: { type: "string" },
+        emptyKind: { type: "enum", enum: ["idle", "empty"] },
       },
       variants: ["default"],
       states: ["default"],
@@ -392,6 +397,8 @@ export const bMobileCatalog: Catalog = {
       props: {
         label: { type: "string", required: true },
         emphasis: { type: "enum", enum: ["primary", "secondary", "ghost"] },
+        action: { type: "string" },
+        viewToggle: { type: "boolean" },
       },
       variants: ["primary", "secondary", "ghost"],
       states: ["default", "hover", "press", "disabled"],
