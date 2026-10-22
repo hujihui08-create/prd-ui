@@ -1,7 +1,7 @@
 {
   "runId": "run-2026-10-22T03-16-05-257Z",
   "project": "employee-app-phase2",
-  "status": "success",
+  "status": "awaiting_signoff",
   "gates": {
     "ia": "passed",
     "interaction": "passed",
@@ -62,9 +62,11 @@
   },
   "signoff": {
     "ia": true,
-    "visualStyle": true
+    "visualStyle": false
   },
   "costCny": 0.4399832736,
   "usageComplete": true,
-  "error": null
+  "error": null,
+  "normalized": true,
+  "note": "CLI summary captured when the M1 run completed (awaiting_signoff). Final status after agent:sign is in m1-state.json and m1-agent-sign.json."
 }

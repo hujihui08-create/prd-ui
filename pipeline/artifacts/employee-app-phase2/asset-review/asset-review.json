@@ -1,6 +1,5 @@
 {
   "runId": "run-2026-10-21T10-48-48-004Z",
-  "runDir": "/tmp/assets-phase2/run-2026-10-21T10-48-48-004Z",
   "project": "employee-app-phase2",
   "profile": "b-mobile",
   "startedAt": "2026-10-21T10:48:48.007Z",
@@ -423,5 +422,7 @@
   },
   "usageSource": "unavailable",
   "usageComplete": false,
-  "passed": true
+  "passed": true,
+  "evidenceDate": "2026-10-21",
+  "evidenceScope": "Earlier 2026-10-21 asset-review evidence; not part of the 2026-10-22 clean M1/Spec/render run."
 }

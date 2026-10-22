@@ -1,0 +1,74 @@
+[
+  {
+    "pageId": "today",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "customer-search",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "customer-detail",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "appointment-detail",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "appointment-form",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "treatment-notice",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "appointment-list",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  },
+  {
+    "pageId": "callback-register",
+    "findings": [],
+    "blockers": 0,
+    "major": 0,
+    "minor": 0,
+    "questions": 0,
+    "passed": true
+  }
+]
