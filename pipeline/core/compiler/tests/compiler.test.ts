@@ -71,6 +71,18 @@ describe("compileProject", () => {
     expect(icons).toEqual(["icon-plus", "icon-plus", "icon-search"]);
   });
 
+  it("adds a clear-keyword action to the customer-search empty state", () => {
+    const phase2Brief = UiBriefSchema.parse(phase2BriefJson);
+    const phase2Specs = compileProject(phase2Brief, deps);
+    const search = phase2Specs.find((spec) => spec.meta.pageId === "customer-search")!;
+    const empty = collectNodes(search.layout).find(
+      (node) => node.type === "EmptyState" && node.props?.emptyKind === "empty"
+    );
+    expect(empty).toBeDefined();
+    const actions = (empty!.children ?? []).map((node) => node.props?.action);
+    expect(actions).toEqual(["清空关键词"]);
+  });
+
   it("uses the target-appropriate shell as the root", () => {
     for (const page of brief.ia.pages) {
       const spec = specsByPageId.get(page.id)!;

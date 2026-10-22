@@ -739,6 +739,15 @@ function buildLayout(
             : {}),
         };
       };
+      const emptyNode = emptyStateNode(
+        page,
+        page.emptyTitle ?? `暂无${page.name}`,
+        "调整筛选条件后重试",
+        searchField === undefined ? undefined : "empty"
+      );
+      if (searchField !== undefined) {
+        emptyNode.children = [btn("清空关键词", "secondary")];
+      }
       return {
         type: "MobileShell",
         props: { title: page.name, back: true, showTabs: false },
@@ -862,12 +871,7 @@ function buildLayout(
                         })),
                       },
                     ]),
-                emptyStateNode(
-                  page,
-                  page.emptyTitle ?? `暂无${page.name}`,
-                  "调整筛选条件后重试",
-                  searchField === undefined ? undefined : "empty"
-                ),
+                emptyNode,
               ],
             },
           ],
