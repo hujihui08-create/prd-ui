@@ -268,7 +268,10 @@ export function compilePageSpec(input: {
   const pickerReturnTo =
     page.pickerReturnTo ?? (page.id === customerSearch?.id ? firstForm?.id : undefined);
   const customerPicker =
-    page.customerPicker ?? (page.archetype === "mobile-form" ? customerSearch?.id : undefined);
+    page.customerPicker ??
+    (page.archetype === "mobile-form" && (page.fields ?? []).includes("customer")
+      ? customerSearch?.id
+      : undefined);
 
   function mondayOf(date: string): string {
     const base = new Date(`${date}T00:00:00`);

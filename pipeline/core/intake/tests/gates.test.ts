@@ -409,8 +409,10 @@ describe("brief gate", () => {
 
   it("blocks picker and calendar metadata on unsupported page types", () => {
     const pickerReturn = withBrief((brief) => {
+      const form = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      form.archetype = "mobile-form";
       const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
-      page.pickerReturnTo = "orders-list";
+      page.pickerReturnTo = "order-form";
       return brief;
     });
     const pickerReturnCodes = gateForDraft(pickerReturn).issues.map((issue) => issue.code);
@@ -420,6 +422,7 @@ describe("brief gate", () => {
     const customerPicker = withBrief((brief) => {
       const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
       list.archetype = "mobile-list";
+      list.filterFields = ["keyword"];
       const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
       page.customerPicker = "orders-list";
       return brief;
@@ -448,6 +451,62 @@ describe("brief gate", () => {
     expect(gateForDraft(nonListPage).issues.map((issue) => issue.code)).toContain(
       "BRIEF_CALENDAR_FIELDS_MISSING"
     );
+  });
+
+  it("requires customerPicker to target the customer-search page", () => {
+    const listOnly = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.archetype = "mobile-list";
+      list.filterFields = ["status"];
+      const form = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      form.archetype = "mobile-form";
+      form.customerPicker = "orders-list";
+      return brief;
+    });
+    const listOnlyCodes = gateForDraft(listOnly).issues.map((issue) => issue.code);
+    expect(listOnlyCodes).toContain("BRIEF_CUSTOMER_PICKER_UNKNOWN");
+    expect(listOnlyCodes).not.toContain("BRIEF_CUSTOMER_PICKER_UNSUPPORTED");
+
+    const keywordFilter = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.archetype = "mobile-list";
+      list.filterFields = ["keyword"];
+      const form = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      form.archetype = "mobile-form";
+      form.customerPicker = "orders-list";
+      return brief;
+    });
+    const keywordCodes = gateForDraft(keywordFilter).issues.map((issue) => issue.code);
+    expect(keywordCodes).not.toContain("BRIEF_CUSTOMER_PICKER_UNKNOWN");
+    expect(keywordCodes).not.toContain("BRIEF_CUSTOMER_PICKER_UNSUPPORTED");
+  });
+
+  it("requires pickerReturnTo to target a mobile form page", () => {
+    const toDetail = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.id = "customer-search";
+      list.archetype = "mobile-list";
+      list.pickerReturnTo = "order-detail";
+      return brief;
+    });
+    const codes = gateForDraft(toDetail).issues.map((issue) => issue.code);
+    expect(codes).toContain("BRIEF_PICKER_RETURN_UNKNOWN");
+    expect(codes).not.toContain("BRIEF_PICKER_RETURN_UNSUPPORTED");
+  });
+
+  it("blocks impossible calendar dates", () => {
+    for (const value of ["2026-02-31", "2026-13-01", "2026-02-29"]) {
+      const invalid = withBrief((brief) => {
+        const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+        list.archetype = "mobile-list";
+        list.fields = [...(list.fields ?? []), "date"];
+        list.calendarWeekStart = value;
+        return brief;
+      });
+      const codes = gateForDraft(invalid).issues.map((issue) => issue.code);
+      expect(codes, value).toContain("BRIEF_CALENDAR_DATE_INVALID");
+      expect(codes, value).not.toContain("BRIEF_CALENDAR_FIELDS_MISSING");
+    }
   });
 
   it("accepts supported picker targets and calendar metadata", () => {

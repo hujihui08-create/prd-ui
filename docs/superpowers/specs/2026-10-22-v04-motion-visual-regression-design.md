@@ -379,11 +379,11 @@ calendarWeekStart?: string; // ISO date，日历一周的第一天
 
 - Briefer prompt：有 customer picker 的页面必须写 `customerPicker`/`pickerReturnTo`；有日历的页面必须写 `calendarWeekStart` 或给出可由 `meta.date` 推导的明确说明。
 - Brief gate 新增：
-  - `BRIEF_PICKER_RETURN_UNKNOWN`（blocker）：`pickerReturnTo` 不是存在的页面；
+  - `BRIEF_PICKER_RETURN_UNKNOWN`（blocker）：`pickerReturnTo` 不是存在的 mobile-form 页面；
   - `BRIEF_PICKER_RETURN_UNSUPPORTED`（blocker）：`pickerReturnTo` 出现在非 customer-search 页面；
-  - `BRIEF_CUSTOMER_PICKER_UNKNOWN`（blocker）：`customerPicker` 不是存在的 customer-search；
+  - `BRIEF_CUSTOMER_PICKER_UNKNOWN`（blocker）：`customerPicker` 不是 customer-search 页面（id 为 customer-search，或带 keyword/search 过滤的 mobile-list）；
   - `BRIEF_CUSTOMER_PICKER_UNSUPPORTED`（blocker）：`customerPicker` 出现在非 mobile-form 页面；
-  - `BRIEF_CALENDAR_DATE_INVALID`（blocker）：`calendarWeekStart` 不是 ISO 日期；
+  - `BRIEF_CALENDAR_DATE_INVALID`（blocker）：`calendarWeekStart` 不是真实的 ISO 日历日期；
   - `BRIEF_CALENDAR_FIELDS_MISSING`（blocker）：`calendarWeekStart` 出现在非 mobile-list 或没有 date/time 字段的页面。
 
 ## 6. 渲染保真度修复

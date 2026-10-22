@@ -115,6 +115,21 @@ describe("compileProject", () => {
     ).toBe("2026-12-07");
   });
 
+  it("defaults customerPicker only for forms with a customer field", () => {
+    const noCustomer = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const callback = noCustomer.ia.pages.find((page) => page.id === "callback-register")!;
+    callback.fields = (callback.fields ?? []).filter((field) => field !== "customer");
+    const compiled = compileProject(noCustomer, deps);
+    expect(
+      compiled.find((spec) => spec.meta.pageId === "callback-register")?.customerPicker
+    ).toBeUndefined();
+    expect(
+      compiled.find((spec) => spec.meta.pageId === "appointment-form")?.customerPicker
+    ).toBe("customer-search");
+  });
+
   it("derives calendarWeekStart from meta.date when a list has no row dates", () => {
     const fallback = UiBriefSchema.parse(
       JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))

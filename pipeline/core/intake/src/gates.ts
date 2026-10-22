@@ -1,3 +1,4 @@
+import { isIsoDate } from "@prd-ui/contracts";
 import type {
   BriefGate,
   IntakeGateIssue,
@@ -623,6 +624,20 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
             page.id
           )
         );
+      } else {
+        const returnTarget = brief.ia.pages.find(
+          (entry) => entry.id === page.pickerReturnTo
+        );
+        if (returnTarget?.archetype !== "mobile-form") {
+          issues.push(
+            issue(
+              "BRIEF_PICKER_RETURN_UNKNOWN",
+              "blocker",
+              `pickerReturnTo ${page.pickerReturnTo} is not a mobile form page`,
+              page.id
+            )
+          );
+        }
       }
     }
     if (page.customerPicker !== undefined) {
@@ -637,19 +652,26 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         );
       }
       const target = brief.ia.pages.find((entry) => entry.id === page.customerPicker);
-      if (target?.archetype !== "mobile-list") {
+      const targetFields = target?.filterFields ?? [];
+      const isCustomerSearch =
+        target !== undefined &&
+        target.archetype === "mobile-list" &&
+        (target.id === "customer-search" ||
+          targetFields.includes("keyword") ||
+          targetFields.includes("search"));
+      if (!isCustomerSearch) {
         issues.push(
           issue(
             "BRIEF_CUSTOMER_PICKER_UNKNOWN",
             "blocker",
-            `customerPicker ${page.customerPicker} is not a mobile-list search page`,
+            `customerPicker ${page.customerPicker} is not the customer-search page`,
             page.id
           )
         );
       }
     }
     if (page.calendarWeekStart !== undefined) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(page.calendarWeekStart)) {
+      if (!isIsoDate(page.calendarWeekStart)) {
         issues.push(
           issue(
             "BRIEF_CALENDAR_DATE_INVALID",
