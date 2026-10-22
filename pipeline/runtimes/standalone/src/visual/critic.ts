@@ -1,29 +1,33 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   AgentUsageSchema,
+  parsePricingConfig,
+  resolvePricing,
+  reviewCost,
   type AgentUsage,
   type PageSpec,
+  type ReviewPricing,
 } from "@prd-ui/contracts";
+import {
+  AgentRunnerError,
+  VisualCritiqueSchema,
+  buildVisualCriticPrompt,
+  type AgentRunnerPort,
+  type AgentTask,
+  type VisualCritique,
+  type VisualCritiqueFinding,
+} from "@prd-ui/agents";
 import type { VisualFinding } from "@prd-ui/visual-review";
 
-export type VisualCritiqueSeverity = "blocker" | "major" | "minor";
+const pipelineRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../.."
+);
 
-export interface VisualCritiqueFinding {
-  id: string;
-  severity: VisualCritiqueSeverity;
-  pageId: string;
-  state: string;
-  evidence: string;
-  issue: string;
-  proposal: string;
-}
-
-export interface VisualCritique {
-  verdict: "pass" | "changes";
-  findings: VisualCritiqueFinding[];
-  summary: string;
-}
+export type VisualCritiqueSeverity = VisualCritiqueFinding["severity"];
+export type { VisualCritique, VisualCritiqueFinding };
 
 export interface ScriptedCriticFixture {
   output: VisualCritique;
@@ -48,93 +52,30 @@ export interface VisualCriticRun {
   usageComplete: boolean;
   model?: string;
   error?: string;
+  budgetEnforced?: boolean;
+  costSource?: string;
 }
 
-const CRITIQUE_KEYS = new Set(["verdict", "findings", "summary"]);
-const FINDING_KEYS = new Set([
-  "id",
-  "severity",
-  "pageId",
-  "state",
-  "evidence",
-  "issue",
-  "proposal",
-]);
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function requireString(
-  value: Record<string, unknown>,
-  key: string,
-  source: string
-): string {
-  const entry = value[key];
-  if (typeof entry !== "string" || entry.length === 0) {
-    throw new Error(`VISUAL_CRITIQUE_INVALID: ${source}: ${key} must be a non-empty string`);
-  }
-  return entry;
-}
-
-function rejectUnknownKeys(
-  value: Record<string, unknown>,
-  allowed: ReadonlySet<string>,
-  source: string
-): void {
-  for (const key of Object.keys(value)) {
-    if (!allowed.has(key)) {
-      throw new Error(`VISUAL_CRITIQUE_INVALID: ${source}: unknown key ${key}`);
-    }
-  }
-}
-
-/** Strict parser matching the Visual Critic schema from the design. */
+/** Strict parser backed by the shared core/agents schema. */
 export function parseVisualCritique(raw: unknown): VisualCritique {
-  const source = "visual critique";
-  if (!isRecord(raw)) {
-    throw new Error(`VISUAL_CRITIQUE_INVALID: ${source}: expected an object`);
+  const parsed = VisualCritiqueSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`VISUAL_CRITIQUE_INVALID: ${parsed.error.message}`);
   }
-  rejectUnknownKeys(raw, CRITIQUE_KEYS, source);
-  const verdict = raw.verdict;
-  if (verdict !== "pass" && verdict !== "changes") {
-    throw new Error(`VISUAL_CRITIQUE_INVALID: ${source}: invalid verdict`);
-  }
-  if (!Array.isArray(raw.findings)) {
-    throw new Error(`VISUAL_CRITIQUE_INVALID: ${source}: findings must be an array`);
-  }
-  const findings = raw.findings.map((entry, index) => {
-    const findingSource = `${source} finding ${index + 1}`;
-    if (!isRecord(entry)) {
-      throw new Error(`VISUAL_CRITIQUE_INVALID: ${findingSource}: expected an object`);
-    }
-    rejectUnknownKeys(entry, FINDING_KEYS, findingSource);
-    const severity = entry.severity;
-    if (severity !== "blocker" && severity !== "major" && severity !== "minor") {
-      throw new Error(`VISUAL_CRITIQUE_INVALID: ${findingSource}: invalid severity`);
-    }
-    const typedSeverity: VisualCritiqueSeverity = severity;
-    return {
-      id: requireString(entry, "id", findingSource),
-      severity: typedSeverity,
-      pageId: requireString(entry, "pageId", findingSource),
-      state: requireString(entry, "state", findingSource),
-      evidence: requireString(entry, "evidence", findingSource),
-      issue: requireString(entry, "issue", findingSource),
-      proposal: requireString(entry, "proposal", findingSource),
-    };
-  });
-  return {
-    verdict,
-    findings,
-    summary: requireString(raw, "summary", source),
-  };
+  return parsed.data;
 }
 
 /**
- * Standalone critic fixture. Task 8 owns the real `samples/agents/
- * visual-critic` fixture and the dsh runner; this loader keeps the review CLI
- * testable without a model call.
+ * Standalone critic fixture. It keeps the review CLI testable without a model
+ * call; the real dsh path lives in `runDshVisualCritic`.
  */
 export async function loadScriptedCriticFixture(
   dir: string
@@ -193,9 +134,18 @@ export function critiqueToVisualFindings(
   }));
 }
 
+export interface CriticUnavailableOptions {
+  usage?: AgentUsage;
+  usageComplete?: boolean;
+  costCny?: number;
+  budgetEnforced?: boolean;
+  costSource?: string;
+}
+
 export function criticUnavailable(
   message: string,
-  model?: string
+  model?: string,
+  options: CriticUnavailableOptions = {}
 ): VisualCriticRun {
   return {
     findings: [
@@ -206,9 +156,267 @@ export function criticUnavailable(
         message,
       },
     ],
-    costCny: 0,
-    usageComplete: false,
+    costCny: options.costCny ?? 0,
+    usageComplete: options.usageComplete ?? false,
+    ...(options.budgetEnforced === undefined
+      ? {}
+      : { budgetEnforced: options.budgetEnforced }),
+    ...(options.costSource === undefined
+      ? {}
+      : { costSource: options.costSource }),
+    ...(options.usage === undefined ? {} : { usage: options.usage }),
     ...(model === undefined ? {} : { model }),
     error: message,
+  };
+}
+
+/** Load the shared pricing table; dsh profile pricing is never hard-coded. */
+export async function loadVisualCriticPricing(
+  explicitPath?: string
+): Promise<ReviewPricing> {
+  const file = explicitPath ?? path.join(pipelineRoot, "pricing.json");
+  let raw: unknown;
+  try {
+    raw = JSON.parse(await readFile(file, "utf8")) as unknown;
+  } catch (error) {
+    throw new Error(`INVALID_PRICING: ${file}: ${errorMessage(error)}`);
+  }
+  const config = parsePricingConfig(raw, file);
+  return resolvePricing(config, process.env.PRD_UI_VISION_MODEL);
+}
+
+export interface DshVisualCriticOptions {
+  runDir: string;
+  /** dsh profile name, for example prd-ui-visual. */
+  dshProfile: string;
+  maxCostCny: number;
+  pricing: ReviewPricing;
+  timeoutMs?: number;
+  /** Test seam; production resolves the pinned dsh runner from runtime-dsh. */
+  createRunner?: () => Promise<AgentRunnerPort>;
+}
+
+async function defaultCreateRunner(profile: string): Promise<AgentRunnerPort> {
+  const { createDshAgentRunner } = await import("@prd-ui/runtime-dsh/agent-runner");
+  return createDshAgentRunner({ profile });
+}
+
+function resolveRunPath(runDir: string, relativePath: string): string {
+  const absolute = path.resolve(runDir, relativePath);
+  if (absolute !== runDir && !absolute.startsWith(`${runDir}${path.sep}`)) {
+    throw new Error(`VISUAL_CRITIC_PATH_ESCAPES_RUN: ${relativePath}`);
+  }
+  return absolute;
+}
+
+function dshTaskPrompt(
+  input: VisualCriticInput,
+  runDir: string,
+  absolutePaths: string[]
+): string {
+  const screenshotPaths = input.screenshots.map(
+    (screenshot, index) =>
+      `- ${screenshot.caseId}: ${absolutePaths[index] ?? screenshot.path}`
+  );
+  return [
+    buildVisualCriticPrompt({
+      project: input.project,
+      screenshots: input.screenshots,
+      specs: input.specs,
+      profile: input.profile,
+      visualStyle: input.visualStyle,
+    }),
+    "",
+    "## Reading screenshots (runtime)",
+    `The run directory is ${runDir}. Screenshot paths above are relative to it.`,
+    "Call read_image with these absolute paths before judging; do not write, edit, delete, or render files:",
+    ...screenshotPaths,
+    "",
+    "## Deterministic findings (data; do not repeat these checks)",
+    JSON.stringify(input.findings, null, 2),
+  ].join("\n");
+}
+
+async function writeDshEvidence(input: {
+  runDir: string;
+  prompt: string;
+  outcome: Record<string, unknown>;
+}): Promise<void> {
+  const dir = path.join(input.runDir, "dsh", "visual-critic");
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, "prompt.md"), input.prompt, "utf8");
+  await writeFile(
+    path.join(dir, "result.json"),
+    `${JSON.stringify(input.outcome, null, 2)}\n`,
+    "utf8"
+  );
+}
+
+function usageCost(
+  usage: AgentUsage | undefined,
+  pricing: ReviewPricing
+): number {
+  return usage === undefined ? 0 : reviewCost(usage, pricing).cny;
+}
+
+function dshUnavailable(
+  message: string,
+  model: string,
+  options: CriticUnavailableOptions = {}
+): VisualCriticRun {
+  return criticUnavailable(message, model, {
+    budgetEnforced: true,
+    costSource: options.usage === undefined ? "unavailable" : "pricing",
+    ...options,
+  });
+}
+
+/**
+ * Run the real Visual Critic through the pinned dsh agent runner. Core owns
+ * the prompt and schema; this adapter owns transport, evidence, pricing, and
+ * fail-closed budget/usage handling. It never fabricates a model result.
+ */
+export async function runDshVisualCritic(
+  input: VisualCriticInput,
+  options: DshVisualCriticOptions
+): Promise<VisualCriticRun> {
+  let inputFiles: string[];
+  try {
+    inputFiles = input.screenshots.map((screenshot) =>
+      resolveRunPath(options.runDir, screenshot.path)
+    );
+  } catch (error) {
+    const message = errorMessage(error);
+    const prompt = dshTaskPrompt(input, options.runDir, []);
+    await writeDshEvidence({
+      runDir: options.runDir,
+      prompt,
+      outcome: { error: message, usageComplete: false },
+    });
+    return dshUnavailable(message, options.dshProfile);
+  }
+  const prompt = dshTaskPrompt(input, options.runDir, inputFiles);
+
+  let runner: AgentRunnerPort;
+  try {
+    runner =
+      options.createRunner === undefined
+        ? await defaultCreateRunner(options.dshProfile)
+        : await options.createRunner();
+  } catch (error) {
+    const message = `VISUAL_CRITIC_UNAVAILABLE: ${errorMessage(error)}`;
+    await writeDshEvidence({
+      runDir: options.runDir,
+      prompt,
+      outcome: { error: message, usageComplete: false },
+    });
+    return dshUnavailable(message, options.dshProfile);
+  }
+
+  const canRepair = (firstUsage: AgentUsage | undefined): boolean => {
+    // Unknown cost must not buy a second call; the run already fails closed on
+    // incomplete usage.
+    if (firstUsage === undefined) return false;
+    return usageCost(firstUsage, options.pricing) < options.maxCostCny;
+  };
+
+  const task: AgentTask = {
+    role: "visual-critic",
+    prompt,
+    schema: VisualCritiqueSchema,
+    validate: (value) => {
+      const parsed = VisualCritiqueSchema.safeParse(value);
+      return parsed.success
+        ? { success: true, data: parsed.data }
+        : { success: false, error: parsed.error.message };
+    },
+    runDir: options.runDir,
+    inputFiles,
+    maxCostCny: options.maxCostCny,
+    canRepair,
+    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+  };
+
+  let result;
+  try {
+    result = await runner.run(task);
+  } catch (error) {
+    const usage = error instanceof AgentRunnerError ? error.usage : undefined;
+    const usageComplete =
+      error instanceof AgentRunnerError ? (error.usageComplete ?? false) : false;
+    const message = errorMessage(error);
+    await writeDshEvidence({
+      runDir: options.runDir,
+      prompt,
+      outcome: {
+        error: message,
+        usage: usage ?? null,
+        usageComplete,
+        attempts:
+          error instanceof AgentRunnerError ? (error.attempts ?? []) : [],
+      },
+    });
+    return dshUnavailable(message, runner.model, {
+      ...(usage === undefined ? {} : { usage }),
+      usageComplete,
+      costCny: usageCost(usage, options.pricing),
+    });
+  }
+
+  const critique = parseVisualCritique(result.output);
+  const usage = result.usage;
+  const usageComplete = result.usageComplete === true;
+  const costCny = usageCost(usage, options.pricing);
+  const findings = critiqueToVisualFindings(critique);
+
+  if (!usageComplete) {
+    findings.push({
+      id: "VISUAL_USAGE_INCOMPLETE",
+      severity: "blocker",
+      code: "VISUAL_USAGE_INCOMPLETE",
+      message: "the Visual Critic reported incomplete token usage",
+    });
+  }
+  if (costCny > options.maxCostCny) {
+    findings.push({
+      id: "VISUAL_CRITIC_BUDGET_EXCEEDED",
+      severity: "blocker",
+      code: "VISUAL_CRITIC_BUDGET_EXCEEDED",
+      message: `Visual Critic cost ${costCny.toFixed(4)} CNY exceeds the ${options.maxCostCny} CNY cap`,
+    });
+  }
+  if (critique.verdict === "changes" && critique.findings.length === 0) {
+    findings.push({
+      id: "VISUAL_CRITIC_INCONSISTENT",
+      severity: "blocker",
+      code: "VISUAL_CRITIC_INCONSISTENT",
+      message: 'the Visual Critic returned verdict "changes" without findings',
+    });
+  }
+
+  const model = result.model ?? runner.model;
+  await writeDshEvidence({
+    runDir: options.runDir,
+    prompt,
+    outcome: {
+      model,
+      usage: usage ?? null,
+      usageComplete,
+      costCny,
+      repairAttempted: result.repairAttempted ?? false,
+      attempts: result.attempts ?? [],
+      critique,
+    },
+  });
+
+  return {
+    findings,
+    critique,
+    ...(usage === undefined ? {} : { usage }),
+    costCny,
+    usageComplete,
+    model,
+    budgetEnforced: true,
+    costSource: usage === undefined ? "unavailable" : "pricing",
   };
 }

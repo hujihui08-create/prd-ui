@@ -1,8 +1,8 @@
 # Project-local dsh profile
 
 This directory holds the pinned DeepSeek Harness profiles used by
-`asset:review --runtime dsh`, `agent:run --runtime dsh`, and
-`intake:run --runtime dsh`.
+`asset:review --runtime dsh`, `agent:run --runtime dsh`,
+`intake:run --runtime dsh`, and `visual:review --runtime dsh`.
 It never modifies `~/.dsh`; the CLI is pointed at this home with `DSH_HOME`.
 
 ## Layout
@@ -22,6 +22,10 @@ dsh/
       package.json                      # same bundles; no project plugin
       cordis.yml                        # []
       cordis.patch.yml                  # vision provider, default model, 65536 maxTokens
+    profiles/prd-ui-visual/
+      package.json                      # pinned bundles + @prd-ui/runtime-dsh
+      cordis.yml                        # []
+      cordis.patch.yml                  # vision provider, default model, 32768 maxTokens
 ```
 
 `node_modules/`, `.credentials.yaml`, `.env`, and logs inside `home/` are gitignored.
@@ -69,6 +73,38 @@ DSH_HOME="$PWD/dsh/home" pnpm intake:run \
 Real dsh results (2026-10-20): employee-app 2-page intake completed
 (`success`, ¥0.6948); 8-page sample intake completed with three explicit
 sample waivers (`success`, ¥0.90666), both `usageComplete=true`.
+
+## Visual critic profile
+
+`prd-ui-visual` is the profile used by `visual:review --runtime dsh`. It has
+the same vision provider and `@prd-ui/runtime-dsh` bundle as `prd-ui-assets`,
+with `maxTokens` 32768. The critic reads the captured screenshots with the
+base `read_image` tool and returns one `VisualCritique` JSON object; it never
+writes, edits, or renders files. `--max-cost-cny` (default 3) is enforced from
+`pricing.json`; incomplete usage is a blocker.
+
+```bash
+cd pipeline
+set -a; . ./.env; set +a
+DSH_HOME="$PWD/dsh/home" pnpm visual:review \
+  --project samples/projects/employee-app-phase2/project.yaml \
+  --spec-run /tmp/spec-v04/<runId> \
+  --html /tmp/html-v04 \
+  --baseline baselines/employee-app-phase2 \
+  --runtime dsh \
+  --profile prd-ui-visual \
+  --runs /tmp/visual-review-dsh
+```
+
+Smoke test the profile without a review:
+
+```bash
+cd pipeline
+set -a; . ./.env; set +a
+DSH_HOME="$PWD/dsh/home" \
+  ./node_modules/.bin/dsh --profile prd-ui-visual \
+  "Return the JSON {\"ok\":true} and nothing else."
+```
 
 ## Install
 

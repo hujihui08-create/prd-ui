@@ -1,0 +1,14 @@
+{
+  "output": {
+    "verdict": "pass",
+    "findings": [],
+    "summary": "No visual blockers."
+  },
+  "usage": {
+    "inputTokens": 100,
+    "outputTokens": 20,
+    "cacheReadTokens": 0,
+    "totalTokens": 120
+  },
+  "usageComplete": true
+}

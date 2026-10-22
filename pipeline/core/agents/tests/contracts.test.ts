@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  AGENT_ROLES,
+  AgentTaskRoleSchema,
   IaOutputSchema,
   InteractionOutputSchema,
   VisualStyleOutputSchema,
@@ -15,6 +17,11 @@ import {
 } from "./fixtures.js";
 
 describe("M1 role contracts", () => {
+  it("keeps the visual critic as a task role, not an M1 design role", () => {
+    expect(AgentTaskRoleSchema.parse("visual-critic")).toBe("visual-critic");
+    expect(AGENT_ROLES).toEqual(["ia", "interaction", "visual-style"]);
+  });
+
   it("parses a valid IA output", () => {
     expect(IaOutputSchema.parse(iaOutput).map.pages).toHaveLength(2);
   });

@@ -1,0 +1,30 @@
+# Project-local dsh profile for the Visual Critic.
+# The critic needs a vision model (screenshots are read with read_image) and the
+# fs read tools; it never edits or renders files. This profile never modifies
+# ~/.dsh; DSH_HOME points here and --profile prd-ui-visual selects it.
+
+- insert:
+    - id: llm-pi-ai
+      name: '@deepseek-ai/dsh-llm-pi-ai'
+      config:
+        providers:
+          prd-ui-vision:
+            displayName: PRD UI Vision
+            apiKeyEnv: PRD_UI_VISION_API_KEY
+            api: openai-completions
+            baseURL: !!js process.env.PRD_UI_VISION_BASE_URL
+            defaultInput: [text, image]
+            models:
+              - id: !!js process.env.PRD_UI_VISION_MODEL
+                name: PRD UI Vision
+                contextWindow: 128000
+                maxTokens: 32768
+
+- id: agent-default-model
+  config:
+    provider: prd-ui-vision
+    model: !!js process.env.PRD_UI_VISION_MODEL
+
+- insert:
+    - id: prd-ui-visual
+      name: '@prd-ui/runtime-dsh'

@@ -15,6 +15,13 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { PNG } from "pngjs";
 import { chromium } from "playwright";
+import {
+  AgentRunnerError,
+  type AgentResult,
+  type AgentRunnerPort,
+  type AgentTask,
+} from "@prd-ui/agents";
+import type { AgentUsage } from "@prd-ui/contracts";
 import type { ScreenshotEvidence } from "@prd-ui/visual-review";
 import { main as baselineMain } from "../src/visual-baseline-cli.js";
 import { main as reviewMain } from "../src/visual-review-cli.js";
@@ -326,7 +333,48 @@ interface ReviewArtifact {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
-  critic?: { budgetEnforced?: boolean; costSource?: string };
+  critic?: {
+    runtime?: string;
+    profile?: string;
+    model?: string;
+    budgetEnforced?: boolean;
+    costSource?: string;
+  };
+  error?: string;
+}
+
+interface FakeCriticOptions {
+  output?: unknown;
+  usage?: AgentUsage;
+  usageComplete?: boolean;
+  error?: Error;
+}
+
+function fakeCriticRunner(options: FakeCriticOptions = {}) {
+  const calls: AgentTask[] = [];
+  const output =
+    options.output ?? { verdict: "pass", findings: [], summary: "No blockers." };
+  return {
+    calls,
+    create: async (): Promise<AgentRunnerPort> => ({
+      name: "fake-dsh",
+      model: "mock-visual",
+      run: async (task: AgentTask): Promise<AgentResult> => {
+        calls.push(task);
+        if (options.error !== undefined) throw options.error;
+        const checked = task.validate(output);
+        if (!checked.success) {
+          throw new AgentRunnerError("AGENT_INVALID_OUTPUT", checked.error);
+        }
+        return {
+          output: checked.data,
+          usageComplete: options.usageComplete ?? options.usage !== undefined,
+          model: "mock-visual",
+          ...(options.usage === undefined ? {} : { usage: options.usage }),
+        };
+      },
+    }),
+  };
 }
 
 async function signoffText(hashes: {
@@ -835,7 +883,7 @@ describe("visual CLIs", () => {
     expect(state.status).toBe("success");
   });
 
-  it("fails closed for the dsh critic handoff", async () => {
+  it("runs the dsh critic with pricing and budget enforcement", async () => {
     const fixture = await makeFixture();
     await runCli(baselineMain, baselineArgs(fixture), {
       captureVisualCases: fakeCapture(),
@@ -849,10 +897,171 @@ describe("visual CLIs", () => {
     expect(missingProfile.code).toBe(2);
     expect(missingProfile.stderr).toContain("--profile");
 
+    const critic = fakeCriticRunner({
+      usage: {
+        inputTokens: 1000,
+        outputTokens: 200,
+        cacheReadTokens: 0,
+        totalTokens: 1200,
+      },
+      usageComplete: true,
+    });
     const review = await runCli(
       reviewMain,
       [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
-      { captureVisualCases: fakeCapture() }
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("awaiting_signoff");
+    expect(artifact.findings).toEqual([]);
+    expect(artifact.usageComplete).toBe(true);
+    expect(artifact.costCny).toBeGreaterThan(0);
+    expect(artifact.critic).toMatchObject({
+      runtime: "dsh",
+      profile: "prd-ui-visual",
+      model: "mock-visual",
+      budgetEnforced: true,
+      costSource: "pricing",
+    });
+
+    const task = critic.calls[0]!;
+    expect(task.role).toBe("visual-critic");
+    expect(task.prompt).toContain("Visual Critic");
+    expect(task.prompt).toContain("screenshots/today.default.png");
+    expect(task.prompt).toContain("read_image");
+    expect(task.prompt).toContain(runDir);
+    expect(task.prompt).toContain(
+      path.join(runDir, "screenshots", "today.default.png")
+    );
+    expect(task.prompt).toContain('"profile": "b-mobile"');
+    expect(task.prompt).not.toContain('"profile": "prd-ui-visual"');
+    expect(task.inputFiles).toHaveLength(4);
+    for (const file of task.inputFiles) {
+      expect(path.isAbsolute(file)).toBe(true);
+      await expect(stat(file)).resolves.toBeTruthy();
+    }
+    expect(task.maxCostCny).toBe(3);
+    expect(
+      task.canRepair?.({
+        inputTokens: 1000,
+        outputTokens: 200,
+        cacheReadTokens: 0,
+      })
+    ).toBe(true);
+    expect(
+      task.canRepair?.({
+        inputTokens: 1_000_000,
+        outputTokens: 1_000_000,
+        cacheReadTokens: 0,
+      })
+    ).toBe(false);
+    expect(task.canRepair?.(undefined)).toBe(false);
+
+    const criticArtifact = await readJson<{
+      runtime: string;
+      profile: string;
+      model: string;
+      usageComplete: boolean;
+      usage: AgentUsage;
+      costCny: number;
+      costSource: string;
+      budgetEnforced: boolean;
+      critique: unknown;
+      error: null;
+    }>(path.join(runDir, "findings", "visual-critic.json"));
+    expect(criticArtifact.runtime).toBe("dsh");
+    expect(criticArtifact.profile).toBe("prd-ui-visual");
+    expect(criticArtifact.model).toBe("mock-visual");
+    expect(criticArtifact.usageComplete).toBe(true);
+    expect(criticArtifact.usage.totalTokens).toBe(1200);
+    expect(criticArtifact.costCny).toBeGreaterThan(0);
+    expect(criticArtifact.costSource).toBe("pricing");
+    expect(criticArtifact.budgetEnforced).toBe(true);
+    expect(criticArtifact.critique).toEqual({
+      verdict: "pass",
+      findings: [],
+      summary: "No blockers.",
+    });
+    expect(criticArtifact.error).toBeNull();
+  });
+
+  it("blocks when a dsh critique exceeds the cost budget", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner({
+      usage: {
+        inputTokens: 1_000_000,
+        outputTokens: 1_000_000,
+        cacheReadTokens: 0,
+      },
+      usageComplete: true,
+    });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.costCny).toBeGreaterThan(3);
+    expect(artifact.usageComplete).toBe(true);
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_BUDGET_EXCEEDED"
+    );
+  });
+
+  it("blocks a dsh critique with incomplete usage", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner({ usageComplete: false });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.usageComplete).toBe(false);
+    expect(artifact.costCny).toBe(0);
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_USAGE_INCOMPLETE"
+    );
+  });
+
+  it("keeps deterministic results when the dsh critic is unavailable", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner({
+      error: new AgentRunnerError(
+        "AGENT_EXIT_NONZERO",
+        "MODEL_OFFLINE: mock critic failure"
+      ),
+    });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
     );
     expect(review.code).toBe(1);
     const runDir = await onlyRunDir(fixture.runsDir);
@@ -864,7 +1073,11 @@ describe("visual CLIs", () => {
     expect(artifact.findings.map((finding) => finding.code)).toContain(
       "VISUAL_CRITIC_UNAVAILABLE"
     );
-    expect(review.stdout).toContain("Task 8");
+    expect(artifact.error).toBeUndefined();
+    const criticArtifact = await readJson<{ error: string }>(
+      path.join(runDir, "findings", "visual-critic.json")
+    );
+    expect(criticArtifact.error).toContain("MODEL_OFFLINE");
   });
 
   it.skipIf(!hasChromium)("captures deterministic screenshots with animations disabled", async () => {

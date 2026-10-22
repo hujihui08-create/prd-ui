@@ -18,6 +18,7 @@ export const AgentTaskRoleSchema = z.enum([
   "visual-style",
   "prd-review",
   "ui-briefer",
+  "visual-critic",
 ]);
 export type AgentTaskRole = z.infer<typeof AgentTaskRoleSchema>;
 

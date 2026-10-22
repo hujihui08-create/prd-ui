@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { AgentRunnerPort } from "@prd-ui/agents";
 import { redactValue } from "@prd-ui/contracts";
 import { createRunId } from "@prd-ui/orchestrator";
 import {
@@ -33,6 +34,8 @@ import {
   critiqueToVisualFindings,
   criticUnavailable,
   loadScriptedCriticFixture,
+  loadVisualCriticPricing,
+  runDshVisualCritic,
   type VisualCriticInput,
   type VisualCriticRun,
 } from "./visual/critic.js";
@@ -58,7 +61,7 @@ Options:
   --runtime standalone|dsh  Critic runtime (default: standalone)
   --profile <name>       dsh profile; required for --runtime dsh
   --fixtures <dir>       Standalone critic fixture directory
-  --max-cost-cny <n>     Visual Critic budget in CNY (Task 8 dsh runner; default: 3)
+  --max-cost-cny <n>     Visual Critic budget in CNY (default: 3)
   --json                 Print one JSON summary to stdout
   -h, --help             Print this help and exit`;
 
@@ -81,6 +84,8 @@ export interface VisualReviewDeps {
     input: CaptureVisualCasesInput
   ) => Promise<ScreenshotEvidence[]>;
   diffPng?: DiffPng;
+  /** Test seam; production uses the pinned dsh runner from @prd-ui/runtime-dsh. */
+  createCriticRunner?: () => Promise<AgentRunnerPort>;
 }
 
 export class VisualReviewUsageError extends Error {}
@@ -194,22 +199,39 @@ async function assertHtmlFiles(htmlDir: string, pageIds: string[]): Promise<void
 async function runCritic(input: {
   options: VisualReviewOptions;
   criticInput: VisualCriticInput;
+  runDir: string;
+  deps: VisualReviewDeps;
 }): Promise<VisualCriticRun> {
   if (input.options.runtime === "dsh") {
-    // Task 8 owns the real prd-ui-visual runner. Until then the dsh path fails
-    // closed instead of pretending a scripted fixture is a model review.
-    return criticUnavailable(
-      `VISUAL_CRITIC_DSH_NOT_WIRED: Task 8 owns the prd-ui-visual dsh runner ` +
-        `(profile ${input.options.profile ?? "missing"}); deterministic results were kept.`,
-      "dsh"
-    );
+    const profile = input.options.profile!;
+    let pricing;
+    try {
+      pricing = await loadVisualCriticPricing();
+    } catch (error) {
+      return criticUnavailable(errorMessage(error), profile, {
+        budgetEnforced: true,
+        costSource: "unavailable",
+      });
+    }
+    return runDshVisualCritic(input.criticInput, {
+      runDir: input.runDir,
+      dshProfile: profile,
+      maxCostCny: input.options.maxCostCny,
+      pricing,
+      ...(input.deps.createCriticRunner === undefined
+        ? {}
+        : { createRunner: input.deps.createCriticRunner }),
+    });
   }
 
   let fixture;
   try {
     fixture = await loadScriptedCriticFixture(input.options.fixturesDir);
   } catch (error) {
-    return criticUnavailable(errorMessage(error), "scripted");
+    return criticUnavailable(errorMessage(error), "scripted", {
+      budgetEnforced: false,
+      costSource: "scripted-placeholder",
+    });
   }
 
   const findings = critiqueToVisualFindings(fixture.output);
@@ -222,9 +244,8 @@ async function runCritic(input: {
       message: "the Visual Critic fixture reported incomplete usage",
     });
   }
-  // Task 8: the real prd-ui-visual runner reports usage and pricing. Scripted
-  // fixtures make no model call, so 0 is a placeholder and --max-cost-cny is
-  // not enforced on this path.
+  // Scripted fixtures make no model call, so cost is a placeholder and
+  // --max-cost-cny is not enforced on this path.
   return {
     findings,
     critique: fixture.output,
@@ -232,6 +253,8 @@ async function runCritic(input: {
     costCny: 0,
     usageComplete,
     model: "scripted",
+    budgetEnforced: false,
+    costSource: "scripted-placeholder",
   };
 }
 
@@ -504,7 +527,9 @@ export async function main(
 
     const criticInput: VisualCriticInput = {
       project,
-      profile: options.profile ?? loaded.brief.meta.profile,
+      // The design profile always comes from the signed brief; --profile names
+      // the dsh runtime profile and must not leak into the prompt as design.
+      profile: loaded.brief.meta.profile,
       visualStyle: loaded.brief.designDirection,
       screenshots: screenshots.map((entry) => ({
         caseId: entry.caseId,
@@ -513,11 +538,12 @@ export async function main(
       specs: loaded.specs,
       findings: deterministicFindings,
     };
-    const critic = await runCritic({ options, criticInput });
+    const critic = await runCritic({ options, criticInput, runDir, deps });
     const criticFindings = critic.findings;
-    // Task 8 activates pricing/budget enforcement with the real dsh runner.
     const costSource =
-      options.runtime === "dsh" ? "unavailable" : "scripted-placeholder";
+      critic.costSource ??
+      (options.runtime === "dsh" ? "unavailable" : "scripted-placeholder");
+    const budgetEnforced = critic.budgetEnforced ?? false;
     await store.writeJson("findings/visual-critic.json", {
       schemaVersion: "1.0",
       project,
@@ -529,7 +555,7 @@ export async function main(
       usage: critic.usage ?? null,
       costCny: critic.costCny,
       costSource,
-      budgetEnforced: false,
+      budgetEnforced,
       critique: critic.critique ?? null,
       error: critic.error ?? null,
     });
@@ -609,7 +635,7 @@ export async function main(
         runtime: options.runtime,
         ...(options.profile === undefined ? {} : { profile: options.profile }),
         ...(critic.model === undefined ? {} : { model: critic.model }),
-        budgetEnforced: false,
+        budgetEnforced,
         costSource,
       },
     };
