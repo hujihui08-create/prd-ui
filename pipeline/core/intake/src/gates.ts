@@ -603,6 +603,42 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         )
       );
     }
+    if (page.pickerReturnTo !== undefined && !pageIdSet.has(page.pickerReturnTo)) {
+      issues.push(
+        issue(
+          "BRIEF_PICKER_RETURN_UNKNOWN",
+          "blocker",
+          `pickerReturnTo ${page.pickerReturnTo} is not a page`,
+          page.id
+        )
+      );
+    }
+    if (page.customerPicker !== undefined) {
+      const target = brief.ia.pages.find((entry) => entry.id === page.customerPicker);
+      if (target?.archetype !== "mobile-list") {
+        issues.push(
+          issue(
+            "BRIEF_CUSTOMER_PICKER_UNKNOWN",
+            "blocker",
+            `customerPicker ${page.customerPicker} is not a mobile-list search page`,
+            page.id
+          )
+        );
+      }
+    }
+    if (
+      page.calendarWeekStart !== undefined &&
+      !/^\d{4}-\d{2}-\d{2}$/.test(page.calendarWeekStart)
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_CALENDAR_DATE_INVALID",
+          "blocker",
+          `calendarWeekStart ${page.calendarWeekStart} is not ISO`,
+          page.id
+        )
+      );
+    }
     if (
       (page.filterFields ?? []).some((field) => field === "keyword" || field === "search") &&
       page.searchIdleTitle === undefined

@@ -369,6 +369,61 @@ describe("brief gate", () => {
     );
   });
 
+  it("blocks unknown picker targets and invalid calendar dates", () => {
+    const unknownReturn = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      page.pickerReturnTo = "ghost-page";
+      return brief;
+    });
+    expect(gateForDraft(unknownReturn).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_PICKER_RETURN_UNKNOWN"
+    );
+
+    const unknownPicker = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      page.customerPicker = "orders-list";
+      return brief;
+    });
+    expect(gateForDraft(unknownPicker).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_CUSTOMER_PICKER_UNKNOWN"
+    );
+
+    const missingPicker = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      page.customerPicker = "ghost-search";
+      return brief;
+    });
+    expect(gateForDraft(missingPicker).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_CUSTOMER_PICKER_UNKNOWN"
+    );
+
+    const invalidDate = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      page.calendarWeekStart = "11-05";
+      return brief;
+    });
+    expect(gateForDraft(invalidDate).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_CALENDAR_DATE_INVALID"
+    );
+  });
+
+  it("accepts known picker targets and ISO calendar dates", () => {
+    const valid = withBrief((brief) => {
+      const list = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      list.archetype = "mobile-list";
+      list.calendarWeekStart = "2026-11-02";
+      const detail = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      detail.pickerReturnTo = "orders-list";
+      const form = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      form.customerPicker = "orders-list";
+      return brief;
+    });
+    const codes = gateForDraft(valid).issues.map((issue) => issue.code);
+    expect(codes).not.toContain("BRIEF_PICKER_RETURN_UNKNOWN");
+    expect(codes).not.toContain("BRIEF_CUSTOMER_PICKER_UNKNOWN");
+    expect(codes).not.toContain("BRIEF_CALENDAR_DATE_INVALID");
+  });
+
   it("warns when a search page has no idle title", () => {
     const gate = gateForDraft(withBrief((brief) => brief));
     expect(gate.issues.map((issue) => issue.code)).toContain("BRIEF_SEARCH_IDLE_MISSING");

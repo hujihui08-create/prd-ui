@@ -45,6 +45,12 @@ describe("UI briefer prompt", () => {
     expect(prompt).toContain("must be a subset of page.actions");
   });
 
+  it("requires picker and calendar metadata", () => {
+    expect(prompt).toContain("customerPicker");
+    expect(prompt).toContain("pickerReturnTo");
+    expect(prompt).toContain("calendarWeekStart");
+  });
+
   it("forbids host actions and home fields", () => {
     expect(prompt).toContain("Never emit host actions");
     expect(prompt).toContain("前往客户 Tab");

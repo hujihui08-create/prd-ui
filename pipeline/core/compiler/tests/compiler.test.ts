@@ -84,6 +84,49 @@ describe("compileProject", () => {
     expect(actions).toEqual(["清空关键词"]);
   });
 
+  it("defaults picker and calendar metadata for the signed phase2 brief", () => {
+    const phase2 = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const compiled = compileProject(phase2, deps);
+    const form = compiled.find((spec) => spec.meta.pageId === "appointment-form")!;
+    const search = compiled.find((spec) => spec.meta.pageId === "customer-search")!;
+    const list = compiled.find((spec) => spec.meta.pageId === "appointment-list")!;
+    expect(form.customerPicker).toBe("customer-search");
+    expect(search.pickerReturnTo).toBe("appointment-form");
+    expect(list.calendarWeekStart).toBe("2026-11-02");
+    expect(search.calendarWeekStart).toBeUndefined();
+  });
+
+  it("keeps explicit picker and calendar metadata over defaults", () => {
+    const explicit = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const form = explicit.ia.pages.find((page) => page.id === "appointment-form")!;
+    form.customerPicker = "customer-detail";
+    const list = explicit.ia.pages.find((page) => page.id === "appointment-list")!;
+    list.calendarWeekStart = "2026-12-07";
+    const compiled = compileProject(explicit, deps);
+    expect(
+      compiled.find((spec) => spec.meta.pageId === "appointment-form")?.customerPicker
+    ).toBe("customer-detail");
+    expect(
+      compiled.find((spec) => spec.meta.pageId === "appointment-list")?.calendarWeekStart
+    ).toBe("2026-12-07");
+  });
+
+  it("derives calendarWeekStart from meta.date when a list has no row dates", () => {
+    const fallback = UiBriefSchema.parse(
+      JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+    );
+    const list = fallback.ia.pages.find((page) => page.id === "appointment-list")!;
+    list.mockData = { rows: [{ time: "10:00-11:00", customer: "示例客户" }] };
+    const compiled = compileProject(fallback, deps);
+    expect(
+      compiled.find((spec) => spec.meta.pageId === "appointment-list")?.calendarWeekStart
+    ).toBe("2026-10-19");
+  });
+
   it("uses the target-appropriate shell as the root", () => {
     for (const page of brief.ia.pages) {
       const spec = specsByPageId.get(page.id)!;

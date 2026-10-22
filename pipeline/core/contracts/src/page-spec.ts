@@ -146,6 +146,12 @@ export interface PageSpec {
   views?: Array<"calendar" | "list">;
   defaultView?: "calendar" | "list";
   searchIdleTitle?: string;
+  /** Form page a customer-search page returns to after a picker selection. */
+  pickerReturnTo?: PageId;
+  /** Customer-search page a mobile form opens as a picker. */
+  customerPicker?: PageId;
+  /** ISO date (YYYY-MM-DD) for the Monday that starts the calendar week. */
+  calendarWeekStart?: string;
   currentStatus?: string;
   referenceId?: string;
   linkedRoutes?: {
@@ -236,6 +242,9 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
     views: z.array(z.enum(["calendar", "list"])).optional(),
     defaultView: z.enum(["calendar", "list"]).optional(),
     searchIdleTitle: z.string().min(1).optional(),
+    pickerReturnTo: PageIdSchema.optional(),
+    customerPicker: PageIdSchema.optional(),
+    calendarWeekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     currentStatus: z.string().min(1).optional(),
     referenceId: z.string().min(1).optional(),
     linkedRoutes: z

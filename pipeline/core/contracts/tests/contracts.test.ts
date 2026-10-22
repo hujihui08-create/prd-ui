@@ -227,6 +227,50 @@ describe("contracts", () => {
     expect(parsedPage.searchIdleTitle).toContain("脱敏手机号");
   });
 
+  it("parses picker and calendar metadata on a brief page", () => {
+    const page = {
+      ...minimalBrief.ia.pages[0]!,
+      pickerReturnTo: "orders-list",
+      customerPicker: "customer-search",
+      calendarWeekStart: "2026-11-02",
+    };
+    const parsed = UiBriefSchema.parse({
+      ...minimalBrief,
+      ia: { ...minimalBrief.ia, pages: [page] },
+    });
+    expect(parsed.ia.pages[0]?.pickerReturnTo).toBe("orders-list");
+    expect(parsed.ia.pages[0]?.customerPicker).toBe("customer-search");
+    expect(parsed.ia.pages[0]?.calendarWeekStart).toBe("2026-11-02");
+
+    const spec = PageSpecSchema.parse({
+      ...minimalPageSpec,
+      pickerReturnTo: "orders-list",
+      customerPicker: "customer-search",
+      calendarWeekStart: "2026-11-02",
+    });
+    expect(spec.pickerReturnTo).toBe("orders-list");
+    expect(spec.customerPicker).toBe("customer-search");
+    expect(spec.calendarWeekStart).toBe("2026-11-02");
+  });
+
+  it("rejects malformed picker and calendar metadata", () => {
+    const page = minimalBrief.ia.pages[0]!;
+    for (const patch of [
+      { pickerReturnTo: "../orders" },
+      { customerPicker: "" },
+      { calendarWeekStart: "11-05" },
+      { calendarWeekStart: "2026-11-05T00:00:00" },
+    ]) {
+      expect(() =>
+        UiBriefSchema.parse({
+          ...minimalBrief,
+          ia: { ...minimalBrief.ia, pages: [{ ...page, ...patch }] },
+        })
+      ).toThrow();
+      expect(() => PageSpecSchema.parse({ ...minimalPageSpec, ...patch })).toThrow();
+    }
+  });
+
   it("rejects malformed interaction metadata", () => {
     const page = minimalBrief.ia.pages[0]!;
     for (const patch of [

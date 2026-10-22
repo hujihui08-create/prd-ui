@@ -73,6 +73,12 @@ export interface UiBriefPage {
   defaultView?: "calendar" | "list";
   /** Idle hint shown before a customer keyword is entered. */
   searchIdleTitle?: string;
+  /** Form page a customer-search page returns to after a picker selection. */
+  pickerReturnTo?: PageId;
+  /** Customer-search page a mobile form opens as a picker. */
+  customerPicker?: PageId;
+  /** ISO date (YYYY-MM-DD) for the Monday that starts the calendar week. */
+  calendarWeekStart?: string;
   feedItems?: Array<{ title: string; body: string }>;
   stats?: Array<{ label: string; value: string }>;
   mockData?: UiBriefMockData;
@@ -249,6 +255,9 @@ export const UiBriefPageSchema = z
     views: z.array(z.enum(["calendar", "list"])).optional(),
     defaultView: z.enum(["calendar", "list"]).optional(),
     searchIdleTitle: z.string().min(1).optional(),
+    pickerReturnTo: PageIdSchema.optional(),
+    customerPicker: PageIdSchema.optional(),
+    calendarWeekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     feedItems: z
       .array(z.object({ title: z.string().min(1), body: z.string().min(1) }).strict())
       .optional(),

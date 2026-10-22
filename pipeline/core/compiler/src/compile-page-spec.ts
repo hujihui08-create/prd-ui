@@ -263,6 +263,31 @@ export function compilePageSpec(input: {
     ((page.filterFields ?? []).some((field) => field === "keyword" || field === "search")
       ? "输入姓名或脱敏手机号搜索客户"
       : undefined);
+  const customerSearch = brief.ia.pages.find((entry) => entry.id === "customer-search");
+  const firstForm = brief.ia.pages.find((entry) => entry.archetype === "mobile-form");
+  const pickerReturnTo =
+    page.pickerReturnTo ?? (page.id === customerSearch?.id ? firstForm?.id : undefined);
+  const customerPicker =
+    page.customerPicker ?? (page.archetype === "mobile-form" ? customerSearch?.id : undefined);
+
+  function mondayOf(date: string): string {
+    const base = new Date(`${date}T00:00:00`);
+    const offset = (base.getDay() + 6) % 7;
+    base.setDate(base.getDate() - offset);
+    return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`;
+  }
+  const firstRowDate = page.mockData?.rows?.[0]?.date?.match(/^(\d{2})-(\d{2})/);
+  const rowYear = brief.meta.date.slice(0, 4);
+  const rowDate =
+    firstRowDate === undefined || firstRowDate === null
+      ? undefined
+      : `${rowYear}-${firstRowDate[1]}-${firstRowDate[2]}`;
+  const calendarWeekStart =
+    page.calendarWeekStart ??
+    (page.archetype === "mobile-list" &&
+    ((page.fields ?? []).includes("date") || (page.fields ?? []).includes("time"))
+      ? mondayOf(rowDate ?? brief.meta.date)
+      : undefined);
   const currentStatus = page.mockData?.values?.status;
   const layout = buildLayout(brief, page, archetype, { views, searchIdleTitle });
   assignNodeIds(page, layout);
@@ -301,6 +326,9 @@ export function compilePageSpec(input: {
       ? {}
       : { views, defaultView: page.defaultView ?? views[0]! }),
     ...(searchIdleTitle === undefined ? {} : { searchIdleTitle }),
+    ...(pickerReturnTo === undefined ? {} : { pickerReturnTo }),
+    ...(customerPicker === undefined ? {} : { customerPicker }),
+    ...(calendarWeekStart === undefined ? {} : { calendarWeekStart }),
     ...(currentStatus === undefined ? {} : { currentStatus }),
     referenceId:
       page.mockData?.values?.orderNo ??
