@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "run-2026-10-22T03-16-05-257Z",
+  "project": "employee-app-phase2",
+  "signedAt": "2026-10-22T03:21:27.901Z",
+  "gates": {
+    "ia": "passed",
+    "interaction": "passed",
+    "visualStyle": "passed"
+  },
+  "signoff": {
+    "ia": true,
+    "visualStyle": true
+  },
+  "costCny": 0.4399832736,
+  "usageComplete": true
+}

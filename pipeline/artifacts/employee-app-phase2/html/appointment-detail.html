@@ -55,6 +55,7 @@ html,body{margin:0;padding:0;}
 body{min-height:100vh;}
 a{color:inherit;text-decoration:none;}
 button{font:inherit;color:inherit;}
+[hidden]{display:none!important;}
 .typo-heading-1{font-size:var(--type-heading-1-size);line-height:var(--type-heading-1-line);font-weight:var(--type-heading-1-weight);}
 .typo-heading-2{font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
 .typo-heading-3{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
@@ -118,6 +119,7 @@ button{font:inherit;color:inherit;}
 .searchbar{height:36px;border-radius:var(--radius-md);background:var(--color-surface-default);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-3);color:var(--color-text-tertiary);}
 .search-icon{font-size:20px;}
 .search-placeholder{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
+.search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
@@ -168,6 +170,7 @@ button{font:inherit;color:inherit;}
 .empty-title{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);}
 .empty-desc{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .empty-actions{margin-top:var(--space-2);}
+.empty-state[data-empty-kind]{display:flex;}
 body[data-state="empty"] .empty-state{display:flex;}
 body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card,body[data-state="empty"] .calendar{display:none;}
 body[data-state="empty"] .typo-heading-3{display:none;}
@@ -250,6 +253,14 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 .state-switcher-label{font-weight:600;color:#111827;}
 .state-switcher a{padding:2px 0;}
 .state-switcher a:hover{color:#111827;}
+.mode-tabs{display:flex;gap:8px;padding:12px 16px 0;}
+.mode-tabs button{height:32px;border:1px solid var(--color-border-strong);border-radius:6px;background:#fff;font:inherit;font-size:13px;}
+.mode-tabs button.active{background:var(--color-action-primary);color:#fff;border-color:var(--color-action-primary);}
+.appointment-id{font-size:12px;color:var(--color-text-tertiary);padding:4px 16px;}
+.state-note{padding:12px 16px;font-size:13px;color:var(--color-text-secondary);}
+.detail-drawer{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.35);display:flex;align-items:flex-end;}
+.detail-drawer-card{width:100%;background:#fff;border-radius:12px 12px 0 0;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.detail-drawer-card p{margin:0;font-size:14px;color:var(--color-text-primary);}
 @keyframes fade-up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
@@ -263,52 +274,52 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   <a href="?state=loading">加载</a>
   <a href="?state=error">失败</a>
 </nav>
-  <div class="app ">
+  <div class="app " data-page-archetype="detail" data-page-id="appointment-detail" data-current-status="已登记" data-business-states="[{&quot;name&quot;:&quot;已登记&quot;,&quot;actions&quot;:[&quot;已到店确认&quot;,&quot;接单并确认到店&quot;,&quot;开单&quot;,&quot;改期&quot;,&quot;取消&quot;,&quot;客户详情&quot;],&quot;note&quot;:&quot;待分配时「已到店确认」文案为「接单并确认到店」；仅「已登记」可到店、改期、取消，由系统硬校验；「改期」入口需预约登记 + 客户查看。&quot;},{&quot;name&quot;:&quot;已到店&quot;,&quot;actions&quot;:[&quot;开单&quot;,&quot;术后告知&quot;,&quot;客户详情&quot;],&quot;note&quot;:&quot;底部保留开单；serviceCompleted=true 且告知快照存在时显示「术后告知」；改期与取消不出现。&quot;},{&quot;name&quot;:&quot;爽约&quot;,&quot;actions&quot;:[&quot;客户详情&quot;],&quot;note&quot;:&quot;只读说明「爽约已记录入客户档案」；员工端不提供爽约入口；客户详情链接仅在可查看该客户时显示。&quot;},{&quot;name&quot;:&quot;已取消&quot;,&quot;actions&quot;:[&quot;客户详情&quot;],&quot;note&quot;:&quot;只读说明「本单已取消」；底部操作栏消失；客户详情链接仅在可查看该客户时显示。&quot;}]">
   <header class="page-header"><h1 class="page-title">预约详情</h1></header>
   <main class="app-scroll"><section class="card">
   <div class="card-head">
     <h2 class="card-title">预约详情摘要</h2>
     
   </div>
-  <div class="card-body"><div class="list-text"><div class="list-text-row">客户: 张女士</div><div class="list-text-row">手机号: 138****0000</div><div class="list-text-row">状态: 已登记</div><div class="list-text-row">项目: 小气泡</div><div class="list-text-row">时间段: 11-05 周三 10:00-11:00</div><div class="list-text-row">护理师: 王美容（我）</div><div class="list-text-row">门店: 星光店</div><div class="list-text-row">来源: 电话</div><div class="list-text-row">创建人: 李前台</div><div class="list-text-row">创建时间: 2026-11-01 09:30</div><div class="list-text-row">委派留痕: —</div><div class="list-text-row">服务完成: 否</div></div><span class="badge tone-neutral">已登记</span></div>
-</section><label class="form-field">
+  <div class="card-body"><div class="list-text"><div class="list-text-row">客户: 张女士</div><div class="list-text-row">手机号: 138****0000</div><div class="list-text-row">状态: 已登记</div><div class="list-text-row">项目: 小气泡</div><div class="list-text-row">时间段: 11-05 周三 10:00-11:00</div><div class="list-text-row">护理师: 王美容</div><div class="list-text-row">门店: 星光店</div><div class="list-text-row">来源: 电话</div><div class="list-text-row">创建人: 王美容</div><div class="list-text-row">创建时间: 2026-11-01 15:20</div><div class="list-text-row">委派留痕: —</div><div class="list-text-row">服务完成: 否</div></div><span class="badge tone-neutral">已登记</span></div>
+</section><label class="form-field" data-field="customer">
   <span class="form-label">客户</span>
   <span class="form-value">张女士</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="phone">
   <span class="form-label">手机号</span>
   <span class="form-value">138****0000</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="status">
   <span class="form-label">状态</span>
   <span class="form-value">已登记</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="project">
   <span class="form-label">项目</span>
   <span class="form-value">小气泡</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="time">
   <span class="form-label">时间段</span>
   <span class="form-value">11-05 周三 10:00-11:00</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="therapist">
   <span class="form-label">护理师</span>
-  <span class="form-value">王美容（我）</span>
-</label><label class="form-field">
+  <span class="form-value">王美容</span>
+</label><label class="form-field" data-field="store">
   <span class="form-label">门店</span>
   <span class="form-value">星光店</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="source">
   <span class="form-label">来源</span>
   <span class="form-value">电话</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="creator">
   <span class="form-label">创建人</span>
-  <span class="form-value">李前台</span>
-</label><label class="form-field">
+  <span class="form-value">王美容</span>
+</label><label class="form-field" data-field="createdAt">
   <span class="form-label">创建时间</span>
-  <span class="form-value">2026-11-01 09:30</span>
-</label><label class="form-field">
+  <span class="form-value">2026-11-01 15:20</span>
+</label><label class="form-field" data-field="delegation">
   <span class="form-label">委派留痕</span>
   <span class="form-value">—</span>
-</label><label class="form-field">
+</label><label class="form-field" data-field="serviceCompleted">
   <span class="form-label">服务完成</span>
   <span class="form-value">否</span>
-</label><div class="row filter-row" style="gap:var(--space-2)"><button class="btn ghost" type="button">接单并确认到店</button><button class="btn ghost" type="button">改期</button><button class="btn ghost" type="button">取消</button><button class="btn ghost" type="button">术后告知</button><button class="btn ghost" type="button">客户详情</button></div></main>
-  <div class="app-actions"><button class="btn primary" type="button">已到店确认</button><button class="btn secondary" type="button">开单</button></div>
+</label><div class="row filter-row" style="gap:var(--space-2)"><button class="btn ghost" type="button" data-action="接单并确认到店">接单并确认到店</button><button class="btn ghost" type="button" data-action="改期">改期</button><button class="btn ghost" type="button" data-action="取消">取消</button><button class="btn ghost" type="button" data-action="术后告知">术后告知</button><button class="btn ghost" type="button" data-action="客户详情">客户详情</button></div></main>
+  <div class="app-actions"><button class="btn primary" type="button" data-action="已到店确认">已到店确认</button><button class="btn secondary" type="button" data-action="开单">开单</button></div>
   
   
   <div class="state-panel loading" aria-hidden="true">
@@ -325,6 +336,248 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     </div>
   </div>
 </div>
+  <script id="interaction-config" type="application/json">{"archetype":"detail","pageId":"appointment-detail","businessStates":[{"name":"已登记","actions":["已到店确认","接单并确认到店","开单","改期","取消","客户详情"],"note":"待分配时「已到店确认」文案为「接单并确认到店」；仅「已登记」可到店、改期、取消，由系统硬校验；「改期」入口需预约登记 + 客户查看。"},{"name":"已到店","actions":["开单","术后告知","客户详情"],"note":"底部保留开单；serviceCompleted=true 且告知快照存在时显示「术后告知」；改期与取消不出现。"},{"name":"爽约","actions":["客户详情"],"note":"只读说明「爽约已记录入客户档案」；员工端不提供爽约入口；客户详情链接仅在可查看该客户时显示。"},{"name":"已取消","actions":["客户详情"],"note":"只读说明「本单已取消」；底部操作栏消失；客户详情链接仅在可查看该客户时显示。"}],"formModes":null,"views":null,"defaultView":null,"searchIdleTitle":null,"currentStatus":"已登记","referenceId":"appointment-detail","linkedRoutes":{"create":"appointment-form.html","detail":"appointment-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
+  <script>
+(() => {
+  const raw = document.getElementById("interaction-config")?.textContent;
+  if (!raw) return;
+  const config = JSON.parse(raw);
+  const qsa = (selector) => Array.from(document.querySelectorAll(selector));
+  const showHint = (message) => window.alert(message);
+
+  function applyBusinessStates() {
+    const states = config.businessStates;
+    if (!states) return;
+    let status = config.currentStatus ?? states[0]?.name;
+    const currentState = () => states.find((state) => state.name === status);
+    const allowed = () => currentState()?.actions ?? [];
+    const bar = document.querySelector(".app-actions");
+    const noteHost = document.querySelector(".app-scroll");
+    const apply = () => {
+      let visibleInBar = 0;
+      for (const button of qsa("[data-action]")) {
+        const isAllowed = allowed().includes(button.dataset.action);
+        button.hidden = !isAllowed;
+        if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
+      }
+      if (bar) bar.hidden = visibleInBar === 0;
+      const badge = document.querySelector(".app-scroll .badge");
+      if (badge) badge.textContent = status;
+      const statusField = document.querySelector('[data-field="status"] .form-value, [data-field="status"] .form-readonly');
+      if (statusField) statusField.textContent = status;
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if ((row.textContent ?? "").indexOf("状态:") === 0) row.textContent = "状态: " + status;
+      }
+      let note = document.querySelector(".state-note");
+      if (currentState()?.note) {
+        if (!note && noteHost) {
+          note = document.createElement("div");
+          note.className = "state-note";
+          noteHost.append(note);
+        }
+        if (note) note.textContent = currentState().note;
+      } else if (note) {
+        note.remove();
+      }
+    };
+    for (const button of qsa("[data-action]")) {
+      button.addEventListener("click", () => {
+        const action = button.dataset.action;
+        if (action === "改期" && config.linkedRoutes.form) {
+          location.href = config.linkedRoutes.form + "?mode=reschedule&appointmentId=" + encodeURIComponent(config.referenceId);
+          return;
+        }
+        if (action === "术后告知") {
+          if (config.linkedRoutes.notice) location.href = config.linkedRoutes.notice;
+          else showHint("当前切片没有告知页");
+          return;
+        }
+        if (action === "客户详情") {
+          if (config.linkedRoutes.customer) location.href = config.linkedRoutes.customer;
+          else showHint("当前切片没有客户详情页");
+          return;
+        }
+        if (action === "开单") {
+          showHint("开单流程不在本切片");
+          return;
+        }
+        if (action === "已到店确认" || action === "接单并确认到店") {
+          status = (states.find((state) => state.name.indexOf("到店") >= 0) ?? states[1] ?? currentState())?.name ?? status;
+        } else if (action === "取消") {
+          if (!window.confirm("确认取消本单？")) return;
+          status = (states.find((state) => state.name.indexOf("取消") >= 0) ?? states[states.length - 1])?.name ?? status;
+        } else if (action === "确认已当面告知") {
+          status = (states.find((state) => state.name.indexOf("已确认") >= 0) ?? states[states.length - 1])?.name ?? status;
+        }
+        apply();
+      });
+    }
+    apply();
+  }
+
+  function applyFormModes() {
+    const modes = config.formModes;
+    if (!modes) return;
+    const params = new URLSearchParams(location.search);
+    let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
+    const submit = document.querySelector(".app-actions [data-action]");
+    const customer = document.querySelector('[data-field="customer"] input');
+    const host = document.querySelector(".app-scroll");
+    const tabs = document.createElement("div");
+    tabs.className = "mode-tabs";
+    if (modes.length > 1 && host) {
+      for (const mode of modes) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = mode.label;
+        button.addEventListener("click", () => {
+          current = mode;
+          const appointmentId = params.get("appointmentId") ?? config.referenceId;
+          history.replaceState(null, "", "?mode=" + mode.name + "&appointmentId=" + encodeURIComponent(appointmentId));
+          apply();
+        });
+        tabs.append(button);
+      }
+      host.prepend(tabs);
+    }
+    const appointmentId = params.get("appointmentId") ?? config.referenceId;
+    const prefill = params.get("date") && params.get("time") ? params.get("date") + " " + params.get("time") : "";
+    const startInput = document.querySelector('input[name="startTime"]');
+    if (startInput && prefill) startInput.value = prefill;
+    const apply = () => {
+      for (const button of Array.from(tabs.children)) {
+        button.classList.toggle("active", button.textContent === current.label);
+      }
+      if (submit) {
+        submit.textContent = current.actions[0] ?? submit.textContent;
+        submit.dataset.action = current.actions[0] ?? submit.dataset.action;
+      }
+      if (customer) customer.disabled = current.customerLocked === true;
+      let id = document.querySelector(".appointment-id");
+      if (current.name === "reschedule") {
+        if (!id && host) {
+          id = document.createElement("div");
+          id.className = "appointment-id";
+          host.prepend(id);
+        }
+        if (id) id.textContent = "预约 " + appointmentId;
+      } else if (id) {
+        id.remove();
+      }
+    };
+    apply();
+  }
+
+  function applySearch() {
+    const input = document.querySelector("[data-search-input]");
+    if (!input) return;
+    const rows = qsa("[data-search-text]");
+    const idle = document.querySelector('[data-empty-kind="idle"]');
+    const empty = document.querySelector('[data-empty-kind="empty"]');
+    const apply = () => {
+      const query = input.value.trim().toLowerCase();
+      let visible = 0;
+      for (const row of rows) {
+        const text = (row.dataset.searchText ?? "").toLowerCase();
+        const match = query.length > 0 && text.indexOf(query) >= 0;
+        row.hidden = !match;
+        if (match) visible += 1;
+      }
+      if (idle) idle.hidden = query.length > 0;
+      if (empty) empty.hidden = query.length === 0 || visible > 0;
+    };
+    input.addEventListener("input", apply);
+    const clear = document.querySelector('[data-action="清空关键词"]');
+    if (clear) {
+      clear.addEventListener("click", () => {
+        input.value = "";
+        apply();
+        input.focus();
+      });
+    }
+    apply();
+  }
+
+  function applyViews() {
+    if (!config.views) return;
+    const panels = qsa("[data-view-panel]");
+    let current = config.defaultView ?? config.views[0];
+    const toggle = document.querySelector("[data-view-toggle]");
+    const apply = () => {
+      for (const panel of panels) {
+        panel.hidden = panel.dataset.viewPanel !== current;
+      }
+    };
+    if (toggle) {
+      toggle.addEventListener("click", () => {
+        current = current === "calendar" ? "list" : "calendar";
+        apply();
+      });
+    }
+    for (const cell of qsa("[data-slot-date]")) {
+      cell.addEventListener("click", () => {
+        if (!config.linkedRoutes.create) {
+          showHint("当前切片没有新增预约页");
+          return;
+        }
+        location.href = config.linkedRoutes.create + "?mode=new&date=" + encodeURIComponent(cell.dataset.slotDate ?? "") + "&time=" + encodeURIComponent(cell.dataset.slotTime ?? "");
+      });
+    }
+    for (const block of qsa("[data-block]")) {
+      block.addEventListener("click", () => {
+        let data = {};
+        try {
+          data = JSON.parse(block.dataset.block ?? "{}");
+        } catch {
+          return;
+        }
+        const labels = { title: "客户", subtitle: "项目", status: "状态", date: "日期", time: "时间" };
+        const drawer = document.createElement("div");
+        drawer.className = "detail-drawer";
+        const card = document.createElement("div");
+        card.className = "detail-drawer-card";
+        for (const key of Object.keys(labels)) {
+          if (!data[key]) continue;
+          const line = document.createElement("p");
+          line.textContent = labels[key] + "：" + data[key];
+          card.append(line);
+        }
+        const detail = document.createElement("button");
+        detail.type = "button";
+        detail.className = "btn primary";
+        detail.textContent = "查看完整详情";
+        detail.addEventListener("click", () => {
+          if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
+          else showHint("当前切片没有预约详情页");
+        });
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "btn secondary";
+        close.textContent = "关闭";
+        close.addEventListener("click", () => drawer.remove());
+        card.append(detail, close);
+        drawer.append(card);
+        drawer.addEventListener("click", (event) => {
+          if (event.target === drawer) drawer.remove();
+        });
+        document.body.append(drawer);
+      });
+    }
+    for (const button of qsa('[data-action="查看完整详情"]')) {
+      button.addEventListener("click", () => {
+        if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
+        else showHint("当前切片没有预约详情页");
+      });
+    }
+    apply();
+  }
+
+  applyBusinessStates();
+  applyFormModes();
+  applySearch();
+  applyViews();
+})();
+</script>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);

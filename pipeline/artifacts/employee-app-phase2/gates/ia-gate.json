@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-22T03:17:12.039Z",
+  "model": "deepseek-flash",
+  "promptHash": "sha256:3aef6733294bbe193fc46afa1fb8e3130e699e68df6940bd8bca8cfc8c9bead0",
+  "role": "ia",
+  "gate": {
+    "passed": true,
+    "status": "passed",
+    "issues": []
+  }
+}

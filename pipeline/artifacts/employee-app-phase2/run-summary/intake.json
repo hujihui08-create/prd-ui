@@ -1,0 +1,35 @@
+{
+  "runId": "run-2026-10-22T03-09-28-544Z",
+  "project": "employee-app-phase2",
+  "status": "success",
+  "prd": {
+    "sourceHash": "sha256:2f442a07f0ba51952fa76a6d6aaac383a3255712056a44a85df81d85ecddf24b",
+    "readiness": "ready",
+    "blockers": 0,
+    "questions": 0
+  },
+  "ia": {
+    "passed": true,
+    "blockers": 0
+  },
+  "brief": {
+    "passed": true,
+    "version": "0.1.0",
+    "pages": 8,
+    "hash": "sha256:b558b57a5876bdabdd268f05d355876f84b1f675d668f561db253b3c3b0b8335",
+    "path": "samples/projects/employee-app-phase2/ui-brief.json"
+  },
+  "signoff": {
+    "prdIa": true,
+    "brief": true
+  },
+  "cost": {
+    "cny": 0.8977902623999999,
+    "usageComplete": true
+  },
+  "error": null,
+  "published": {
+    "path": "/Users/jihui/Desktop/产品、ui/pipeline/samples/projects/employee-app-phase2/ui-brief.json",
+    "overwritten": true
+  }
+}

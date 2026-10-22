@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0",
-  "runId": "run-2026-10-21T10-51-44-438Z",
+  "runId": "run-2026-10-22T03-23-54-618Z",
   "project": "employee-app-phase2",
-  "agentRunId": "run-2026-10-21T10-46-02-038Z",
-  "generatedAt": "2026-10-21T10:51:44.445Z",
+  "agentRunId": "run-2026-10-22T03-16-05-257Z",
+  "generatedAt": "2026-10-22T03:23:54.626Z",
   "pages": [
     "today",
     "customer-search",
@@ -41,110 +41,206 @@
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node appointment-row is not present in the layout",
-        "evidence": "today#appointment-row"
+        "message": "motion binding node today.quick-new-appointment is not present in the layout",
+        "evidence": "today#today.quick-new-appointment"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node my-appointments-section is not present in the layout",
-        "evidence": "today#my-appointments-section"
+        "message": "motion binding node today.appointment-row is not present in the layout",
+        "evidence": "today#today.appointment-row"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node callback-item is not present in the layout",
-        "evidence": "today#callback-item"
+        "message": "motion binding node today.callback-row is not present in the layout",
+        "evidence": "today#today.callback-row"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node result-row is not present in the layout",
-        "evidence": "customer-search#result-row"
+        "message": "motion binding node today.appointments-view-all is not present in the layout",
+        "evidence": "today#today.appointments-view-all"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node search-results is not present in the layout",
-        "evidence": "customer-search#search-results"
+        "message": "motion binding node today.error-retry is not present in the layout",
+        "evidence": "today#today.error-retry"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node customer-summary is not present in the layout",
-        "evidence": "customer-detail#customer-summary"
+        "message": "motion binding node cs.result-row is not present in the layout",
+        "evidence": "customer-search#cs.result-row"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node action-footer is not present in the layout",
-        "evidence": "customer-detail#action-footer"
+        "message": "motion binding node cs.clear-keyword is not present in the layout",
+        "evidence": "customer-search#cs.clear-keyword"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node status-header is not present in the layout",
-        "evidence": "appointment-detail#status-header"
+        "message": "motion binding node cs.error-retry is not present in the layout",
+        "evidence": "customer-search#cs.error-retry"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node action-footer is not present in the layout",
-        "evidence": "appointment-detail#action-footer"
+        "message": "motion binding node cs.back is not present in the layout",
+        "evidence": "customer-search#cs.back"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node form-body is not present in the layout",
-        "evidence": "appointment-form#form-body"
+        "message": "motion binding node cd.view-appointment is not present in the layout",
+        "evidence": "customer-detail#cd.view-appointment"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node save-cta is not present in the layout",
-        "evidence": "appointment-form#save-cta"
+        "message": "motion binding node cd.new-appointment is not present in the layout",
+        "evidence": "customer-detail#cd.new-appointment"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node notice-blocks is not present in the layout",
-        "evidence": "treatment-notice#notice-blocks"
+        "message": "motion binding node cd.callback-register is not present in the layout",
+        "evidence": "customer-detail#cd.callback-register"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node confirm-cta is not present in the layout",
-        "evidence": "treatment-notice#confirm-cta"
+        "message": "motion binding node cd.error-retry is not present in the layout",
+        "evidence": "customer-detail#cd.error-retry"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node scope-toggle is not present in the layout",
-        "evidence": "appointment-list#scope-toggle"
+        "message": "motion binding node ad.footer-checkin is not present in the layout",
+        "evidence": "appointment-detail#ad.footer-checkin"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node appointment-row is not present in the layout",
-        "evidence": "appointment-list#appointment-row"
+        "message": "motion binding node ad.footer-order is not present in the layout",
+        "evidence": "appointment-detail#ad.footer-order"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node calendar-grid is not present in the layout",
-        "evidence": "appointment-list#calendar-grid"
+        "message": "motion binding node ad.footer-reschedule is not present in the layout",
+        "evidence": "appointment-detail#ad.footer-reschedule"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node form-body is not present in the layout",
-        "evidence": "callback-register#form-body"
+        "message": "motion binding node ad.footer-cancel is not present in the layout",
+        "evidence": "appointment-detail#ad.footer-cancel"
       },
       {
         "code": "SPEC_MOTION_NODE_UNRESOLVED",
         "severity": "warning",
-        "message": "motion binding node save-cta is not present in the layout",
-        "evidence": "callback-register#save-cta"
+        "message": "motion binding node ad.customer-link is not present in the layout",
+        "evidence": "appointment-detail#ad.customer-link"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node ad.error-retry is not present in the layout",
+        "evidence": "appointment-detail#ad.error-retry"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node af.customer-field is not present in the layout",
+        "evidence": "appointment-form#af.customer-field"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node af.pick-customer is not present in the layout",
+        "evidence": "appointment-form#af.pick-customer"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node af.save is not present in the layout",
+        "evidence": "appointment-form#af.save"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node af.save-reschedule is not present in the layout",
+        "evidence": "appointment-form#af.save-reschedule"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node tn.confirm is not present in the layout",
+        "evidence": "treatment-notice#tn.confirm"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node tn.error-retry is not present in the layout",
+        "evidence": "treatment-notice#tn.error-retry"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node tn.back is not present in the layout",
+        "evidence": "treatment-notice#tn.back"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node al.view-toggle is not present in the layout",
+        "evidence": "appointment-list#al.view-toggle"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node al.new-appointment is not present in the layout",
+        "evidence": "appointment-list#al.new-appointment"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node al.calendar-block is not present in the layout",
+        "evidence": "appointment-list#al.calendar-block"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node al.list-row is not present in the layout",
+        "evidence": "appointment-list#al.list-row"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node al.error-retry is not present in the layout",
+        "evidence": "appointment-list#al.error-retry"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node cr.pick-customer is not present in the layout",
+        "evidence": "callback-register#cr.pick-customer"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node cr.save is not present in the layout",
+        "evidence": "callback-register#cr.save"
+      },
+      {
+        "code": "SPEC_MOTION_NODE_UNRESOLVED",
+        "severity": "warning",
+        "message": "motion binding node cr.error-retry is not present in the layout",
+        "evidence": "callback-register#cr.error-retry"
       },
       {
         "code": "SPEC_ASSET_UNUSED",

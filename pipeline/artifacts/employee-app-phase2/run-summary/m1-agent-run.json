@@ -1,0 +1,70 @@
+{
+  "runId": "run-2026-10-22T03-16-05-257Z",
+  "project": "employee-app-phase2",
+  "status": "awaiting_signoff",
+  "gates": {
+    "ia": "passed",
+    "interaction": "passed",
+    "visualStyle": "passed"
+  },
+  "agents": {
+    "ia": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 18033,
+        "outputTokens": 14833,
+        "cacheReadTokens": 13056,
+        "totalTokens": 45922
+      },
+      "usageComplete": true,
+      "costUsd": 0.023287836,
+      "costCny": 0.1676724192,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:3aef6733294bbe193fc46afa1fb8e3130e699e68df6940bd8bca8cfc8c9bead0"
+    },
+    "interaction": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 17019,
+        "outputTokens": 21864,
+        "cacheReadTokens": 5632,
+        "totalTokens": 44515
+      },
+      "usageComplete": true,
+      "costUsd": 0.031376292,
+      "costCny": 0.2259093024,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:f21ce2dd336f72f3bbca1e4a61006f7e3b302d2e186ad50f66c5c4bcf28fa661"
+    },
+    "visual-style": {
+      "status": "passed",
+      "attempts": 1,
+      "repairAttempts": 0,
+      "gateRounds": 0,
+      "usage": {
+        "inputTokens": 11335,
+        "outputTokens": 2508,
+        "cacheReadTokens": 5760,
+        "totalTokens": 19603
+      },
+      "usageComplete": true,
+      "costUsd": 0.00644466,
+      "costCny": 0.046401552,
+      "model": "deepseek-flash",
+      "promptHash": "sha256:3db9d7284aa897dfab8636f3c33dfc74affb965d6928e9398f646ce82e43c17b"
+    }
+  },
+  "signoff": {
+    "ia": true,
+    "visualStyle": false
+  },
+  "costCny": 0.4399832736,
+  "usageComplete": true,
+  "error": null
+}
