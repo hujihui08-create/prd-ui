@@ -29,7 +29,7 @@ const critique = {
 
 interface MockServer {
   baseUrl: string;
-  calls: Array<{ url: string; authorization: string | undefined }>;
+  calls: Array<{ url: string; authorization: string | undefined; body: string }>;
   close(): Promise<void>;
 }
 
@@ -45,6 +45,7 @@ function startMockServer(output: unknown): Promise<MockServer> {
       calls.push({
         url: request.url ?? "",
         authorization: request.headers.authorization,
+        body,
       });
       if (request.method !== "POST" || !request.url?.endsWith("/chat/completions")) {
         response.writeHead(404, { "content-type": "application/json" });
@@ -231,6 +232,26 @@ describe.skipIf(skipDsh)("dsh visual critic mock integration", () => {
           url: "/v1/chat/completions",
           authorization: "Bearer mock",
         });
+
+        // The profile must expose reads but no mutating tools. The model-facing
+        // request body is the authoritative tool list.
+        const request = JSON.parse(mock.calls[0]!.body) as {
+          tools?: Array<{ function?: { name?: string } }>;
+        };
+        const toolNames = (request.tools ?? [])
+          .map((tool) => tool.function?.name ?? "")
+          .filter((name) => name.length > 0);
+        const hasTool = (name: string): boolean =>
+          toolNames.some(
+            (entry) => entry === name || entry.endsWith(`__${name}`)
+          );
+        expect(toolNames.length, JSON.stringify(toolNames)).toBeGreaterThan(0);
+        expect(hasTool("read_image"), JSON.stringify(toolNames)).toBe(true);
+        for (const forbidden of ["write", "edit", "bash", "pwsh"]) {
+          expect(hasTool(forbidden), `${forbidden}: ${JSON.stringify(toolNames)}`).toBe(
+            false
+          );
+        }
       } finally {
         if (previous.key === undefined) delete env.PRD_UI_VISION_API_KEY;
         else env.PRD_UI_VISION_API_KEY = previous.key;

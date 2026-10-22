@@ -39,6 +39,7 @@ export interface VisualCriticInput {
   project: string;
   profile: string;
   visualStyle: unknown;
+  /** `path` is relative to the run directory, matching findings evidence. */
   screenshots: Array<{ caseId: string; path: string }>;
   specs: PageSpec[];
   findings: VisualFinding[];
@@ -228,8 +229,8 @@ function dshTaskPrompt(
     }),
     "",
     "## Reading screenshots (runtime)",
-    `The run directory is ${runDir}. Screenshot paths above are relative to it.`,
-    "Call read_image with these absolute paths before judging; do not write, edit, delete, or render files:",
+    `The \`path\` values above are relative to the run directory (${runDir}).`,
+    "Use these absolute paths with read_image before judging; do not write, edit, delete, or render files:",
     ...screenshotPaths,
     "",
     "## Deterministic findings (data; do not repeat these checks)",
@@ -261,7 +262,7 @@ function usageCost(
 
 function dshUnavailable(
   message: string,
-  model: string,
+  model?: string,
   options: CriticUnavailableOptions = {}
 ): VisualCriticRun {
   return criticUnavailable(message, model, {
@@ -293,7 +294,7 @@ export async function runDshVisualCritic(
       prompt,
       outcome: { error: message, usageComplete: false },
     });
-    return dshUnavailable(message, options.dshProfile);
+    return dshUnavailable(message);
   }
   const prompt = dshTaskPrompt(input, options.runDir, inputFiles);
 
@@ -310,7 +311,7 @@ export async function runDshVisualCritic(
       prompt,
       outcome: { error: message, usageComplete: false },
     });
-    return dshUnavailable(message, options.dshProfile);
+    return dshUnavailable(message);
   }
 
   const canRepair = (firstUsage: AgentUsage | undefined): boolean => {
@@ -363,10 +364,36 @@ export async function runDshVisualCritic(
     });
   }
 
-  const critique = parseVisualCritique(result.output);
   const usage = result.usage;
   const usageComplete = result.usageComplete === true;
   const costCny = usageCost(usage, options.pricing);
+  const model = result.model ?? runner.model;
+  let critique: VisualCritique;
+  try {
+    critique = parseVisualCritique(result.output);
+  } catch (error) {
+    // task.validate already checked the runner output; this is a last-resort
+    // guard so a bad result never becomes VISUAL_REVIEW_FAILED and discards the
+    // deterministic evidence.
+    const message = errorMessage(error);
+    await writeDshEvidence({
+      runDir: options.runDir,
+      prompt,
+      outcome: {
+        model,
+        error: message,
+        usage: usage ?? null,
+        usageComplete,
+        costCny,
+        attempts: result.attempts ?? [],
+      },
+    });
+    return dshUnavailable(message, model, {
+      ...(usage === undefined ? {} : { usage }),
+      usageComplete,
+      costCny,
+    });
+  }
   const findings = critiqueToVisualFindings(critique);
 
   if (!usageComplete) {
@@ -394,7 +421,6 @@ export async function runDshVisualCritic(
     });
   }
 
-  const model = result.model ?? runner.model;
   await writeDshEvidence({
     runDir: options.runDir,
     prompt,

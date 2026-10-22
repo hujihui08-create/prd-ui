@@ -1,7 +1,9 @@
 # Project-local dsh profile for the Visual Critic.
 # The critic needs a vision model (screenshots are read with read_image) and the
-# fs read tools; it never edits or renders files. This profile never modifies
-# ~/.dsh; DSH_HOME points here and --profile prd-ui-visual selects it.
+# read side of tool-fs. write/edit tools and bash/pwsh are disabled below, so
+# the model cannot modify files even if the prompt is ignored. This profile
+# never modifies ~/.dsh; DSH_HOME points here and --profile prd-ui-visual
+# selects it.
 
 - insert:
     - id: llm-pi-ai
@@ -28,3 +30,14 @@
 - insert:
     - id: prd-ui-visual
       name: '@prd-ui/runtime-dsh'
+
+# The critic only reads screenshots and Page Spec data. Remove every mutating
+# surface from the base bundle: no write/edit tools and no shell.
+- id: tool-fs
+  config:
+    write: false
+    edit: false
+- id: tool-bash
+  disabled: true
+- id: tool-pwsh
+  disabled: true

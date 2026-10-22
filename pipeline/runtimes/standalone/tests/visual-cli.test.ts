@@ -340,6 +340,12 @@ interface ReviewArtifact {
     budgetEnforced?: boolean;
     costSource?: string;
   };
+  signoff?: {
+    valid: boolean;
+    signer?: string;
+    date?: string;
+    waivedFindings?: string[];
+  };
   error?: string;
 }
 
@@ -348,6 +354,8 @@ interface FakeCriticOptions {
   usage?: AgentUsage;
   usageComplete?: boolean;
   error?: Error;
+  bypassValidation?: boolean;
+  repairAttempted?: boolean;
 }
 
 function fakeCriticRunner(options: FakeCriticOptions = {}) {
@@ -362,14 +370,21 @@ function fakeCriticRunner(options: FakeCriticOptions = {}) {
       run: async (task: AgentTask): Promise<AgentResult> => {
         calls.push(task);
         if (options.error !== undefined) throw options.error;
-        const checked = task.validate(output);
-        if (!checked.success) {
-          throw new AgentRunnerError("AGENT_INVALID_OUTPUT", checked.error);
+        let validated: { success: true; data: unknown };
+        if (options.bypassValidation === true) {
+          validated = { success: true, data: output };
+        } else {
+          const checked = task.validate(output);
+          if (!checked.success) {
+            throw new AgentRunnerError("AGENT_INVALID_OUTPUT", checked.error);
+          }
+          validated = { success: true, data: checked.data };
         }
         return {
-          output: checked.data,
+          output: validated.data,
           usageComplete: options.usageComplete ?? options.usage !== undefined,
           model: "mock-visual",
+          ...(options.repairAttempted === true ? { repairAttempted: true } : {}),
           ...(options.usage === undefined ? {} : { usage: options.usage }),
         };
       },
@@ -881,6 +896,33 @@ describe("visual CLIs", () => {
       path.join(runDir, "state.json")
     );
     expect(state.status).toBe("success");
+
+    // A re-review whose critic blocker is covered by that signoff passes; the
+    // waived blocker stays in the recorded findings.
+    const rerun = await runCli(reviewMain, reviewArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+    expect(rerun.code).toBe(0);
+    const rerunDir = (await runDirs(fixture.runsDir)).find(
+      (entry) => entry !== runDir
+    );
+    expect(rerunDir).toBeDefined();
+    const rerunArtifact = await readJson<ReviewArtifact>(
+      path.join(rerunDir!, "visual-review.json")
+    );
+    expect(rerunArtifact.status).toBe("passed");
+    expect(rerunArtifact.signoff).toMatchObject({
+      valid: true,
+      waivedFindings: ["VC-001"],
+    });
+    expect(rerunArtifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_BLOCKER"
+    );
+    const rerunState = await readJson<{ status: string; signoff: { visual: boolean } }>(
+      path.join(rerunDir!, "state.json")
+    );
+    expect(rerunState.status).toBe("passed");
+    expect(rerunState.signoff.visual).toBe(true);
   });
 
   it("runs the dsh critic with pricing and budget enforcement", async () => {
@@ -1078,6 +1120,193 @@ describe("visual CLIs", () => {
       path.join(runDir, "findings", "visual-critic.json")
     );
     expect(criticArtifact.error).toContain("MODEL_OFFLINE");
+  });
+
+  it("blocks an inconsistent dsh critique (changes without findings)", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner({
+      output: { verdict: "changes", findings: [], summary: "Looks wrong." },
+      usage: {
+        inputTokens: 1000,
+        outputTokens: 100,
+        cacheReadTokens: 0,
+      },
+      usageComplete: true,
+    });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_INCONSISTENT"
+    );
+  });
+
+  it("accepts a repaired dsh critic output and records the repair", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const usage: AgentUsage = {
+      inputTokens: 2500,
+      outputTokens: 600,
+      cacheReadTokens: 100,
+    };
+    const critic = fakeCriticRunner({
+      usage,
+      usageComplete: true,
+      repairAttempted: true,
+    });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("awaiting_signoff");
+    expect(artifact.usageComplete).toBe(true);
+    expect(artifact.costCny).toBeGreaterThan(0);
+    const evidence = await readJson<{
+      repairAttempted: boolean;
+      usageComplete: boolean;
+      usage: AgentUsage;
+    }>(path.join(runDir, "dsh", "visual-critic", "result.json"));
+    expect(evidence.repairAttempted).toBe(true);
+    expect(evidence.usageComplete).toBe(true);
+    expect(evidence.usage).toEqual(usage);
+  });
+
+  it("keeps deterministic evidence when the dsh output is unparseable", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner({
+      output: { verdict: "pass" },
+      bypassValidation: true,
+      usage: {
+        inputTokens: 1000,
+        outputTokens: 100,
+        cacheReadTokens: 0,
+      },
+      usageComplete: true,
+    });
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      { captureVisualCases: fakeCapture(), createCriticRunner: critic.create }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_UNAVAILABLE"
+    );
+    const criticArtifact = await readJson<{
+      error: string;
+      model: string | null;
+      usageComplete: boolean;
+      costCny: number;
+    }>(path.join(runDir, "findings", "visual-critic.json"));
+    expect(criticArtifact.error).toContain("VISUAL_CRITIQUE_INVALID");
+    expect(criticArtifact.model).toBe("mock-visual");
+    expect(criticArtifact.usageComplete).toBe(true);
+    expect(criticArtifact.costCny).toBeGreaterThan(0);
+  });
+
+  it("does not record the dsh profile as the model when runner setup fails", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture(),
+        createCriticRunner: async () => {
+          throw new Error("CONFIGURATION_ERROR: missing PRD_UI_VISION_API_KEY");
+        },
+      }
+    );
+    expect(review.code).toBe(1);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_UNAVAILABLE"
+    );
+    const criticArtifact = await readJson<{
+      model: string | null;
+      error: string;
+      costCny: number;
+    }>(path.join(runDir, "findings", "visual-critic.json"));
+    expect(criticArtifact.model).toBeNull();
+    expect(criticArtifact.error).toContain("CONFIGURATION_ERROR");
+    expect(criticArtifact.costCny).toBe(0);
+  });
+
+  it("fails closed without a model name when pricing cannot be loaded", async () => {
+    const fixture = await makeFixture();
+    await runCli(baselineMain, baselineArgs(fixture), {
+      captureVisualCases: fakeCapture(),
+    });
+
+    const critic = fakeCriticRunner();
+    const review = await runCli(
+      reviewMain,
+      [...reviewArgs(fixture), "--runtime", "dsh", "--profile", "prd-ui-visual"],
+      {
+        captureVisualCases: fakeCapture(),
+        createCriticRunner: critic.create,
+        loadPricing: async () => {
+          throw new Error("INVALID_PRICING: missing pricing.json");
+        },
+      }
+    );
+    expect(review.code).toBe(1);
+    expect(critic.calls).toHaveLength(0);
+    const runDir = await onlyRunDir(fixture.runsDir);
+    const artifact = await readJson<ReviewArtifact>(
+      path.join(runDir, "visual-review.json")
+    );
+    expect(artifact.status).toBe("blocked");
+    expect(artifact.findings.map((finding) => finding.code)).toContain(
+      "VISUAL_CRITIC_UNAVAILABLE"
+    );
+    const criticArtifact = await readJson<{
+      model: string | null;
+      error: string;
+      costSource: string;
+      budgetEnforced: boolean;
+    }>(path.join(runDir, "findings", "visual-critic.json"));
+    expect(criticArtifact.model).toBeNull();
+    expect(criticArtifact.error).toContain("INVALID_PRICING");
+    expect(criticArtifact.costSource).toBe("unavailable");
+    expect(criticArtifact.budgetEnforced).toBe(true);
   });
 
   it.skipIf(!hasChromium)("captures deterministic screenshots with animations disabled", async () => {

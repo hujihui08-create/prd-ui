@@ -77,11 +77,13 @@ sample waivers (`success`, ¥0.90666), both `usageComplete=true`.
 ## Visual critic profile
 
 `prd-ui-visual` is the profile used by `visual:review --runtime dsh`. It has
-the same vision provider and `@prd-ui/runtime-dsh` bundle as `prd-ui-assets`,
-with `maxTokens` 32768. The critic reads the captured screenshots with the
-base `read_image` tool and returns one `VisualCritique` JSON object; it never
-writes, edits, or renders files. `--max-cost-cny` (default 3) is enforced from
-`pricing.json`; incomplete usage is a blocker.
+the same vision provider and `@prd-ui/runtime-dsh` bundle as `prd-ui-assets`.
+`maxTokens` is 32768 because the critique JSON is small and all 24 screenshots
+plus Page Specs fit comfortably in the 128K input window. The profile keeps
+`read_image` but disables the `tool-fs` write/edit tools and the bash/pwsh
+shell, so the critic cannot modify files even if the prompt is ignored.
+`--max-cost-cny` (default 3) is enforced from `pricing.json`; incomplete usage
+is a blocker.
 
 ```bash
 cd pipeline

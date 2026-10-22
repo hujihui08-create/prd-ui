@@ -2,7 +2,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AgentRunnerPort } from "@prd-ui/agents";
-import { redactValue } from "@prd-ui/contracts";
+import { redactValue, type ReviewPricing } from "@prd-ui/contracts";
 import { createRunId } from "@prd-ui/orchestrator";
 import {
   buildVisualMatrix,
@@ -86,6 +86,8 @@ export interface VisualReviewDeps {
   diffPng?: DiffPng;
   /** Test seam; production uses the pinned dsh runner from @prd-ui/runtime-dsh. */
   createCriticRunner?: () => Promise<AgentRunnerPort>;
+  /** Test seam for the shared pricing table. */
+  loadPricing?: () => Promise<ReviewPricing>;
 }
 
 export class VisualReviewUsageError extends Error {}
@@ -206,9 +208,9 @@ async function runCritic(input: {
     const profile = input.options.profile!;
     let pricing;
     try {
-      pricing = await loadVisualCriticPricing();
+      pricing = await (input.deps.loadPricing ?? loadVisualCriticPricing)();
     } catch (error) {
-      return criticUnavailable(errorMessage(error), profile, {
+      return criticUnavailable(errorMessage(error), undefined, {
         budgetEnforced: true,
         costSource: "unavailable",
       });
@@ -578,9 +580,6 @@ export async function main(
     });
     const findings = gate.issues;
     const findingsHash = hashValue(findings);
-    const hasBlockingFinding = findings.some(
-      (finding) => finding.severity === "blocker"
-    );
 
     const matchedSignoff = await findMatchingSignoff({
       runsDir: options.runsDir,
@@ -594,8 +593,15 @@ export async function main(
       await store.writeText("signoff/visual.md", matchedSignoff.text);
     }
     const signoffValid = matchedSignoff !== undefined;
+    // A valid signoff can waive VISUAL_CRITIC_BLOCKER findings. The status is
+    // based on unwaived blockers only; the full findings list stays recorded.
+    const waivedFindings = new Set(matchedSignoff?.waivedFindings ?? []);
+    const hasBlockingFinding = findings.some(
+      (finding) =>
+        finding.severity === "blocker" && !waivedFindings.has(finding.id)
+    );
     const status = visualReviewStatus({
-      gatePassed: gate.passed,
+      gatePassed: !hasBlockingFinding,
       hasBlockingFinding,
       signoffValid,
     });

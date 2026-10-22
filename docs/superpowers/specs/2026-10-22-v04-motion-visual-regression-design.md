@@ -260,7 +260,7 @@ interface VisualCritique {
 - 不重复确定性检查（console/overflow/diff）。
 - 不修改文件、不写最终交付目录。
 - blocker 必须有人工 waiver 才能通过；major 是 warning；minor 记录不阻断。
-- 真实 dsh 使用新 profile `prd-ui-visual`（vision + 文件读取，maxTokens 65536）；standalone 使用 scripted critic 做测试。
+- 真实 dsh 使用新 profile `prd-ui-visual`（vision + 只读文件工具，maxTokens 32768；critic 输出 JSON 很小，24 张截图 + Page Spec 仍在 128K 输入窗口内）；standalone 使用 scripted critic 做测试。
 - 预算：`--max-cost-cny 3`，usage fail-closed；一次 schema repair。
 
 ### 4.5 Gate 与签核
