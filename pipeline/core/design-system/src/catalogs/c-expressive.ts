@@ -109,6 +109,8 @@ export const cExpressiveCatalog: Catalog = {
       category: "content",
       props: {
         title: { type: "string", required: true },
+        badge: { type: "string" },
+        badgeTone: { type: "enum", enum: ["neutral", "success", "warning", "danger"] },
       },
       variants: ["default", "elevated", "interactive"],
       states: ["default", "hover"],

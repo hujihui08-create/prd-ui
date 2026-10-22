@@ -277,7 +277,18 @@ describe("design-system baselines", () => {
     expect(button.props.size?.enum).toEqual(["sm", "md", "lg"]);
     const mobileButton = component(bMobileCatalog, "Button");
     expect(mobileButton.props.emphasis?.enum).toEqual(["primary", "secondary", "ghost"]);
-    expect(component(bDenseCatalog, "Input").props.inputType?.enum).toEqual(["text", "email", "password"]);
+    expect(component(bDenseCatalog, "Input").props.inputType?.enum).toEqual([
+      "text",
+      "email",
+      "password",
+      "datetime-local",
+    ]);
+    expect(component(bMobileCatalog, "Input").props.inputType?.enum).toEqual([
+      "text",
+      "email",
+      "password",
+      "datetime-local",
+    ]);
     expect(component(cExpressiveCatalog, "Input").props.inputType?.enum).toEqual(["text", "email", "password"]);
 
     const pageShell = component(bDenseCatalog, "PageShell");

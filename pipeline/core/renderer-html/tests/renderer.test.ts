@@ -52,6 +52,12 @@ const phase2Specs = compileProject(phase2Brief, {
   getArchetype,
 });
 const phase2ById = new Map(phase2Specs.map((spec) => [spec.meta.pageId, spec]));
+const phase2Routes = Object.fromEntries(
+  phase2Specs.map((spec) => [spec.meta.pageId, spec.meta.route])
+);
+const phase2PageNames = Object.fromEntries(
+  phase2Specs.map((spec) => [spec.meta.pageId, spec.meta.name])
+);
 
 type PageMotion = NonNullable<PageSpec["motion"]>;
 
@@ -286,6 +292,99 @@ describe("generic web/mobile renderer", () => {
     expect(index).toContain("8 个页面");
     expect(index).toContain('href="orders-list.html"');
     expect(index).toContain("color:#111827;text-decoration:none;");
+  });
+});
+
+describe("v0.4 picker, dates, and fidelity fixes", () => {
+  it("renders picker hooks, full dates, and deduplicated detail fields", () => {
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(form).toContain('data-picker-search="customer-search"');
+    expect(form).toContain('type="datetime-local"');
+    expect(form).toContain('data-action="选择客户"');
+
+    const list = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(list).toContain('data-slot-date="2026-11-02"');
+    expect(list).toContain('data-slot-date="2026-11-08"');
+    expect(list).toContain('data-calendar-week-start="2026-11-02"');
+    expect(list).not.toContain("日期 时间段 客户");
+    expect(list).toContain("日历");
+
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(detail.match(/data-field="customer"/g)?.length ?? 0).toBe(0);
+    expect(detail.match(/已登记<\/span>/g)?.length ?? 0).toBe(1);
+    expect(detail).not.toContain('form-readonly">已登记');
+  });
+
+  it("renders the search idle state without a bottom search action", () => {
+    const search = renderDocument(
+      phase2ById.get("customer-search")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(search).not.toContain('class="app-actions"');
+    expect(search).toContain('data-action="查看详情"');
+    expect(search).toContain("button.hidden = visible === 0");
+  });
+
+  it("renders today plus the brief tabs on the home tab bar", () => {
+    const home = renderDocument(
+      phase2ById.get("today")!,
+      getProfile("b-mobile"),
+      { pageNames: phase2PageNames, pageRoutes: phase2Routes }
+    );
+    expect(home).toContain('class="tab active"');
+    expect(home).toContain("今日");
+    expect(home).toContain("预约列表");
+    expect(home).toContain("today");
+  });
+
+  it("drives business states and views from the query string", () => {
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(detail).toContain(
+      'new URLSearchParams(location.search).get("status")'
+    );
+
+    const list = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(list).toContain('new URLSearchParams(location.search).get("view")');
+  });
+
+  it("prefills datetime-local values and ships the picker state machine", () => {
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(form).toContain('dateParam + "T" + timeParam');
+    expect(form).toContain('sessionStorage.setItem("prd-ui:picker:"');
+    expect(form).toContain('sessionStorage.getItem("prd-ui:picker:selected")');
+    expect(form).toContain('document.body.dataset.pageKind === "form"');
+
+    const search = renderDocument(
+      phase2ById.get("customer-search")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes }
+    );
+    expect(search).toContain('data-picker-return="appointment-form"');
   });
 });
 

@@ -677,8 +677,8 @@ describe("catalog validation", () => {
 
   it("reports CATALOG-PROP-ENUM for an out-of-enum prop value", () => {
     const spec = cloneSpec("item-detail");
-    const badge = findNode(spec, "Badge");
-    badge.props = { ...(badge.props ?? {}), tone: "purple" };
+    const card = findNode(spec, "Card");
+    card.props = { ...(card.props ?? {}), badgeTone: "purple" };
 
     const report = validatePageSpec(spec, contextFor(spec));
     expect(ruleIds(report)).toEqual(["CATALOG-PROP-ENUM"]);

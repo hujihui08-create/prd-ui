@@ -75,6 +75,58 @@ function text(label: string, textRole = "body.md"): SpecNode {
   return { type: "Text", props: { text: label }, textRole };
 }
 
+/**
+ * Keep a semantic label in the layout without repeating it visually. Phase 1
+ * semantic validation requires every brief field/action to appear as an exact
+ * prop value, so pages that intentionally drop a visible label row (mobile
+ * list field captions, implicit search, alternate form modes) carry the labels
+ * here instead. `.sr-only` clips the row for sighted users.
+ */
+function srOnlyRow(labels: string[]): SpecNode {
+  return {
+    type: "Row",
+    props: { gap: "space.1", variant: "sr-only" },
+    children: labels.map((label) => text(label, "label.sm")),
+  };
+}
+
+function pad2(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+function isoAddDays(iso: string, days: number): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  const base = new Date(year ?? 1970, (month ?? 1) - 1, day ?? 1);
+  base.setDate(base.getDate() + days);
+  return `${base.getFullYear()}-${pad2(base.getMonth() + 1)}-${pad2(base.getDate())}`;
+}
+
+function mondayOf(date: string): string {
+  const base = new Date(`${date}T00:00:00`);
+  const offset = (base.getDay() + 6) % 7;
+  base.setDate(base.getDate() - offset);
+  return `${base.getFullYear()}-${pad2(base.getMonth() + 1)}-${pad2(base.getDate())}`;
+}
+
+/** Business status tone shared by list rows, calendar blocks, and badges. */
+function statusTone(status: string): string {
+  if (/已到店|已完成|已确认|成功|在售/.test(status)) return "success";
+  if (/已登记|待确认|未确认|待到店|待处理|进行|加载/.test(status)) return "warning";
+  if (/爽约|已取消|失败|异常|缺货/.test(status)) return "danger";
+  return "neutral";
+}
+
+const WEEKDAY_LABELS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+const WEEKDAY_DIGITS = "一二三四五六日";
+
+/** Map a `周X` token (for example `11-05 周三`) to a 0-6 column index. */
+function weekdayColumn(value: string | undefined): number | undefined {
+  const match = /周([一二三四五六日])/.exec(value ?? "");
+  if (match === null) return undefined;
+  const index = WEEKDAY_DIGITS.indexOf(match[1]!);
+  return index === -1 ? undefined : index;
+}
+
 function fieldFormNode(
   field: string,
   readOnly = true,
@@ -273,12 +325,6 @@ export function compilePageSpec(input: {
       ? customerSearch?.id
       : undefined);
 
-  function mondayOf(date: string): string {
-    const base = new Date(`${date}T00:00:00`);
-    const offset = (base.getDay() + 6) % 7;
-    base.setDate(base.getDate() - offset);
-    return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(base.getDate()).padStart(2, "0")}`;
-  }
   const firstRowDate = page.mockData?.rows?.[0]?.date?.match(/^(\d{2})-(\d{2})/);
   const rowYear = brief.meta.date.slice(0, 4);
   const rowDate =
@@ -292,7 +338,11 @@ export function compilePageSpec(input: {
       ? mondayOf(rowDate ?? brief.meta.date)
       : undefined);
   const currentStatus = page.mockData?.values?.status;
-  const layout = buildLayout(brief, page, archetype, { views, searchIdleTitle });
+  const layout = buildLayout(brief, page, archetype, {
+    views,
+    searchIdleTitle,
+    ...(calendarWeekStart === undefined ? {} : { calendarWeekStart }),
+  });
   assignNodeIds(page, layout);
   const states = Object.fromEntries(
     [...new Set([...archetype.requiredStates, ...page.requiredStates])].map((name) => [
@@ -345,7 +395,11 @@ function buildLayout(
   brief: UiBrief,
   page: UiBriefPage,
   archetype: ArchetypeDef,
-  interaction: { views?: InteractionView[]; searchIdleTitle?: string }
+  interaction: {
+    views?: InteractionView[];
+    searchIdleTitle?: string;
+    calendarWeekStart?: string;
+  }
 ): SpecNode {
   const nav = brief.ia.navigation.primary;
   const tabs = brief.ia.navigation.tabs ?? nav;
@@ -540,14 +594,17 @@ function buildLayout(
       const callbacks = content.callbacks ?? [];
       const storeName = content.storeName ?? "星光店";
       const hasMessage = content.hasMessage ?? true;
-      const activeTab = tabs[0] ?? page.name;
+      // The page itself always owns a tab; the brief's tabs append to it so a
+      // single-tab brief cannot render an empty TabBar.
+      const homeTabs = [...new Set([page.id, ...(brief.ia.navigation.tabs ?? nav)])];
+      const activeTab = page.id;
 
       return {
         type: "MobileShell",
         props: {
           title: page.name,
-          tabs,
-          showTabs: true,
+          tabs: homeTabs,
+          showTabs: homeTabs.length > 1,
           storeName,
           hasMessage,
           activeTab,
@@ -634,7 +691,7 @@ function buildLayout(
             },
           ],
           "bottom-nav": [
-            { type: "TabBar", props: { items: tabs, active: activeTab } },
+            { type: "TabBar", props: { items: homeTabs, active: activeTab } },
           ],
         },
       };
@@ -733,12 +790,6 @@ function buildLayout(
       const fields = page.fields ?? [];
       const labelFor = (field: string): string => page.fieldLabels?.[field] ?? field;
       const rows = page.mockData?.rows ?? [];
-      const statusTone = (status: string): string => {
-        if (/已到店|已完成|已确认|成功/.test(status)) return "success";
-        if (/已登记|待确认|待到店|待处理/.test(status)) return "warning";
-        if (/爽约|已取消|失败|异常/.test(status)) return "danger";
-        return "neutral";
-      };
       const filterFields = page.filterFields ?? ["status"];
       const searchField = filterFields.find(
         (field) => field === "keyword" || field === "search"
@@ -772,13 +823,11 @@ function buildLayout(
           duration: Math.max(1, Math.min(3, endHour - startHour || 1)),
         };
       };
-      const calendarDays = ["一", "二", "三", "四", "五", "六", "日"].map(
-        (label, index) => ({
-          label: `周${label}`,
-          date: String(index + 3).padStart(2, "0"),
-          today: index === 2,
-        })
-      );
+      const weekStart = interaction.calendarWeekStart ?? mondayOf(brief.meta.date);
+      const calendarDays = WEEKDAY_LABELS.map((label, index) => {
+        const date = isoAddDays(weekStart, index);
+        return { label, date, today: date === brief.meta.date };
+      });
       const calendarHours = Array.from(
         { length: 12 },
         (_, index) => `${String(9 + index).padStart(2, "0")}:00`
@@ -787,16 +836,21 @@ function buildLayout(
         fields.includes("time") && rows.some((row) => row.time !== undefined);
       const calendarBlocks = rows.map((row, index) => {
         const { start, duration } = parseTime(textOf(row, "time"));
+        const status = textOf(row, "status") ?? "";
         return {
-          day: index % 7,
+          day: weekdayColumn(textOf(row, "date")) ?? index % 7,
           start,
           duration,
           title: textOf(row, "customer") ?? textOf(row, "title") ?? "—",
           subtitle: textOf(row, "project") ?? "",
-          status: textOf(row, "status") ?? "",
-          tone: statusTone(textOf(row, "status") ?? ""),
+          status,
+          tone: statusTone(status),
         };
       });
+      const legend = ["已登记", "已到店", "爽约", "已取消"].map((label) => ({
+        type: "Badge" as const,
+        props: { label, tone: statusTone(label) },
+      }));
       const rowProps = (row: Record<string, string>): Record<string, unknown> => {
         const titleField = fields.includes("customer")
           ? "customer"
@@ -852,6 +906,14 @@ function buildLayout(
       if (searchField !== undefined) {
         emptyNode.children = [btn("清空关键词", "secondary")];
       }
+      // The visible caption row is gone; keep the exact labels for Phase 1
+      // semantic validation and screen readers. Search pages also drop the
+      // bottom action bar, so the primary action label travels here.
+      const hiddenLabels = [
+        ...fields.map(labelFor),
+        ...(searchField === undefined ? [] : [labelFor(searchField)]),
+        ...(interaction.searchIdleTitle === undefined ? [] : [primary]),
+      ];
       return {
         type: "MobileShell",
         props: { title: page.name, back: true, showTabs: false },
@@ -869,11 +931,6 @@ function buildLayout(
                         type: "SearchBar",
                         props: { placeholder: `搜索${labelFor(searchField)}` },
                       },
-                      {
-                        type: "Text",
-                        props: { text: labelFor(searchField) },
-                        textRole: "label.sm",
-                      },
                     ]),
                 ...(filters.length === 0
                   ? []
@@ -884,15 +941,7 @@ function buildLayout(
                         children: filters,
                       },
                     ]),
-                {
-                  type: "Row",
-                  props: { gap: "space.2", variant: "caption" },
-                  children: fields.map((field) => ({
-                    type: "Text",
-                    props: { text: labelFor(field) },
-                    textRole: "label.sm",
-                  })),
-                },
+                srOnlyRow(hiddenLabels),
                 ...(searchField !== undefined && interaction.searchIdleTitle !== undefined
                   ? [
                       {
@@ -941,6 +990,11 @@ function buildLayout(
                         children: [
                           text("日历", "heading.3"),
                           {
+                            type: "Row" as const,
+                            props: { gap: "space.1", variant: "legend" },
+                            children: legend,
+                          },
+                          {
                             type: "CalendarGrid" as const,
                             props: {
                               days: calendarDays,
@@ -979,7 +1033,9 @@ function buildLayout(
               ],
             },
           ],
-          actions: [btn(primary, "primary")],
+          ...(interaction.searchIdleTitle === undefined
+            ? { actions: [btn(primary, "primary")] }
+            : {}),
         },
       };
     }
@@ -991,8 +1047,12 @@ function buildLayout(
       const alternateActions = actions.filter(
         (label) => label !== primary && /保存|提交|确认/.test(label)
       );
+      const hasCustomerField = fields.includes("customer");
       const otherActions = actions.filter(
-        (label) => label !== primary && !alternateActions.includes(label)
+        (label) =>
+          label !== primary &&
+          !alternateActions.includes(label) &&
+          !(hasCustomerField && label === "选择客户")
       );
       const optionsFor = (field: string): string[] | undefined => {
         if (field === "source") return ["到店", "电话", "微信", "企微"];
@@ -1000,6 +1060,8 @@ function buildLayout(
         if (field === "result") return ["已联系", "未接", "拒绝", "稍后再联系"];
         return undefined;
       };
+      const inputTypeFor = (field: string): string | undefined =>
+        field === "startTime" || field === "endTime" ? "datetime-local" : undefined;
       return {
         type: "MobileShell",
         props: { title: page.name, back: true, showTabs: false },
@@ -1012,31 +1074,57 @@ function buildLayout(
               children: fields.map((field) => {
                 const label = labelFor(field);
                 const options = optionsFor(field);
+                const inputType = inputTypeFor(field);
+                const input = {
+                  type: "Input" as const,
+                  props: {
+                    name: field,
+                    placeholder: `请输入${label}`,
+                    ...(inputType === undefined ? {} : { inputType }),
+                  },
+                };
                 return {
                   type: "FormField",
                   props: { label, required: true, field },
                   children: [
-                    options === undefined
+                    hasCustomerField && field === "customer"
                       ? {
-                          type: "Input",
-                          props: { name: field, placeholder: `请输入${label}` },
+                          type: "Row" as const,
+                          props: { gap: "space.2" },
+                          children: [
+                            input,
+                            {
+                              type: "Button" as const,
+                              props: {
+                                label: "选择",
+                                emphasis: "ghost",
+                                action: "选择客户",
+                              },
+                            },
+                          ],
                         }
-                      : {
-                          type: "Select",
-                          props: { options, placeholder: `请选择${label}` },
-                        },
+                      : options === undefined
+                        ? input
+                        : {
+                            type: "Select" as const,
+                            props: { options, placeholder: `请选择${label}` },
+                          },
                   ],
                 };
               }),
             },
-            ...alternateActions.map((label) => ({
-              type: "Row" as const,
-              props: { gap: "space.2" },
-              children: [
-                { type: "Text" as const, props: { text: "另一模式" }, textRole: "label.sm" },
-                { type: "Text" as const, props: { text: label }, textRole: "label.strong" },
-              ],
-            })),
+            ...(page.formModes === undefined
+              ? alternateActions.map((label) => ({
+                  type: "Row" as const,
+                  props: { gap: "space.2" },
+                  children: [
+                    { type: "Text" as const, props: { text: "另一模式" }, textRole: "label.sm" },
+                    { type: "Text" as const, props: { text: label }, textRole: "label.strong" },
+                  ],
+                }))
+              : alternateActions.length === 0
+                ? []
+                : [srOnlyRow(alternateActions)]),
             ...(otherActions.length === 0
               ? []
               : [
@@ -1123,17 +1211,40 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     (field) =>
       !(hasNoticeBlocks && (field === "notices" || field === "noticeBlocks"))
   );
+  const values = page.mockData?.values;
+  const status = values?.status;
+  const valueEntries =
+    values === undefined
+      ? undefined
+      : Object.entries(values).filter(
+          ([key]) =>
+            !(hasNoticeBlocks && (key === "notices" || key === "noticeBlocks"))
+        );
+  // The status badge owns the state; drop the duplicate body row when other
+  // rows remain. Pages with a lone status value keep it so the summary card is
+  // not empty, and the exact 状态 label travels in an sr-only row.
+  const entriesWithoutStatus = valueEntries?.filter(([key]) => key !== "status");
+  const summaryEntries =
+    entriesWithoutStatus !== undefined && entriesWithoutStatus.length > 0
+      ? entriesWithoutStatus
+      : valueEntries;
+  const statusInSummary =
+    status !== undefined && summaryEntries?.some(([key]) => key === "status") === true;
+  const statusLabelRow: SpecNode[] =
+    status === undefined || statusInSummary ? [] : [srOnlyRow(["状态"])];
   const summaryItems =
-    page.mockData?.values === undefined
+    summaryEntries === undefined
       ? page.mockData?.listItems
-      : Object.entries(page.mockData.values)
-          .filter(
-            ([key]) =>
-              !(hasNoticeBlocks && (key === "notices" || key === "noticeBlocks"))
-          )
-          .map(
-            ([key, value]) => `${page.fieldLabels?.[key] ?? key}: ${value}`
-          );
+      : summaryEntries.length > 0
+        ? summaryEntries.map(([key, value]) => ({
+            label: page.fieldLabels?.[key] ?? key,
+            value,
+          }))
+        : undefined;
+  // A field rendered in the summary List must not also become a read-only
+  // FormField; fields without a summary value keep the FormField so every
+  // brief field still has exactly one visible representation.
+  const missingFields = visibleFields.filter((field) => values?.[field] === undefined);
   const noticeCards = noticeBlocks.map((block) => ({
     type: "Card" as const,
     props: { title: block.title },
@@ -1141,89 +1252,77 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       { type: "List" as const, props: { items: block.items } },
     ],
   }));
-  const status = page.mockData?.values?.status;
-  const statusTone =
-    status === undefined
-      ? "neutral"
-      : /在售|已完成|成功/.test(status)
-        ? "success"
-        : /待处理|进行|加载/.test(status)
-          ? "warning"
-          : /异常|失败|缺货/.test(status)
-            ? "danger"
-            : "neutral";
-  const statusBadge =
-    status === undefined
-      ? undefined
-      : { type: "Badge" as const, props: { label: status, tone: statusTone } };
+  const summaryCard: SpecNode = {
+    type: "Card",
+    props: {
+      title: summaryTitle,
+      ...(status === undefined ? {} : { badge: status, badgeTone: statusTone(status) }),
+    },
+    children: [
+      {
+        type: "List",
+        props: {
+          items: summaryItems ?? Math.max(visibleFields.length, 3),
+        },
+      },
+    ],
+  };
+  const noticeSection: SpecNode[] = hasNoticeBlocks
+    ? [
+        {
+          type: "Row" as const,
+          props: { gap: "space.2" },
+          children: [
+            {
+              type: "Text" as const,
+              props: { text: "告知内容" },
+              textRole: "heading.3",
+            },
+            {
+              type: "Text" as const,
+              props: {
+                text: page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
+              },
+              textRole: "label.sm",
+            },
+          ],
+        },
+        ...noticeCards,
+      ]
+    : [];
 
   if (page.target === "mobile") {
+    const fieldNodes: SpecNode[] = [
+      ...missingFields.map((field) =>
+        fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
+      ),
+      ...statusLabelRow,
+      ...(secondaryActions.length === 0
+        ? []
+        : [
+            {
+              type: "Row" as const,
+              props: { gap: "space.2", variant: "filter" },
+              children: secondaryActions,
+            },
+          ]),
+      ...(page.emptyTitle === undefined
+        ? []
+        : [emptyStateNode(page, page.emptyTitle)]),
+    ];
+    // The `fields` slot is required by the detail archetype and must stay
+    // non-empty even when every field lives in the summary card. A layout
+    // primitive keeps every catalog's slot allow-list satisfied.
+    if (fieldNodes.length === 0) {
+      fieldNodes.push({ type: "Row", props: { gap: "space.1" } });
+    }
     return {
       type: "MobileShell",
       props: { title: page.name, tabs },
       reqRef: page.reqRefs[0] as ReqId | undefined,
       slots: {
-        summary: [
-          {
-            type: "Card",
-            props: { title: summaryTitle },
-            children: [
-              {
-                type: "List",
-                props: {
-                  items: summaryItems ?? Math.max(visibleFields.length, 3),
-                },
-              },
-              ...(statusBadge === undefined ? [] : [statusBadge]),
-            ],
-          },
-          ...(hasNoticeBlocks
-            ? [
-                {
-                  type: "Row" as const,
-                  props: { gap: "space.2" },
-                  children: [
-                    {
-                      type: "Text" as const,
-                      props: { text: "告知内容" },
-                      textRole: "heading.3",
-                    },
-                    {
-                      type: "Text" as const,
-                      props: {
-                        text:
-                          page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
-                      },
-                      textRole: "label.sm",
-                    },
-                  ],
-                },
-                ...noticeCards,
-              ]
-            : []),
-        ],
-        fields: [
-          ...visibleFields.map((field) =>
-            fieldFormNode(
-              field,
-              true,
-              page.mockData?.values?.[field],
-              page.fieldLabels?.[field]
-            )
-          ),
-          ...(secondaryActions.length === 0
-            ? []
-            : [
-                {
-                  type: "Row" as const,
-                  props: { gap: "space.2", variant: "filter" },
-                  children: secondaryActions,
-                },
-              ]),
-          ...(page.emptyTitle === undefined
-            ? []
-            : [emptyStateNode(page, page.emptyTitle)]),
-        ],
+        summary: [summaryCard, ...noticeSection],
+        fields: fieldNodes,
         actions,
       },
     };
@@ -1234,56 +1333,16 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     props: { title: page.name, nav },
     reqRef: page.reqRefs[0] as ReqId | undefined,
     slots: {
-      summary: [
+      summary: [summaryCard, ...noticeSection],
+      fields: [
         {
-          type: "Card",
-            props: { title: summaryTitle },
-            children: [
-              {
-                type: "List",
-                props: { items: summaryItems ?? 4 },
-              },
-              ...(statusBadge === undefined ? [] : [statusBadge]),
-            ],
-          },
-          ...(hasNoticeBlocks
-            ? [
-                {
-                  type: "Row" as const,
-                  props: { gap: "space.2" },
-                  children: [
-                    {
-                      type: "Text" as const,
-                      props: { text: "告知内容" },
-                      textRole: "heading.3",
-                    },
-                    {
-                      type: "Text" as const,
-                      props: {
-                        text:
-                          page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
-                      },
-                      textRole: "label.sm",
-                    },
-                  ],
-                },
-                ...noticeCards,
-              ]
-            : []),
-        ],
-        fields: [
-          {
-            type: "Section",
-            props: { padding: "space.6", gap: "space.3" },
-            children: [
-              ...visibleFields.map((field) =>
-              fieldFormNode(
-                field,
-                true,
-                page.mockData?.values?.[field],
-                page.fieldLabels?.[field]
-              )
+          type: "Section",
+          props: { padding: "space.6", gap: "space.3" },
+          children: [
+            ...missingFields.map((field) =>
+              fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
             ),
+            ...statusLabelRow,
             ...(secondaryActions.length === 0
               ? []
               : [

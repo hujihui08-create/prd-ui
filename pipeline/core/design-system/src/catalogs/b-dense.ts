@@ -182,7 +182,7 @@ export const bDenseCatalog: Catalog = {
       props: {
         name: { type: "string", required: true },
         placeholder: { type: "string" },
-        inputType: { type: "enum", enum: ["text", "email", "password"] },
+        inputType: { type: "enum", enum: ["text", "email", "password", "datetime-local"] },
       },
       variants: ["default", "filled"],
       states: ["default", "hover", "focus", "disabled", "error"],
@@ -227,6 +227,8 @@ export const bDenseCatalog: Catalog = {
       category: "content",
       props: {
         title: { type: "string", required: true },
+        badge: { type: "string" },
+        badgeTone: { type: "enum", enum: ["neutral", "success", "warning", "danger"] },
       },
       variants: ["default", "interactive"],
       states: ["default", "hover", "loading"],

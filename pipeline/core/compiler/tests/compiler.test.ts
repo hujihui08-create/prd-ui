@@ -428,7 +428,9 @@ describe("brief-driven page content", () => {
       expect.arrayContaining(["客户", "项目", "时间段", "状态", "护理师"])
     );
     expect(nodesOf(spec, "CalendarGrid")[0]?.props).toMatchObject({
-      days: expect.arrayContaining([expect.objectContaining({ label: "周三", today: true })]),
+      days: expect.arrayContaining([
+        expect.objectContaining({ label: "周一", date: "2026-10-19", today: true }),
+      ]),
       blocks: [
         expect.objectContaining({
           title: "张女士",
@@ -487,8 +489,12 @@ describe("brief-driven page content", () => {
       "微信",
       "企微",
     ]);
-    expect(nodesOf(spec, "Button")).toHaveLength(1);
-    expect(nodesOf(spec, "Button")[0]?.props?.label).toBe("保存");
+    expect(nodesOf(spec, "Button")).toHaveLength(2);
+    expect(nodesOf(spec, "Button").map((node) => node.props?.label)).toEqual([
+      "选择",
+      "保存",
+    ]);
+    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("选择客户");
     expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain("保存改期");
   });
 
@@ -855,10 +861,15 @@ describe("brief-driven page content", () => {
     expect(nodesOf(spec, "Button").map((node) => node.props?.action)).toEqual(
       expect.arrayContaining(["已到店确认", "开单", "取消"])
     );
-    expect(nodesOf(spec, "FormField").map((node) => node.props?.field)).toEqual([
-      "customer",
-      "status",
-    ]);
+    // customer and status arrive through the summary List, so the fields slot
+    // keeps only the secondary actions.
+    expect(nodesOf(spec, "FormField")).toEqual([]);
+    expect(
+      (nodesOf(spec, "List")[0]?.props?.items as Array<{ label: string }>).map(
+        (item) => item.label
+      )
+    ).toEqual(expect.arrayContaining(["客户"]));
+    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain("状态");
   });
 
   it("defaults form modes and calendar/list views", () => {
@@ -1013,6 +1024,120 @@ describe("brief-driven page content", () => {
     expect(JSON.stringify(bareSpec)).not.toContain("empty-feed");
     expect(nodesOf(bareSpec, "FilterBar")[0]?.props?.action).toBe("新建");
   });
+
+describe("v0.4 picker, dates, and fidelity fixes", () => {
+  const compilePhase2 = (): PageSpec[] =>
+    compileProject(
+      UiBriefSchema.parse(
+        JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+      ),
+      deps
+    );
+  const phase2Spec = (pageId: string): PageSpec =>
+    compilePhase2().find((spec) => spec.meta.pageId === pageId)!;
+
+  it("emits a full ISO calendar week, status legend, and row-date columns", () => {
+    const list = phase2Spec("appointment-list");
+    const grid = nodesOf(list, "CalendarGrid")[0]!;
+    expect(grid.props?.days).toEqual([
+      { label: "周一", date: "2026-11-02", today: false },
+      { label: "周二", date: "2026-11-03", today: false },
+      { label: "周三", date: "2026-11-04", today: false },
+      { label: "周四", date: "2026-11-05", today: false },
+      { label: "周五", date: "2026-11-06", today: false },
+      { label: "周六", date: "2026-11-07", today: false },
+      { label: "周日", date: "2026-11-08", today: false },
+    ]);
+    expect(
+      (grid.props?.blocks as Array<{ day: number }>).map((block) => block.day)
+    ).toEqual([2, 2, 2, 2]);
+    expect(nodesOf(list, "Badge").map((badge) => badge.props?.label)).toEqual([
+      "已登记",
+      "已到店",
+      "爽约",
+      "已取消",
+    ]);
+    expect(list.calendarWeekStart).toBe("2026-11-02");
+  });
+
+  it("keeps list field labels out of the visible layout", () => {
+    const list = phase2Spec("appointment-list");
+    const captionRows = collectNodes(list.layout).filter(
+      (node) => node.type === "Row" && node.props?.variant === "caption"
+    );
+    expect(captionRows).toEqual([]);
+    const visibleLabels = collectNodes(list.layout)
+      .filter((node) => node.type === "Text" && node.props?.text === "客户")
+      .map((node) => node);
+    expect(visibleLabels).toHaveLength(1);
+    expect(visibleLabels[0]?.id).toBeDefined();
+  });
+
+  it("emits datetime-local inputs and an inline customer picker", () => {
+    const form = phase2Spec("appointment-form");
+    const inputs = nodesOf(form, "Input");
+    expect(inputs.find((input) => input.props?.name === "startTime")?.props?.inputType).toBe(
+      "datetime-local"
+    );
+    expect(inputs.find((input) => input.props?.name === "endTime")?.props?.inputType).toBe(
+      "datetime-local"
+    );
+    const pick = nodesOf(form, "Button").find(
+      (button) => button.props?.action === "选择客户"
+    );
+    expect(pick?.props?.label).toBe("选择");
+    const customerField = nodesOf(form, "FormField").find(
+      (field) => field.props?.field === "customer"
+    );
+    expect(customerField?.children?.map((child) => child.type)).toEqual(["Row"]);
+    expect(
+      nodesOf(form, "Text").map((node) => node.props?.text)
+    ).not.toContain("另一模式");
+    expect(form.customerPicker).toBe("customer-search");
+  });
+
+  it("deduplicates detail fields into the summary list and badge", () => {
+    const detail = phase2Spec("appointment-detail");
+    expect(nodesOf(detail, "FormField")).toEqual([]);
+    expect(nodesOf(detail, "Badge")).toEqual([]);
+    const summary = nodesOf(detail, "Card").find((card) =>
+      String(card.props?.title ?? "").includes("摘要")
+    )!;
+    expect(summary.props).toMatchObject({ badge: "已登记", badgeTone: "warning" });
+    const items = nodesOf(detail, "List")[0]?.props?.items as Array<{
+      label: string;
+      value: string;
+    }>;
+    expect(items.map((item) => item.label)).toEqual(
+      expect.arrayContaining(["客户", "手机号", "项目", "时间段"])
+    );
+    expect(items.map((item) => item.label)).not.toContain("状态");
+    expect(nodesOf(detail, "Text").map((node) => node.props?.text)).toContain("状态");
+    const actionRow = collectNodes(detail.layout).find(
+      (node) => node.type === "Row" && node.props?.variant === "filter"
+    );
+    expect(actionRow?.children?.length).toBeGreaterThan(1);
+    expect(actionRow?.children?.every((child) => child.type === "Button")).toBe(true);
+  });
+
+  it("puts the page id into home tabs and activates it", () => {
+    const home = phase2Spec("today");
+    expect(home.layout.props?.tabs).toEqual(["today", "appointment-list"]);
+    expect(home.layout.props?.activeTab).toBe("today");
+    expect(home.layout.props?.showTabs).toBe(true);
+  });
+
+  it("omits the search action bar and keeps the detail action in content", () => {
+    const search = phase2Spec("customer-search");
+    expect(search.layout.slots?.actions).toBeUndefined();
+    expect(nodesOf(search, "Button").map((button) => button.props?.action)).toEqual(
+      expect.arrayContaining(["查看详情"])
+    );
+    expect(nodesOf(search, "EmptyState").map((node) => node.props?.emptyKind)).toEqual(
+      expect.arrayContaining(["idle", "empty"])
+    );
+  });
+});
 
   it("compiles a demo-crm contacts-list page without order copy", () => {
     const contactsPage: UiBriefPage = {

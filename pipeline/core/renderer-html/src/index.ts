@@ -55,6 +55,15 @@ function shellInteractionAttrs(): string {
     attrs.push(`data-views="${esc(JSON.stringify(spec.views))}"`);
     attrs.push(`data-default-view="${esc(spec.defaultView ?? spec.views[0] ?? "")}"`);
   }
+  if (spec.customerPicker !== undefined) {
+    attrs.push(`data-picker-search="${esc(spec.customerPicker)}"`);
+  }
+  if (spec.pickerReturnTo !== undefined) {
+    attrs.push(`data-picker-return="${esc(spec.pickerReturnTo)}"`);
+  }
+  if (spec.calendarWeekStart !== undefined) {
+    attrs.push(`data-calendar-week-start="${esc(spec.calendarWeekStart)}"`);
+  }
   return attrs.join(" ");
 }
 
@@ -184,10 +193,12 @@ function illustrationSvg(name: string): string {
 
 const tabIcons: Record<string, string> = {
   今日: "home",
+  today: "home",
   库存查询: "inventory_2",
   客户: "person",
   客户搜索: "search",
   预约列表: "calendar_month",
+  "appointment-list": "calendar_month",
   回访登记: "call",
   工作台: "grid_view",
   我的: "settings",
@@ -277,9 +288,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const content = slot(node, "content")
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
-      const nav = slot(node, "bottom-nav")
+      const navNodes = slot(node, "bottom-nav");
+      const nav = navNodes
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
+      const tabCount = navNodes.reduce(
+        (count, child) => count + stringArray(child.props?.items).length,
+        0
+      );
       const titleSlot = slot(node, "title")
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
@@ -301,7 +317,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const actions = slot(node, "actions")
         .map((child) => renderNode(child, profile, depth + 1))
         .join("");
-      const showTabs = props.showTabs !== false && nav.length > 0;
+      // A single tab cannot fill a bottom bar; omit the bar entirely.
+      const showTabs = props.showTabs !== false && tabCount > 1;
       const back = bool(props.back);
       const header =
         top ||
@@ -358,7 +375,15 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "List": {
       if (Array.isArray(props.items)) {
         return `<div class="list-text">${(props.items as unknown[])
-          .map((item) => `<div class="list-text-row">${esc(item)}</div>`)
+          .map((item) => {
+            if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+              const record = item as Record<string, unknown>;
+              const label = str(record.label);
+              const value = str(record.value);
+              return `<div class="list-text-row summary-row"><span class="list-text-label">${esc(label)}</span><b class="list-text-value">${esc(value)}</b></div>`;
+            }
+            return `<div class="list-text-row">${esc(item)}</div>`;
+          })
           .join("")}</div>`;
       }
       const count = Math.min(Math.max(Number(props.items) || 3, 1), 6);
@@ -459,11 +484,13 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     }
     case "Card": {
       const title = str(props.title);
+      const badge = str(props.badge);
+      const badgeTone = str(props.badgeTone) || "neutral";
       const art = illustrationSvg(str(props.illustration));
       const motion = motionAttrs(node, renderMotionContext);
       return `<section class="card"${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="card-head">
-    <h2 class="card-title">${esc(title)}</h2>
+    <h2 class="card-title">${esc(title)}${badge ? `<span class="badge tone-${esc(badgeTone)}">${esc(badge)}</span>` : ""}</h2>
     ${art}
   </div>
   <div class="card-body">${children}</div>
@@ -472,7 +499,9 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Row": {
       const gap = str(props.gap);
       const variant = str(props.variant);
-      return `<div class="row ${variant === "filter" ? "filter-row" : ""}" style="gap:${cssVar(gap)}">${children}</div>`;
+      const variantClass =
+        variant === "filter" ? " filter-row" : variant === "sr-only" ? " sr-only" : "";
+      return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
     }
     case "Stack":
       return `<div class="stack">${children}</div>`;
@@ -752,7 +781,8 @@ ${typeClasses(profile)}
 .card{background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-4);box-shadow:0 1px 2px rgba(17,24,39,.04);}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);}
 .card-illustration{width:80px;height:56px;flex:0 0 80px;display:block;}
-.card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);}
+.card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;}
+.card-title .badge{margin-left:8px;}
 .card-body{margin-top:var(--space-2);display:flex;flex-direction:column;gap:0;}
 .card-body>.list-row:not(:last-child){border-bottom:1px solid var(--color-border-subtle);}
 .quick-action{flex:1;height:56px;border:0;border-radius:var(--radius-md);background:var(--color-surface-subtle);display:flex;align-items:center;justify-content:center;gap:var(--space-2);transition:transform var(--motion-fast) ease,background var(--motion-normal) ease;}
@@ -765,6 +795,8 @@ ${typeClasses(profile)}
 .quick-label{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
 .list-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:10px 0;}
 .list-row[data-row-link]{cursor:pointer;}
+.list-row[data-row-link]{transition:background var(--motion-fast) ease;}
+.list-row[data-row-link]:hover,.list-row[data-row-link]:active{background:var(--color-surface-subtle);}
 .list-row-main{flex:1;min-width:0;}
 .list-row-title{display:flex;align-items:center;gap:6px;min-width:0;}
 .row-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -800,11 +832,11 @@ ${typeClasses(profile)}
 .summary{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);padding:0 2px;}
 .calendar{background:var(--color-surface-default);border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(17,24,39,.04);overflow:hidden;}
 .calendar-scroll{overflow-x:auto;overflow-y:hidden;}
-.calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(44px,1fr));min-width:360px;position:relative;}
+.calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(88px,1fr));min-width:720px;position:relative;}
 .calendar-corner{grid-column:1;grid-row:1;background:var(--color-surface-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day{grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-secondary);background:var(--color-surface-subtle);border-left:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day.today{background:color-mix(in srgb,var(--color-status-info) 10%,white);color:var(--color-status-info);font-weight:600;}
-.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);}
+.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);white-space:nowrap;}
 .calendar-day.today .calendar-date{color:var(--color-status-info);}
 .calendar-hour{grid-column:1;font-size:9px;line-height:11px;color:var(--color-text-tertiary);display:flex;justify-content:flex-end;padding:2px 4px 0 0;}
 .calendar-cell{border-top:1px solid var(--color-border-subtle);border-left:1px solid var(--color-border-subtle);}
@@ -853,6 +885,9 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.primary{background:var(--color-action-primary);color:var(--color-text-onAction);}
 .btn.secondary{background:#fff;border:1px solid #CBD5E1;color:var(--color-text-primary);}
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
+.btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
+.btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -874,8 +909,11 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .stat-value{font-size:24px;line-height:32px;font-weight:600;color:#0F172A;}
 .list-placeholder{display:flex;flex-direction:column;gap:10px;padding:4px 0;}
 .list-text{display:flex;flex-direction:column;gap:0;padding:4px 0;}
-.list-text-row{padding:10px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#334155;}
+.list-text-row{padding:10px 0;border-bottom:1px solid var(--color-border-subtle);font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);color:var(--color-text-primary);}
 .list-text-row:last-child{border-bottom:0;}
+.list-text-row.summary-row{display:flex;align-items:baseline;gap:var(--space-3);}
+.list-text-label{flex:0 0 auto;color:var(--color-text-tertiary);}
+.list-text-value{flex:1;min-width:0;font-weight:var(--type-body-md-weight);word-break:break-word;}
 .list-placeholder-row{display:grid;grid-template-columns:2fr 1fr 60px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9;}
 .skeleton-line{display:block;height:10px;border-radius:6px;background:#E7E9ED;}
 .skeleton-line.wide{width:80%;}
@@ -901,6 +939,9 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .form-value{display:block;min-height:20px;padding:8px 10px;border-radius:6px;background:#F8FAFC;color:#0F172A;font-size:14px;}
 .input,.select{height:36px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;padding:0 10px;font:inherit;font-size:14px;color:#0F172A;width:100%;}
 .input:focus,.select:focus{outline:2px solid #BFDBFE;border-color:#2563EB;}
+.form-field .row{align-items:center;}
+.form-field .row .input{flex:1;min-width:0;}
+.form-field .row .btn{flex:0 0 auto;}
 .app-scroll>.form-field{margin:0 var(--space-4) var(--space-3);}
 .app-scroll>.btn{margin:var(--space-4);}
 .app-scroll>.card{margin:var(--space-4);}
@@ -942,11 +983,16 @@ function renderInteractionScript(): string {
   function applyBusinessStates() {
     const states = config.businessStates;
     if (!states) return;
-    let status = config.currentStatus ?? states[0]?.name;
+    let status =
+      new URLSearchParams(location.search).get("status") ??
+      config.currentStatus ??
+      states[0]?.name;
     const currentState = () => states.find((state) => state.name === status);
     const allowed = () => currentState()?.actions ?? [];
     const bar = document.querySelector(".app-actions");
     const noteHost = document.querySelector(".app-scroll");
+    const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
+    const rowValue = (row) => row.querySelector(".list-text-value");
     const apply = () => {
       let visibleInBar = 0;
       for (const button of qsa("[data-action]")) {
@@ -960,17 +1006,38 @@ function renderInteractionScript(): string {
       const statusField = document.querySelector('[data-field="status"] .form-value, [data-field="status"] .form-readonly');
       if (statusField) statusField.textContent = status;
       for (const row of qsa(".app-scroll .list-text-row")) {
-        if ((row.textContent ?? "").indexOf("状态:") === 0) row.textContent = "状态: " + status;
+        if (rowLabel(row) === "状态") {
+          const value = rowValue(row);
+          if (value) value.textContent = status;
+        } else if ((row.textContent ?? "").indexOf("状态:") === 0) {
+          row.textContent = "状态: " + status;
+        }
       }
       if (status === "已确认") {
         const confirmedBy = document.querySelector('[data-field="confirmedBy"] .form-value');
         const confirmedAt = document.querySelector('[data-field="confirmedAt"] .form-value');
-        const byValue = confirmedBy && (confirmedBy.textContent ?? "").trim() !== "—"
-          ? confirmedBy.textContent
-          : "当前员工";
-        const atValue = confirmedAt && (confirmedAt.textContent ?? "").trim() !== "—"
-          ? confirmedAt.textContent
-          : new Date().toLocaleString("zh-CN", { hour12: false });
+        const summaryText = (label) => {
+          for (const row of qsa(".app-scroll .list-text-row")) {
+            if (rowLabel(row) !== label) continue;
+            const value = rowValue(row);
+            if (value) return (value.textContent ?? "").trim();
+          }
+          return "";
+        };
+        const bySummary = summaryText("确认人");
+        const atSummary = summaryText("确认时间");
+        const byValue =
+          confirmedBy && (confirmedBy.textContent ?? "").trim() !== "—"
+            ? confirmedBy.textContent
+            : bySummary !== "" && bySummary !== "—"
+              ? bySummary
+              : "当前员工";
+        const atValue =
+          confirmedAt && (confirmedAt.textContent ?? "").trim() !== "—"
+            ? confirmedAt.textContent
+            : atSummary !== "" && atSummary !== "—"
+              ? atSummary
+              : new Date().toLocaleString("zh-CN", { hour12: false });
         if (confirmedBy && (confirmedBy.textContent ?? "").trim() === "—") {
           confirmedBy.textContent = byValue;
         }
@@ -978,6 +1045,14 @@ function renderInteractionScript(): string {
           confirmedAt.textContent = atValue;
         }
         for (const row of qsa(".app-scroll .list-text-row")) {
+          const label = rowLabel(row);
+          if (label === "确认人" || label === "确认时间") {
+            const value = rowValue(row);
+            if (value && (value.textContent ?? "").trim() === "—") {
+              value.textContent = label === "确认人" ? byValue : atValue;
+            }
+            continue;
+          }
           const text = row.textContent ?? "";
           if (text.indexOf("确认人:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认人: " + byValue;
           if (text.indexOf("确认时间:") === 0 && text.indexOf("—") >= 0) row.textContent = "确认时间: " + atValue;
@@ -1036,7 +1111,7 @@ function renderInteractionScript(): string {
     const params = new URLSearchParams(location.search);
     let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
     const submit = document.querySelector(".app-actions [data-action]");
-    const customer = document.querySelector('[data-field="customer"] input');
+    const customer = document.querySelector('[data-field=customer] input');
     const host = document.querySelector(".app-scroll");
     const tabs = document.createElement("div");
     tabs.className = "mode-tabs";
@@ -1056,9 +1131,33 @@ function renderInteractionScript(): string {
       host.prepend(tabs);
     }
     const appointmentId = params.get("appointmentId") ?? config.referenceId;
-    const prefill = params.get("date") && params.get("time") ? params.get("date") + " " + params.get("time") : "";
+    const dateParam = params.get("date");
+    const timeParam = params.get("time");
     const startInput = document.querySelector('input[name="startTime"]');
-    if (startInput && prefill) startInput.value = prefill;
+    const endInput = document.querySelector('input[name="endTime"]');
+    if (dateParam && timeParam) {
+      const start = new Date(dateParam + "T" + timeParam + ":00");
+      if (!Number.isNaN(start.getTime())) {
+        if (startInput) startInput.value = dateParam + "T" + timeParam;
+        if (endInput) {
+          const end = new Date(start.getTime() + 60 * 60 * 1000);
+          const pad = (value) => String(value).padStart(2, "0");
+          endInput.value =
+            end.getFullYear() +
+            "-" +
+            pad(end.getMonth() + 1) +
+            "-" +
+            pad(end.getDate()) +
+            "T" +
+            pad(end.getHours()) +
+            ":" +
+            pad(end.getMinutes());
+        }
+      }
+    }
+    const customerPickerButton = document.querySelector(
+      '[data-field=customer] [data-action="选择客户"]'
+    );
     const apply = () => {
       for (const button of Array.from(tabs.children)) {
         button.classList.toggle("active", button.textContent === current.label);
@@ -1068,6 +1167,9 @@ function renderInteractionScript(): string {
         submit.dataset.action = current.actions[0] ?? submit.dataset.action;
       }
       if (customer) customer.disabled = current.customerLocked === true;
+      if (customerPickerButton) {
+        customerPickerButton.disabled = current.customerLocked === true;
+      }
       let id = document.querySelector(".appointment-id");
       if (current.name === "reschedule") {
         if (!id && host) {
@@ -1100,6 +1202,10 @@ function renderInteractionScript(): string {
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
+      // The detail entry depends on results; idle and no-match hide it.
+      for (const button of qsa('[data-action="查看详情"]')) {
+        button.hidden = visible === 0;
+      }
     };
     input.addEventListener("input", apply);
     const clear = document.querySelector('[data-action="清空关键词"]');
@@ -1114,6 +1220,8 @@ function renderInteractionScript(): string {
   }
 
   function applyRowLinks() {
+    // In picker mode a row click selects a customer instead of navigating.
+    if (new URLSearchParams(location.search).get("mode") === "picker") return;
     const target =
       config.pageId === "customer-search"
         ? config.linkedRoutes.customer
@@ -1137,7 +1245,10 @@ function renderInteractionScript(): string {
   function applyViews() {
     if (!config.views) return;
     const panels = qsa("[data-view-panel]");
-    let current = config.defaultView ?? config.views[0];
+    let current =
+      new URLSearchParams(location.search).get("view") ??
+      config.defaultView ??
+      config.views[0];
     const toggle = document.querySelector("[data-view-toggle]");
     const apply = () => {
       for (const panel of panels) {
@@ -1208,11 +1319,78 @@ function renderInteractionScript(): string {
     apply();
   }
 
+  function applyPicker() {
+    const params = new URLSearchParams(location.search);
+    const pickerSearch = config.customerPicker;
+    const pickerReturn = config.pickerReturnTo;
+    if (params.get("mode") === "picker") {
+      const title = document.querySelector(".page-title");
+      if (title) title.textContent = "选择客户";
+    }
+    if (pickerSearch && document.body.dataset.pageKind === "form") {
+      const button = document.querySelector('[data-action="选择客户"]');
+      if (button) {
+        button.addEventListener("click", () => {
+          const draft = {};
+          for (const input of qsa(".app-scroll input, .app-scroll select")) {
+            const key =
+              input.name ||
+              input.id ||
+              input.closest("[data-field]")?.dataset.field;
+            if (key) draft[key] = input.value;
+          }
+          sessionStorage.setItem("prd-ui:picker:" + config.pageId, JSON.stringify(draft));
+          location.href = pickerSearch + ".html?mode=picker&returnTo=" + config.pageId;
+        });
+      }
+    }
+    if (params.get("mode") === "picker" && pickerReturn) {
+      for (const row of qsa("[data-search-text]")) {
+        row.addEventListener("click", () => {
+          sessionStorage.setItem("prd-ui:picker:selected", row.dataset.searchText ?? "");
+          location.href = pickerReturn + ".html";
+        });
+      }
+    }
+    if (document.body.dataset.pageKind === "form") {
+      const draftRaw = sessionStorage.getItem("prd-ui:picker:" + config.pageId);
+      if (draftRaw) {
+        try {
+          const draft = JSON.parse(draftRaw);
+          for (const [name, value] of Object.entries(draft)) {
+            const input =
+              document.querySelector('[name="' + name + '"]') ||
+              document.querySelector(
+                '[data-field="' + name + '"] input, [data-field="' + name + '"] select'
+              );
+            if (input) input.value = value;
+          }
+        } catch {
+          sessionStorage.removeItem("prd-ui:picker:" + config.pageId);
+        }
+      }
+      const selected = sessionStorage.getItem("prd-ui:picker:selected");
+      if (selected) {
+        const customer = document.querySelector('[data-field=customer] input');
+        if (customer) customer.value = selected.split(" ")[0] ?? "";
+        sessionStorage.removeItem("prd-ui:picker:selected");
+      }
+      // Saving or cancelling the form ends the picker drafts.
+      for (const button of qsa(".app-actions [data-action]")) {
+        button.addEventListener("click", () => {
+          sessionStorage.removeItem("prd-ui:picker:" + config.pageId);
+          sessionStorage.removeItem("prd-ui:picker:selected");
+        });
+      }
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
   applyRowLinks();
   applyViews();
+  applyPicker();
 })();
 </script>`;
 }
@@ -1243,6 +1421,8 @@ export function renderDocument(
     defaultView: spec.defaultView ?? null,
     searchIdleTitle: spec.searchIdleTitle ?? null,
     currentStatus: spec.currentStatus ?? null,
+    customerPicker: spec.customerPicker ?? null,
+    pickerReturnTo: spec.pickerReturnTo ?? null,
     referenceId: spec.referenceId ?? spec.meta.pageId,
     linkedRoutes,
   };
@@ -1251,7 +1431,10 @@ export function renderDocument(
     (spec.businessStates !== undefined ||
       spec.formModes !== undefined ||
       spec.views !== undefined ||
-      spec.searchIdleTitle !== undefined);
+      spec.searchIdleTitle !== undefined ||
+      spec.customerPicker !== undefined ||
+      spec.pickerReturnTo !== undefined);
+  const pageKind = spec.meta.archetype === "mobile-form" ? "form" : spec.meta.archetype;
   const interactionMarkup = hasInteraction
     ? `  <script id="interaction-config" type="application/json">${JSON.stringify(config).replace(/</g, "\\u003c")}</script>
   ${renderInteractionScript()}`
@@ -1267,7 +1450,7 @@ export function renderDocument(
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
   <style>${renderCss(profile)}${renderMotionCss()}</style>
 </head>
-<body data-state="default">
+<body data-state="default" data-page-kind="${esc(pageKind)}">
   ${stateSwitcher()}
   ${body}
 ${interactionMarkup}

@@ -123,6 +123,8 @@ export const bMobileCatalog: Catalog = {
         title: { type: "string", required: true },
         variant: { type: "enum", enum: ["default", "plain"] },
         illustration: { type: "string" },
+        badge: { type: "string" },
+        badgeTone: { type: "enum", enum: toneEnum },
       },
       variants: ["default", "plain"],
       states: ["default"],
@@ -231,7 +233,7 @@ export const bMobileCatalog: Catalog = {
       props: {
         name: { type: "string", required: true },
         placeholder: { type: "string" },
-        inputType: { type: "enum", enum: ["text", "email", "password"] },
+        inputType: { type: "enum", enum: ["text", "email", "password", "datetime-local"] },
       },
       variants: ["default", "filled"],
       states: ["default", "hover", "focus", "disabled", "error"],
