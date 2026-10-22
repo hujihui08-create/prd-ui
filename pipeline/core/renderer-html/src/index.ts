@@ -103,6 +103,24 @@ export function readOnlyNote(note: string | undefined): string | undefined {
   return match?.[1];
 }
 
+export const PICKER_STORAGE_PREFIX = "prd-ui:picker:";
+
+/**
+ * The page that opened a mobile form. A picker page is never an origin: when
+ * the form is re-entered after selecting a customer, the original list/detail
+ * page must remain the back target.
+ */
+export function formOrigin(referrer: string | undefined): string | undefined {
+  if (referrer === undefined || referrer.length === 0) return undefined;
+  if (referrer.includes("mode=picker")) return undefined;
+  return referrer;
+}
+
+/** Every pending picker key (draft, selected, and return) under the prefix. */
+export function pickerStorageKeys(keys: string[]): string[] {
+  return keys.filter((key) => key.startsWith(PICKER_STORAGE_PREFIX));
+}
+
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }
@@ -1351,6 +1369,15 @@ function renderInteractionScript(): string {
     const draftKey = "prd-ui:picker:" + config.pageId;
     const selectedKey = "prd-ui:picker:selected";
     const returnKey = "prd-ui:picker:return";
+    const originKey = "prd-ui:form:origin";
+    if (document.body.dataset.pageKind === "form") {
+      // Remember the page that opened the form; a picker is never an origin,
+      // so returning from customer selection keeps the original list/detail.
+      const referrer = document.referrer;
+      if (referrer && referrer.indexOf("mode=picker") < 0) {
+        sessionStorage.setItem(originKey, referrer);
+      }
+    }
     if (params.get("mode") === "picker") {
       const title = document.querySelector(".page-title");
       if (title) title.textContent = "选择客户";
@@ -1386,8 +1413,23 @@ function renderInteractionScript(): string {
             config.pageArchetypes?.[requestedReturn] === "mobile-form";
           const target = allowed ? requestedReturn : pickerReturn;
           if (!target) return;
+          const selectedText = row.dataset.searchText ?? "";
+          const customerName = selectedText.split(" ")[0] ?? "";
           sessionStorage.setItem(returnKey, target);
-          sessionStorage.setItem(selectedKey, row.dataset.searchText ?? "");
+          sessionStorage.setItem(selectedKey, selectedText);
+          // Keep the customer in the draft too, so reloads after a restore
+          // still show the selected customer even before selected is read.
+          const targetDraftKey = "prd-ui:picker:" + target;
+          const targetDraftRaw = sessionStorage.getItem(targetDraftKey);
+          if (targetDraftRaw) {
+            try {
+              const draft = JSON.parse(targetDraftRaw);
+              draft.customer = customerName;
+              sessionStorage.setItem(targetDraftKey, JSON.stringify(draft));
+            } catch {
+              // keep the draft as-is
+            }
+          }
           location.href = target + ".html";
         });
       }
@@ -1395,7 +1437,6 @@ function renderInteractionScript(): string {
     if (document.body.dataset.pageKind === "form") {
       const hasPrefill = Boolean(params.get("date") && params.get("time"));
       const isPickerReturn = sessionStorage.getItem(returnKey) === config.pageId;
-      if (isPickerReturn) sessionStorage.removeItem(returnKey);
       if (hasPrefill) {
         // Calendar/list prefill always wins over a stale picker draft.
         sessionStorage.removeItem(draftKey);
@@ -1418,12 +1459,12 @@ function renderInteractionScript(): string {
             sessionStorage.removeItem(draftKey);
           }
         }
-        // The draft stays until save/back; a selected customer is optional.
+        // Both the draft and the return/selected keys stay until save, form
+        // back, or a calendar prefill; a reload must restore them again.
         const selected = sessionStorage.getItem(selectedKey);
         if (selected) {
           const customer = document.querySelector('[data-field=customer] input');
           if (customer) customer.value = selected.split(" ")[0] ?? "";
-          sessionStorage.removeItem(selectedKey);
         }
       }
       // Saving the form ends the picker draft (back clears it separately).
@@ -1432,6 +1473,7 @@ function renderInteractionScript(): string {
           sessionStorage.removeItem(draftKey);
           sessionStorage.removeItem(selectedKey);
           sessionStorage.removeItem(returnKey);
+          sessionStorage.removeItem(originKey);
         });
       }
     }
@@ -1513,13 +1555,21 @@ export function renderDocument(
       const back = document.querySelector(".back-icon");
       if (!back) return;
       back.addEventListener("click", () => {
-        // Form/detail back cancels the form and its picker drafts. The search
-        // page back is a picker cancel: it must leave the draft for the form.
         const pageKind = document.body.dataset.pageKind;
-        if (pageKind === "form" || pageKind === "detail") {
-          sessionStorage.removeItem("prd-ui:picker:" + ${JSON.stringify(spec.meta.pageId)});
-          sessionStorage.removeItem("prd-ui:picker:selected");
-          sessionStorage.removeItem("prd-ui:picker:return");
+        const isFormOrDetail = pageKind === "form" || pageKind === "detail";
+        const origin = isFormOrDetail
+          ? sessionStorage.getItem("prd-ui:form:origin")
+          : null;
+        if (isFormOrDetail) {
+          // Clear every pending picker key for every form, not just this page.
+          for (const key of Object.keys(sessionStorage)) {
+            if (key.indexOf("prd-ui:picker:") === 0) sessionStorage.removeItem(key);
+          }
+          sessionStorage.removeItem("prd-ui:form:origin");
+        }
+        if (origin) {
+          location.href = origin;
+          return;
         }
         if (history.length > 1) history.back();
         else location.href = "index.html";

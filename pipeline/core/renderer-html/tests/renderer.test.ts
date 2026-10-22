@@ -9,7 +9,9 @@ import appointmentsBriefJson from "../../../samples/projects/employee-app-appoin
 import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
 import {
   createMotionContext,
+  formOrigin,
   motionAttrs,
+  pickerStorageKeys,
   readOnlyNote,
   renderDocument,
   renderIndex,
@@ -310,6 +312,32 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(readOnlyNote(undefined)).toBeUndefined();
   });
 
+  it("records only non-picker form origins and sweeps picker keys", () => {
+    expect(formOrigin("https://app.example.com/appointment-list.html")).toBe(
+      "https://app.example.com/appointment-list.html"
+    );
+    expect(
+      formOrigin(
+        "https://app.example.com/customer-search.html?mode=picker&returnTo=appointment-form"
+      )
+    ).toBeUndefined();
+    expect(formOrigin("")).toBeUndefined();
+    expect(formOrigin(undefined)).toBeUndefined();
+    expect(
+      pickerStorageKeys([
+        "prd-ui:picker:appointment-form",
+        "prd-ui:picker:selected",
+        "prd-ui:picker:return",
+        "prd-ui:form:origin",
+        "other",
+      ])
+    ).toEqual([
+      "prd-ui:picker:appointment-form",
+      "prd-ui:picker:selected",
+      "prd-ui:picker:return",
+    ]);
+  });
+
   it("renders picker hooks, full dates, and deduplicated detail fields", () => {
     const form = renderDocument(
       phase2ById.get("appointment-form")!,
@@ -398,6 +426,9 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       '"stateNotes":{"爽约":"爽约已记录入客户档案","已取消":"本单已取消"}'
     );
     expect(detail).toContain('back.addEventListener("click"');
+    expect(detail).toContain('sessionStorage.getItem("prd-ui:form:origin")');
+    expect(detail).toContain('key.indexOf("prd-ui:picker:") === 0');
+    expect(detail).toContain("location.href = origin");
     expect(detail).toContain("history.length > 1");
     expect(detail).toContain('location.href = "index.html"');
     expect(detail).toContain(".back-icon{font-size:20px;cursor:pointer;}");
@@ -425,10 +456,17 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(form).toContain('sessionStorage.getItem(returnKey) === config.pageId');
     expect(form).toContain("if (hasPrefill)");
     expect(form).toContain('sessionStorage.getItem(selectedKey)');
-    expect(form).toContain("// The draft stays until save/back; a selected customer is optional.");
+    expect(form).toContain("document.referrer");
+    expect(form).toContain('referrer.indexOf("mode=picker") < 0');
+    expect(form).toContain('sessionStorage.setItem(originKey, referrer)');
+    expect(form).toContain("// Both the draft and the return/selected keys stay");
+    expect(form).toContain('sessionStorage.setItem(selectedKey, selectedText)');
+    expect(form).toContain("draft.customer = customerName");
+    expect(form).toContain('sessionStorage.setItem(targetDraftKey, JSON.stringify(draft))');
     expect(form).toContain("sessionStorage.removeItem(draftKey)");
     expect(form).toContain("sessionStorage.removeItem(selectedKey)");
     expect(form).toContain("sessionStorage.removeItem(returnKey)");
+    expect(form).toContain("sessionStorage.removeItem(originKey)");
     expect(form).toContain('document.body.dataset.pageKind === "form"');
 
     const search = renderDocument(
