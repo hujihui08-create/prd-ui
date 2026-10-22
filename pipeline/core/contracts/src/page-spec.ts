@@ -131,6 +131,27 @@ export interface PageSpec {
   interactions: Interaction[];
   /** Optional; carried for Phase 2 renderer/Figma consumers. */
   motion?: PageMotion;
+  /** Allowed actions per business status, carried from the signed brief. */
+  businessStates?: Array<{ name: string; actions: string[]; note?: string }>;
+  /** New/reschedule modes for mobile form pages. */
+  formModes?: Array<{
+    name: "new" | "reschedule";
+    label: string;
+    actions: string[];
+    customerLocked?: boolean;
+  }>;
+  views?: Array<"calendar" | "list">;
+  defaultView?: "calendar" | "list";
+  searchIdleTitle?: string;
+  currentStatus?: string;
+  referenceId?: string;
+  linkedRoutes?: {
+    create?: string;
+    detail?: string;
+    customer?: string;
+    notice?: string;
+    form?: string;
+  };
   traceability: PageTraceability;
 }
 
@@ -186,6 +207,44 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
         .strict()
     ),
     motion: PageMotionSchema.optional(),
+    businessStates: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1),
+            actions: z.array(z.string().min(1)),
+            note: z.string().min(1).optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    formModes: z
+      .array(
+        z
+          .object({
+            name: z.enum(["new", "reschedule"]),
+            label: z.string().min(1),
+            actions: z.array(z.string().min(1)),
+            customerLocked: z.boolean().optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    views: z.array(z.enum(["calendar", "list"])).optional(),
+    defaultView: z.enum(["calendar", "list"]).optional(),
+    searchIdleTitle: z.string().min(1).optional(),
+    currentStatus: z.string().min(1).optional(),
+    referenceId: z.string().min(1).optional(),
+    linkedRoutes: z
+      .object({
+        create: z.string().min(1).optional(),
+        detail: z.string().min(1).optional(),
+        customer: z.string().min(1).optional(),
+        notice: z.string().min(1).optional(),
+        form: z.string().min(1).optional(),
+      })
+      .strict()
+      .optional(),
     traceability: z
       .object({
         reqMap: z.record(z.string(), z.array(z.string())),

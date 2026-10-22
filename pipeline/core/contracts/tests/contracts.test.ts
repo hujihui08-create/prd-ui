@@ -191,6 +191,86 @@ describe("contracts", () => {
     expect(parsed.ia.navigation.tabs).toEqual(["推荐", "关注"]);
   });
 
+  it("parses interaction metadata on a brief page", () => {
+    const page = {
+      ...minimalBrief.ia.pages[0]!,
+      fields: ["status"],
+      actions: ["已到店确认", "开单", "取消"],
+      businessStates: [
+        { name: "已登记", actions: ["已到店确认", "开单", "取消"] },
+        { name: "已到店", actions: ["开单"] },
+        { name: "已取消", actions: [], note: "本单已取消" },
+      ],
+      formModes: [
+        { name: "new" as const, label: "新增预约", actions: ["保存"] },
+        {
+          name: "reschedule" as const,
+          label: "改期",
+          actions: ["保存改期"],
+          customerLocked: true,
+        },
+      ],
+      views: ["calendar", "list"] as const,
+      defaultView: "calendar" as const,
+      searchIdleTitle: "输入姓名或脱敏手机号搜索客户",
+    };
+    const parsed = UiBriefSchema.parse({
+      ...minimalBrief,
+      ia: { ...minimalBrief.ia, pages: [page] },
+    });
+    const parsedPage = parsed.ia.pages[0]!;
+    expect(parsedPage.businessStates).toHaveLength(3);
+    expect(parsedPage.businessStates?.[2]?.note).toBe("本单已取消");
+    expect(parsedPage.formModes?.[1]?.customerLocked).toBe(true);
+    expect(parsedPage.views).toEqual(["calendar", "list"]);
+    expect(parsedPage.defaultView).toBe("calendar");
+    expect(parsedPage.searchIdleTitle).toContain("脱敏手机号");
+  });
+
+  it("rejects malformed interaction metadata", () => {
+    const page = minimalBrief.ia.pages[0]!;
+    for (const patch of [
+      { businessStates: [{ name: "已登记", actions: [""] }] },
+      { businessStates: [{ name: "", actions: ["开单"] }] },
+      { formModes: [{ name: "edit", label: "编辑", actions: ["保存"] }] },
+      { views: ["grid"] },
+      { defaultView: "grid" },
+    ]) {
+      expect(() =>
+        UiBriefSchema.parse({
+          ...minimalBrief,
+          ia: { ...minimalBrief.ia, pages: [{ ...page, ...patch }] },
+        })
+      ).toThrow();
+    }
+  });
+
+  it("carries interaction metadata on a page spec", () => {
+    const spec = {
+      ...minimalPageSpec,
+      businessStates: [{ name: "已登记", actions: ["开单"] }],
+      formModes: [
+        { name: "reschedule", label: "改期", actions: ["保存改期"], customerLocked: true },
+      ],
+      views: ["calendar", "list"],
+      defaultView: "calendar",
+      searchIdleTitle: "输入姓名搜索客户",
+      currentStatus: "已登记",
+      referenceId: "A-001",
+      linkedRoutes: {
+        create: "/appointments/form",
+        detail: "/appointments/detail/:id",
+        customer: "/customers/:id",
+        notice: "/appointments/detail/:id/notice",
+        form: "/appointments/form",
+      },
+    };
+    const parsed = PageSpecSchema.parse(spec);
+    expect(parsed.businessStates?.[0]?.actions).toEqual(["开单"]);
+    expect(parsed.currentStatus).toBe("已登记");
+    expect(parsed.linkedRoutes?.form).toBe("/appointments/form");
+  });
+
   it("rejects malformed optional page presentation fields", () => {
     const page = {
       ...minimalBrief.ia.pages[0]!,

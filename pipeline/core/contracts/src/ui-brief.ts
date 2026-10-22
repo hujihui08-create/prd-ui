@@ -59,6 +59,20 @@ export interface UiBriefPage {
   summaryTitle?: string;
   /** Per-project notice blocks for treatment/handoff detail pages. */
   noticeBlocks?: Array<{ title: string; items: string[] }>;
+  /** Allowed actions per business status; actions must be a subset of `actions`. */
+  businessStates?: Array<{ name: string; actions: string[]; note?: string }>;
+  /** New/reschedule modes for mobile form pages. */
+  formModes?: Array<{
+    name: "new" | "reschedule";
+    label: string;
+    actions: string[];
+    customerLocked?: boolean;
+  }>;
+  /** Calendar/list views for two-dimensional mobile list pages. */
+  views?: Array<"calendar" | "list">;
+  defaultView?: "calendar" | "list";
+  /** Idle hint shown before a customer keyword is entered. */
+  searchIdleTitle?: string;
   feedItems?: Array<{ title: string; body: string }>;
   stats?: Array<{ label: string; value: string }>;
   mockData?: UiBriefMockData;
@@ -209,6 +223,32 @@ export const UiBriefPageSchema = z
           .strict()
       )
       .optional(),
+    businessStates: z
+      .array(
+        z
+          .object({
+            name: z.string().min(1),
+            actions: z.array(z.string().min(1)),
+            note: z.string().min(1).optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    formModes: z
+      .array(
+        z
+          .object({
+            name: z.enum(["new", "reschedule"]),
+            label: z.string().min(1),
+            actions: z.array(z.string().min(1)),
+            customerLocked: z.boolean().optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    views: z.array(z.enum(["calendar", "list"])).optional(),
+    defaultView: z.enum(["calendar", "list"]).optional(),
+    searchIdleTitle: z.string().min(1).optional(),
     feedItems: z
       .array(z.object({ title: z.string().min(1), body: z.string().min(1) }).strict())
       .optional(),

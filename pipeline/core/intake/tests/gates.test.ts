@@ -16,6 +16,7 @@ import {
   prdHash,
   review,
   validPrdSignoff,
+  withBrief,
 } from "./fixtures.js";
 
 const now = "2026-10-20T00:00:00.000Z";
@@ -238,6 +239,13 @@ describe("PRD gate", () => {
   });
 });
 
+function gateForDraft(candidate: UiBriefDraft): ReturnType<typeof runBriefGate> {
+  const hash = briefHash(hashText, candidate.brief);
+  return runBriefGate(
+    briefGateInput({ draft: candidate, briefHash: hash, signoff: briefSignoff(hash) })
+  );
+}
+
 describe("brief gate", () => {
   it("passes a complete signed brief", () => {
     const gate = runBriefGate(briefGateInput());
@@ -301,6 +309,78 @@ describe("brief gate", () => {
     expect(codes).toContain("BRIEF_MOCK_DATA_MISSING");
     expect(codes).toContain("BRIEF_FIELD_LABELS_MISSING");
     expect(gate.passed).toBe(true);
+  });
+
+  it("blocks home fields/actions and host actions", () => {
+    const home = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "orders-overview")!;
+      page.archetype = "home";
+      page.fields = ["storeName"];
+      page.actions = ["前往客户 Tab"];
+      return brief;
+    });
+    const gate = gateForDraft(home);
+    const codes = gate.issues.map((issue) => issue.code);
+    expect(codes).toContain("BRIEF_HOME_FIELDS");
+    expect(codes).toContain("BRIEF_HOST_ACTION");
+    expect(gate.passed).toBe(false);
+  });
+
+  it("blocks missing or unknown business state actions", () => {
+    const missing = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      page.fields = ["status"];
+      page.actions = ["开单", "取消"];
+      return brief;
+    });
+    expect(gateForDraft(missing).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_BUSINESS_STATES_MISSING"
+    );
+
+    const unknown = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
+      page.fields = ["status"];
+      page.actions = ["开单"];
+      page.businessStates = [{ name: "已到店", actions: ["开单", "不存在"] }];
+      return brief;
+    });
+    expect(gateForDraft(unknown).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_BUSINESS_STATE_ACTION_UNKNOWN"
+    );
+  });
+
+  it("blocks form modes and views that the page cannot support", () => {
+    const mode = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "order-form")!;
+      page.formModes = [{ name: "new", label: "新增", actions: ["保存草稿"] }];
+      return brief;
+    });
+    expect(gateForDraft(mode).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_FORM_MODE_ACTION_UNKNOWN"
+    );
+
+    const view = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "orders-overview")!;
+      page.views = ["calendar", "list"];
+      return brief;
+    });
+    expect(gateForDraft(view).issues.map((issue) => issue.code)).toContain(
+      "BRIEF_VIEW_WITHOUT_TIME"
+    );
+  });
+
+  it("warns when a search page has no idle title", () => {
+    const gate = gateForDraft(withBrief((brief) => brief));
+    expect(gate.issues.map((issue) => issue.code)).toContain("BRIEF_SEARCH_IDLE_MISSING");
+
+    const titled = withBrief((brief) => {
+      const page = brief.ia.pages.find((entry) => entry.id === "orders-list")!;
+      page.searchIdleTitle = "输入订单号或客户姓名搜索";
+      return brief;
+    });
+    expect(gateForDraft(titled).issues.map((issue) => issue.code)).not.toContain(
+      "BRIEF_SEARCH_IDLE_MISSING"
+    );
   });
 
   it("blocks compile failures, placeholders, and blocking questions", () => {

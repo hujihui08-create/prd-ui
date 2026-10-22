@@ -506,6 +506,116 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         )
       );
     }
+    if (
+      page.archetype === "home" &&
+      ((page.fields ?? []).length > 0 || (page.actions ?? []).length > 0)
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_HOME_FIELDS",
+          "blocker",
+          `home page ${page.id} must not declare fields/actions`,
+          page.id
+        )
+      );
+    }
+    const hostAction = (page.actions ?? []).find((action) =>
+      /前往客户\s*(Tab|页)|前往工作台|打开工作台|前往我的|我的\s*(Tab|页)/.test(action)
+    );
+    if (hostAction !== undefined) {
+      issues.push(
+        issue(
+          "BRIEF_HOST_ACTION",
+          "blocker",
+          `page ${page.id} has host action ${hostAction}`,
+          hostAction
+        )
+      );
+    }
+    if (
+      page.archetype === "detail" &&
+      (page.fields ?? []).includes("status") &&
+      (page.actions ?? []).length >= 2 &&
+      page.businessStates === undefined
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_BUSINESS_STATES_MISSING",
+          "blocker",
+          `detail page ${page.id} needs businessStates`,
+          page.id
+        )
+      );
+    }
+    for (const state of page.businessStates ?? []) {
+      for (const action of state.actions) {
+        if (!(page.actions ?? []).includes(action)) {
+          issues.push(
+            issue(
+              "BRIEF_BUSINESS_STATE_ACTION_UNKNOWN",
+              "blocker",
+              `state ${state.name} uses unknown action ${action}`,
+              action
+            )
+          );
+        }
+      }
+    }
+    for (const mode of page.formModes ?? []) {
+      for (const action of mode.actions) {
+        if (!(page.actions ?? []).includes(action)) {
+          issues.push(
+            issue(
+              "BRIEF_FORM_MODE_ACTION_UNKNOWN",
+              "blocker",
+              `mode ${mode.name} uses unknown action ${action}`,
+              action
+            )
+          );
+        }
+      }
+    }
+    if (
+      page.views !== undefined &&
+      !(page.fields ?? []).includes("time") &&
+      !(page.fields ?? []).includes("date")
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_VIEW_WITHOUT_TIME",
+          "blocker",
+          `page ${page.id} declares views without time/date`,
+          page.id
+        )
+      );
+    }
+    if (
+      page.defaultView !== undefined &&
+      page.views !== undefined &&
+      !page.views.includes(page.defaultView)
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_DEFAULT_VIEW_UNKNOWN",
+          "blocker",
+          `page ${page.id} defaultView ${page.defaultView} is not in views`,
+          page.defaultView
+        )
+      );
+    }
+    if (
+      (page.filterFields ?? []).some((field) => field === "keyword" || field === "search") &&
+      page.searchIdleTitle === undefined
+    ) {
+      issues.push(
+        issue(
+          "BRIEF_SEARCH_IDLE_MISSING",
+          "warning",
+          `search page ${page.id} has no idle title`,
+          page.id
+        )
+      );
+    }
     const missingLabels = (page.fields ?? []).filter(
       (field) => page.fieldLabels?.[field] === undefined
     );
