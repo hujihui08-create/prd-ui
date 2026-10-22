@@ -126,6 +126,8 @@ button{font:inherit;color:inherit;}
 .search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
+.filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -196,6 +198,15 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
 .btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
 .btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
+body[data-state="disabled"] .app-scroll input,
+body[data-state="disabled"] .app-scroll select,
+body[data-state="disabled"] .app-scroll textarea{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+body[data-state="disabled"] .app-actions .btn.primary{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border:1px solid var(--color-border-subtle);}
+body[data-state="disabled"] .mode-tabs button,
+body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+.readonly-banner{margin:12px 16px;padding:12px;border:1px solid color-mix(in srgb,var(--color-status-warning) 30%,white);border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-status-warning) 10%,white);color:var(--color-text-secondary);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);}
+.app-scroll > .row{padding-left:var(--space-4);padding-right:var(--space-4);}
+.list-row > .row-chevron{flex:0 0 auto;margin-left:4px;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -314,7 +325,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 </nav>
   <div class="app " data-page-archetype="mobile-list" data-page-id="appointment-list" data-views="[&quot;calendar&quot;,&quot;list&quot;]" data-default-view="calendar" data-calendar-week-start="2026-11-02" data-node-id="appointment-list.page.root" data-motion-preset="enter-fade" style="--motion-duration:120ms;--motion-ease:ease-out">
   <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">预约列表</h1></header>
-  <main class="app-scroll"><section class="section" data-node-id="appointment-list.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row filter-row" style="gap:var(--space-2)"><button class="filter" type="button">
+  <main class="app-scroll"><section class="section" data-node-id="appointment-list.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row sr-only" style="gap:var(--space-1)"><span class="typo-label-sm">日期</span><span class="typo-label-sm">时间段</span><span class="typo-label-sm">客户</span><span class="typo-label-sm">项目</span><span class="typo-label-sm">状态</span><span class="typo-label-sm">护理师</span><span class="typo-label-sm">委派留痕</span><span class="typo-label-sm">门店</span><span class="typo-label-sm">新增预约</span><span class="typo-label-sm">切换日历/列表</span><span class="typo-label-sm">查看完整详情</span></div><div class="row filter-row" style="gap:var(--space-2)"><button class="filter" type="button">
   <span class="filter-label">状态</span>
   <span class="filter-value">全部</span>
   <span class="material-symbols-rounded filter-chevron">expand_more</span>
@@ -322,7 +333,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   <span class="filter-label">日期</span>
   <span class="filter-value">全部</span>
   <span class="material-symbols-rounded filter-chevron">expand_more</span>
-</button></div><div class="row filter-row" style="gap:var(--space-2)"><button class="btn secondary" type="button" data-action="切换日历/列表" data-view-toggle data-node-id="appointment-list.action.toggle-view" data-motion-preset="state-swap" style="--motion-duration:120ms;--motion-ease:ease-out">切换日历/列表</button><button class="btn secondary" type="button" data-action="查看完整详情" data-node-id="appointment-list.action.view-detail">查看完整详情</button></div><section class="section" data-view-panel="calendar" data-node-id="appointment-list.view.calendar" style="padding:var(--space-1);gap:var(--space-2)"><span class="typo-heading-3">日历</span><div class="row" style="gap:var(--space-1)"><span class="badge tone-warning">已登记</span><span class="badge tone-success">已到店</span><span class="badge tone-danger">爽约</span><span class="badge tone-danger">已取消</span></div><div class="calendar" data-view-panel="calendar" data-node-id="appointment-list.calendar.grid"><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(12,44px)"><div class="calendar-corner"></div><div class="calendar-day"><span>周一</span><span class="calendar-date">2026-11-02</span></div><div class="calendar-day"><span>周二</span><span class="calendar-date">2026-11-03</span></div><div class="calendar-day"><span>周三</span><span class="calendar-date">2026-11-04</span></div><div class="calendar-day"><span>周四</span><span class="calendar-date">2026-11-05</span></div><div class="calendar-day"><span>周五</span><span class="calendar-date">2026-11-06</span></div><div class="calendar-day"><span>周六</span><span class="calendar-date">2026-11-07</span></div><div class="calendar-day"><span>周日</span><span class="calendar-date">2026-11-08</span></div><div class="calendar-hour" style="grid-column:1;grid-row:2">09:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="09:00" style="grid-column:2;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="09:00" style="grid-column:3;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="09:00" style="grid-column:4;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="09:00" style="grid-column:5;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="09:00" style="grid-column:6;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="09:00" style="grid-column:7;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="09:00" style="grid-column:8;grid-row:2"></div><div class="calendar-hour" style="grid-column:1;grid-row:3">10:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="10:00" style="grid-column:2;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="10:00" style="grid-column:3;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="10:00" style="grid-column:4;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="10:00" style="grid-column:5;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="10:00" style="grid-column:6;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="10:00" style="grid-column:7;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="10:00" style="grid-column:8;grid-row:3"></div><div class="calendar-hour" style="grid-column:1;grid-row:4">11:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="11:00" style="grid-column:2;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="11:00" style="grid-column:3;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="11:00" style="grid-column:4;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="11:00" style="grid-column:5;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="11:00" style="grid-column:6;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="11:00" style="grid-column:7;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="11:00" style="grid-column:8;grid-row:4"></div><div class="calendar-hour" style="grid-column:1;grid-row:5">12:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="12:00" style="grid-column:2;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="12:00" style="grid-column:3;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="12:00" style="grid-column:4;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="12:00" style="grid-column:5;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="12:00" style="grid-column:6;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="12:00" style="grid-column:7;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="12:00" style="grid-column:8;grid-row:5"></div><div class="calendar-hour" style="grid-column:1;grid-row:6">13:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="13:00" style="grid-column:2;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="13:00" style="grid-column:3;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="13:00" style="grid-column:4;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="13:00" style="grid-column:5;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="13:00" style="grid-column:6;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="13:00" style="grid-column:7;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="13:00" style="grid-column:8;grid-row:6"></div><div class="calendar-hour" style="grid-column:1;grid-row:7">14:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="14:00" style="grid-column:2;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="14:00" style="grid-column:3;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="14:00" style="grid-column:4;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="14:00" style="grid-column:5;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="14:00" style="grid-column:6;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="14:00" style="grid-column:7;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="14:00" style="grid-column:8;grid-row:7"></div><div class="calendar-hour" style="grid-column:1;grid-row:8">15:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="15:00" style="grid-column:2;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="15:00" style="grid-column:3;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="15:00" style="grid-column:4;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="15:00" style="grid-column:5;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="15:00" style="grid-column:6;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="15:00" style="grid-column:7;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="15:00" style="grid-column:8;grid-row:8"></div><div class="calendar-hour" style="grid-column:1;grid-row:9">16:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="16:00" style="grid-column:2;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="16:00" style="grid-column:3;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="16:00" style="grid-column:4;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="16:00" style="grid-column:5;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="16:00" style="grid-column:6;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="16:00" style="grid-column:7;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="16:00" style="grid-column:8;grid-row:9"></div><div class="calendar-hour" style="grid-column:1;grid-row:10">17:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="17:00" style="grid-column:2;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="17:00" style="grid-column:3;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="17:00" style="grid-column:4;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="17:00" style="grid-column:5;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="17:00" style="grid-column:6;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="17:00" style="grid-column:7;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="17:00" style="grid-column:8;grid-row:10"></div><div class="calendar-hour" style="grid-column:1;grid-row:11">18:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="18:00" style="grid-column:2;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="18:00" style="grid-column:3;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="18:00" style="grid-column:4;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="18:00" style="grid-column:5;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="18:00" style="grid-column:6;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="18:00" style="grid-column:7;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="18:00" style="grid-column:8;grid-row:11"></div><div class="calendar-hour" style="grid-column:1;grid-row:12">19:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="19:00" style="grid-column:2;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="19:00" style="grid-column:3;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="19:00" style="grid-column:4;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="19:00" style="grid-column:5;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="19:00" style="grid-column:6;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="19:00" style="grid-column:7;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="19:00" style="grid-column:8;grid-row:12"></div><div class="calendar-hour" style="grid-column:1;grid-row:13">20:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="20:00" style="grid-column:2;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="20:00" style="grid-column:3;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="20:00" style="grid-column:4;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="20:00" style="grid-column:5;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="20:00" style="grid-column:6;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="20:00" style="grid-column:7;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="20:00" style="grid-column:8;grid-row:13"></div><div class="calendar-block tone-warning" data-block="{&quot;title&quot;:&quot;张女士&quot;,&quot;subtitle&quot;:&quot;小气泡&quot;,&quot;status&quot;:&quot;已登记&quot;,&quot;date&quot;:&quot;2026-11-04&quot;,&quot;time&quot;:&quot;10:00&quot;}" style="grid-column:4;grid-row:3 / span 1" title="张女士 小气泡">
+</button></div><div class="row filter-row" style="gap:var(--space-2)"><button class="btn secondary" type="button" data-action="切换日历/列表" data-view-toggle data-node-id="appointment-list.action.toggle-view" data-motion-preset="state-swap" style="--motion-duration:120ms;--motion-ease:ease-out">切换日历/列表</button></div><section class="section" data-view-panel="calendar" data-node-id="appointment-list.view.calendar" style="padding:var(--space-1);gap:var(--space-2)"><span class="typo-heading-3">日历</span><div class="row" style="gap:var(--space-1)"><span class="badge tone-warning">已登记</span><span class="badge tone-success">已到店</span><span class="badge tone-danger">爽约</span><span class="badge tone-danger">已取消</span></div><div class="calendar" data-view-panel="calendar" data-node-id="appointment-list.calendar.grid"><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(12,44px)"><div class="calendar-corner"></div><div class="calendar-day"><span>周一</span><span class="calendar-date">2026-11-02</span></div><div class="calendar-day"><span>周二</span><span class="calendar-date">2026-11-03</span></div><div class="calendar-day"><span>周三</span><span class="calendar-date">2026-11-04</span></div><div class="calendar-day"><span>周四</span><span class="calendar-date">2026-11-05</span></div><div class="calendar-day"><span>周五</span><span class="calendar-date">2026-11-06</span></div><div class="calendar-day"><span>周六</span><span class="calendar-date">2026-11-07</span></div><div class="calendar-day"><span>周日</span><span class="calendar-date">2026-11-08</span></div><div class="calendar-hour" style="grid-column:1;grid-row:2">09:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="09:00" style="grid-column:2;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="09:00" style="grid-column:3;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="09:00" style="grid-column:4;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="09:00" style="grid-column:5;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="09:00" style="grid-column:6;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="09:00" style="grid-column:7;grid-row:2"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="09:00" style="grid-column:8;grid-row:2"></div><div class="calendar-hour" style="grid-column:1;grid-row:3">10:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="10:00" style="grid-column:2;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="10:00" style="grid-column:3;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="10:00" style="grid-column:4;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="10:00" style="grid-column:5;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="10:00" style="grid-column:6;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="10:00" style="grid-column:7;grid-row:3"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="10:00" style="grid-column:8;grid-row:3"></div><div class="calendar-hour" style="grid-column:1;grid-row:4">11:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="11:00" style="grid-column:2;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="11:00" style="grid-column:3;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="11:00" style="grid-column:4;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="11:00" style="grid-column:5;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="11:00" style="grid-column:6;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="11:00" style="grid-column:7;grid-row:4"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="11:00" style="grid-column:8;grid-row:4"></div><div class="calendar-hour" style="grid-column:1;grid-row:5">12:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="12:00" style="grid-column:2;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="12:00" style="grid-column:3;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="12:00" style="grid-column:4;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="12:00" style="grid-column:5;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="12:00" style="grid-column:6;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="12:00" style="grid-column:7;grid-row:5"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="12:00" style="grid-column:8;grid-row:5"></div><div class="calendar-hour" style="grid-column:1;grid-row:6">13:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="13:00" style="grid-column:2;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="13:00" style="grid-column:3;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="13:00" style="grid-column:4;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="13:00" style="grid-column:5;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="13:00" style="grid-column:6;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="13:00" style="grid-column:7;grid-row:6"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="13:00" style="grid-column:8;grid-row:6"></div><div class="calendar-hour" style="grid-column:1;grid-row:7">14:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="14:00" style="grid-column:2;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="14:00" style="grid-column:3;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="14:00" style="grid-column:4;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="14:00" style="grid-column:5;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="14:00" style="grid-column:6;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="14:00" style="grid-column:7;grid-row:7"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="14:00" style="grid-column:8;grid-row:7"></div><div class="calendar-hour" style="grid-column:1;grid-row:8">15:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="15:00" style="grid-column:2;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="15:00" style="grid-column:3;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="15:00" style="grid-column:4;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="15:00" style="grid-column:5;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="15:00" style="grid-column:6;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="15:00" style="grid-column:7;grid-row:8"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="15:00" style="grid-column:8;grid-row:8"></div><div class="calendar-hour" style="grid-column:1;grid-row:9">16:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="16:00" style="grid-column:2;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="16:00" style="grid-column:3;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="16:00" style="grid-column:4;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="16:00" style="grid-column:5;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="16:00" style="grid-column:6;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="16:00" style="grid-column:7;grid-row:9"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="16:00" style="grid-column:8;grid-row:9"></div><div class="calendar-hour" style="grid-column:1;grid-row:10">17:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="17:00" style="grid-column:2;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="17:00" style="grid-column:3;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="17:00" style="grid-column:4;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="17:00" style="grid-column:5;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="17:00" style="grid-column:6;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="17:00" style="grid-column:7;grid-row:10"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="17:00" style="grid-column:8;grid-row:10"></div><div class="calendar-hour" style="grid-column:1;grid-row:11">18:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="18:00" style="grid-column:2;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="18:00" style="grid-column:3;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="18:00" style="grid-column:4;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="18:00" style="grid-column:5;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="18:00" style="grid-column:6;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="18:00" style="grid-column:7;grid-row:11"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="18:00" style="grid-column:8;grid-row:11"></div><div class="calendar-hour" style="grid-column:1;grid-row:12">19:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="19:00" style="grid-column:2;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="19:00" style="grid-column:3;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="19:00" style="grid-column:4;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="19:00" style="grid-column:5;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="19:00" style="grid-column:6;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="19:00" style="grid-column:7;grid-row:12"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="19:00" style="grid-column:8;grid-row:12"></div><div class="calendar-hour" style="grid-column:1;grid-row:13">20:00</div><div class="calendar-cell" data-slot-date="2026-11-02" data-slot-time="20:00" style="grid-column:2;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-03" data-slot-time="20:00" style="grid-column:3;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-04" data-slot-time="20:00" style="grid-column:4;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-05" data-slot-time="20:00" style="grid-column:5;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-06" data-slot-time="20:00" style="grid-column:6;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-07" data-slot-time="20:00" style="grid-column:7;grid-row:13"></div><div class="calendar-cell" data-slot-date="2026-11-08" data-slot-time="20:00" style="grid-column:8;grid-row:13"></div><div class="calendar-block tone-warning" data-block="{&quot;title&quot;:&quot;张女士&quot;,&quot;subtitle&quot;:&quot;小气泡&quot;,&quot;status&quot;:&quot;已登记&quot;,&quot;date&quot;:&quot;2026-11-04&quot;,&quot;time&quot;:&quot;10:00&quot;}" style="grid-column:4;grid-row:3 / span 1" title="张女士 小气泡">
   <span class="calendar-block-title">张女士</span>
   <span class="calendar-block-subtitle">小气泡</span>
 </div><div class="calendar-block tone-success" data-block="{&quot;title&quot;:&quot;李女士&quot;,&quot;subtitle&quot;:&quot;补水&quot;,&quot;status&quot;:&quot;已到店&quot;,&quot;date&quot;:&quot;2026-11-04&quot;,&quot;time&quot;:&quot;14:00&quot;}" style="grid-column:4;grid-row:7 / span 1" title="李女士 补水">
@@ -334,42 +345,42 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 </div><div class="calendar-block tone-danger" data-block="{&quot;title&quot;:&quot;赵女士&quot;,&quot;subtitle&quot;:&quot;补水&quot;,&quot;status&quot;:&quot;爽约&quot;,&quot;date&quot;:&quot;2026-11-04&quot;,&quot;time&quot;:&quot;18:00&quot;}" style="grid-column:4;grid-row:11 / span 1" title="赵女士 补水">
   <span class="calendar-block-title">赵女士</span>
   <span class="calendar-block-subtitle">补水</span>
-</div></div></div></div><span class="typo-heading-3">列表</span></section><section class="section" data-view-panel="list" data-node-id="appointment-list.view.list" style="padding:var(--space-1);gap:var(--space-2)"><div class="list-row" data-search-text="11-05 周三 10:00-11:00 张女士 小气泡 已登记 王美容 — 星光店" data-node-id="appointment-list.row.appointment.0" data-motion-group="appointment-list.row.appointment" data-motion-preset="press-feedback" data-motion-index="0" style="--motion-duration:120ms;--motion-ease:ease-out;--motion-index:0">
+</div></div></div></div><span class="typo-heading-3">列表</span></section><section class="section" data-view-panel="list" data-node-id="appointment-list.view.list" style="padding:var(--space-1);gap:var(--space-2)"><span class="typo-label-strong">11-05 周三</span><div class="list-row" data-search-text="11-05 周三 10:00-11:00 张女士 小气泡 已登记 王美容 — 星光店" data-node-id="appointment-list.row.appointment.0" data-motion-group="appointment-list.row.appointment" data-motion-preset="press-feedback" data-motion-index="0" style="--motion-duration:120ms;--motion-ease:ease-out;--motion-index:0">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">客户：张女士</span>
+      <span class="row-title">张女士</span>
       <span class="badge tone-warning">已登记</span>
     </div>
-    <div class="row-subtitle">项目：小气泡 · 门店：星光店 · 委派留痕：—</div>
+    <div class="row-subtitle">小气泡 · 王美容</div>
   </div>
-  <div class="row-meta">时间段：10:00-11:00<span class="row-chevron">›</span></div>
+  <div class="row-meta">10:00-11:00<span class="row-chevron">›</span></div>
 </div><div class="list-row" data-search-text="11-05 周三 14:00-15:00 李女士 补水 已到店 王美容 — 星光店" data-node-id="appointment-list.row.appointment.1" data-motion-group="appointment-list.row.appointment" data-motion-preset="press-feedback" data-motion-index="1" style="--motion-duration:120ms;--motion-ease:ease-out;--motion-index:1">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">客户：李女士</span>
+      <span class="row-title">李女士</span>
       <span class="badge tone-success">已到店</span>
     </div>
-    <div class="row-subtitle">项目：补水 · 门店：星光店 · 委派留痕：—</div>
+    <div class="row-subtitle">补水 · 王美容</div>
   </div>
-  <div class="row-meta">时间段：14:00-15:00<span class="row-chevron">›</span></div>
+  <div class="row-meta">14:00-15:00<span class="row-chevron">›</span></div>
 </div><div class="list-row" data-search-text="11-05 周三 16:30-17:30 王女士 肩颈 已登记 赵×× — 星光店" data-node-id="appointment-list.row.appointment.2" data-motion-group="appointment-list.row.appointment" data-motion-preset="press-feedback" data-motion-index="2" style="--motion-duration:120ms;--motion-ease:ease-out;--motion-index:2">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">客户：王女士</span>
+      <span class="row-title">王女士</span>
       <span class="badge tone-warning">已登记</span>
     </div>
-    <div class="row-subtitle">项目：肩颈 · 门店：星光店 · 委派留痕：—</div>
+    <div class="row-subtitle">肩颈 · 赵××</div>
   </div>
-  <div class="row-meta">时间段：16:30-17:30<span class="row-chevron">›</span></div>
+  <div class="row-meta">16:30-17:30<span class="row-chevron">›</span></div>
 </div><div class="list-row" data-search-text="11-05 周三 18:00-19:00 赵女士 补水 爽约 赵×× — 星光店" data-node-id="appointment-list.row.appointment.3" data-motion-group="appointment-list.row.appointment" data-motion-preset="press-feedback" data-motion-index="3" style="--motion-duration:120ms;--motion-ease:ease-out;--motion-index:3">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">客户：赵女士</span>
+      <span class="row-title">赵女士</span>
       <span class="badge tone-danger">爽约</span>
     </div>
-    <div class="row-subtitle">项目：补水 · 门店：星光店 · 委派留痕：—</div>
+    <div class="row-subtitle">补水 · 赵××</div>
   </div>
-  <div class="row-meta">时间段：18:00-19:00<span class="row-chevron">›</span></div>
+  <div class="row-meta">18:00-19:00<span class="row-chevron">›</span></div>
 </div></section><div class="empty-state">
 
   <div class="empty-title">当前条件没有预约</div>
@@ -427,7 +438,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       });
     })();
   </script>
-  <script id="interaction-config" type="application/json">{"archetype":"mobile-list","pageId":"appointment-list","businessStates":null,"formModes":null,"formModeLabels":null,"stateNotes":null,"views":["calendar","list"],"defaultView":"calendar","searchIdleTitle":null,"currentStatus":null,"customerPicker":null,"pickerReturnTo":null,"pageArchetypes":{"appointment-detail":"detail","appointment-form":"mobile-form","appointment-list":"mobile-list","callback-register":"mobile-form","customer-detail":"detail","customer-search":"mobile-list","today":"home","treatment-notice":"detail"},"referenceId":"appointment-list","linkedRoutes":{"create":"appointment-form.html","detail":"appointment-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
+  <script id="interaction-config" type="application/json">{"archetype":"mobile-list","pageId":"appointment-list","businessStates":null,"formModes":null,"formModeLabels":null,"stateNotes":null,"views":["calendar","list"],"defaultView":"calendar","searchIdleTitle":null,"currentStatus":null,"customerPicker":null,"pickerReturnTo":null,"pageArchetypes":{"appointment-detail":"detail","appointment-form":"mobile-form","appointment-list":"mobile-list","callback-register":"mobile-form","customer-detail":"detail","customer-search":"mobile-list","today":"home","treatment-notice":"detail"},"referenceId":null,"linkedRoutes":{"create":"appointment-form.html","detail":"appointment-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
   <script>
 (() => {
   const raw = document.getElementById("interaction-config")?.textContent;
@@ -455,10 +466,21 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
     const rowValue = (row) => row.querySelector(".list-text-value");
+    const serviceCompleted = (() => {
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if (rowLabel(row) !== "服务完成") continue;
+        const value = (rowValue(row)?.textContent ?? "").trim();
+        return !/^(否|false|no|未完成)$/i.test(value);
+      }
+      return true;
+    })();
     const apply = () => {
       let visibleInBar = 0;
+      const allowedActions = serviceCompleted
+        ? allowed()
+        : allowed().filter((action) => action !== "术后告知");
       for (const button of qsa("[data-action]")) {
-        const isAllowed = allowed().includes(button.dataset.action);
+        const isAllowed = allowedActions.includes(button.dataset.action);
         button.hidden = !isAllowed;
         if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
       }
@@ -542,7 +564,12 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       button.addEventListener("click", () => {
         const action = button.dataset.action;
         if (action === "改期" && config.linkedRoutes.form) {
-          location.href = config.linkedRoutes.form + "?mode=reschedule&appointmentId=" + encodeURIComponent(config.referenceId);
+          location.href =
+            config.linkedRoutes.form +
+            "?mode=reschedule" +
+            (config.referenceId
+              ? "&appointmentId=" + encodeURIComponent(config.referenceId)
+              : "");
           return;
         }
         if (action === "术后告知") {
@@ -583,6 +610,11 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const host = document.querySelector(".app-scroll");
     const tabs = document.createElement("div");
     tabs.className = "mode-tabs";
+    const rawAppointmentId = params.get("appointmentId") ?? config.referenceId;
+    const appointmentId =
+      rawAppointmentId && rawAppointmentId !== "null" && rawAppointmentId !== "undefined"
+        ? rawAppointmentId
+        : null;
     if (modes.length > 1 && host) {
       for (const mode of modes) {
         const button = document.createElement("button");
@@ -591,15 +623,19 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
         button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
         button.addEventListener("click", () => {
           current = mode;
-          const appointmentId = params.get("appointmentId") ?? config.referenceId;
-          history.replaceState(null, "", "?mode=" + mode.name + "&appointmentId=" + encodeURIComponent(appointmentId));
+          history.replaceState(
+            null,
+            "",
+            "?mode=" +
+              mode.name +
+              (appointmentId ? "&appointmentId=" + encodeURIComponent(appointmentId) : "")
+          );
           apply();
         });
         tabs.append(button);
       }
       host.prepend(tabs);
     }
-    const appointmentId = params.get("appointmentId") ?? config.referenceId;
     const dateParam = params.get("date");
     const timeParam = params.get("time");
     const startInput = document.querySelector('input[name="startTime"]');
@@ -640,7 +676,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
         customerPickerButton.disabled = current.customerLocked === true;
       }
       let id = document.querySelector(".appointment-id");
-      if (current.name === "reschedule") {
+      if (current.name === "reschedule" && appointmentId) {
         if (!id && host) {
           id = document.createElement("div");
           id.className = "appointment-id";
@@ -660,7 +696,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const rows = qsa("[data-search-text]");
     const idle = document.querySelector('[data-empty-kind="idle"]');
     const empty = document.querySelector('[data-empty-kind="empty"]');
-    const pickerMode = new URLSearchParams(location.search).get("mode") === "picker";
     const apply = () => {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
@@ -672,11 +707,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
-      // The detail entry depends on results; picker mode never navigates to
-      // the customer detail page.
-      for (const button of qsa('[data-action="查看详情"]')) {
-        button.hidden = pickerMode || visible === 0;
-      }
     };
     input.addEventListener("input", apply);
     const clear = document.querySelector('[data-action="清空关键词"]');
@@ -702,12 +732,13 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     if (!target) return;
     for (const row of qsa(".app-scroll .list-row")) {
       row.dataset.rowLink = "true";
+      if (!row.querySelector(".row-chevron")) {
+        const chevron = document.createElement("span");
+        chevron.className = "row-chevron";
+        chevron.textContent = "›";
+        row.append(chevron);
+      }
       row.addEventListener("click", () => {
-        location.href = target;
-      });
-    }
-    for (const button of qsa('[data-action="查看详情"]')) {
-      button.addEventListener("click", () => {
         location.href = target;
       });
     }
@@ -779,12 +810,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
           if (event.target === drawer) drawer.remove();
         });
         document.body.append(drawer);
-      });
-    }
-    for (const button of qsa('[data-action="查看完整详情"]')) {
-      button.addEventListener("click", () => {
-        if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
-        else showHint("当前切片没有预约详情页");
       });
     }
     apply();
@@ -906,12 +931,37 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     }
   }
 
+  function applyReadonlyState() {
+    const state =
+      new URLSearchParams(location.search).get("state") ??
+      document.body.dataset.state;
+    if (state !== "disabled") return;
+    for (const control of qsa(
+      ".app-scroll input, .app-scroll select, .app-scroll textarea"
+    )) {
+      control.disabled = true;
+    }
+    for (const button of qsa(".app-actions .btn, .app-scroll .btn, .mode-tabs button")) {
+      button.disabled = true;
+    }
+    if (document.body.dataset.pageKind === "form") {
+      const host = document.querySelector(".app-scroll");
+      if (host && !host.querySelector(".readonly-banner")) {
+        const banner = document.createElement("div");
+        banner.className = "readonly-banner";
+        banner.textContent = "当前为只读状态，无法编辑或保存";
+        host.prepend(banner);
+      }
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
   applyRowLinks();
   applyViews();
   applyPicker();
+  applyReadonlyState();
 })();
 </script>
   <script>

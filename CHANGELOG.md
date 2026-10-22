@@ -39,20 +39,26 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verification
 
-- `pnpm test`: 632 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
+- `pnpm test`: 636 passing; `pnpm typecheck`: clean; `pnpm test:dsh`: 4 passed
   (including the visual-critic mock and hardened profile tool list).
-- Spec Engineer `--strict-motion` `run-2026-10-22T10-22-51-461Z`: 8 Page Specs,
+- Spec Engineer `--strict-motion` `run-2026-10-22T11-15-21-596Z`: 8 Page Specs,
   8 motion pages, 0 blockers, 2 unused-asset warnings, 0
   `SPEC_MOTION_NODE_UNRESOLVED`.
 - `render:html`: 8 pages + index; motion, picker, full-date, and
   `datetime-local` attributes present.
 - Baseline: `pipeline/baselines/employee-app-phase2`, 24 cases / 24 PNG,
-  manifest `sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184`.
-- Final real-dsh visual review `run-2026-10-22T10-42-23-082Z`:
-  `status=passed`, 24/24 screenshots, 0 console / 0 overflow, diff 24 passed /
-  0 failed / 0 missing, 10 findings (7 major / 3 minor / 0 blocker),
-  `usageComplete=true`, ¥0.2939536224; signed by `Sample Reviewer`, `waivers=[]`,
-  findings hash `sha256:55335024…fbccb1`.
+  manifest `sha256:4f43b2f39589b777366573918dd931fb3ce12854e39a4d2e4561c866a6158b0b`.
+- Initial real-dsh visual review `run-2026-10-22T10-42-23-082Z` was signed
+  (`passed`), then superseded by the concrete-major follow-up below.
+- Follow-up fixes (debug route chip, disabled styling, duplicate check-in,
+  premature notice, search/list CTAs, row density, action row, notice label,
+  status tones) were implemented and re-rendered.
+- Final follow-up real-dsh review `run-2026-10-22T11-23-22-756Z`:
+  `status=awaiting_signoff`, 24/24 screenshots, 0 console / 0 overflow,
+  diff 24/0/0, 10 findings (5 major / 5 minor / 0 blocker), `usageComplete=true`,
+  ¥0.3287296224. It is **not signed**: the 5 new majors (mode pills, calendar
+  orientation, loading/empty calendar structure, reschedule context) need a
+  design decision.
 - Playwright: picker select/cancel/reload, calendar full-date prefill, tabs,
   search idle/empty/results, detail/notice dedupe, calendar legend + horizontal
   scroll, reschedule lock, reduced-motion fallback.

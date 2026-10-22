@@ -79,7 +79,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 632 tests passing, `pnpm test:dsh` 4 passed,
+Current expected evidence: 636 tests passing, `pnpm test:dsh` 4 passed,
 typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
 `13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
 real dsh `deepseek-flash` `13 assets / 13 passed` with
@@ -134,16 +134,16 @@ sample: prompt contains b-dense + c-expressive, interaction passed (¥0.5105).
 Asset chain: 4 standard briefs, `asset:review --briefs` 4/4 passed. v0.4 completed the motion HTML, Visual Critic, screenshot diff, customer
 picker, and full-date prefill work: Spec Engineer `--strict-motion` gives 8
 Page Specs / 0 blockers / 0 motion unresolved, baseline is 24 cases, and the
-final real-dsh review is `status=passed` with 24/24 screenshots, 0 console /
-0 overflow / 0 diff failures, 10 findings (7 major / 3 minor / 0 blocker),
-¥0.2939536224, signed with `waivers=[]`. The first 8-page critic attempt timed
-out at 32768 maxTokens / 300s (¥0.9835, usage incomplete), so the visual
-profile now uses 65536 maxTokens and `visual:review` defaults to a 900000ms
-critic timeout; total v0.4 critic spend is ¥1.6415. Remaining visual debt is
-the critic's 7 majors (disabled styling, reschedule debug chip, duplicate
-check-in CTAs, premature notice action, search/list row affordances, calendar
-loading/empty structure), plus deterministic critic replay, Studio/Asset
-Compiler, Figma, and full a11y in Phase 3/4.
+follow-up concrete-major fixes (debug route chip, disabled styling, duplicate
+check-in, premature notice, search/list CTAs, list row density, read-only action
+row, notice label, status tones) are implemented. The final real-dsh review is
+`status=awaiting_signoff` with 24/24 screenshots, 0 console / 0 overflow /
+0 diff failures, 10 findings (5 major / 5 minor / 0 blocker), ¥0.3287296224;
+it is **not signed** because 5 new structural majors (mode pills, calendar
+orientation, loading/empty calendar structure, reschedule context) need a design
+decision. The earlier signed `passed` run is superseded. Failure attempts
+(console-error, max-tokens) and costs are recorded; deterministic critic replay
+and Phase 3/4 work remain.
 
 ## Architecture boundaries
 

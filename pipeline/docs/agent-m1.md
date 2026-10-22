@@ -246,9 +246,10 @@ Visual Style：`VISUAL_PALETTE_EMPTY`、`VISUAL_TYPOGRAPHY_EMPTY`、`VISUAL_ASSE
   `grep`；无 write/edit/bash/workflow/subagent/web；`maxTokens=65536`）。
   `visual:review` 的 critic 超时默认 900000ms，`--max-cost-cny 3`，
   usage fail-closed，一次 schema repair。
-- 真实 8 页 run：`run-2026-10-22T10-42-23-082Z`，24 张截图、0 console /
-  0 overflow / diff 24/0/0、10 findings（7 major / 3 minor / 0 blocker）、
-  `usageComplete=true`、¥0.2939536224；签核后 `visual-review.json.status=passed`。
+- 真实 8 页 run（concrete-major 修复后）：`run-2026-10-22T11-23-22-756Z`，
+  24 张截图、0 console / 0 overflow / diff 24/0/0、10 findings（5 major /
+  5 minor / 0 blocker）、`usageComplete=true`、¥0.3287296224；
+  `status=awaiting_signoff`，未签核，5 个新结构 major 待设计决策。
 - 采样波动：首次 run 12 findings，签核后重跑得到另一组 10 findings；最终 run
   以自身 findings 签核。确定性 findings replay 尚未实现。
 

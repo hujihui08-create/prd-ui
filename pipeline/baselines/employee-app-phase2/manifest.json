@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T10:24:06.050Z",
+  "generatedAt": "2026-10-22T11:31:17.793Z",
   "cases": [
     {
       "id": "today.default",
@@ -12,7 +12,7 @@
         "height": 844
       },
       "file": "today.default.png",
-      "sha256": "sha256:c45af92c4a79c19f55f2bf864bfd585a24b9e26117237ef79fb76397c5badc0d"
+      "sha256": "sha256:6f6e17d64ce660f3e4d9056a055b654a73e2aabcbe827535d716ac0c6e182b8c"
     },
     {
       "id": "today.state.empty",
@@ -48,7 +48,7 @@
         "height": 844
       },
       "file": "customer-search.search.results.png",
-      "sha256": "sha256:7fe9abf1193dca854dcc7668e79c1f5e6d03a3578e09ba24f4f98be364db9bdf"
+      "sha256": "sha256:9cb7b97ea7203d3f8fff7d1c749233d7dc9de99d9e931ab990a2eb14be88624f"
     },
     {
       "id": "customer-search.search.empty",
@@ -59,7 +59,7 @@
         "height": 844
       },
       "file": "customer-search.search.empty.png",
-      "sha256": "sha256:f5ec7100a9c641c1e35c2017ffbba57521ddf09eea4f556675bbb164b7b4a4c7"
+      "sha256": "sha256:ebd0b21cef4dd05443ca60f49db2094c488e24d044334b890f2daddde045e395"
     },
     {
       "id": "customer-detail.default",
@@ -70,7 +70,7 @@
         "height": 844
       },
       "file": "customer-detail.default.png",
-      "sha256": "sha256:2e66f32f1656318c36b98a863a2b1e335035e79e99a0da519b88f3f55d45e6ff"
+      "sha256": "sha256:48b7923b70998631575791a50fa48525748416ea7df77359303651acd62f3a53"
     },
     {
       "id": "appointment-detail.default",
@@ -81,7 +81,7 @@
         "height": 844
       },
       "file": "appointment-detail.default.png",
-      "sha256": "sha256:6be3356c6af54a22ab8d13d9fc4f0ff8c072a6401b1b15a7bc4ddaa2bfbd0368"
+      "sha256": "sha256:77898a3a83eca12c8fa904ab7af296aa8040e301a0f276fda6a52b420b600d39"
     },
     {
       "id": "appointment-detail.state.loading",
@@ -123,7 +123,7 @@
         "height": 844
       },
       "file": "appointment-detail.business.已到店.png",
-      "sha256": "sha256:43803c71dda252d6a90fd51f43f6fe2d1c36bd9224944b86c9324ff925b6acd7"
+      "sha256": "sha256:0603f28b3250e14af89716fa560c08f1c0159f8212101182c0a572c97d1a1db3"
     },
     {
       "id": "appointment-detail.business.爽约",
@@ -137,7 +137,7 @@
         "height": 844
       },
       "file": "appointment-detail.business.爽约.png",
-      "sha256": "sha256:7679d3c6d11a55fcc92ec2ce5282348167086a4143943bf6061f33694719d6b9"
+      "sha256": "sha256:a750d2bb5e98731cd54705feb11d13072b118e13f346f4fb8e33a5f3190bce0f"
     },
     {
       "id": "appointment-detail.business.已取消",
@@ -151,7 +151,7 @@
         "height": 844
       },
       "file": "appointment-detail.business.已取消.png",
-      "sha256": "sha256:307d5fb2e1b12f54d64b9da3be7c919354a075f57a7780423b1ecf0a0f1a202f"
+      "sha256": "sha256:5daf520829d380eecbaf3f536ddf8a48389556950fc3adf6958b40ddc1cb91b1"
     },
     {
       "id": "appointment-form.default",
@@ -162,7 +162,7 @@
         "height": 844
       },
       "file": "appointment-form.default.png",
-      "sha256": "sha256:1e391a87492e67e689de4aaaf5d8efe0efb9f230e905dab305d6b978f78e9b83"
+      "sha256": "sha256:dc0886caac657a3b9a4860eb53683e4af55e0b6115215dfb8244284e32c059bb"
     },
     {
       "id": "appointment-form.state.disabled",
@@ -176,7 +176,7 @@
         "height": 844
       },
       "file": "appointment-form.state.disabled.png",
-      "sha256": "sha256:1e391a87492e67e689de4aaaf5d8efe0efb9f230e905dab305d6b978f78e9b83"
+      "sha256": "sha256:be65900ddc944b47169a9a5b7ed5ee24dd7330a89faf59c5096a744c4319a65f"
     },
     {
       "id": "appointment-form.mode.reschedule",
@@ -190,7 +190,7 @@
         "height": 844
       },
       "file": "appointment-form.mode.reschedule.png",
-      "sha256": "sha256:a7c208598b88a698fb0464525145c52985bd5939a7142b41d72c68b743dc76fe"
+      "sha256": "sha256:1e2e1ef442d3360b539fd820dc1ab060199d8c6312befd9a4f8d5fc7753b17bc"
     },
     {
       "id": "treatment-notice.default",
@@ -201,7 +201,7 @@
         "height": 844
       },
       "file": "treatment-notice.default.png",
-      "sha256": "sha256:1e6a8d0f064ce930a2e690feba40149e7b11f33e69a6adc0ae637eb4c84cb4c6"
+      "sha256": "sha256:dd31a154b14b38e0500fe7dabe049daf3e1812d9f5cd75929f7151bbcce56211"
     },
     {
       "id": "treatment-notice.business.已确认",
@@ -215,7 +215,7 @@
         "height": 844
       },
       "file": "treatment-notice.business.已确认.png",
-      "sha256": "sha256:a97828ba61c9bfbc3a0098cf502f0207d3bd129fddce766f51a383c9dae2cdec"
+      "sha256": "sha256:ab76a04020768cbb6bd7f2bf93abef3d1270b6115f511d513033f05cdf98a53d"
     },
     {
       "id": "appointment-list.default",
@@ -226,7 +226,7 @@
         "height": 844
       },
       "file": "appointment-list.default.png",
-      "sha256": "sha256:b1f13e2a7d5465be77ed324d6cfa0d8d96a7c89033e59d9a0e97b139f247d4ea"
+      "sha256": "sha256:c2b7aef33c3bbfedea74ec275577353c5402bf82ffe06493f192b1c7651afb60"
     },
     {
       "id": "appointment-list.state.loading",
@@ -268,7 +268,7 @@
         "height": 844
       },
       "file": "appointment-list.state.empty.png",
-      "sha256": "sha256:bff6bd6e79d21a0d385c795e01ab355393acca9e87ad43d623cb9d3b409779bd"
+      "sha256": "sha256:ed5d4f20c01343dcaa0ef450a98fb5637883df95b6fc464a26e91e045349d82e"
     },
     {
       "id": "appointment-list.view.list",
@@ -282,7 +282,7 @@
         "height": 844
       },
       "file": "appointment-list.view.list.png",
-      "sha256": "sha256:54b3c95c1aa703111f267ee8d5bc5a034de50b44e8e184bba92488d5204028bf"
+      "sha256": "sha256:aa83bd3554fe880850ba040fc69dc09fbe730ea7cbca69b46aeb03b1b307e4dd"
     },
     {
       "id": "appointment-list.drawer",
@@ -296,7 +296,7 @@
         "height": 844
       },
       "file": "appointment-list.drawer.png",
-      "sha256": "sha256:94f9156688aab25ba55bee02e05f4346805c060673e70cfc12a4296fd3909d35"
+      "sha256": "sha256:ad830a125257b2b17421037bd1fb7677a7d8717ec3c7c9ba328fe38cde2c93df"
     },
     {
       "id": "callback-register.default",
@@ -307,7 +307,7 @@
         "height": 844
       },
       "file": "callback-register.default.png",
-      "sha256": "sha256:2c20e1e7611cb82c31d9ed6d04bcd37f9f1bb4394a7389d7b95559119eb1555a"
+      "sha256": "sha256:62f1e7562cbcadfb1765188b13bd9be49d630b4f12f523304287b6be7950a586"
     }
   ]
 }

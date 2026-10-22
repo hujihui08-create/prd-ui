@@ -1,8 +1,11 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "checkedAt": "2026-10-22T10:35:00.000Z",
-  "viewport": { "width": 390, "height": 844 },
+  "checkedAt": "2026-10-22T11:30:00.000Z",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
   "checks": [
     {
       "id": "picker.select",
@@ -15,8 +18,6 @@
       "observed": {
         "customer": "张女士",
         "project": "肩颈理疗",
-        "startTime": "2026-11-03T10:00",
-        "endTime": "2026-11-03T11:00",
         "therapist": "王芳"
       }
     },
@@ -28,7 +29,11 @@
         "click 选择 -> picker -> click back arrow",
         "reload appointment-form.html"
       ],
-      "observed": { "customer": "李四", "project": "补水", "therapist": "王芳" }
+      "observed": {
+        "customer": "李四",
+        "project": "补水",
+        "therapist": "王芳"
+      }
     },
     {
       "id": "calendar.empty-cell-prefill",
@@ -47,7 +52,13 @@
     {
       "id": "today.tabs",
       "status": "passed",
-      "observed": { "tabs": ["今日", "预约列表"], "active": "今日" }
+      "observed": {
+        "tabs": [
+          "今日",
+          "预约列表"
+        ],
+        "active": "今日"
+      }
     },
     {
       "id": "customer-search.idle-empty-results",
@@ -65,9 +76,22 @@
       "id": "detail-and-notice-dedupe",
       "status": "passed",
       "observed": {
-        "appointmentDetail": { "customer": 1, "phone": 1, "statusBadges": 1 },
-        "treatmentNotice": { "customer": 1, "statusBadges": 1, "rawStatusText": false },
-        "customerDetail": { "name": 1, "phone": 1 }
+        "appointmentDetail": {
+          "customer": 1,
+          "phone": 1,
+          "statusBadges": 1,
+          "checkinButtons": 1,
+          "noticeButton": false
+        },
+        "treatmentNotice": {
+          "customer": 1,
+          "statusBadges": 1,
+          "visibleNoticeBlockLabel": false
+        },
+        "customerDetail": {
+          "name": 1,
+          "phone": 1
+        }
       }
     },
     {
@@ -75,15 +99,43 @@
       "status": "passed",
       "observed": {
         "fieldCaptionRow": false,
-        "calendarLegend": ["已登记", "已到店", "爽约", "已取消"],
-        "calendarScroll": { "scrollWidth": 720, "clientWidth": 350, "overflowX": "auto" },
-        "fullDates": ["2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08"]
+        "calendarLegend": [
+          "已登记",
+          "已到店",
+          "爽约",
+          "已取消"
+        ],
+        "calendarScroll": {
+          "scrollWidth": 720,
+          "clientWidth": 350,
+          "overflowX": "auto"
+        },
+        "fullDates": [
+          "2026-11-02",
+          "2026-11-03",
+          "2026-11-04",
+          "2026-11-05",
+          "2026-11-06",
+          "2026-11-07",
+          "2026-11-08"
+        ],
+        "dateHeader": "11-05 周三",
+        "pageDetailCta": false,
+        "rows": [
+          "张女士 已登记 小气泡 · 王美容 10:00-11:00",
+          "李女士 已到店 补水 · 王美容 14:00-15:00"
+        ]
       }
     },
     {
       "id": "reschedule-mode",
       "status": "passed",
-      "observed": { "customerDisabled": true, "pickerDisabled": true, "cta": "保存改期" }
+      "observed": {
+        "customerDisabled": true,
+        "pickerDisabled": true,
+        "cta": "保存改期",
+        "debugChip": false
+      }
     },
     {
       "id": "motion",
@@ -93,6 +145,17 @@
         "rootAnimation": "motion-enter-fade",
         "reducedMotionFallback": "fade",
         "reducedMotionAnimation": "motion-state-swap"
+      }
+    },
+    {
+      "id": "disabled-state",
+      "status": "passed",
+      "observed": {
+        "banner": "当前为只读状态，无法编辑或保存",
+        "inputsDisabled": true,
+        "pickerDisabled": true,
+        "modeTabsDisabled": true,
+        "saveDisabled": true
       }
     }
   ]

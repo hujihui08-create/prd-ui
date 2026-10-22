@@ -551,7 +551,12 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Row": {
       const gap = str(props.gap);
       const variant = str(props.variant);
-      const variantClass = variant === "filter" ? " filter-row" : "";
+      const variantClass =
+        variant === "filter"
+          ? " filter-row"
+          : variant === "sr-only"
+            ? " sr-only"
+            : "";
       return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
     }
     case "Stack":
@@ -868,6 +873,8 @@ ${typeClasses(profile)}
 .search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
+.filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -938,6 +945,15 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
 .btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
 .btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
+body[data-state="disabled"] .app-scroll input,
+body[data-state="disabled"] .app-scroll select,
+body[data-state="disabled"] .app-scroll textarea{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+body[data-state="disabled"] .app-actions .btn.primary{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border:1px solid var(--color-border-subtle);}
+body[data-state="disabled"] .mode-tabs button,
+body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+.readonly-banner{margin:12px 16px;padding:12px;border:1px solid color-mix(in srgb,var(--color-status-warning) 30%,white);border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-status-warning) 10%,white);color:var(--color-text-secondary);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);}
+.app-scroll > .row{padding-left:var(--space-4);padding-right:var(--space-4);}
+.list-row > .row-chevron{flex:0 0 auto;margin-left:4px;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -1049,10 +1065,21 @@ function renderInteractionScript(): string {
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
     const rowValue = (row) => row.querySelector(".list-text-value");
+    const serviceCompleted = (() => {
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if (rowLabel(row) !== "服务完成") continue;
+        const value = (rowValue(row)?.textContent ?? "").trim();
+        return !/^(否|false|no|未完成)$/i.test(value);
+      }
+      return true;
+    })();
     const apply = () => {
       let visibleInBar = 0;
+      const allowedActions = serviceCompleted
+        ? allowed()
+        : allowed().filter((action) => action !== "术后告知");
       for (const button of qsa("[data-action]")) {
-        const isAllowed = allowed().includes(button.dataset.action);
+        const isAllowed = allowedActions.includes(button.dataset.action);
         button.hidden = !isAllowed;
         if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
       }
@@ -1136,7 +1163,12 @@ function renderInteractionScript(): string {
       button.addEventListener("click", () => {
         const action = button.dataset.action;
         if (action === "改期" && config.linkedRoutes.form) {
-          location.href = config.linkedRoutes.form + "?mode=reschedule&appointmentId=" + encodeURIComponent(config.referenceId);
+          location.href =
+            config.linkedRoutes.form +
+            "?mode=reschedule" +
+            (config.referenceId
+              ? "&appointmentId=" + encodeURIComponent(config.referenceId)
+              : "");
           return;
         }
         if (action === "术后告知") {
@@ -1177,6 +1209,11 @@ function renderInteractionScript(): string {
     const host = document.querySelector(".app-scroll");
     const tabs = document.createElement("div");
     tabs.className = "mode-tabs";
+    const rawAppointmentId = params.get("appointmentId") ?? config.referenceId;
+    const appointmentId =
+      rawAppointmentId && rawAppointmentId !== "null" && rawAppointmentId !== "undefined"
+        ? rawAppointmentId
+        : null;
     if (modes.length > 1 && host) {
       for (const mode of modes) {
         const button = document.createElement("button");
@@ -1185,15 +1222,19 @@ function renderInteractionScript(): string {
         button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
         button.addEventListener("click", () => {
           current = mode;
-          const appointmentId = params.get("appointmentId") ?? config.referenceId;
-          history.replaceState(null, "", "?mode=" + mode.name + "&appointmentId=" + encodeURIComponent(appointmentId));
+          history.replaceState(
+            null,
+            "",
+            "?mode=" +
+              mode.name +
+              (appointmentId ? "&appointmentId=" + encodeURIComponent(appointmentId) : "")
+          );
           apply();
         });
         tabs.append(button);
       }
       host.prepend(tabs);
     }
-    const appointmentId = params.get("appointmentId") ?? config.referenceId;
     const dateParam = params.get("date");
     const timeParam = params.get("time");
     const startInput = document.querySelector('input[name="startTime"]');
@@ -1234,7 +1275,7 @@ function renderInteractionScript(): string {
         customerPickerButton.disabled = current.customerLocked === true;
       }
       let id = document.querySelector(".appointment-id");
-      if (current.name === "reschedule") {
+      if (current.name === "reschedule" && appointmentId) {
         if (!id && host) {
           id = document.createElement("div");
           id.className = "appointment-id";
@@ -1254,7 +1295,6 @@ function renderInteractionScript(): string {
     const rows = qsa("[data-search-text]");
     const idle = document.querySelector('[data-empty-kind="idle"]');
     const empty = document.querySelector('[data-empty-kind="empty"]');
-    const pickerMode = new URLSearchParams(location.search).get("mode") === "picker";
     const apply = () => {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
@@ -1266,11 +1306,6 @@ function renderInteractionScript(): string {
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
-      // The detail entry depends on results; picker mode never navigates to
-      // the customer detail page.
-      for (const button of qsa('[data-action="查看详情"]')) {
-        button.hidden = pickerMode || visible === 0;
-      }
     };
     input.addEventListener("input", apply);
     const clear = document.querySelector('[data-action="清空关键词"]');
@@ -1296,12 +1331,13 @@ function renderInteractionScript(): string {
     if (!target) return;
     for (const row of qsa(".app-scroll .list-row")) {
       row.dataset.rowLink = "true";
+      if (!row.querySelector(".row-chevron")) {
+        const chevron = document.createElement("span");
+        chevron.className = "row-chevron";
+        chevron.textContent = "›";
+        row.append(chevron);
+      }
       row.addEventListener("click", () => {
-        location.href = target;
-      });
-    }
-    for (const button of qsa('[data-action="查看详情"]')) {
-      button.addEventListener("click", () => {
         location.href = target;
       });
     }
@@ -1373,12 +1409,6 @@ function renderInteractionScript(): string {
           if (event.target === drawer) drawer.remove();
         });
         document.body.append(drawer);
-      });
-    }
-    for (const button of qsa('[data-action="查看完整详情"]')) {
-      button.addEventListener("click", () => {
-        if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
-        else showHint("当前切片没有预约详情页");
       });
     }
     apply();
@@ -1500,12 +1530,37 @@ function renderInteractionScript(): string {
     }
   }
 
+  function applyReadonlyState() {
+    const state =
+      new URLSearchParams(location.search).get("state") ??
+      document.body.dataset.state;
+    if (state !== "disabled") return;
+    for (const control of qsa(
+      ".app-scroll input, .app-scroll select, .app-scroll textarea"
+    )) {
+      control.disabled = true;
+    }
+    for (const button of qsa(".app-actions .btn, .app-scroll .btn, .mode-tabs button")) {
+      button.disabled = true;
+    }
+    if (document.body.dataset.pageKind === "form") {
+      const host = document.querySelector(".app-scroll");
+      if (host && !host.querySelector(".readonly-banner")) {
+        const banner = document.createElement("div");
+        banner.className = "readonly-banner";
+        banner.textContent = "当前为只读状态，无法编辑或保存";
+        host.prepend(banner);
+      }
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
   applyRowLinks();
   applyViews();
   applyPicker();
+  applyReadonlyState();
 })();
 </script>`;
 }
@@ -1556,7 +1611,7 @@ export function renderDocument(
     customerPicker: spec.customerPicker ?? null,
     pickerReturnTo: spec.pickerReturnTo ?? null,
     pageArchetypes: renderPageArchetypes,
-    referenceId: spec.referenceId ?? spec.meta.pageId,
+    referenceId: spec.referenceId ?? null,
     linkedRoutes,
   };
   const hasInteraction =

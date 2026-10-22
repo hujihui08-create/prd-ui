@@ -35,6 +35,17 @@ function collectNodes(node: SpecNode, nodes: SpecNode[] = []): SpecNode[] {
   return nodes;
 }
 
+/** Nodes a sighted user can see: skips hidden semantic (sr-only) rows. */
+function collectVisibleNodes(node: SpecNode, nodes: SpecNode[] = []): SpecNode[] {
+  if (node.type === "Row" && node.props?.variant === "sr-only") return nodes;
+  nodes.push(node);
+  for (const child of node.children ?? []) collectVisibleNodes(child, nodes);
+  for (const slotNodes of Object.values(node.slots ?? {})) {
+    for (const child of slotNodes) collectVisibleNodes(child, nodes);
+  }
+  return nodes;
+}
+
 describe("compileProject", () => {
   it("compiles exactly the eight sample pages", () => {
     expect(specs).toHaveLength(8);
@@ -291,9 +302,13 @@ describe("compileProject", () => {
     const ghost = nodes.find(
       (node) => node.id === "appointment-detail.action.checkin.2"
     );
-    expect(ghost).toBeDefined();
-    expect(ghost!.props?.label).toBe("接单并确认到店");
-    expect(detail.layout.slots?.actions).not.toContain(ghost);
+    expect(ghost).toBeUndefined();
+    expect(
+      nodes
+        .filter((node) => node.type === "Button")
+        .map((node) => node.props?.label)
+        .filter((label) => label === "接单并确认到店")
+    ).toEqual([]);
   });
 
   it("has at least one requirement reference per spec", () => {
@@ -424,10 +439,11 @@ describe("brief-driven page content", () => {
     });
     expect(spec.layout.type).toBe("MobileShell");
     expect(nodesOf(spec, "CollapsedFilter")[0]?.props?.label).toBe("状态");
-    expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toEqual([
-      "日历",
-      "列表",
-    ]);
+    expect(
+      collectVisibleNodes(spec.layout)
+        .filter((node) => node.type === "Text")
+        .map((node) => node.props?.text)
+    ).toEqual(["日历", "列表"]);
     expect(nodesOf(spec, "CalendarGrid")[0]?.props).toMatchObject({
       days: expect.arrayContaining([
         expect.objectContaining({ label: "周一", date: "2026-10-19", today: true }),
@@ -443,13 +459,13 @@ describe("brief-driven page content", () => {
       ],
     });
     expect(nodesOf(spec, "ListRow")[0]?.props).toMatchObject({
-      title: "客户：张女士",
-      subtitle: "项目：小气泡",
-      meta: "时间段：10:00-11:00",
+      title: "张女士",
+      subtitle: "小气泡 · 王美容",
+      meta: "10:00-11:00",
       status: "已登记",
       statusTone: "warning",
-      trailing: "护理师：王美容",
     });
+    expect(nodesOf(spec, "ListRow")[0]?.props?.trailing).toBeUndefined();
     expect(nodesOf(spec, "Button")[0]?.props?.label).toBe("新增预约");
   });
 
@@ -590,8 +606,8 @@ describe("brief-driven page content", () => {
       "关键词"
     );
     expect(nodesOf(spec, "ListRow")[0]?.props).toMatchObject({
-      title: "姓名：张女士",
-      subtitle: "手机号：138****0000 · 门店：星光店",
+      title: "张女士",
+      subtitle: "138****0000 · 星光店",
     });
   });
 
@@ -1068,11 +1084,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       (node) => node.type === "Row" && node.props?.variant === "caption"
     );
     expect(captionRows).toEqual([]);
-    const fieldLabels = collectNodes(list.layout).filter(
+    const fieldLabels = collectVisibleNodes(list.layout).filter(
       (node) => node.type === "Text" && ["客户", "时间段", "状态"].includes(String(node.props?.text))
     );
     expect(fieldLabels).toEqual([]);
-    expect(nodesOf(list, "ListRow")[0]?.props?.subtitle).toContain("门店：星光店");
+    expect(nodesOf(list, "ListRow")[0]?.props?.subtitle).toBe("小气泡 · 王美容");
+    expect(nodesOf(list, "ListRow")[0]?.props?.subtitle).not.toContain("门店");
+    expect(nodesOf(list, "ListRow")[0]?.props?.meta).toBe("10:00-11:00");
   });
 
   it("emits datetime-local inputs and an inline customer picker", () => {
@@ -1122,6 +1140,42 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(actionRow?.children?.every((child) => child.type === "Button")).toBe(true);
   });
 
+  it("drops debug references, duplicate check-in, and premature notice actions", () => {
+    const detail = phase2Spec("appointment-detail");
+    const form = phase2Spec("appointment-form");
+    const list = phase2Spec("appointment-list");
+    expect(detail.referenceId).toBeUndefined();
+    expect(form.referenceId).toBeUndefined();
+    expect(nodesOf(detail, "Button").map((node) => node.props?.action)).not.toContain(
+      "接单并确认到店"
+    );
+    expect(nodesOf(detail, "Button").map((node) => node.props?.action)).not.toContain(
+      "术后告知"
+    );
+    expect(nodesOf(list, "Button").map((node) => node.props?.action)).not.toContain(
+      "查看完整详情"
+    );
+    expect(
+      nodesOf(detail, "Text").map((node) => node.props?.text)
+    ).not.toContain("告知分块");
+  });
+
+  it("keeps the notice action when serviceCompleted is true", () => {
+    const custom = structuredClone(
+      UiBriefSchema.parse(
+        JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
+      )
+    );
+    const detailPage = custom.ia.pages.find((page) => page.id === "appointment-detail")!;
+    detailPage.mockData!.values!.serviceCompleted = "是";
+    const spec = compileProject(custom, deps).find(
+      (candidate) => candidate.meta.pageId === "appointment-detail"
+    )!;
+    expect(nodesOf(spec, "Button").map((node) => node.props?.action)).toContain(
+      "术后告知"
+    );
+  });
+
   it("puts the page id into home tabs and activates it", () => {
     const home = phase2Spec("today");
     expect(home.layout.props?.tabs).toEqual(["today", "appointment-list"]);
@@ -1129,11 +1183,11 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(home.layout.props?.showTabs).toBe(true);
   });
 
-  it("omits the search action bar and keeps the detail action in content", () => {
+  it("omits the search action bar and page-level detail CTA", () => {
     const search = phase2Spec("customer-search");
     expect(search.layout.slots?.actions).toBeUndefined();
-    expect(nodesOf(search, "Button").map((button) => button.props?.action)).toEqual(
-      expect.arrayContaining(["查看详情"])
+    expect(nodesOf(search, "Button").map((button) => button.props?.action)).not.toContain(
+      "查看详情"
     );
     expect(nodesOf(search, "EmptyState").map((node) => node.props?.emptyKind)).toEqual(
       expect.arrayContaining(["idle", "empty"])

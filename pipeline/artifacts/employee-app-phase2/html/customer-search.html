@@ -126,6 +126,8 @@ button{font:inherit;color:inherit;}
 .search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
+.filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -196,6 +198,15 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
 .btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
 .btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
+body[data-state="disabled"] .app-scroll input,
+body[data-state="disabled"] .app-scroll select,
+body[data-state="disabled"] .app-scroll textarea{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+body[data-state="disabled"] .app-actions .btn.primary{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border:1px solid var(--color-border-subtle);}
+body[data-state="disabled"] .mode-tabs button,
+body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+.readonly-banner{margin:12px 16px;padding:12px;border:1px solid color-mix(in srgb,var(--color-status-warning) 30%,white);border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-status-warning) 10%,white);color:var(--color-text-secondary);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);}
+.app-scroll > .row{padding-left:var(--space-4);padding-right:var(--space-4);}
+.list-row > .row-chevron{flex:0 0 auto;margin-left:4px;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -314,7 +325,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 </nav>
   <div class="app " data-page-archetype="mobile-list" data-page-id="customer-search" data-picker-return="appointment-form" data-node-id="customer-search.page.root" data-motion-preset="enter-fade" style="--motion-duration:120ms;--motion-ease:ease-out">
   <header class="page-header"><span class="material-symbols-rounded back-icon">arrow_back_ios_new</span><h1 class="page-title">客户搜索</h1></header>
-  <main class="app-scroll"><section class="section" data-node-id="customer-search.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="searchbar">
+  <main class="app-scroll"><section class="section" data-node-id="customer-search.root.content.0" style="padding:var(--space-4);gap:var(--space-2)"><div class="row sr-only" style="gap:var(--space-1)"><span class="typo-label-sm">姓名</span><span class="typo-label-sm">手机号</span><span class="typo-label-sm">门店</span><span class="typo-label-sm">查看详情</span></div><div class="searchbar">
   <span class="material-symbols-rounded search-icon">search</span>
   <input class="search-input" data-search-input placeholder="输入姓名或脱敏手机号搜索客户" />
 </div><div class="empty-state" data-empty-kind="idle">
@@ -322,31 +333,31 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
   <div class="empty-title">输入姓名或脱敏手机号搜索客户</div>
   <div class="empty-desc">输入关键词后显示匹配结果</div>
 
-</div><div class="row filter-row" style="gap:var(--space-2)"><button class="btn secondary" type="button" data-action="查看详情" data-node-id="customer-search.action.view-detail">查看详情</button></div><div class="list-row" data-search-text="张女士 138****0000 星光店" data-node-id="customer-search.row.result.0" data-motion-group="customer-search.row.result" data-motion-preset="list-stagger" data-motion-index="0" style="--motion-duration:200ms;--motion-ease:ease-out;--motion-stagger:24ms;--motion-index:0">
+</div><div class="list-row" data-search-text="张女士 138****0000 星光店" data-node-id="customer-search.row.result.0" data-motion-group="customer-search.row.result" data-motion-preset="list-stagger" data-motion-index="0" style="--motion-duration:200ms;--motion-ease:ease-out;--motion-stagger:24ms;--motion-index:0">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">姓名：张女士</span>
+      <span class="row-title">张女士</span>
 
     </div>
-    <div class="row-subtitle">手机号：138****0000 · 门店：星光店</div>
+    <div class="row-subtitle">138****0000 · 星光店</div>
   </div>
 
 </div><div class="list-row" data-search-text="李女士 139****0000 星光店" data-node-id="customer-search.row.result.1" data-motion-group="customer-search.row.result" data-motion-preset="list-stagger" data-motion-index="1" style="--motion-duration:200ms;--motion-ease:ease-out;--motion-stagger:24ms;--motion-index:1">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">姓名：李女士</span>
+      <span class="row-title">李女士</span>
 
     </div>
-    <div class="row-subtitle">手机号：139****0000 · 门店：星光店</div>
+    <div class="row-subtitle">139****0000 · 星光店</div>
   </div>
 
 </div><div class="list-row" data-search-text="王女士 137****0000 星光店" data-node-id="customer-search.row.result.2" data-motion-group="customer-search.row.result" data-motion-preset="list-stagger" data-motion-index="2" style="--motion-duration:200ms;--motion-ease:ease-out;--motion-stagger:24ms;--motion-index:2">
   <div class="list-row-main">
     <div class="list-row-title">
-      <span class="row-title">姓名：王女士</span>
+      <span class="row-title">王女士</span>
 
     </div>
-    <div class="row-subtitle">手机号：137****0000 · 门店：星光店</div>
+    <div class="row-subtitle">137****0000 · 星光店</div>
   </div>
 
 </div><div class="empty-state" data-empty-kind="empty">
@@ -406,7 +417,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       });
     })();
   </script>
-  <script id="interaction-config" type="application/json">{"archetype":"mobile-list","pageId":"customer-search","businessStates":null,"formModes":null,"formModeLabels":null,"stateNotes":null,"views":null,"defaultView":null,"searchIdleTitle":"输入姓名或脱敏手机号搜索客户","currentStatus":null,"customerPicker":null,"pickerReturnTo":"appointment-form","pageArchetypes":{"appointment-detail":"detail","appointment-form":"mobile-form","appointment-list":"mobile-list","callback-register":"mobile-form","customer-detail":"detail","customer-search":"mobile-list","today":"home","treatment-notice":"detail"},"referenceId":"customer-search","linkedRoutes":{"create":"appointment-form.html","detail":"customer-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
+  <script id="interaction-config" type="application/json">{"archetype":"mobile-list","pageId":"customer-search","businessStates":null,"formModes":null,"formModeLabels":null,"stateNotes":null,"views":null,"defaultView":null,"searchIdleTitle":"输入姓名或脱敏手机号搜索客户","currentStatus":null,"customerPicker":null,"pickerReturnTo":"appointment-form","pageArchetypes":{"appointment-detail":"detail","appointment-form":"mobile-form","appointment-list":"mobile-list","callback-register":"mobile-form","customer-detail":"detail","customer-search":"mobile-list","today":"home","treatment-notice":"detail"},"referenceId":null,"linkedRoutes":{"create":"appointment-form.html","detail":"customer-detail.html","customer":"customer-detail.html","notice":"treatment-notice.html","form":"appointment-form.html"}}</script>
   <script>
 (() => {
   const raw = document.getElementById("interaction-config")?.textContent;
@@ -434,10 +445,21 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
     const rowValue = (row) => row.querySelector(".list-text-value");
+    const serviceCompleted = (() => {
+      for (const row of qsa(".app-scroll .list-text-row")) {
+        if (rowLabel(row) !== "服务完成") continue;
+        const value = (rowValue(row)?.textContent ?? "").trim();
+        return !/^(否|false|no|未完成)$/i.test(value);
+      }
+      return true;
+    })();
     const apply = () => {
       let visibleInBar = 0;
+      const allowedActions = serviceCompleted
+        ? allowed()
+        : allowed().filter((action) => action !== "术后告知");
       for (const button of qsa("[data-action]")) {
-        const isAllowed = allowed().includes(button.dataset.action);
+        const isAllowed = allowedActions.includes(button.dataset.action);
         button.hidden = !isAllowed;
         if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
       }
@@ -521,7 +543,12 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       button.addEventListener("click", () => {
         const action = button.dataset.action;
         if (action === "改期" && config.linkedRoutes.form) {
-          location.href = config.linkedRoutes.form + "?mode=reschedule&appointmentId=" + encodeURIComponent(config.referenceId);
+          location.href =
+            config.linkedRoutes.form +
+            "?mode=reschedule" +
+            (config.referenceId
+              ? "&appointmentId=" + encodeURIComponent(config.referenceId)
+              : "");
           return;
         }
         if (action === "术后告知") {
@@ -562,6 +589,11 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const host = document.querySelector(".app-scroll");
     const tabs = document.createElement("div");
     tabs.className = "mode-tabs";
+    const rawAppointmentId = params.get("appointmentId") ?? config.referenceId;
+    const appointmentId =
+      rawAppointmentId && rawAppointmentId !== "null" && rawAppointmentId !== "undefined"
+        ? rawAppointmentId
+        : null;
     if (modes.length > 1 && host) {
       for (const mode of modes) {
         const button = document.createElement("button");
@@ -570,15 +602,19 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
         button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
         button.addEventListener("click", () => {
           current = mode;
-          const appointmentId = params.get("appointmentId") ?? config.referenceId;
-          history.replaceState(null, "", "?mode=" + mode.name + "&appointmentId=" + encodeURIComponent(appointmentId));
+          history.replaceState(
+            null,
+            "",
+            "?mode=" +
+              mode.name +
+              (appointmentId ? "&appointmentId=" + encodeURIComponent(appointmentId) : "")
+          );
           apply();
         });
         tabs.append(button);
       }
       host.prepend(tabs);
     }
-    const appointmentId = params.get("appointmentId") ?? config.referenceId;
     const dateParam = params.get("date");
     const timeParam = params.get("time");
     const startInput = document.querySelector('input[name="startTime"]');
@@ -619,7 +655,7 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
         customerPickerButton.disabled = current.customerLocked === true;
       }
       let id = document.querySelector(".appointment-id");
-      if (current.name === "reschedule") {
+      if (current.name === "reschedule" && appointmentId) {
         if (!id && host) {
           id = document.createElement("div");
           id.className = "appointment-id";
@@ -639,7 +675,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     const rows = qsa("[data-search-text]");
     const idle = document.querySelector('[data-empty-kind="idle"]');
     const empty = document.querySelector('[data-empty-kind="empty"]');
-    const pickerMode = new URLSearchParams(location.search).get("mode") === "picker";
     const apply = () => {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
@@ -651,11 +686,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
       }
       if (idle) idle.hidden = query.length > 0;
       if (empty) empty.hidden = query.length === 0 || visible > 0;
-      // The detail entry depends on results; picker mode never navigates to
-      // the customer detail page.
-      for (const button of qsa('[data-action="查看详情"]')) {
-        button.hidden = pickerMode || visible === 0;
-      }
     };
     input.addEventListener("input", apply);
     const clear = document.querySelector('[data-action="清空关键词"]');
@@ -681,12 +711,13 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     if (!target) return;
     for (const row of qsa(".app-scroll .list-row")) {
       row.dataset.rowLink = "true";
+      if (!row.querySelector(".row-chevron")) {
+        const chevron = document.createElement("span");
+        chevron.className = "row-chevron";
+        chevron.textContent = "›";
+        row.append(chevron);
+      }
       row.addEventListener("click", () => {
-        location.href = target;
-      });
-    }
-    for (const button of qsa('[data-action="查看详情"]')) {
-      button.addEventListener("click", () => {
         location.href = target;
       });
     }
@@ -758,12 +789,6 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
           if (event.target === drawer) drawer.remove();
         });
         document.body.append(drawer);
-      });
-    }
-    for (const button of qsa('[data-action="查看完整详情"]')) {
-      button.addEventListener("click", () => {
-        if (config.linkedRoutes.detail) location.href = config.linkedRoutes.detail;
-        else showHint("当前切片没有预约详情页");
       });
     }
     apply();
@@ -885,12 +910,37 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
     }
   }
 
+  function applyReadonlyState() {
+    const state =
+      new URLSearchParams(location.search).get("state") ??
+      document.body.dataset.state;
+    if (state !== "disabled") return;
+    for (const control of qsa(
+      ".app-scroll input, .app-scroll select, .app-scroll textarea"
+    )) {
+      control.disabled = true;
+    }
+    for (const button of qsa(".app-actions .btn, .app-scroll .btn, .mode-tabs button")) {
+      button.disabled = true;
+    }
+    if (document.body.dataset.pageKind === "form") {
+      const host = document.querySelector(".app-scroll");
+      if (host && !host.querySelector(".readonly-banner")) {
+        const banner = document.createElement("div");
+        banner.className = "readonly-banner";
+        banner.textContent = "当前为只读状态，无法编辑或保存";
+        host.prepend(banner);
+      }
+    }
+  }
+
   applyBusinessStates();
   applyFormModes();
   applySearch();
   applyRowLinks();
   applyViews();
   applyPicker();
+  applyReadonlyState();
 })();
 </script>
   <script>

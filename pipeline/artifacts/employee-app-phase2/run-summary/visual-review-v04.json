@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T10:48:00.000Z",
+  "generatedAt": "2026-10-22T11:30:00.000Z",
   "specEngineer": {
-    "runId": "run-2026-10-22T10-22-51-461Z",
+    "runId": "run-2026-10-22T11-15-21-596Z",
     "pages": 8,
     "motionPages": 8,
     "blockers": 0,
@@ -20,11 +20,11 @@
   },
   "baseline": {
     "cases": 24,
-    "manifestHash": "sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184"
+    "manifestHash": "sha256:4f43b2f39589b777366573918dd931fb3ce12854e39a4d2e4561c866a6158b0b"
   },
   "visualReview": {
-    "runId": "run-2026-10-22T10-42-23-082Z",
-    "status": "passed",
+    "runId": "run-2026-10-22T11-23-22-756Z",
+    "status": "awaiting_signoff",
     "cases": 24,
     "screenshots": 24,
     "diff": {
@@ -34,26 +34,26 @@
     },
     "findings": 10,
     "blockers": 0,
-    "major": 7,
-    "minor": 3,
-    "costCny": 0.2939536224,
+    "major": 5,
+    "minor": 5,
+    "costCny": 0.3287296224,
     "usageComplete": true,
     "model": "deepseek-flash",
-    "manifestHash": "sha256:7340ff7f586453a63b56355dcea22d99c10819ede2b919669bec618da1a0a885",
-    "findingsHash": "sha256:5533502404e7f9c67ebb096f8751df3a5329fc18007c08970447b69686fbccb1",
+    "manifestHash": "sha256:1a8005647950a1c6363061c4b8c5ef2cd0c843283b96bc9d3ab47ffeb8772551",
+    "findingsHash": "sha256:220e6f56449b0f20c936e90a794bc0f1afaab5e242687b176032de79e1e325b2",
     "signoff": {
-      "valid": true,
-      "signer": "Sample Reviewer",
-      "date": "2026-10-22",
-      "waivedFindings": []
+      "valid": false
     },
-    "stateStatus": "success"
+    "stateStatus": "awaiting_signoff"
   },
-  "earlierReview": {
-    "runId": "run-2026-10-22T10-35-22-301Z",
-    "findings": 12,
-    "blockers": 0,
-    "costCny": 0.36412459199999997,
-    "note": "first real critic run; signed, then the re-review produced a different findings set, so the final run was signed on its own findings"
-  }
+  "roundCosts": {
+    "consoleErrorRun": 0.3504589632,
+    "oldHtmlCriticRun": 0.2169933408,
+    "maxTokensRun": 0.5312153664,
+    "finalRun": 0.3287296224,
+    "followUpTotal": 1.4273972928,
+    "priorTask9Total": 1.6415096768,
+    "cumulative": 3.0689069696
+  },
+  "note": "Final review is awaiting_signoff with 5 major / 5 minor / 0 blocker; not signed. The new majors are design decisions (mode switcher, calendar orientation/loading/empty structure, reschedule context) recorded for a follow-up decision."
 }

@@ -1,7 +1,7 @@
 # v0.4 动效与视觉回归设计
 
 - 日期：2026-10-22
-- 状态：Completed（2026-10-22 实现并验收；结果见 §12）
+- 状态：Implemented（2026-10-22；初始验收通过，concrete-major 跟进后视觉签核待决策；结果见 §12）
 - 输入：Phase 2 clean 出口（v0.3.1，0 waiver / 0 patch）、主设计文档、v0.4 版本路径
 - 关联：[主设计文档](2026-10-19-prd-to-ui-pipeline-design.md)、[Clean Phase 2 收尾](2026-10-22-clean-phase-2-finish-design.md)
 
@@ -600,27 +600,40 @@ v0.4 的 8 项端到端验收全部通过，最终视觉证据在
 | Spec Engineer（`--strict-motion`） | `run-2026-10-22T10-22-51-461Z`：8 Page Specs、8 motion pages、0 blockers、2 unused-asset warnings、**0 `SPEC_MOTION_NODE_UNRESOLVED`** |
 | Render | 8 页 + `index.html`；8 页均带 `data-motion-preset` / `data-node-id`；日历 `data-slot-date` 为完整 `YYYY-MM-DD`；form 为 `datetime-local` |
 | Baseline | `pipeline/baselines/employee-app-phase2`：24 cases / 24 PNG；manifest `sha256:6055996f30c1f6a8eee4521e7e4d134f5e8b524fc79384dc488169669ca24184` |
-| Visual review（最终） | `run-2026-10-22T10-42-23-082Z`：24/24 截图，0 console、0 overflow、diff 24 passed / 0 failed / 0 missing；10 findings（7 major / 3 minor / 0 blocker）；`usageComplete=true`；¥0.2939536224 |
-| Signoff | `Sample Reviewer`，2026-10-22，`waivers=[]`；manifest `sha256:7340ff7f586453a63b56355dcea22d99c10819ede2b919669bec618da1a0a885`；findings `sha256:5533502404e7f9c67ebb096f8751df3a5329fc18007c08970447b69686fbccb1`；`visual-review.json.status=passed`，`state.json.status=success` |
+| Visual review（最终） | `run-2026-10-22T11-23-22-756Z`：24/24 截图，0 console、0 overflow、diff 24 passed / 0 failed / 0 missing；10 findings（5 major / 5 minor / 0 blocker）；`usageComplete=true`；¥0.3287296224；`status=awaiting_signoff` |
+| Signoff | **未签核**。最终 review 仍为 `changes`，5 个新 major（mode pills、日历日期一致性/today、loading/empty calendar、reschedule 记录上下文）需要设计决策；`signoff.valid=false`，`state.json.status=awaiting_signoff` |
 | Picker | form → 选择 → customer-search（picker）→ 张女士 → 返回 form，customer 回填且 project/start/end/therapist 保留；取消/返回/reload 保留草稿；reschedule 锁定客户 |
 | 日期 | 日历空格 `2026-11-02 09:00` → `startTime=2026-11-02T09:00`、`endTime=2026-11-02T10:00` |
 | 保真 | 列表无字段标题 Row；detail/notice 客户与状态各出现一次；Tab 今日/预约列表；搜索 idle 无「查看详情」/底部「搜索」，空态有「清空关键词」；日历图例 + 720px 横向滚动 |
-| 回归 | `pnpm test` 632+、typecheck clean、`pnpm test:dsh` 4、Phase 1 `8 / 2 / 4 / 8` all 0 blockers |
+| 回归 | `pnpm test` 636+、typecheck clean、`pnpm test:dsh` 4、Phase 1 `8 / 2 / 4 / 8` all 0 blockers |
 
 ### 12.1 真实 critic 结果与后续债
 
-最终 run 无 blocker；7 major / 3 minor 作为 warning 记录并签核，不进入 waiver。主要
-未修复项：form disabled 预览无禁用样式、reschedule 内部 `预约 appointment-form`
-chip、detail 双 check-in CTA、已到店仍显示术后告知、customer-search 浮动的
-「查看详情」、appointment-list 页面级「查看完整详情」与列表截断、loading 保留结构、
-只读「客户详情」按钮感、`告知分块` 内部标签、native 日期占位。这些进入 Phase 3/4
-视觉债。
+初始 v0.4 run 无 blocker，7 major / 3 minor 曾作为 warning 签核；reviewer 随后
+要求修复 concrete majors，初始 run 被 §12.2 的最终 run 取代。初始未修复项
+（disabled 样式、reschedule chip、双 check-in CTA、术后告知时序、搜索/列表
+CTA、`告知分块`、native 日期）已在本轮修复。
 
 真实 critic 存在采样波动：首次 review（`run-2026-10-22T10-35-22-301Z`）12 findings，
-签核后重跑得到 10 findings；最终 run 以自身 findings 签核，因此 `passed` 成立，但
-“同输入二次评审 findings 收敛”尚未实现为确定性 replay。
+签核后重跑得到不同 findings set；“同输入二次评审 findings 收敛”仍未实现为
+确定性 replay。
 
 真实 critic 的首个 8 页 run（`run-2026-10-22T10-24-11-704Z`）在 32768 maxTokens /
 300s 下超时（¥0.9835，`usageComplete=false`，`VISUAL_CRITIC_UNAVAILABLE`）；
 将 `prd-ui-visual` 提升到 65536 maxTokens，并给 `visual:review` 增加默认 900000ms
-的 `--critic-timeout-ms` 后完成。v0.4 visual critic 累计真实调用成本 ¥1.6415。
+的 `--critic-timeout-ms` 后完成。初始 Task 9 visual critic 成本 ¥1.6415；
+concrete-major 跟进再花 ¥1.4273972928（含两次 fail-closed），累计 ¥3.0689069696。
+
+### 12.2 Concrete-major follow-up（2026-10-22）
+
+按 reviewer 要求修复了 9 项 concrete majors：reschedule 调试 chip、disabled
+样式与只读 banner、重复 check-in、术后告知时序、搜索页浮动「查看详情」、
+列表页「查看完整详情」、列表行降噪、只读 action 行、`告知分块` 标签；另统一
+状态色、业务状态 badge/note、列表日期分组，并记录 VC-009 skeleton 为 v0.5。
+
+修复后最终 review `run-2026-10-22T11-23-22-756Z` 为 10 findings（5 major /
+5 minor / 0 blocker），`status=awaiting_signoff`，未签核。新 major：mode
+pills、日历日期信号/today 高亮、loading skeleton、empty calendar、reschedule
+记录上下文。按“不要伪造 pass”的约束，未调用 `visual:sign`，等待设计决策。
+
+本轮 critic 成本 ¥1.4273972928（含两次失败调用），累计 ¥3.0689069696。

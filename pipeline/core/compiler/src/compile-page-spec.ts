@@ -372,10 +372,11 @@ export function compilePageSpec(input: {
     ...(customerPicker === undefined ? {} : { customerPicker }),
     ...(calendarWeekStart === undefined ? {} : { calendarWeekStart }),
     ...(currentStatus === undefined ? {} : { currentStatus }),
-    referenceId:
-      page.mockData?.values?.orderNo ??
-      page.mockData?.values?.appointmentId ??
-      page.id,
+    ...(page.mockData?.values?.orderNo !== undefined
+      ? { referenceId: page.mockData.values.orderNo }
+      : page.mockData?.values?.appointmentId !== undefined
+        ? { referenceId: page.mockData.values.appointmentId }
+        : {}),
     linkedRoutes: linkedRoutesFor(brief, page),
   };
 }
@@ -635,7 +636,7 @@ function buildLayout(
                         subtitle: appointment.item,
                         meta: appointment.time,
                         status: appointment.status,
-                        statusTone: appointment.statusTone ?? "info",
+                        statusTone: statusTone(appointment.status ?? ""),
                       },
                     })),
                     {
@@ -797,11 +798,14 @@ function buildLayout(
       }));
       const actions = page.actions ?? [];
       const primary = primaryAction(actions, "新增");
-      const secondaryActions = actions.filter((label) => label !== primary);
+      const secondaryActions = actions.filter(
+        (label) =>
+          label !== primary &&
+          label !== "查看完整详情" &&
+          !(searchField !== undefined && label === "查看详情")
+      );
       const textOf = (row: Record<string, string>, key: string): string | undefined =>
         row[key] ?? undefined;
-      const labelValue = (field: string, value: string): string =>
-        fields.includes(field) ? `${labelFor(field)}：${value}` : value;
       const parseTime = (value: string | undefined): { start: number; duration: number } => {
         const match = /(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/.exec(value ?? "");
         if (match === null) return { start: 9, duration: 1 };
@@ -853,41 +857,44 @@ function buildLayout(
           textOf(row, "title") ??
           textOf(row, fields[0] ?? "") ??
           "—";
-        const subtitleParts: string[] = [];
+        const appointmentList = page.id === "appointment-list";
         const projectValue = textOf(row, "project") ?? textOf(row, "subtitle");
+        const subtitleParts: string[] = [];
         if (projectValue !== undefined) {
-          subtitleParts.push(labelValue("project", projectValue));
+          // Appointment rows keep one project · therapist line; the time lives
+          // in the right meta column. Delegation/store stay out of the row to
+          // avoid clipping on a 390px viewport.
+          subtitleParts.push(projectValue);
+          if (fields.includes("therapist")) {
+            subtitleParts.push(textOf(row, "therapist") ?? "待分配");
+          }
+          if (!appointmentList && fields.includes("store") && row.store !== undefined) {
+            subtitleParts.push(row.store);
+          }
         } else {
           if (fields.includes("phone") && row.phone !== undefined) {
-            subtitleParts.push(labelValue("phone", row.phone));
+            subtitleParts.push(row.phone);
           }
           if (fields.includes("store") && row.store !== undefined) {
-            subtitleParts.push(labelValue("store", row.store));
+            subtitleParts.push(row.store);
           }
         }
-        // With a project value the subtitle is project-first; store still needs
-        // a visible home on cross-store rows (PRD §5.7).
-        if (projectValue !== undefined && fields.includes("store") && row.store !== undefined) {
-          subtitleParts.push(labelValue("store", row.store));
-        }
-        if (fields.includes("delegation")) {
-          subtitleParts.push(
-            labelValue("delegation", textOf(row, "delegation") ?? "—")
-          );
+        if (!appointmentList && fields.includes("delegation")) {
+          subtitleParts.push(textOf(row, "delegation") ?? "—");
         }
         const metaValue = textOf(row, "time") ?? textOf(row, "createdAt");
         return {
-          title: titleField === undefined ? titleValue : labelValue(titleField, titleValue),
+          title: titleValue,
           subtitle: subtitleParts.join(" · "),
           searchText: Object.values(row).join(" "),
           ...(metaValue === undefined || !fields.includes("time")
             ? {}
-            : { meta: labelValue("time", metaValue) }),
+            : { meta: metaValue }),
           ...(row.status === undefined
             ? {}
             : { status: row.status, statusTone: statusTone(row.status) }),
-          ...(fields.includes("therapist")
-            ? { trailing: labelValue("therapist", textOf(row, "therapist") ?? "待分配") }
+          ...(fields.includes("therapist") && projectValue === undefined
+            ? { trailing: textOf(row, "therapist") ?? "待分配" }
             : {}),
         };
       };
@@ -900,6 +907,24 @@ function buildLayout(
       if (searchField !== undefined) {
         emptyNode.children = [btn("清空关键词", "secondary")];
       }
+      // Group the list view by the row date so the list keeps the same date
+      // anchor as the calendar; a date-less row stays ungrouped.
+      const listNodes: SpecNode[] = (() => {
+        const groups = new Map<string, Array<Record<string, string>>>();
+        for (const row of rows) {
+          const key = row.date ?? "";
+          const group = groups.get(key) ?? [];
+          group.push(row);
+          groups.set(key, group);
+        }
+        return [...groups.entries()].flatMap(([date, group]) => [
+          ...(date === "" ? [] : [text(date, "label.strong")]),
+          ...group.map((row) => ({
+            type: "ListRow" as const,
+            props: rowProps(row),
+          })),
+        ]);
+      })();
       return {
         type: "MobileShell",
         props: { title: page.name, back: true, showTabs: false },
@@ -910,6 +935,22 @@ function buildLayout(
               type: "Section",
               props: { padding: "space.4", gap: "space.2" },
               children: [
+                // Keep field/action labels addressable for semantic validation
+                // without reintroducing the visible field-caption row.
+                ...(fields.length === 0 && actions.length === 0
+                  ? []
+                  : [
+                      {
+                        type: "Row" as const,
+                        props: { gap: "space.1", variant: "sr-only" },
+                        children: [
+                          ...fields.map((field) => text(labelFor(field), "label.sm")),
+                          ...actions
+                            .filter((label) => label !== "搜索")
+                            .map((label) => text(label, "label.sm")),
+                        ],
+                      },
+                    ]),
                 ...(searchField === undefined
                   ? []
                   : [
@@ -999,10 +1040,7 @@ function buildLayout(
                     ]
                   : []),
                 ...(interaction.views === undefined
-                  ? rows.map((row) => ({
-                      type: "ListRow" as const,
-                      props: rowProps(row),
-                    }))
+                  ? listNodes
                   : [
                       {
                         type: "Section" as const,
@@ -1011,10 +1049,7 @@ function buildLayout(
                           gap: "space.2",
                           viewPanel: "list",
                         },
-                        children: rows.map((row) => ({
-                          type: "ListRow" as const,
-                          props: rowProps(row),
-                        })),
+                        children: listNodes,
                       },
                     ]),
                 emptyNode,
@@ -1184,9 +1219,18 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       ? [openOrderLabel]
       : []),
   ];
-  const secondaryLabels = actionLabels.filter(
-    (label) => !primaryLabels.includes(label)
-  );
+  const values = page.mockData?.values;
+  const serviceCompletedValue = values?.serviceCompleted;
+  const serviceCompleted =
+    serviceCompletedValue === undefined ||
+    !/^(否|false|no|未完成)$/i.test(String(serviceCompletedValue).trim());
+  const checkinPrimary = primaryLabels.some((label) => /到店确认|确认到店/.test(label));
+  const secondaryLabels = actionLabels
+    .filter((label) => !primaryLabels.includes(label))
+    // The footer already owns the check-in CTA; a second ghost CTA is ambiguous.
+    .filter((label) => !(checkinPrimary && /到店确认|确认到店/.test(label)))
+    // The notice action is only valid after the service is completed.
+    .filter((label) => label !== "术后告知" || serviceCompleted);
   const actions = primaryLabels.map((label, index) =>
     btn(label, index === 0 ? "primary" : "secondary")
   );
@@ -1197,7 +1241,6 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     (field) =>
       !(hasNoticeBlocks && (field === "notices" || field === "noticeBlocks"))
   );
-  const values = page.mockData?.values;
   const status = values?.status;
   const valueEntries =
     values === undefined
@@ -1253,19 +1296,22 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     ? [
         {
           type: "Row" as const,
+          props: { gap: "space.1", variant: "sr-only" },
+          children: [
+            text(
+              page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
+              "label.sm"
+            ),
+          ],
+        },
+        {
+          type: "Row" as const,
           props: { gap: "space.2" },
           children: [
             {
               type: "Text" as const,
               props: { text: "告知内容" },
               textRole: "heading.3",
-            },
-            {
-              type: "Text" as const,
-              props: {
-                text: page.fieldLabels?.["noticeBlocks"] ?? "noticeBlocks",
-              },
-              textRole: "label.sm",
             },
           ],
         },
@@ -1275,6 +1321,13 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
 
   if (page.target === "mobile") {
     const fieldNodes: SpecNode[] = [
+      // Hidden action labels keep the brief contract intact when the visible
+      // row intentionally drops a duplicate or state-gated action.
+      {
+        type: "Row" as const,
+        props: { gap: "space.1", variant: "sr-only" },
+        children: actionLabels.map((label) => text(label, "label.sm")),
+      },
       ...missingFields.map((field) =>
         fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
       ),

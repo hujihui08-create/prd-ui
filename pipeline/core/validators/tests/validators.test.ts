@@ -241,6 +241,22 @@ function removeNodesOfType(node: SpecNode, type: string): void {
   }
 }
 
+function removeNodesOfVariant(node: SpecNode, variant: string): void {
+  if (node.children) {
+    node.children = node.children.filter(
+      (child) => !(child.type === "Row" && child.props?.variant === variant)
+    );
+    for (const child of node.children) removeNodesOfVariant(child, variant);
+  }
+  for (const [slotName, slotNodes] of Object.entries(node.slots ?? {})) {
+    const kept = slotNodes.filter(
+      (child) => !(child.type === "Row" && child.props?.variant === variant)
+    );
+    node.slots![slotName] = kept;
+    for (const child of kept) removeNodesOfVariant(child, variant);
+  }
+}
+
 function ruleIds(report: ValidationReport): string[] {
   return [...new Set(report.findings.map((finding) => finding.ruleId))];
 }
@@ -713,13 +729,15 @@ describe("structural semantic representations", () => {
     // The date filter label would otherwise satisfy the field as an exact
     // string; remove it to isolate the calendar representation.
     removeNodesOfType(spec.layout, "CollapsedFilter");
+    // Hidden semantic labels also represent the fields; strip them too so this
+    // test exercises the CalendarGrid path only.
+    removeNodesOfVariant(spec.layout, "sr-only");
     const report = validatePageSpec(spec, phase2ContextFor(spec));
     const missing = report.findings
       .filter((finding) => finding.ruleId === "SEMANTIC-FIELD")
       .map((finding) => finding.evidence);
     expect(missing, findingDetail(report)).toContain("date");
-    // time remains represented by the ListRow meta string.
-    expect(missing).not.toContain("time");
+    expect(missing).toContain("time");
   });
 });
 

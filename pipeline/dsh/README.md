@@ -104,11 +104,13 @@ is a blocker.
 Real 8-page visual reviews (2026-10-22): the first run timed out at 300s with
 32768 maxTokens (¥0.9835, `usageComplete=false`); after raising the profile to
 65536 and the default CLI timeout to 900s, the next run produced 12 findings
-(¥0.3641); the final signed run `run-2026-10-22T10-42-23-082Z` produced 10
-findings (7 major / 3 minor / 0 blocker), `usageComplete=true`, ¥0.2939536224,
-24/24 screenshots, 0 console / 0 overflow, diff 24/0/0. Findings are sampled:
-a signed re-review produced a different findings set, so the final run was
-signed on its own findings (`status=passed`, `waivers=[]`).
+(¥0.3641); after the concrete-major fixes the final run `run-2026-10-22T11-23-22-756Z`
+produced 10 findings (5 major / 5 minor / 0 blocker), `usageComplete=true`,
+¥0.3287296224, 24/24 screenshots, 0 console / 0 overflow, diff 24/0/0. It is
+`awaiting_signoff` and unsigned: the 5 new majors (mode pills, calendar
+orientation, loading/empty calendar structure, reschedule context) need a
+design decision. Two follow-up attempts failed closed (console error; max
+tokens) and are included in the cost.
 
 ```bash
 cd pipeline

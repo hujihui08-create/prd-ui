@@ -287,7 +287,7 @@ describe("generic web/mobile renderer", () => {
         ),
       }
     );
-    expect(html).toContain('data-action="查看完整详情"');
+    expect(html).not.toContain('data-action="查看完整详情"');
     expect(html).toContain("appointment-detail.html");
     expect(html).toContain("detail.textContent = \"查看完整详情\"");
     expect(html).toContain(
@@ -375,16 +375,53 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(detail).not.toContain('form-readonly">已登记');
   });
 
-  it("renders the search idle state without a bottom search action", () => {
+  it("renders the search idle state without a page-level detail CTA", () => {
     const search = renderDocument(
       phase2ById.get("customer-search")!,
       getProfile("b-mobile"),
       { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
     );
     expect(search).not.toContain('class="app-actions"');
-    expect(search).toContain('data-action="查看详情"');
+    expect(search).not.toContain('data-action="查看详情"');
     expect(search).toContain('placeholder="输入姓名或脱敏手机号搜索客户"');
-    expect(search).toContain("button.hidden = pickerMode || visible === 0");
+    expect(search).toContain("row.dataset.rowLink = \"true\"");
+    expect(search).toContain("chevron.className = \"row-chevron\"");
+  });
+
+  it("does not leak the page id as a reschedule reference", () => {
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(form).toContain('"referenceId":null');
+    expect(form).toContain("current.name === \"reschedule\" && appointmentId");
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(detail).toContain('"referenceId":null');
+  });
+
+  it("renders disabled styling and hides the premature notice action", () => {
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(form).toContain('body[data-state="disabled"] .app-scroll input');
+    expect(form).toContain(".readonly-banner");
+    expect(form).toContain("当前为只读状态，无法编辑或保存");
+
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(detail).not.toContain('data-action="术后告知"');
+    expect(detail).toContain('rowLabel(row) !== "服务完成"');
+    expect(detail).toContain("action !== \"术后告知\"");
   });
 
   it("carries page archetypes and validates the runtime picker return target", () => {
