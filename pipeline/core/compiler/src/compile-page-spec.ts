@@ -35,6 +35,7 @@ const STANDARD_ICON_ASSETS: Record<string, string> = {
   receipt: "icon-plus",
   order: "icon-plus",
   appointment: "icon-plus",
+  "appointment-create": "icon-plus",
   calendar: "icon-plus",
   "customer-search": "icon-search",
   search: "icon-search",
@@ -905,7 +906,7 @@ function buildLayout(
                 const options = optionsFor(field);
                 return {
                   type: "FormField",
-                  props: { label, required: true },
+                  props: { label, required: true, field },
                   children: [
                     options === undefined
                       ? {

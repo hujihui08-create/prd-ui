@@ -14,6 +14,7 @@ import {
   isLayoutPrimitive,
 } from "@prd-ui/design-system";
 import briefJson from "../../../samples/ui-brief.sample.json";
+import phase2BriefJson from "../../../samples/projects/employee-app-phase2/ui-brief.json";
 import { compilePageSpec, compileProject } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(briefJson);
@@ -58,6 +59,16 @@ describe("compileProject", () => {
       });
       expect(spec!.meta.reqRefs).toEqual(page.reqRefs);
     }
+  });
+
+  it("maps the phase2 quick-action icons to standard asset ids", () => {
+    const phase2Brief = UiBriefSchema.parse(phase2BriefJson);
+    const phase2Specs = compileProject(phase2Brief, deps);
+    const today = phase2Specs.find((spec) => spec.meta.pageId === "today")!;
+    const icons = collectNodes(today.layout)
+      .filter((node) => node.type === "QuickAction")
+      .map((node) => node.props?.icon);
+    expect(icons).toEqual(["icon-plus", "icon-plus", "icon-search"]);
   });
 
   it("uses the target-appropriate shell as the root", () => {
