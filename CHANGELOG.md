@@ -3,6 +3,13 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-23 — Version roadmap confirmed
+
+- Confirmed the release path: v0.4.1 visual patch → v0.5 visual/a11y closure →
+  v0.6 Figma/Studio → v0.7 sandbox/Handoff → v0.8 real-project pilot → v0.9 RC →
+  v1.0. No code or behavior changes in this entry.
+- Roadmap: `docs/superpowers/plans/2026-10-23-version-roadmap.md`.
+
 ## 2026-10-22 — Motion, Visual Review, picker, and fidelity (v0.4)
 
 ### Added

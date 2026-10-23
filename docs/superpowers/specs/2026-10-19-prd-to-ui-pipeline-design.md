@@ -1318,8 +1318,14 @@ handoff/
 | v0.2 | 多 profile + 资产 | 已完成：per-profile M1、标准图标 inventory、asset review |
 | v0.3 | Phase 2 验收交付 | 已完成（sample waiver）：8 页真实 PRD、HTML/资产/视觉巡检 |
 | v0.3.1 | Clean Phase 2 收尾 | 已完成：0 waiver / 0 brief patch、状态动作栏、表单 mode、日历/搜索交互、529 tests、19 张交互截图 |
-| v0.4 | 动效 + 视觉回归 | 已完成：motion node id / CSS 动效、picker、完整日期、24 项截图 baseline、真实 Visual Critic（已签核，v0.5 债）、644 tests、`test:dsh` 4、Phase 1 8/2/4/8 全 0；critic major 转入 Phase 3/4 视觉债 |
-| v1.0 | 项目最终交付 | Phase 3 + Phase 4：Figma/Studio/Handoff、沙箱、真实项目用户签核 |
+| v0.4 | 动效 + 视觉回归 | 已完成：motion node id / CSS 动效、picker、完整日期、24 项截图 baseline、真实 Visual Critic（已签核，6 major 转 v0.5）、644 tests、`test:dsh` 4、Phase 1 8/2/4/8 全 0 |
+| v0.4.1 | 视觉小额补丁 | today 查看全部、日历滚动提示、reschedule 截图上下文、datetime placeholder、选中日高亮、error 状态上下文 |
+| v0.5 | 视觉 + a11y 收口 | loading 12 行模板、empty overlay、form mode pills、a11y 基线、critic 停止规则；fresh critic 0 blocker / ≤2 major + 人工签核 |
+| v0.6 | Phase 3A：Figma + Studio | Figma Renderer、结构 diff、Studio、Asset Compiler |
+| v0.7 | Phase 3B：沙箱 + Handoff | scratch 沙箱、Test Subagent、Handoff Packager |
+| v0.8 | Phase 4A：真实项目试点 | 1 个真实项目端到端、问题收敛、成本/时间记录 |
+| v0.9 | Release Candidate | 全量回归、同输入稳定、无新增能力、验收逐项核对 |
+| v1.0 | 项目最终交付 | HTML + Figma + Handoff + 资产 + 评审包，用户视觉终审与项目签核 |
 
 ---
 
