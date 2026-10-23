@@ -223,8 +223,10 @@ recorded; deterministic critic replay and Phase 3/4 work remain.
 - `docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md` — 8-page renderer/slots/mockData/fieldLabels fixes.
 - `docs/superpowers/specs/2026-10-21-visual-fidelity-v01-design.md` — calendar, fixed action footer, form CTA, notice blocks.
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-21-8page-renderer-handoff.md` — current 8-page/renderer handoff.
+- `docs/handoffs/2026-10-23-v04-acceptance-handoff.md` — current v0.4 acceptance handoff (motion, visual review/cache, picker/date, v0.5 debt, next steps).
+- `docs/handoffs/2026-10-21-8page-renderer-handoff.md` — historical 8-page/renderer handoff (v0.3.1/v0.4 increments).
 - `docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md` — Q&A handoff and next-agent prompt.
+- `docs/superpowers/plans/2026-10-23-version-roadmap.md` — confirmed v0.4.1 → v1.0 release path.
 - `pipeline/docs/prd-review-briefer.md` — intake usage, signoffs, resume, publish, gates.
 - `pipeline/docs/spec-engineer-v0.md` — Spec Engineer usage, mapping, gates, v0 limits.
 - `pipeline/docs/agent-m1.md` — M1 usage, artifacts, signoff format, exit codes.
