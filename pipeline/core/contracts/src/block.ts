@@ -57,13 +57,22 @@ export interface BlockExperimentMetrics {
   heightDeltaPct?: number;
 }
 
+/**
+ * Tri-state conformance result. `not_evaluated` is deliberately distinct from
+ * `failed`: a gate that did not run yields insufficient evidence, while a gate
+ * that ran and found blockers is a hard failure.
+ */
+export type BlockConformanceStatus = "passed" | "failed" | "not_evaluated";
+
 export interface BlockExperimentPage {
   pageId: string;
   metrics: BlockExperimentMetrics[];
   pageRetries: number;
   costCny: number;
   durationMs: number;
-  conformancePassed?: boolean;
+  conformance: BlockConformanceStatus;
+  /** False when the assembled block manifest has structural blockers. */
+  blockVerifyPassed?: boolean;
   parityPassed?: boolean;
 }
 

@@ -23,33 +23,32 @@ export function percentDelta(baseline: number, value: number): number | undefine
 }
 
 /**
- * Whether the boundary in front of block `index` is a seam.
+ * Number of seam types at the leading boundary of each block (0, 1, or 2).
  *
- * `countSeams` only returns a total, so prefix counts attribute a seam to the
- * block that its leading boundary belongs to.
+ * `countSeams` counts both a double-padding boundary and a duplicate-title
+ * boundary, so prefix differences preserve the full count instead of
+ * collapsing the boundary to a boolean.
  */
-export function seamBoundaries(blocks: BlockSpec[], profile: Profile): boolean[] {
+export function seamCountsByBoundary(blocks: BlockSpec[], profile: Profile): number[] {
   return blocks.map((_, index) => {
-    if (index === 0) return false;
-    const withPrevious = countSeams(blocks.slice(0, index + 1), profile);
-    const withoutPrevious = countSeams(blocks.slice(0, index), profile);
-    return withPrevious > withoutPrevious;
+    if (index === 0) return 0;
+    return countSeams(blocks.slice(0, index + 1), profile) - countSeams(blocks.slice(0, index), profile);
   });
 }
 
 /**
  * Seams introduced by the experiment, attributed to the block after the
- * boundary. A seam that already existed in the baseline is not counted: the
- * experiment only answers whether block generation made the page worse.
+ * boundary. Counts are per boundary, so gaining a second seam type is visible.
+ * Removed seams are not credited back: the experiment only asks whether block
+ * generation made the page worse.
  */
 export function newSeamsByBlock(
   baseline: BlockSpec[],
   experiment: BlockSpec[],
   profile: Profile
 ): number[] {
-  const baselineSeams = seamBoundaries(baseline, profile);
-  const experimentSeams = seamBoundaries(experiment, profile);
-  return experimentSeams.map((seam, index) =>
-    seam && baselineSeams[index] !== true ? 1 : 0
+  const baselineCounts = seamCountsByBoundary(baseline, profile);
+  return seamCountsByBoundary(experiment, profile).map((count, index) =>
+    Math.max(0, count - (baselineCounts[index] ?? 0))
   );
 }

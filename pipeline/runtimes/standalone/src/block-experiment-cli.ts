@@ -5,6 +5,7 @@ import {
   AssetManifestSchema,
   UiBriefSchema,
   type AssetManifest,
+  type BlockConformanceStatus,
   type BlockExperimentPage,
   type BlockExperimentReport,
   type BlockManifest,
@@ -20,6 +21,7 @@ import {
 import {
   assembleBlocks,
   countRawStyleValues,
+  countSeams,
   evaluateBlockExperiment,
   splitBlocks,
   verifyBlockManifest,
@@ -37,7 +39,6 @@ import {
   blockRootHash,
   newSeamsByBlock,
   percentDelta,
-  seamBoundaries,
 } from "./block/metrics.js";
 import { captureStyleManifests } from "./conformance/capture.js";
 import { measurePages } from "./measure/measure.js";
@@ -276,17 +277,12 @@ function blockerSignatures(page: ConformancePage): string[] {
     .map((finding) => `${finding.code}|${finding.specId ?? ""}|${finding.message}`);
 }
 
-function conformanceRecorded(value: boolean | undefined): "passed" | "failed" | "not_evaluated" {
-  if (value === true) return "passed";
-  if (value === false) return "failed";
-  return "not_evaluated";
-}
-
 interface PageSeamDiagnostics {
   pageId: string;
   baselineSeams: number;
   experimentSeams: number;
   newSeams: number;
+  netDelta: number;
 }
 
 interface PageMeasurement {
@@ -309,7 +305,7 @@ interface ConformanceGatePage {
   newBlockers: string[];
   fixedBlockers: string[];
   gateUsable: boolean;
-  recorded: "passed" | "failed" | "not_evaluated";
+  conformance: BlockConformanceStatus;
 }
 
 interface PageOutcome {
@@ -436,8 +432,8 @@ export async function runBlockExperiment(
     const context = contextLoad.contexts.get(pageId);
     const validation = context === undefined ? undefined : validatePageSpec(experimentSpec, context);
 
-    const baselineSeams = seamBoundaries(manifest.blocks, profile).filter(Boolean).length;
-    const experimentSeams = seamBoundaries(experimentManifest.blocks, profile).filter(Boolean).length;
+    const baselineSeams = countSeams(manifest.blocks, profile);
+    const experimentSeams = countSeams(experimentManifest.blocks, profile);
     const newSeams = newSeamsByBlock(manifest.blocks, experimentManifest.blocks, profile);
 
     const metrics = manifest.blocks.map((block, index) => ({
@@ -453,6 +449,7 @@ export async function runBlockExperiment(
       pageRetries: 0,
       costCny: 0,
       durationMs: Date.now() - started,
+      conformance: "not_evaluated",
     };
 
     outcomes.push({
@@ -461,7 +458,13 @@ export async function runBlockExperiment(
       experimentManifest,
       verifyFindings,
       ...(validation === undefined ? {} : { validation }),
-      seams: { pageId, baselineSeams, experimentSeams, newSeams: newSeams.reduce((sum, n) => sum + n, 0) },
+      seams: {
+        pageId,
+        baselineSeams,
+        experimentSeams,
+        newSeams: newSeams.reduce((sum, n) => sum + n, 0),
+        netDelta: experimentSeams - baselineSeams,
+      },
     });
     experimentSpecs.push(experimentSpec);
 
@@ -567,12 +570,9 @@ export async function runBlockExperiment(
 
     const verifyFindings = outcome.verifyFindings;
     const hasBlockFailures = verifyFindings.some((finding) => finding.severity === "blocker");
-    let conformancePassed: boolean | undefined;
-    if (hasBlockFailures) conformancePassed = false;
-    else if (baselineGate.passed || experimentGate.passed) conformancePassed = experimentGate.passed;
-    else if (newBlockers.length > 0) conformancePassed = false;
-    else conformancePassed = undefined;
-    outcome.report.conformancePassed = conformancePassed;
+    outcome.report.blockVerifyPassed = !hasBlockFailures;
+    const conformance: BlockConformanceStatus = experimentGate.passed ? "passed" : "failed";
+    outcome.report.conformance = conformance;
 
     conformancePages.push({
       pageId,
@@ -591,7 +591,7 @@ export async function runBlockExperiment(
       newBlockers,
       fixedBlockers,
       gateUsable: baselineGate.passed,
-      recorded: conformanceRecorded(conformancePassed),
+      conformance,
     });
 
     blockVerifyPages.push({
@@ -648,6 +648,7 @@ export async function runBlockExperiment(
   const report = evaluateBlockExperiment({
     project,
     baseline: options.baseline,
+    maxCostCny: options.maxCostCny,
     pages: outcomes.map((outcome) => outcome.report),
   });
 
@@ -676,9 +677,10 @@ export async function runBlockExperiment(
     project,
     pages: conformancePages,
     note:
-      "conformancePassed is only true when the page is green or the experiment introduces no new blockers " +
-      "relative to the baseline. When the baseline gate itself is red, an unchanged experiment is recorded " +
-      "as not_evaluated instead of green.",
+      "conformance is a tri-state: passed means the in-process gate ran with 0 blockers; " +
+      "failed means it ran and found blockers (including a pre-existing red baseline); " +
+      "not_evaluated means it did not run. newBlockers and fixedBlockers are regression " +
+      "diagnostics only; they never rewrite failed as passed.",
   });
   await writeJson(path.join(runDir, "conformance", "style-manifest.baseline.json"), {
     schemaVersion: "1.0",
@@ -750,7 +752,7 @@ function renderMarkdown(input: {
   lines.push(`- 结论：${conclusionLabel(report.conclusion)}`);
   lines.push(`- 基线：\`${report.baseline}\``);
   lines.push(`- 运行目录：\`${input.runDir}\``);
-  lines.push(`- 预算：¥${input.maxCostCny}（fixture 模式实际成本 ¥0）`);
+  lines.push(`- 预算：¥${input.maxCostCny}（已传入 evaluateBlockExperiment；fixture 模式实际成本 ¥0）`);
   lines.push(`- 原因：${report.reasons.length === 0 ? "无" : report.reasons.join("；")}`, "");
   lines.push("## 页面指标", "");
   lines.push("| 页面 | 块数 | 新接缝 | token 漂移 | 重试 | 页高 Δ | conformance | parity |");
@@ -761,30 +763,38 @@ function renderMarkdown(input: {
     const retries = page.metrics.reduce((sum, metric) => sum + metric.retries, 0);
     const pageDelta =
       measurement?.heightDeltaPct === undefined ? "未测量" : `${measurement.heightDeltaPct}%`;
-    const conformance =
-      page.conformancePassed === undefined ? "未评估" : page.conformancePassed ? "通过" : "失败";
+    const conformance = recordedLabel(page.conformance);
     const parity = page.parityPassed === undefined ? "未评估" : page.parityPassed ? "通过" : "失败";
     lines.push(
       `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${pageDelta} | ${conformance} | ${parity} |`
     );
   }
-  lines.push("", "## 接缝", "");
-  lines.push("| 页面 | 基线接缝 | 实验接缝 | 新增接缝 |");
-  lines.push("| --- | ---: | ---: | ---: |");
+  lines.push(
+    "",
+    "> `durationMs` 在 fixture 模式只覆盖块生成/组装/校验，不含浏览器测量与 conformance 捕获。",
+    ""
+  );
+  lines.push("## 接缝", "");
+  lines.push("| 页面 | 基线 countSeams | 实验 countSeams | 新增 seam 类型 | 净 Δ |");
+  lines.push("| --- | ---: | ---: | ---: | ---: |");
   for (const seam of input.seamDiagnostics) {
-    lines.push(`| ${seam.pageId} | ${seam.baselineSeams} | ${seam.experimentSeams} | ${seam.newSeams} |`);
+    lines.push(
+      `| ${seam.pageId} | ${seam.baselineSeams} | ${seam.experimentSeams} | ${seam.newSeams} | ${seam.netDelta} |`
+    );
   }
   lines.push(
     "",
-    "> `seams` 指标只统计实验相对基线新增的接缝；基线已有的接缝单独列在上表，不会被当成实验回归，也不会被隐藏。",
+    "> `countSeams` 在每条块边界分别计数：padding seam 与 duplicate-title seam 各算 1。",
+    "> “新增 seam 类型”是逐边界正增量之和，`metrics.seams` 使用同一值；“净 Δ”是实验总数减基线总数。",
+    "> 基线已有的接缝（例如 appointment-list 的 calendar/list 互斥视图面板）会显示在基线列，不会被隐藏。",
     ""
   );
   lines.push("## Conformance gate", "");
-  lines.push("| 页面 | 基线 blocker | 实验 blocker | 新增 blocker | 基线 gate | 记录 |");
+  lines.push("| 页面 | 基线 blocker | 实验 blocker | 新增 blocker | 基线 gate | conformance |");
   lines.push("| --- | ---: | ---: | ---: | --- | --- |");
   for (const page of input.conformancePages) {
     lines.push(
-      `| ${page.pageId} | ${page.baseline.blockers} | ${page.experiment.blockers} | ${page.newBlockers.length} | ${page.gateUsable ? "通过" : "未通过"} | ${recordedLabel(page.recorded)} |`
+      `| ${page.pageId} | ${page.baseline.blockers} | ${page.experiment.blockers} | ${page.newBlockers.length} | ${page.gateUsable ? "通过" : "未通过"} | ${recordedLabel(page.conformance)} |`
     );
   }
   const gateUnusable = input.conformancePages.filter((page) => !page.gateUsable).length;
@@ -792,9 +802,15 @@ function renderMarkdown(input: {
     lines.push(
       "",
       `> ${gateUnusable} 页的基线 conformance 本身未通过（已知 plan/HTML 建模差异，见 v0.7 SDD ledger 的 Task 6 记录）。`,
-      "> 这些页面只有在没有新增 blocker 时才以 `not_evaluated` 记录；绝对 gate 仍为红色，不能据此推广。"
+      "> 这些页面按 fail-closed 记录为 `failed`，结论回滚；新增 blocker = 0 只说明实验没有引入新的 conformance 回归，不能抵消基线红灯。"
     );
   }
+  lines.push(
+    "",
+    "> `conformance` 是 tri-state：`passed` 仅当 gate 运行且 0 blocker；`failed` 表示 gate 运行且有 blocker；",
+    "> `not_evaluated` 表示 gate 未运行。`新增 blocker` / `修复 blocker` 只是回归诊断，不会改写 tri-state。",
+    ""
+  );
   lines.push("", "## 页面校验与块校验", "");
   lines.push("| 页面 | Phase 1 blockers | Phase 1 major | 块校验 |", "| --- | ---: | ---: | --- |");
   for (const page of report.pages) {
@@ -868,7 +884,7 @@ export async function main(
         io.stdout(
           `Block experiment ${page.pageId}: ${page.metrics.length} blocks, ` +
             `${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} new seams, ` +
-            `conformance ${page.conformancePassed === undefined ? "not evaluated" : page.conformancePassed ? "passed" : "failed"}`
+            `conformance ${page.conformance}`
         );
       }
       io.stdout(`Block experiment: ${report.conclusion} -> ${runDir}`);

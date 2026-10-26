@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { UiBriefSchema } from "@prd-ui/contracts";
+import { UiBriefSchema, type BlockExperimentPage } from "@prd-ui/contracts";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import { compileProject } from "../src/index.js";
 import { splitBlocks } from "../src/blocks.js";
@@ -12,6 +12,40 @@ const brief = UiBriefSchema.parse(
 const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
 const today = specs.find((spec) => spec.meta.pageId === "today")!;
 const manifest = splitBlocks(today, getArchetype(today.meta.archetype));
+
+function page(overrides: {
+  conformance?: "passed" | "failed" | "not_evaluated";
+  blockVerifyPassed?: boolean;
+  parityPassed?: boolean;
+  metrics?: Array<{
+    blockId: string;
+    retries: number;
+    seams: number;
+    tokenDrift: number;
+    heightDeltaPct?: number;
+  }>;
+  costCny?: number;
+}): BlockExperimentPage {
+  return {
+    pageId: "today",
+    pageRetries: 0,
+    costCny: overrides.costCny ?? 0,
+    durationMs: 10,
+    metrics:
+      overrides.metrics ??
+      manifest.blocks.map((block) => ({
+        blockId: block.blockId,
+        retries: 0,
+        seams: 0,
+        tokenDrift: 0,
+      })),
+    conformance: overrides.conformance ?? "passed",
+    ...(overrides.blockVerifyPassed === undefined
+      ? {}
+      : { blockVerifyPassed: overrides.blockVerifyPassed }),
+    ...(overrides.parityPassed === undefined ? {} : { parityPassed: overrides.parityPassed }),
+  };
+}
 
 describe("block experiment metrics", () => {
   it("counts raw style values", () => {
@@ -49,21 +83,7 @@ describe("block experiment metrics", () => {
     const report = evaluateBlockExperiment({
       project: today.meta.project,
       baseline: "run-x",
-      pages: [
-        {
-          pageId: "today",
-          pageRetries: 0,
-          costCny: 0,
-          durationMs: 10,
-          metrics: manifest.blocks.map((block) => ({
-            blockId: block.blockId,
-            retries: 0,
-            seams: 0,
-            tokenDrift: 0,
-          })),
-          conformancePassed: true,
-        },
-      ],
+      pages: [page({ conformance: "passed" })],
     });
     expect(report.conclusion).toBe("insufficient_evidence");
     expect(report.reasons).toContain("parity not evaluated");
@@ -73,73 +93,55 @@ describe("block experiment metrics", () => {
     const report = evaluateBlockExperiment({
       project: today.meta.project,
       baseline: "run-x",
-      pages: [
-        {
-          pageId: "today",
-          pageRetries: 0,
-          costCny: 0,
-          durationMs: 10,
-          metrics: [
-            {
-              blockId: manifest.blocks[0]!.blockId,
-              retries: 0,
-              seams: 0,
-              tokenDrift: 0,
-              heightDeltaPct: 0,
-            },
-          ],
-          conformancePassed: true,
-          parityPassed: true,
-        },
-      ],
+      pages: [page({ conformance: "passed", parityPassed: true })],
     });
     expect(report.conclusion).toBe("promote");
     expect(report.reasons).toEqual([]);
   });
 
-  it("treats unevaluated conformance as insufficient evidence, not as a failure", () => {
+  it("does not treat not_evaluated conformance as either pass or failure", () => {
     const report = evaluateBlockExperiment({
       project: today.meta.project,
       baseline: "run-x",
-      pages: [
-        {
-          pageId: "today",
-          pageRetries: 0,
-          costCny: 0,
-          durationMs: 10,
-          metrics: [
-            {
-              blockId: manifest.blocks[0]!.blockId,
-              retries: 0,
-              seams: 0,
-              tokenDrift: 0,
-            },
-          ],
-          parityPassed: true,
-        },
-      ],
+      pages: [page({ conformance: "not_evaluated", parityPassed: true })],
     });
     expect(report.conclusion).toBe("insufficient_evidence");
     expect(report.reasons).toContain("conformance not evaluated");
+    expect(report.reasons).not.toContain("conformance failed");
   });
 
   it("rolls back on a hard conformance failure", () => {
     const report = evaluateBlockExperiment({
       project: today.meta.project,
       baseline: "run-x",
-      pages: [
-        {
-          pageId: "today",
-          pageRetries: 0,
-          costCny: 0,
-          durationMs: 10,
-          metrics: [],
-          conformancePassed: false,
-        },
-      ],
+      pages: [page({ conformance: "failed" })],
     });
     expect(report.conclusion).toBe("rollback");
     expect(report.reasons).toContain("conformance failed");
+  });
+
+  it("lets a hard failure override not_evaluated conformance", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "not_evaluated",
+          metrics: [
+            {
+              blockId: manifest.blocks[0]!.blockId,
+              retries: 0,
+              seams: 1,
+              tokenDrift: 0,
+            },
+          ],
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toEqual(
+      expect.arrayContaining(["seams=1", "conformance not evaluated"])
+    );
   });
 
   it("rolls back on seams, retries, cost, page height, and parity failures", () => {
@@ -147,11 +149,10 @@ describe("block experiment metrics", () => {
       project: today.meta.project,
       baseline: "run-x",
       pages: [
-        {
-          pageId: "today",
-          pageRetries: 0,
+        page({
+          conformance: "passed",
+          parityPassed: false,
           costCny: 4,
-          durationMs: 10,
           metrics: [
             {
               blockId: "today.content.0",
@@ -167,9 +168,7 @@ describe("block experiment metrics", () => {
               tokenDrift: 0,
             },
           ],
-          conformancePassed: true,
-          parityPassed: false,
-        },
+        }),
       ],
     });
     expect(report.conclusion).toBe("rollback");
@@ -182,5 +181,53 @@ describe("block experiment metrics", () => {
         "parity failed",
       ])
     );
+  });
+
+  it("uses the evaluator budget passed by the CLI", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      maxCostCny: 5,
+      pages: [page({ conformance: "passed", parityPassed: true, costCny: 4 })],
+    });
+    expect(report.conclusion).toBe("promote");
+    expect(report.reasons).toEqual([]);
+
+    const overBudget = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      maxCostCny: 3,
+      pages: [page({ conformance: "passed", parityPassed: true, costCny: 4 })],
+    });
+    expect(overBudget.conclusion).toBe("rollback");
+    expect(overBudget.reasons).toContain("cost=4");
+  });
+
+  it("rolls back when parity fails even if conformance was not evaluated", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [page({ conformance: "not_evaluated", parityPassed: false })],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toEqual(
+      expect.arrayContaining(["conformance not evaluated", "parity failed"])
+    );
+  });
+
+  it("rolls back when block verification failed", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          blockVerifyPassed: false,
+          parityPassed: true,
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toContain("block verification failed");
   });
 });

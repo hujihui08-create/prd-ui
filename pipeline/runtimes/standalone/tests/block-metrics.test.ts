@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { BlockSpec, Profile } from "@prd-ui/contracts";
 import { FixtureBlockGenerator } from "../src/block/generator.js";
-import { newSeamsByBlock, percentDelta, seamBoundaries } from "../src/block/metrics.js";
+import { newSeamsByBlock, percentDelta, seamCountsByBoundary } from "../src/block/metrics.js";
 
 const dirs: string[] = [];
 afterEach(async () => {
@@ -83,12 +83,19 @@ describe("block metrics", () => {
     expect(percentDelta(100, Number.NaN)).toBeUndefined();
   });
 
-  it("maps seams to the leading block boundary", () => {
+  it("counts every seam type at each leading block boundary", () => {
     const blocks = [block("0"), block("1", "space.4"), block("2", "space.4"), block("3")];
-    expect(seamBoundaries(blocks, profile)).toEqual([false, false, true, false]);
+    expect(seamCountsByBoundary(blocks, profile)).toEqual([0, 0, 1, 0]);
+
+    const bothTypes = [
+      block("0"),
+      block("1", "space.4", "同"),
+      block("2", "space.4", "同"),
+    ];
+    expect(seamCountsByBoundary(bothTypes, profile)).toEqual([0, 0, 2]);
   });
 
-  it("reports only seams that are new relative to the baseline", () => {
+  it("reports new seams relative to the baseline as count deltas", () => {
     const baseline = [block("0"), block("1"), block("2")];
     const unchanged = structuredClone(baseline);
     expect(newSeamsByBlock(baseline, unchanged, profile)).toEqual([0, 0, 0]);
@@ -97,9 +104,27 @@ describe("block metrics", () => {
     expect(newSeamsByBlock(baseline, regressed, profile)).toEqual([0, 0, 1]);
   });
 
+  it("does not hide a boundary that gains a second seam type", () => {
+    const baseline = [block("0"), block("1", "space.4"), block("2", "space.4")];
+    const regressed = [
+      block("0"),
+      block("1", "space.4", "同"),
+      block("2", "space.4", "同"),
+    ];
+    expect(seamCountsByBoundary(baseline, profile)).toEqual([0, 0, 1]);
+    expect(seamCountsByBoundary(regressed, profile)).toEqual([0, 0, 2]);
+    expect(newSeamsByBlock(baseline, regressed, profile)).toEqual([0, 0, 1]);
+  });
+
   it("ignores seams that the baseline already had", () => {
     const baseline = [block("0", "space.4", "同"), block("1", "space.4", "同")];
     const experiment = structuredClone(baseline);
     expect(newSeamsByBlock(baseline, experiment, profile)).toEqual([0, 0]);
+  });
+
+  it("never reports a negative seam delta", () => {
+    const baseline = [block("0"), block("1", "space.4"), block("2", "space.4")];
+    const improved = [block("0"), block("1"), block("2")];
+    expect(newSeamsByBlock(baseline, improved, profile)).toEqual([0, 0, 0]);
   });
 });

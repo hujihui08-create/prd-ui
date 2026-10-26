@@ -1,4 +1,5 @@
 import type {
+  BlockConformanceStatus,
   BlockExperimentReport,
   BlockSpec,
   Profile,
@@ -61,15 +62,15 @@ export function countSeams(blocks: BlockSpec[], profile: Profile): number {
 /**
  * Decide whether the block experiment can be promoted.
  *
- * A missing check is not a failure: `conformancePassed === undefined` means
- * the check was not usable (for example, the current plan/HTML conformance
- * gate has a known modeling mismatch), so the result is insufficient
- * evidence. Only an explicit `false` (or a numeric budget breach) is a hard
- * failure that rolls the experiment back.
+ * Conformance is a required tri-state. `failed` is a hard failure (rollback);
+ * `not_evaluated` means the gate did not run, so the result is insufficient
+ * evidence unless another hard failure already forces a rollback. A missing
+ * parity result is likewise insufficient evidence, never a pass.
  */
 export function evaluateBlockExperiment(input: {
   project: string;
   baseline: string;
+  maxCostCny?: number;
   pages: Array<{
     pageId: string;
     pageRetries: number;
@@ -82,11 +83,13 @@ export function evaluateBlockExperiment(input: {
       tokenDrift: number;
       heightDeltaPct?: number;
     }>;
-    conformancePassed?: boolean;
+    conformance: BlockConformanceStatus;
+    blockVerifyPassed?: boolean;
     parityPassed?: boolean;
   }>;
 }): BlockExperimentReport {
   const reasons: string[] = [];
+  const budget = input.maxCostCny ?? 3;
   const allMetrics = input.pages.flatMap((page) => page.metrics);
   const seams = allMetrics.reduce((sum, metric) => sum + metric.seams, 0);
   const retries = allMetrics.reduce((sum, metric) => sum + metric.retries, 0);
@@ -94,32 +97,39 @@ export function evaluateBlockExperiment(input: {
   const heightDeltas = allMetrics
     .map((metric) => metric.heightDeltaPct)
     .filter((value): value is number => value !== undefined);
-  const conformanceEvaluated =
-    input.pages.length > 0 && input.pages.every((page) => page.conformancePassed !== undefined);
-  const conformanceFailed = input.pages.some((page) => page.conformancePassed === false);
+  const conformanceFailed = input.pages.some((page) => page.conformance === "failed");
+  const blockVerifyFailed = input.pages.some((page) => page.blockVerifyPassed === false);
+  const conformanceNotEvaluated =
+    input.pages.length === 0 ||
+    input.pages.some((page) => page.conformance === "not_evaluated");
+  const conformancePassed =
+    input.pages.length > 0 &&
+    input.pages.every((page) => page.conformance === "passed");
   const parityEvaluated =
     input.pages.length > 0 && input.pages.every((page) => page.parityPassed !== undefined);
   const parityFailed = input.pages.some((page) => page.parityPassed === false);
 
   if (seams > 0) reasons.push(`seams=${seams}`);
   if (retries > 6) reasons.push(`retries=${retries}`);
-  if (cost > 3) reasons.push(`cost=${cost}`);
+  if (cost > budget) reasons.push(`cost=${cost}`);
   if (heightDeltas.some((value) => Math.abs(value) > 5)) reasons.push("heightDelta>5%");
+  if (blockVerifyFailed) reasons.push("block verification failed");
   if (conformanceFailed) reasons.push("conformance failed");
-  else if (!conformanceEvaluated) reasons.push("conformance not evaluated");
+  else if (conformanceNotEvaluated) reasons.push("conformance not evaluated");
   if (parityFailed) reasons.push("parity failed");
   else if (!parityEvaluated) reasons.push("parity not evaluated");
 
   const hardFailure =
     seams > 0 ||
     retries > 6 ||
-    cost > 3 ||
+    cost > budget ||
     heightDeltas.some((value) => Math.abs(value) > 5) ||
+    blockVerifyFailed ||
     conformanceFailed ||
     parityFailed;
   const conclusion = hardFailure
     ? "rollback"
-    : conformanceEvaluated && parityEvaluated
+    : conformancePassed && parityEvaluated
       ? "promote"
       : "insufficient_evidence";
 
