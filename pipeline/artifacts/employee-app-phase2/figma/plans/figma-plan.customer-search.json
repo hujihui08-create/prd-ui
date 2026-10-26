@@ -123,7 +123,8 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "children": []
           },
           {
             "specId": "customer-search.page.root.header.title",
@@ -131,7 +132,8 @@
             "name": "Title",
             "characters": "客户搜索",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "children": []
           }
         ],
         "height": 48,
@@ -164,7 +166,8 @@
                     "name": "Search",
                     "glyph": "search",
                     "size": 20,
-                    "color": "color/text/tertiary"
+                    "color": "color/text/tertiary",
+                    "children": []
                   },
                   {
                     "specId": "customer-search.root.content.0.children.0.placeholder",
@@ -172,7 +175,8 @@
                     "name": "Placeholder",
                     "characters": "搜索客户",
                     "textStyle": "b-mobile/label.sm",
-                    "color": "color/text/tertiary"
+                    "color": "color/text/tertiary",
+                    "children": []
                   }
                 ],
                 "height": 36,
@@ -194,7 +198,8 @@
                     "name": "Icon",
                     "glyph": "inbox",
                     "size": 40,
-                    "color": "color/text/tertiary"
+                    "color": "color/text/tertiary",
+                    "children": []
                   },
                   {
                     "specId": "customer-search.state.idle.title",
@@ -203,7 +208,8 @@
                     "characters": "输入姓名或脱敏手机号搜索客户",
                     "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary",
-                    "align": "CENTER"
+                    "align": "CENTER",
+                    "children": []
                   },
                   {
                     "specId": "customer-search.state.idle.desc",
@@ -212,157 +218,17 @@
                     "characters": "输入关键词后显示匹配结果",
                     "textStyle": "b-mobile/label.sm",
                     "color": "color/text/tertiary",
-                    "align": "CENTER"
+                    "align": "CENTER",
+                    "children": []
                   }
                 ],
                 "padding": 24,
                 "gap": 4,
                 "alignItems": "CENTER"
-              },
-              {
-                "specId": "customer-search.row.result.0",
-                "type": "FRAME",
-                "name": "ListRow",
-                "layoutMode": "HORIZONTAL",
-                "children": [
-                  {
-                    "specId": "customer-search.row.result.0.main",
-                    "type": "FRAME",
-                    "name": "Main",
-                    "layoutMode": "VERTICAL",
-                    "children": [
-                      {
-                        "specId": "customer-search.row.result.0.titleRow",
-                        "type": "FRAME",
-                        "name": "TitleRow",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-search.row.result.0.title",
-                            "type": "TEXT",
-                            "name": "Title",
-                            "characters": "张女士",
-                            "textStyle": "b-mobile/heading.3",
-                            "color": "color/text/primary"
-                          }
-                        ],
-                        "gap": 6,
-                        "alignItems": "CENTER"
-                      },
-                      {
-                        "specId": "customer-search.row.result.0.subtitle",
-                        "type": "TEXT",
-                        "name": "Subtitle",
-                        "characters": "138****0000 · 星光店",
-                        "textStyle": "b-mobile/body.sm",
-                        "color": "color/text/secondary"
-                      }
-                    ],
-                    "layoutGrow": 1,
-                    "gap": 2
-                  }
-                ],
-                "paddingY": 10,
-                "gap": 12,
-                "alignItems": "CENTER"
-              },
-              {
-                "specId": "customer-search.row.result.1",
-                "type": "FRAME",
-                "name": "ListRow",
-                "layoutMode": "HORIZONTAL",
-                "children": [
-                  {
-                    "specId": "customer-search.row.result.1.main",
-                    "type": "FRAME",
-                    "name": "Main",
-                    "layoutMode": "VERTICAL",
-                    "children": [
-                      {
-                        "specId": "customer-search.row.result.1.titleRow",
-                        "type": "FRAME",
-                        "name": "TitleRow",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-search.row.result.1.title",
-                            "type": "TEXT",
-                            "name": "Title",
-                            "characters": "李女士",
-                            "textStyle": "b-mobile/heading.3",
-                            "color": "color/text/primary"
-                          }
-                        ],
-                        "gap": 6,
-                        "alignItems": "CENTER"
-                      },
-                      {
-                        "specId": "customer-search.row.result.1.subtitle",
-                        "type": "TEXT",
-                        "name": "Subtitle",
-                        "characters": "139****0000 · 星光店",
-                        "textStyle": "b-mobile/body.sm",
-                        "color": "color/text/secondary"
-                      }
-                    ],
-                    "layoutGrow": 1,
-                    "gap": 2
-                  }
-                ],
-                "paddingY": 10,
-                "gap": 12,
-                "alignItems": "CENTER"
-              },
-              {
-                "specId": "customer-search.row.result.2",
-                "type": "FRAME",
-                "name": "ListRow",
-                "layoutMode": "HORIZONTAL",
-                "children": [
-                  {
-                    "specId": "customer-search.row.result.2.main",
-                    "type": "FRAME",
-                    "name": "Main",
-                    "layoutMode": "VERTICAL",
-                    "children": [
-                      {
-                        "specId": "customer-search.row.result.2.titleRow",
-                        "type": "FRAME",
-                        "name": "TitleRow",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-search.row.result.2.title",
-                            "type": "TEXT",
-                            "name": "Title",
-                            "characters": "王女士",
-                            "textStyle": "b-mobile/heading.3",
-                            "color": "color/text/primary"
-                          }
-                        ],
-                        "gap": 6,
-                        "alignItems": "CENTER"
-                      },
-                      {
-                        "specId": "customer-search.row.result.2.subtitle",
-                        "type": "TEXT",
-                        "name": "Subtitle",
-                        "characters": "137****0000 · 星光店",
-                        "textStyle": "b-mobile/body.sm",
-                        "color": "color/text/secondary"
-                      }
-                    ],
-                    "layoutGrow": 1,
-                    "gap": 2
-                  }
-                ],
-                "paddingY": 10,
-                "gap": 12,
-                "alignItems": "CENTER"
               }
             ],
-            "padding": 0,
-            "gap": 0
+            "padding": 16,
+            "gap": 8
           }
         ],
         "layoutGrow": 1,

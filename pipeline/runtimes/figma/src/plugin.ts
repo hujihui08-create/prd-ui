@@ -52,19 +52,23 @@ async function loadFont(family: string, weight: number): Promise<{ family: strin
   }
 }
 
-function ensureCollection(plan: FigmaPlan): void {
+async function ensureCollection(plan: FigmaPlan): Promise<void> {
   if (variableCollection !== undefined) return;
   const name = `${profileName(plan)} Tokens`;
-  const collections = figma.variables.getLocalVariableCollections();
+  const collections = await figma.variables.getLocalVariableCollectionsAsync();
   const existing = collections.find((collection: FigmaNode) => collection.name === name);
   variableCollection =
     existing ?? figma.variables.createVariableCollection(name);
   const modeId = variableCollection.modes[0].modeId;
   for (const [token, value] of Object.entries(plan.tokens)) {
     if (!token.startsWith("color/")) continue;
-    const existingVariable = variableCollection.variableIds
-      .map((id: string) => figma.variables.getVariableById(id))
-      .find((variable: FigmaNode) => variable?.name === token);
+    const existingVariable = (
+      await Promise.all(
+        variableCollection.variableIds.map((id: string) =>
+          figma.variables.getVariableByIdAsync(id)
+        )
+      )
+    ).find((variable: FigmaNode) => variable?.name === token);
     const variable =
       existingVariable ??
       figma.variables.createVariable(token, variableCollection, "COLOR");
@@ -72,7 +76,6 @@ function ensureCollection(plan: FigmaPlan): void {
     variables[token] = variable;
   }
 }
-
 function paint(token: string, plan: FigmaPlan, alpha = 1): any {
   const value = plan.tokens[token];
   const solid: any = {
@@ -87,9 +90,10 @@ function paint(token: string, plan: FigmaPlan, alpha = 1): any {
 }
 
 async function ensureTextStyle(plan: FigmaPlan, name: string): Promise<FigmaStyle> {
-  const existing = textStyles[name] ?? figma.getLocalTextStyles().find((style: FigmaStyle) => style.name === name);
+  const existing = textStyles[name] ?? (await figma.getLocalTextStylesAsync()).find((style: FigmaStyle) => style.name === name);
   if (existing !== undefined) {
     textStyles[name] = existing;
+    await figma.loadFontAsync(existing.fontName);
     return existing;
   }
   const definition = plan.textStyles[name];
@@ -134,7 +138,8 @@ async function ensureButtonSet(plan: FigmaPlan, page: FigmaNode): Promise<void> 
     component.fills = [paint(style.fill, plan)];
     const label = figma.createText();
     label.name = "Label";
-    label.textStyleId = labelStyle.id;
+    await figma.loadFontAsync(labelStyle.fontName);
+    await label.setTextStyleIdAsync(labelStyle.id);
     label.characters = "按钮";
     label.fills = [paint(style.text, plan)];
     component.appendChild(label);
@@ -158,8 +163,11 @@ function applyFrameStyle(node: FigmaNode, planNode: FigmaPlanNode, plan: FigmaPl
     const width = planNode.width;
     const height = planNode.height;
     node.resize(width ?? 100, height ?? 100);
-    node.primaryAxisSizingMode = height === undefined ? "AUTO" : "FIXED";
-    node.counterAxisSizingMode = width === undefined ? "AUTO" : "FIXED";
+    const horizontal = layoutMode === "HORIZONTAL";
+    node.primaryAxisSizingMode =
+      (horizontal ? width : height) === undefined ? "AUTO" : "FIXED";
+    node.counterAxisSizingMode =
+      (horizontal ? height : width) === undefined ? "AUTO" : "FIXED";
     node.itemSpacing = planNode.gap ?? 0;
     const padding = planNode.padding;
     const paddingX = planNode.paddingX;
@@ -185,6 +193,8 @@ function applyFrameStyle(node: FigmaNode, planNode: FigmaPlanNode, plan: FigmaPl
   if (planNode.fill !== undefined) {
     node.fills = [paint(planNode.fill, plan, planNode.fillAlpha ?? 1)];
     node.setPluginData("fillToken", planNode.fill);
+  } else {
+    node.fills = [];
   }
   if (planNode.stroke !== undefined) {
     node.strokes = [paint(planNode.stroke, plan)];
@@ -220,6 +230,7 @@ async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<Figm
     wrapper.x = planNode.x;
     wrapper.y = planNode.y;
     wrapper.clipsContent = false;
+    wrapper.fills = [];
     wrapper.setPluginData("specId", planNode.specId);
     wrapper.setPluginData("kind", "ABSOLUTE");
     const child = await buildNode(planNode.child!, plan);
@@ -239,6 +250,15 @@ async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<Figm
       const child = await buildNode(childPlan, plan);
       node.appendChild(child);
       applyLayoutChild(child, childPlan);
+      const stretchVertical =
+        planNode.layoutMode === "VERTICAL" &&
+        (planNode.alignItems === undefined || planNode.alignItems === "START") &&
+        childPlan.width === undefined &&
+        childPlan.layoutAlign === undefined;
+      if (stretchVertical) {
+        child.layoutAlign = "STRETCH";
+        child.layoutSizingHorizontal = "FILL";
+      }
     }
     return node;
   }
@@ -252,7 +272,7 @@ async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<Figm
     node.name = planNode.name;
     node.setPluginData("specId", planNode.specId);
     node.setPluginData("kind", "TEXT");
-    node.textStyleId = style.id;
+    await node.setTextStyleIdAsync(style.id);
     node.setPluginData("textStyleName", styleName);
     node.characters = planNode.characters ?? "";
     if (planNode.color !== undefined) {
@@ -390,17 +410,24 @@ function readbackNode(node: FigmaNode): FigmaReadbackNode {
 async function build(plan: FigmaPlan, mode: "scratch" | "delivery"): Promise<FigmaReadback> {
   errors.length = 0;
   fonts.length = 0;
+  await figma.loadAllPagesAsync();
   const pageName = mode === "scratch" ? `${plan.pageName} [scratch]` : plan.pageName;
   const existing = figma.root.children.find((page: FigmaNode) => page.name === pageName);
   if (existing !== undefined) {
     if (mode === "delivery") throw new Error(`PAGE_EXISTS: ${pageName}`);
+    if (figma.currentPage.id === existing.id) {
+      const fallback =
+        figma.root.children.find((page: FigmaNode) => page.id !== existing.id) ??
+        figma.createPage();
+      await figma.setCurrentPageAsync(fallback);
+    }
     existing.remove();
     for (const key of Object.keys(componentVariants)) delete componentVariants[key];
   }
   const page = figma.createPage();
   page.name = pageName;
   await figma.setCurrentPageAsync(page);
-  ensureCollection(plan);
+  await ensureCollection(plan);
   await ensureButtonSet(plan, page);
   const root = await buildNode(plan.root, plan);
   page.appendChild(root);

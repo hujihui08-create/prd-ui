@@ -341,8 +341,8 @@
                 "gap": 6
               }
             ],
-            "padding": 0,
-            "gap": 0
+            "padding": 16,
+            "gap": 12
           }
         ],
         "layoutGrow": 1,

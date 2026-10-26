@@ -1,5 +1,6 @@
 {
   "name": "PRD UI Figma Renderer",
+  "id": "prd-ui-figma-renderer-local-dev",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",

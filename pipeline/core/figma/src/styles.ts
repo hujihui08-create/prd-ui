@@ -18,16 +18,24 @@ export function colorToken(key: string): string {
   return tokenKey("color", key);
 }
 
+function normalizeKey(group: "space" | "radius", key: string): string {
+  const dot = `${group}.`;
+  const dash = `${group}-`;
+  if (key.startsWith(dot)) return key.slice(dot.length);
+  if (key.startsWith(dash)) return key.slice(dash.length);
+  return key;
+}
+
 export function spacePx(profile: Profile, key: string | undefined, fallback = 0): number {
   if (key === undefined) return fallback;
-  const raw = profile.space[key];
+  const raw = profile.space[normalizeKey("space", key)];
   if (raw === undefined) return fallback;
   return Number.parseInt(raw, 10);
 }
 
 export function radiusPx(profile: Profile, key: string | undefined, fallback = 0): number {
   if (key === undefined) return fallback;
-  const raw = profile.radius[key];
+  const raw = profile.radius[normalizeKey("radius", key)];
   if (raw === undefined) return fallback;
   return Number.parseInt(raw, 10);
 }

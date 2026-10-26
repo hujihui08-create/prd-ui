@@ -2803,12 +2803,13 @@
                     "clip": true
                   }
                 ],
-                "padding": 0,
-                "gap": 0
+                "gap": 8,
+                "paddingX": 0,
+                "paddingY": 4
               }
             ],
-            "padding": 0,
-            "gap": 0
+            "padding": 16,
+            "gap": 8
           }
         ],
         "layoutGrow": 1,

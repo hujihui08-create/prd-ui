@@ -9,9 +9,12 @@
       p { color: #b3b3b3; margin: 0 0 14px; line-height: 1.5; }
       label { display: block; color: #b3b3b3; margin: 10px 0 6px; }
       input[type="file"] { width: 100%; color: #ddd; }
+      input[type="text"] { width: 100%; box-sizing: border-box; height: 36px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; padding: 0 8px; }
+      textarea { width: 100%; box-sizing: border-box; min-height: 56px; resize: vertical; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; padding: 8px; }
       select, button { width: 100%; height: 36px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; }
       button { margin-top: 12px; background: #fff; color: #111; border: 0; font-weight: 600; cursor: pointer; }
       button:disabled { opacity: .5; cursor: default; }
+      button[hidden] { display: none; }
       #status { margin-top: 14px; padding: 10px; border-radius: 6px; background: #2a2a2a; color: #b3b3b3; line-height: 1.5; white-space: pre-wrap; }
       #status.error { background: #3a1f1f; color: #ffb4b4; }
       #status.ok { background: #1f3a2a; color: #b4ffd0; }
@@ -24,6 +27,12 @@
     <p>选择 <code>figma-plan.&lt;page&gt;.json</code>，先做 scratch build + readback；diff 通过后再 build delivery page。</p>
     <label for="plan">Plan file</label>
     <input id="plan" type="file" accept="application/json,.json" />
+    <label for="planText">或粘贴 plan JSON</label>
+    <textarea id="planText" rows="3" placeholder="粘贴 figma-plan.<page>.json 的内容"></textarea>
+    <button id="loadText" disabled>Load plan JSON</button>
+    <label for="planUrl">或从 localhost 加载</label>
+    <input id="planUrl" type="text" placeholder="http://127.0.0.1:8787/figma-plan.today.json" />
+    <button id="loadUrl" disabled>Load plan URL</button>
     <label for="mode">Build mode</label>
     <select id="mode">
       <option value="scratch">Scratch + readback</option>
@@ -31,31 +40,91 @@
     </select>
     <button id="build" disabled>Build</button>
     <div id="status">Ready. 选择 plan 后开始。</div>
+    <button id="copyReadback" hidden>Copy readback JSON</button>
     <p class="muted">插件不能 headless；delivery page 已存在时会阻止。readback 下载后可交给 <code>pnpm figma:verify</code>。</p>
     <script>
       const input = document.getElementById("plan");
+      const planText = document.getElementById("planText");
+      const loadText = document.getElementById("loadText");
+      const planUrl = document.getElementById("planUrl");
+      const loadUrl = document.getElementById("loadUrl");
       const mode = document.getElementById("mode");
       const build = document.getElementById("build");
       const status = document.getElementById("status");
+      const copyReadback = document.getElementById("copyReadback");
       let plan = null;
+      let lastReadback = null;
 
       function setStatus(text, kind) {
         status.textContent = text;
         status.className = kind || "";
       }
 
+      function acceptPlan(value, source) {
+        plan = value;
+        build.disabled = false;
+        copyReadback.hidden = true;
+        lastReadback = null;
+        setStatus(`已加载 ${plan.pageId || plan.pageName || source}`);
+      }
+
       input.addEventListener("change", async () => {
         const file = input.files && input.files[0];
         if (!file) return;
         try {
-          plan = JSON.parse(await file.text());
-          build.disabled = false;
-          setStatus(`已加载 ${plan.pageId || plan.pageName || file.name}`);
+          acceptPlan(JSON.parse(await file.text()), file.name);
         } catch (error) {
           plan = null;
           build.disabled = true;
           setStatus(`Plan 解析失败：${error.message}`, "error");
         }
+      });
+
+      planText.addEventListener("input", () => {
+        loadText.disabled = planText.value.trim() === "";
+      });
+
+      loadText.addEventListener("click", () => {
+        try {
+          acceptPlan(JSON.parse(planText.value), "粘贴内容");
+        } catch (error) {
+          plan = null;
+          build.disabled = true;
+          setStatus(`Plan 解析失败：${error.message}`, "error");
+        }
+      });
+
+      planUrl.addEventListener("input", () => {
+        loadUrl.disabled = planUrl.value.trim() === "";
+      });
+
+      loadUrl.addEventListener("click", async () => {
+        const url = planUrl.value.trim();
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          acceptPlan(await response.json(), url);
+        } catch (error) {
+          plan = null;
+          build.disabled = true;
+          setStatus(`Plan 加载失败：${error.message}`, "error");
+        }
+      });
+
+      copyReadback.addEventListener("click", async () => {
+        if (lastReadback === null) return;
+        const text = JSON.stringify(lastReadback, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const scratch = document.createElement("textarea");
+          scratch.value = text;
+          document.body.append(scratch);
+          scratch.select();
+          document.execCommand("copy");
+          scratch.remove();
+        }
+        setStatus(`readback 已复制：${lastReadback.pageId}`, "ok");
       });
 
       build.addEventListener("click", () => {
@@ -83,6 +152,8 @@
         if (message.type === "readback") {
           build.disabled = false;
           const readback = message.readback;
+          lastReadback = readback;
+          copyReadback.hidden = false;
           const text = JSON.stringify(readback, null, 2);
           const blob = new Blob([text], { type: "application/json" });
           const url = URL.createObjectURL(blob);
