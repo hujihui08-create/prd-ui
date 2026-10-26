@@ -23,8 +23,8 @@ otherwise to <out>/conformance. The summary is written to <out>/v07-smoke.json a
 printed as one JSON line.
 
 Parity inputs that are not available make the parity step \`skipped\` with an explicit
-reason; a skipped parity does not fail the smoke. Gate failures exit 1, usage or
-infrastructure errors exit 2.
+reason; a skipped parity does not fail the smoke, but the summary then reports
+\`paritySkipped: true\` and \`complete: false\` (executed gates passed is not a full pass).
 
 Exit codes: 0 all executed gates passed, 1 gate failure, 2 usage/infrastructure error.`;
 
@@ -135,7 +135,11 @@ export interface SmokeStepSummary {
 export interface SmokeSummary {
   schemaVersion: "1.0";
   generatedAt: string;
-  passed: boolean;
+  /** True when every gate that actually ran passed. Parity may still be skipped. */
+  executedGatesPassed: boolean;
+  /** True only when every gate ran and passed (parity included); a skip is not a pass. */
+  complete: boolean;
+  paritySkipped?: boolean;
   conformance?: SmokeStepSummary;
   measure?: SmokeStepSummary;
   structure?: SmokeStepSummary;
@@ -270,7 +274,7 @@ async function defaultRunMeasure(options: MeasureStepOptions): Promise<SmokeStep
   return { ...result, summary: { pages: report.pages.length } };
 }
 
-async function defaultRunStructure(options: StructureStepOptions): Promise<SmokeStepResult> {
+export async function defaultRunStructure(options: StructureStepOptions): Promise<SmokeStepResult> {
   const captured = captureIo();
   const code = await structureMain(
     [
@@ -351,6 +355,40 @@ export async function defaultPageIds(specRun: string): Promise<string[]> {
   return files.map((file) => path.basename(file, ".json"));
 }
 
+/** Repository root, derived from this file so evidence never leaks a host path. */
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
+
+/**
+ * Repo-relative path for summaries and skip reasons. Targets outside the repo
+ * are shown as `<external>/<basename>` so committed evidence stays portable.
+ */
+export function displayPath(target: string): string {
+  const relative = path.relative(REPO_ROOT, target).split(path.sep).join("/");
+  if (relative.length === 0) return ".";
+  if (relative === ".." || relative.startsWith("../") || path.isAbsolute(relative)) {
+    return `<external>/${path.basename(target)}`;
+  }
+  return relative;
+}
+
+/**
+ * Input-side parity preconditions. These do not need page ids, so a missing
+ * `--figma`/`--baseline`/baseline manifest is reported before the spec run is
+ * read (a missing page-spec must not turn a skippable parity into an error).
+ */
+async function parityInputSkipReason(options: SmokeOptions): Promise<string | undefined> {
+  if (options.figma === undefined && options.baseline === undefined) {
+    return "missing --figma and --baseline (parity inputs not supplied)";
+  }
+  if (options.figma === undefined) return "missing --figma";
+  if (options.baseline === undefined) return "missing --baseline";
+  const manifest = path.join(options.baseline, "manifest.json");
+  if (!(await pathExists(manifest))) {
+    return `missing baseline manifest: ${displayPath(manifest)}`;
+  }
+  return undefined;
+}
+
 /**
  * Parity is attempted only when both inputs are supplied and every page has a
  * Figma PNG. A missing input is an explicit skip, not a silent pass and not a
@@ -360,22 +398,15 @@ export async function paritySkipReason(
   options: SmokeOptions,
   pageIds: string[]
 ): Promise<string | undefined> {
-  if (options.figma === undefined && options.baseline === undefined) {
-    return "missing --figma and --baseline (parity inputs not supplied)";
-  }
-  if (options.figma === undefined) return "missing --figma";
-  if (options.baseline === undefined) return "missing --baseline";
-  const dir = path.join(options.figma, "parity");
+  const inputReason = await parityInputSkipReason(options);
+  if (inputReason !== undefined) return inputReason;
+  const dir = path.join(options.figma!, "parity");
   const missing: string[] = [];
   for (const pageId of pageIds) {
     if (!(await pathExists(path.join(dir, `figma.${pageId}.png`)))) missing.push(pageId);
   }
   if (missing.length > 0) {
-    return `missing Figma PNGs in ${dir}: ${missing.join(", ")}`;
-  }
-  const manifest = path.join(options.baseline, "manifest.json");
-  if (!(await pathExists(manifest))) {
-    return `missing baseline manifest: ${manifest}`;
+    return `missing Figma PNGs in ${displayPath(dir)}: ${missing.join(", ")}`;
   }
   return undefined;
 }
@@ -450,7 +481,8 @@ export async function main(
   const summary: SmokeSummary = {
     schemaVersion: "1.0",
     generatedAt: now().toISOString(),
-    passed: false,
+    executedGatesPassed: false,
+    complete: false,
   };
   const printed: string[] = [];
   let exitCode = 0;
@@ -510,15 +542,20 @@ export async function main(
   );
   if (!record("structure", structure)) return finish(summary, printed, exitCode, options, io);
 
-  let pageIds: string[];
-  try {
-    pageIds = await loadPageIds(options.specRun);
-  } catch (error) {
-    summary.parity = { status: "error", error: errorMessage(error) };
-    summary.stoppedAt = "parity";
-    return finish(summary, printed, 2, options, io);
+  // Resolve input-side skips first; a missing spec run only matters when parity
+  // actually has both inputs and therefore must be attempted.
+  let skipReason = await parityInputSkipReason(options);
+  if (skipReason === undefined) {
+    let pageIds: string[];
+    try {
+      pageIds = await loadPageIds(options.specRun);
+    } catch (error) {
+      summary.parity = { status: "error", error: errorMessage(error) };
+      summary.stoppedAt = "parity";
+      return finish(summary, printed, 2, options, io);
+    }
+    skipReason = await paritySkipReason(options, pageIds);
   }
-  const skipReason = await paritySkipReason(options, pageIds);
   if (skipReason !== undefined) {
     summary.parity = { status: "skipped", reason: skipReason };
   } else {
@@ -535,7 +572,6 @@ export async function main(
     if (!record("parity", parity)) return finish(summary, printed, exitCode, options, io);
   }
 
-  summary.passed = exitCode === 0;
   return finish(summary, printed, exitCode, options, io);
 }
 
@@ -546,7 +582,18 @@ async function finish(
   options: SmokeOptions,
   io: { stdout: (line: string) => void; stderr: (line: string) => void }
 ): Promise<number> {
-  summary.passed = exitCode === 0;
+  summary.executedGatesPassed = exitCode === 0;
+  summary.complete =
+    summary.executedGatesPassed &&
+    summary.conformance?.status === "passed" &&
+    summary.measure?.status === "passed" &&
+    summary.structure?.status === "passed" &&
+    summary.parity?.status === "passed";
+  if (summary.parity?.status === "skipped") {
+    summary.paritySkipped = true;
+  } else {
+    delete summary.paritySkipped;
+  }
   const file = path.join(options.out!, "v07-smoke.json");
   try {
     await mkdir(options.out!, { recursive: true });
@@ -557,7 +604,13 @@ async function finish(
   }
   if (!options.json) {
     for (const line of printed) io.stdout(line);
-    const label = summary.passed ? "passed" : exitCode === 2 ? "error" : "failed";
+    const label = summary.complete
+      ? "complete (all gates passed)"
+      : summary.executedGatesPassed
+        ? "executed gates passed (parity skipped)"
+        : exitCode === 2
+          ? "error"
+          : "failed";
     io.stdout(`v07:smoke ${label} -> ${file}`);
   }
   io.stdout(JSON.stringify(summary));

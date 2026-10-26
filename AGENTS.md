@@ -129,8 +129,11 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 - `v07:smoke` runs conformance → render:measure → structure:check →
   figma:parity (only with both `--figma` and `--baseline` and every Figma PNG
   present) and stops at the first failure; it writes `<out>/v07-smoke.json` and
-  prints one JSON summary line. It does **not** run `figma:verify`, which needs
-  manual Figma readbacks.
+  prints one JSON summary line. The summary uses `executedGatesPassed` and
+  `complete`: a skipped parity sets `paritySkipped: true` and `complete: false`
+  and the human label reads `executed gates passed (parity skipped)` — a skip is
+  never a full pass. It does **not** run `figma:verify`, which needs manual Figma
+  readbacks.
 - `figma:serve` serves plans and accepts readback/PNG saves from the plugin;
   `figma:sign` binds the five evidence hashes and refuses any `passed:false`
   diff. `figma:verify` is green only after a real Figma rebuild (the checked-in
@@ -147,7 +150,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 
 ## Current state (v0.7 automatable gates implemented, Figma rebuild + Gate 0 pending, 2026-10-26)
 
-Verified: `pnpm test` **945 passed** (86 files), `pnpm test:dsh` **4 passed**
+Verified: `pnpm test` **949 passed** (86 files), `pnpm test:dsh` **4 passed**
 (3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma typecheck` clean
 and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
@@ -157,14 +160,15 @@ signed.** `figma:conformance` is **0 blocker / 0 major / 233 checked** on the 8
 phase2 pages using freshly rendered HTML (`/tmp/html-v07-final`) and the
 committed corrected plans; `render:measure` is 8 pages with no overflow and
 `structure:check --project` is 0 warnings / 0 blockers. `v07:smoke` exits 0 with
-`parity: {status: "skipped"}` because no `figma/parity/figma.<page>.png` exist.
+`executedGatesPassed: true`, `complete: false`, `paritySkipped: true` because no
+`figma/parity/figma.<page>.png` exist (not a full pass).
 Evidence: `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,v07-smoke.json}`.
 
 `figma:verify` is **red against the checked-in v0.6 readbacks** (3/8 passed;
 4 blocker / 53 major, all stale value diffs, no coverage findings) because
 Task 20a corrected the plans. A real Figma rebuild (scratch + delivery) is
 required before verify/parity/`figma:sign` can be green. `handoff:pack` fails
-closed: exit 2 with the brief's `--assets artifact-compiler` (no root
+closed: exit 2 with the brief's `--assets asset-compiler` (no root
 manifest), exit 1 with 23 blockers (missing `figma/parity/`, parity diff PNGs,
 readback `fileKey`, figma signoff, and a full `spec-engineer-gate.json`); no
 partial package is written.

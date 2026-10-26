@@ -8,8 +8,9 @@
 ## 1. 一句话状态
 
 `figma:conformance`（plan ↔ HTML）在 8 页上 **0 blocker / 0 major**（233 项检查）；
-`render:measure` 8 页、`structure:check` 0 warning；`v07:smoke` 退出 0。
-`figma:verify` 因 **v0.6 readback 过期** 仍为红（3/8 passed，4 blocker / 53 major），
+`render:measure` 8 页、`structure:check` 0 warning；`v07:smoke` 退出 0，但
+`executedGatesPassed: true` / `complete: false` / `paritySkipped: true`（parity 未运行，
+不是完整通过）。`figma:verify` 因 **v0.6 readback 过期** 仍为红（3/8 passed，4 blocker / 53 major），
 parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff:pack` fail-closed
 （exit 1，23 blockers，未产出目录）。v0.6 人工签核与 baseline 重生成（Gate 0）仍是最前置的阻塞项。
 
@@ -18,7 +19,7 @@ parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff
 | 项 | 内容 |
 |---|---|
 | CLI | `runtimes/standalone/src/v07-smoke-cli.ts` + `pnpm v07:smoke`；顺序执行 conformance → measure → structure → parity，首个失败即停 |
-| 测试 | `runtimes/standalone/tests/v07-smoke-cli.test.ts`（15 个：参数、顺序、停止、exit code、parity 跳过原因、summary 落盘） |
+| 测试 | `runtimes/standalone/tests/v07-smoke-cli.test.ts`（19 个：参数、顺序、停止、exit code、parity 跳过原因、无绝对路径、summary 落盘、默认 structure 适配器） |
 | 证据 | `artifacts/employee-app-phase2/{figma/conformance,render/metrics,render/structure,blocks,v07-smoke.json}` |
 | 文档 | `AGENTS.md`、`CHANGELOG.md`、`docs/superpowers/plans/2026-10-23-version-roadmap.md`、本文件 |
 | 未做 | 不运行 `visual:baseline`（仅人工）；不伪造 Figma PNG/readback/签核；不提交部分 handoff 包 |
@@ -28,16 +29,18 @@ parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff
 - `--spec-run/--html/--project/--out` 必填；`--plans` 或 `--figma` 至少一个（plans 默认 `<figma>/plans`）。
 - conformance 输出到 `<figma>/conformance`（有 `--figma` 时），否则 `<out>/conformance`。
 - measure/structure 输出到 `<out>/render/metrics`、`<out>/render/structure`。
-- parity 仅在同时提供 `--figma` 与 `--baseline`、且每页 `<figma>/parity/figma.<pageId>.png` 都存在、
-  baseline `manifest.json` 存在时运行；否则 `status: "skipped"` 并写明原因，**不因跳过而失败**。
+- parity 仅在同时提供 `--figma` 与 `--baseline`、baseline `manifest.json` 存在、且每页
+  `<figma>/parity/figma.<pageId>.png` 都存在时运行；否则 `status: "skipped"` 并写明原因，
+  **不因跳过而把执行过的门禁判失败**，但 summary 会记录 `paritySkipped: true` 与 `complete: false`。
 - 真实门禁失败（conformance blocker、measure/structure infra、parity 失败）退出非 0；
-  summary 写到 `<out>/v07-smoke.json` 并作为最后一行 JSON 打印。
+  summary 写到 `<out>/v07-smoke.json` 并作为最后一行 JSON 打印。跳过原因中的路径为仓库相对路径
+  （仓库外目标写成 `<external>/<name>`），不写本机绝对路径。
 
 ## 3. 测试与门禁结果（2026-10-26）
 
 | 命令 | 结果 |
 |---|---|
-| `pnpm test` | **86 files / 945 tests passed** |
+| `pnpm test` | **86 files / 949 tests passed** |
 | `pnpm test:dsh` | **3 files / 4 tests passed** |
 | `pnpm typecheck` | clean（所有 workspace 包） |
 | `pnpm --dir runtimes/figma typecheck` | clean |
@@ -56,17 +59,20 @@ pnpm v07:smoke \
   --out artifacts/employee-app-phase2 --json
 ```
 
-`exit 0`，最后一行 summary（也写入 `artifacts/employee-app-phase2/v07-smoke.json`）：
+`exit 0`（执行过的门禁通过，但**不是完整通过**），最后一行 summary（也写入
+`artifacts/employee-app-phase2/v07-smoke.json`）：
 
 ```json
-{"schemaVersion":"1.0","generatedAt":"2026-10-26T15:34:23.468Z","passed":true,
+{"schemaVersion":"1.0","generatedAt":"2026-10-26T15:47:13.031Z","executedGatesPassed":true,"complete":false,
  "conformance":{"status":"passed","passed":true,"blockers":0,"majors":0,"pages":8},
  "measure":{"status":"passed","pages":8},
  "structure":{"status":"passed","warnings":0,"blockers":0},
- "parity":{"status":"skipped","reason":"missing Figma PNGs in artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"}}
+ "parity":{"status":"skipped","reason":"missing Figma PNGs in pipeline/artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"},
+ "paritySkipped":true}
 ```
 
-注意：parity 的 `skipped` 不是通过。完整包仍由 `handoff:pack` fail-closed 把关。
+注意：parity 的 `skipped` 不是通过；`complete: false` / `paritySkipped: true` 明确表示
+这不是一次完整门禁运行。完整包仍由 `handoff:pack` fail-closed 把关。
 
 ### 3.2 `figma:conformance`（0/0）
 
@@ -121,8 +127,9 @@ summary：`{"blockers":0,"majors":0,"pages":8}`。
 | treatment-notice | false | 4 | 11 | 88 |
 | **total** | **3/8** | **4** | **53** | **973** |
 
-全部差异都是 v0.6 build 的旧值（`FIGMA_SPACING`/`FIGMA_SIZE`/`FIGMA_ABSOLUTE`/
-`FIGMA_TEXT_STYLE` 4 条，其余 951 条为 `READBACK_STYLE_UNSUPPORTED` minor），
+全部差异都是 v0.6 build 的旧值：**57 条值差异**（41 `FIGMA_SPACING` +
+8 `FIGMA_SIZE` + 4 `FIGMA_ABSOLUTE` + 4 `FIGMA_TEXT_STYLE`）+ **916 条
+`READBACK_STYLE_UNSUPPORTED` minor**，合计 **973 = 4 blocker + 53 major + 916 minor**。
 **没有** `UNMAPPED_COMPONENT`/`SPEC_NODE_ID_MISSING`/`FIGMA_NODE_MISSING`/
 `FIGMA_NODE_EXTRA`/`FIGMA_HIERARCHY`/`FIGMA_LAYOUT_MODE`。plan 已按 HTML 修正
 （Task 20a），不重建 Figma 就无法变绿。
@@ -192,7 +199,8 @@ pnpm exec tsx runtimes/standalone/src/figma-cli.ts verify \
  "status":"unmapped","reason":"UNMAPPED_COMPONENT:Chart"}
 ```
 
-`figma:verify` exit 1，含预期 blocker（其余 4 major/2 blocker 来自旧 readback 的噪声）：
+`figma:verify` exit 1，含预期 blocker（另有 2 blocker / 9 major 来自旧 readback 的噪声；
+本次 verify 合计 3 blocker / 9 major）：
 
 ```text
 - [blocker] UNMAPPED_COMPONENT: Chart at layout.slots.content[0].children[3]: UNMAPPED_COMPONENT:Chart
@@ -263,8 +271,10 @@ pnpm handoff:pack ... --assets artifacts/employee-app-phase2/asset-compiler/phas
 | spec-engineer gate 缺失 | 1 | `figma/spec-source` 只有 `artifacts/page-spec`，没有 `findings/spec-engineer-gate.json` |
 | Figma gate 未通过摘要 | 1 | `figmaSign gate did not pass`（parity/签核的汇总） |
 
-视觉侧已通过：visual run 状态 `success`、`visual-sign.json` 与 baseline PNG hash 均匹配
-（baseline 仍是 v0.5 那份；见 §7 的过期说明）。没有提交任何部分包。
+视觉侧的 **gate 机制**在过期的 v0.5 baseline 上通过：visual run 状态 `success`、
+`visual-sign.json` 与 baseline PNG hash 均匹配（baseline 仍是 v0.5 那份）。这不等于当前
+视觉通过——v0.5.x CSS 变更后 baseline 已过期，**Gate 0 仍待人工重生成并签核**（见 §7）。
+没有提交任何部分包。
 
 ## 7. 阻塞在人工 Figma / Gate 0 的项
 
@@ -304,6 +314,8 @@ cd pipeline
 # 1. 自动门禁（fresh HTML + committed plans + smoke）
 rm -rf /tmp/html-v07-final
 pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final
+# plans 是 Task 20a 的已提交输出；需要重新生成时：
+pnpm figma:plan --spec-run artifacts/employee-app-phase2/figma/spec-source --out artifacts/employee-app-phase2/figma/plans
 pnpm v07:smoke \
   --spec-run artifacts/employee-app-phase2/figma/spec-source \
   --html /tmp/html-v07-final \
@@ -365,9 +377,11 @@ pnpm figma:sign --figma artifacts/employee-app-phase2/figma \
 - 自动门禁：`pipeline/artifacts/employee-app-phase2/figma/conformance/`（`conformance.json`、
   `style-manifest.json`）、`.../render/metrics/render-metrics.json`、
   `.../render/structure/structure-measured.json`、`.../v07-smoke.json`
-- 分块实验副本：`pipeline/artifacts/employee-app-phase2/blocks/`
+- 分块实验副本（自包含，路径已仓库相对化）：
+  `pipeline/artifacts/employee-app-phase2/blocks/`（含 `conformance/conformance.json` 与
+  `artifacts/block-manifest/`）
 - 历史 Figma 证据（过期，勿当通过）：`pipeline/artifacts/employee-app-phase2/figma/{plans,readback,diff,screenshots}`
-- 失败注入与 verify 日志（本机临时）：`/tmp/v07-verify/`、`/tmp/defect-*.log`、
+- 失败注入与 verify 日志（本机临时，未提交）：`/tmp/v07-verify/`、`/tmp/defect-*.log`、
   `/tmp/v07-new-project*`
 - 测试：`pipeline/runtimes/standalone/tests/v07-smoke-cli.test.ts`
 
@@ -376,5 +390,7 @@ pnpm figma:sign --figma artifacts/employee-app-phase2/figma \
 - `pipeline/runtimes/standalone/src/v07-smoke-cli.ts`（新增）
 - `pipeline/runtimes/standalone/tests/v07-smoke-cli.test.ts`（新增）
 - `pipeline/package.json`（`v07:smoke`）
-- `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,blocks,v07-smoke.json}`（证据）
+- `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,v07-smoke.json}`（证据）
+- `pipeline/artifacts/employee-app-phase2/blocks/`（包含 `conformance/` 与
+  `artifacts/block-manifest/` 的自包含副本；本地绝对路径已仓库相对化）
 - `AGENTS.md`、`CHANGELOG.md`、`docs/superpowers/plans/2026-10-23-version-roadmap.md`、本文件

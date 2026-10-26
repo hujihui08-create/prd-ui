@@ -10,25 +10,30 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 - `pnpm v07:smoke` (`runtimes/standalone/src/v07-smoke-cli.ts`): runs
   `figma:conformance` → `render:measure` → `structure:check` → `figma:parity` in
   order, stops at the first failure, and writes `<out>/v07-smoke.json` plus one
-  JSON summary line. Parity runs only with `--figma` + `--baseline` and every
-  `figma.<pageId>.png`; otherwise it is an explicit `skipped` (not a pass).
+  JSON summary line. The summary separates `executedGatesPassed` from `complete`;
+  parity runs only with `--figma` + `--baseline` and every `figma.<pageId>.png`,
+  otherwise it is an explicit `skipped` that sets `paritySkipped: true` and
+  `complete: false` (not a full pass). Skip reasons use repo-relative paths.
 - v0.7 gates and evidence (Tasks 1–19): fail-closed plan mapping +
   `plan-coverage.json`, project-agnostic `figma:conformance`, `figma:parity`,
   `figma:serve`/`figma:sign`, `render:measure`, `structure:check --project`,
   `structure:diff`, `block:verify`, `block:experiment`, and the fail-closed
   `handoff:pack`.
 - Committed evidence: `pipeline/artifacts/employee-app-phase2/figma/conformance/`,
-  `.../render/{metrics,structure}/`, `.../blocks/`, and `.../v07-smoke.json`.
+  `.../render/{metrics,structure}/`, `.../blocks/` (sanitized, self-contained
+  copy with `conformance/` and `artifacts/block-manifest/`), and
+  `.../v07-smoke.json`.
 - `docs/handoffs/2026-10-26-v07-implementation-handoff.md`.
 
 ### Verified
 
-- `pnpm test` **945 passed** (86 files); `pnpm test:dsh` **4 passed** (3 files);
+- `pnpm test` **949 passed** (86 files); `pnpm test:dsh` **4 passed** (3 files);
   `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
 - `figma:conformance`: **0 blocker / 0 major / 233 checked** on all 8 phase2
   pages with freshly rendered HTML; `render:measure` 8 pages (no overflow);
-  `structure:check --project` 0 warnings / 0 blockers; `v07:smoke` exit 0
-  (`parity: skipped` for missing Figma PNGs).
+  `structure:check --project` 0 warnings / 0 blockers; `v07:smoke` exit 0 with
+  `executedGatesPassed: true`, `complete: false`, `paritySkipped: true` (missing
+  Figma PNGs).
 - Defect injections fail as intended: `ghost-chip` height 36 → 2
   `CONFORMANCE_STYLE_MISMATCH height`; removed row divider → 1
   `CONFORMANCE_STYLE_MISMATCH borderBottomWidth`; injected `Chart` →

@@ -1,7 +1,8 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-26T15:34:23.468Z",
-  "passed": true,
+  "generatedAt": "2026-10-26T15:47:13.031Z",
+  "executedGatesPassed": true,
+  "complete": false,
   "conformance": {
     "status": "passed",
     "passed": true,
@@ -20,6 +21,7 @@
   },
   "parity": {
     "status": "skipped",
-    "reason": "missing Figma PNGs in /Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"
-  }
+    "reason": "missing Figma PNGs in pipeline/artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"
+  },
+  "paritySkipped": true
 }

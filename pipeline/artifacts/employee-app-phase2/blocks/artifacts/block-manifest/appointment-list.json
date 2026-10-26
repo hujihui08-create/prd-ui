@@ -1,0 +1,516 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "appointment-list",
+  "shell": {
+    "rootType": "MobileShell",
+    "slots": [
+      "content",
+      "actions"
+    ],
+    "wrappers": [
+      {
+        "slot": "content",
+        "specId": "appointment-list.root.content.0",
+        "type": "Section",
+        "padding": "space.4",
+        "gap": "space.2"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "schemaVersion": "1.0",
+      "blockId": "appointment-list.content.0",
+      "pageId": "appointment-list",
+      "slot": "content",
+      "index": 0,
+      "role": "row",
+      "allowedComponents": [
+        "Section",
+        "ListRow",
+        "CalendarGrid",
+        "SearchBar",
+        "CollapsedFilter",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button",
+        "TabBar"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "appointment-list.root.content.0.children.0",
+        "type": "Row",
+        "props": {
+          "gap": "space.2",
+          "variant": "filter"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.0.children.0",
+            "type": "CollapsedFilter",
+            "props": {
+              "label": "状态",
+              "value": "全部",
+              "options": [
+                "全部",
+                "已登记",
+                "已到店",
+                "爽约",
+                "已取消"
+              ]
+            }
+          },
+          {
+            "id": "appointment-list.root.content.0.children.0.children.1",
+            "type": "CollapsedFilter",
+            "props": {
+              "label": "日期",
+              "value": "11-05 周三",
+              "options": [
+                "全部",
+                "11-05 周三"
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "sha256:dec4e61064ab57146fa8bf6b869cfac8d42ba00fc12078ad54d0b9c2b11478a6"
+    },
+    {
+      "schemaVersion": "1.0",
+      "blockId": "appointment-list.content.1",
+      "pageId": "appointment-list",
+      "slot": "content",
+      "index": 1,
+      "role": "row",
+      "allowedComponents": [
+        "Section",
+        "ListRow",
+        "CalendarGrid",
+        "SearchBar",
+        "CollapsedFilter",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button",
+        "TabBar"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "appointment-list.root.content.0.children.1",
+        "type": "Row",
+        "props": {
+          "gap": "space.2",
+          "variant": "filter"
+        },
+        "children": [
+          {
+            "id": "appointment-list.content.1.search",
+            "type": "SearchBar",
+            "props": {
+              "placeholder": "搜索预约人、服务项目",
+              "label": "搜索预约",
+              "action": "搜索预约",
+              "value": ""
+            }
+          },
+          {
+            "id": "appointment-list.content.1.filter",
+            "type": "CollapsedFilter",
+            "props": {
+              "label": "筛选",
+              "summary": "全部预约",
+              "expanded": false,
+              "activeCount": 0
+            }
+          },
+          {
+            "id": "appointment-list.action.toggle-view",
+            "type": "Button",
+            "props": {
+              "label": "切换日历/列表",
+              "emphasis": "secondary",
+              "action": "切换日历/列表",
+              "viewToggle": true
+            }
+          }
+        ]
+      },
+      "hash": "sha256:ec046166d353309f1754708b3c993a49ee5ab6e66a48f3aa45009c35219bb0ff"
+    },
+    {
+      "schemaVersion": "1.0",
+      "blockId": "appointment-list.content.2",
+      "pageId": "appointment-list",
+      "slot": "content",
+      "index": 2,
+      "role": "section",
+      "allowedComponents": [
+        "Section",
+        "ListRow",
+        "CalendarGrid",
+        "SearchBar",
+        "CollapsedFilter",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button",
+        "TabBar"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "appointment-list.view.calendar",
+        "type": "Section",
+        "props": {
+          "padding": "space.1",
+          "gap": "space.2",
+          "viewPanel": "calendar"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.2.children.0",
+            "type": "Row",
+            "props": {
+              "gap": "space.2"
+            },
+            "children": [
+              {
+                "id": "appointment-list.root.content.0.children.2.children.0.children.0",
+                "type": "Text",
+                "props": {
+                  "text": "日历"
+                },
+                "textRole": "heading.3"
+              },
+              {
+                "id": "appointment-list.root.content.0.children.2.children.0.children.1",
+                "type": "Text",
+                "props": {
+                  "text": "11-05 周三"
+                },
+                "textRole": "label.strong"
+              }
+            ]
+          },
+          {
+            "id": "appointment-list.root.content.0.children.2.children.1",
+            "type": "Row",
+            "props": {
+              "gap": "space.1",
+              "variant": "legend"
+            },
+            "children": [
+              {
+                "id": "appointment-list.root.content.0.children.2.children.1.children.0",
+                "type": "Badge",
+                "props": {
+                  "label": "已登记",
+                  "tone": "warning"
+                }
+              },
+              {
+                "id": "appointment-list.root.content.0.children.2.children.1.children.1",
+                "type": "Badge",
+                "props": {
+                  "label": "已到店",
+                  "tone": "success"
+                }
+              },
+              {
+                "id": "appointment-list.root.content.0.children.2.children.1.children.2",
+                "type": "Badge",
+                "props": {
+                  "label": "爽约",
+                  "tone": "danger"
+                }
+              },
+              {
+                "id": "appointment-list.root.content.0.children.2.children.1.children.3",
+                "type": "Badge",
+                "props": {
+                  "label": "已取消",
+                  "tone": "danger"
+                }
+              }
+            ]
+          },
+          {
+            "id": "appointment-list.state.empty",
+            "type": "EmptyState",
+            "props": {
+              "title": "当前条件没有预约",
+              "description": "11-05 周三 · 调整筛选条件后重试",
+              "variant": "inline"
+            },
+            "children": [
+              {
+                "id": "appointment-list.root.content.0.children.2.children.2.children.0",
+                "type": "Button",
+                "props": {
+                  "label": "清空筛选",
+                  "emphasis": "secondary",
+                  "action": "清空筛选"
+                }
+              }
+            ]
+          },
+          {
+            "id": "appointment-list.calendar.grid",
+            "type": "CalendarGrid",
+            "props": {
+              "days": [
+                {
+                  "label": "周一",
+                  "date": "2025-11-03",
+                  "today": false,
+                  "selected": false
+                },
+                {
+                  "label": "周二",
+                  "date": "2025-11-04",
+                  "today": false,
+                  "selected": false
+                },
+                {
+                  "label": "周三",
+                  "date": "2025-11-05",
+                  "today": false,
+                  "selected": true
+                },
+                {
+                  "label": "周四",
+                  "date": "2025-11-06",
+                  "today": false,
+                  "selected": false
+                },
+                {
+                  "label": "周五",
+                  "date": "2025-11-07",
+                  "today": false,
+                  "selected": false
+                },
+                {
+                  "label": "周六",
+                  "date": "2025-11-08",
+                  "today": false,
+                  "selected": false
+                },
+                {
+                  "label": "周日",
+                  "date": "2025-11-09",
+                  "today": false,
+                  "selected": false
+                }
+              ],
+              "hours": [
+                "09:00",
+                "10:00",
+                "11:00",
+                "12:00",
+                "13:00",
+                "14:00",
+                "15:00",
+                "16:00",
+                "17:00",
+                "18:00",
+                "19:00",
+                "20:00"
+              ],
+              "blocks": [
+                {
+                  "day": 2,
+                  "start": 10,
+                  "duration": 1,
+                  "title": "张女士",
+                  "subtitle": "小气泡",
+                  "status": "已登记",
+                  "tone": "warning"
+                },
+                {
+                  "day": 2,
+                  "start": 14,
+                  "duration": 1,
+                  "title": "李女士",
+                  "subtitle": "补水",
+                  "status": "已到店",
+                  "tone": "success"
+                },
+                {
+                  "day": 2,
+                  "start": 16.5,
+                  "duration": 1,
+                  "title": "王女士",
+                  "subtitle": "肩颈",
+                  "status": "已登记",
+                  "tone": "warning"
+                },
+                {
+                  "day": 2,
+                  "start": 18,
+                  "duration": 1,
+                  "title": "赵女士",
+                  "subtitle": "补水",
+                  "status": "爽约",
+                  "tone": "danger"
+                }
+              ],
+              "viewPanel": "calendar"
+            }
+          }
+        ]
+      },
+      "hash": "sha256:a0464f8e4c83748fdd95af19cde12393f9b9aa74c56053fa5fbe93a4ad89c60f"
+    },
+    {
+      "schemaVersion": "1.0",
+      "blockId": "appointment-list.content.3",
+      "pageId": "appointment-list",
+      "slot": "content",
+      "index": 3,
+      "role": "section",
+      "allowedComponents": [
+        "Section",
+        "ListRow",
+        "CalendarGrid",
+        "SearchBar",
+        "CollapsedFilter",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button",
+        "TabBar"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "appointment-list.view.list",
+        "type": "Section",
+        "props": {
+          "padding": "space.1",
+          "gap": "space.2",
+          "viewPanel": "list"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.3.children.0",
+            "type": "Text",
+            "props": {
+              "text": "11-05 周三"
+            },
+            "textRole": "label.strong"
+          },
+          {
+            "id": "appointment-list.row.appointment.0",
+            "motionGroup": "appointment-list.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "张女士",
+              "subtitle": "小气泡 · 王美容",
+              "searchText": "11-05 周三 10:00-11:00 张女士 小气泡 已登记 王美容 — 星光店",
+              "meta": "10:00-11:00",
+              "status": "已登记",
+              "statusTone": "warning"
+            }
+          },
+          {
+            "id": "appointment-list.row.appointment.1",
+            "motionGroup": "appointment-list.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "李女士",
+              "subtitle": "补水 · 王美容",
+              "searchText": "11-05 周三 14:00-15:00 李女士 补水 已到店 王美容 — 星光店",
+              "meta": "14:00-15:00",
+              "status": "已到店",
+              "statusTone": "success"
+            }
+          },
+          {
+            "id": "appointment-list.row.appointment.2",
+            "motionGroup": "appointment-list.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "王女士",
+              "subtitle": "肩颈 · 赵××",
+              "searchText": "11-05 周三 16:30-17:30 王女士 肩颈 已登记 赵×× — 星光店",
+              "meta": "16:30-17:30",
+              "status": "已登记",
+              "statusTone": "warning"
+            }
+          },
+          {
+            "id": "appointment-list.row.appointment.3",
+            "motionGroup": "appointment-list.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "赵女士",
+              "subtitle": "补水 · 赵××",
+              "searchText": "11-05 周三 18:00-19:00 赵女士 补水 爽约 赵×× — 星光店",
+              "meta": "18:00-19:00",
+              "status": "爽约",
+              "statusTone": "danger"
+            }
+          },
+          {
+            "id": "appointment-list.state.empty.2",
+            "type": "EmptyState",
+            "props": {
+              "title": "当前条件没有预约",
+              "description": "11-05 周三 · 调整筛选条件后重试",
+              "variant": "inline"
+            },
+            "children": [
+              {
+                "id": "appointment-list.root.content.0.children.3.children.5.children.0",
+                "type": "Button",
+                "props": {
+                  "label": "清空筛选",
+                  "emphasis": "secondary",
+                  "action": "清空筛选"
+                }
+              }
+            ]
+          },
+          {
+            "id": "appointment-list.root.content.0.children.3.children.6",
+            "type": "Skeleton",
+            "props": {
+              "variant": "list"
+            }
+          }
+        ]
+      },
+      "hash": "sha256:047c431f4555f3e1133dec27d76551c2ff9b2aa4676570260e7f9b25ab1fe103"
+    }
+  ],
+  "skipped": []
+}

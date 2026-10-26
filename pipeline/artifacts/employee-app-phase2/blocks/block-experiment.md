@@ -1,8 +1,11 @@
 # 块级实验报告 — employee-app-phase2
 
+> 本目录是 2026-10-26 公平试跑（run-2026-10-26T14-17-48-295Z）的证据副本；
+> 本地绝对路径已改写为仓库相对路径，测量数据未改。原始运行发生在 v0.7
+> conformance 修复之前，conformance baseline 当时为红。
+
 - 结论：回滚 (`rollback`)
-- 基线：`/Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/spec-source`
-- 运行目录：`/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z`
+- 基线：`pipeline/artifacts/employee-app-phase2/figma/spec-source`
 - 预算：¥3；实际成本：¥0.3302（fixture 模式为 ¥0）
 - 原因：conformance failed；parity not evaluated
 
@@ -36,7 +39,7 @@
 | today | 19 | 19 | 0 | 可比 | 未通过 | 失败 |
 | appointment-list | 708 | 710 | 2 | 可比 | 未通过 | 失败 |
 
-> 2 页的基线 conformance 本身未通过（已知 plan/HTML 建模差异，见 v0.7 SDD ledger 的 Task 6 记录）。
+> 2 页的基线 conformance 本身未通过（已知 plan/HTML 建模差异，v0.7 已修复为 0/0）。
 > 这些页面按 fail-closed 记录为 `failed`，结论回滚；新增 blocker 只是回归诊断，不能抵消基线红灯。
 
 > `conformance` 是 tri-state：`passed` 仅当 gate 运行且 0 blocker；`failed` 表示 gate 运行且有 blocker；
@@ -63,11 +66,16 @@
 
 ## 证据路径
 
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/block-experiment.json`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/block-experiment.md`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/block-verify.json`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/validation.json`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/conformance/conformance.json`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/measurements.json`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/artifacts/block-manifest`
-- `/tmp/block-experiment-fair2/run-2026-10-26T14-17-48-295Z/html`
+以下路径均相对于仓库根目录：
+
+- `pipeline/artifacts/employee-app-phase2/blocks/block-experiment.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/block-experiment.md`
+- `pipeline/artifacts/employee-app-phase2/blocks/block-verify.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/validation.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/conformance/conformance.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/measurements.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/artifacts/block-manifest/`
+- `pipeline/artifacts/employee-app-phase2/blocks/render-metrics.baseline.json`
+- `pipeline/artifacts/employee-app-phase2/blocks/render-metrics.experiment.json`
+
+实验生成的 HTML 未随证据提交（体积原因），不在此处链接。

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "baseline": "/Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/spec-source",
+  "baseline": "pipeline/artifacts/employee-app-phase2/figma/spec-source",
   "pages": [
     {
       "pageId": "today",

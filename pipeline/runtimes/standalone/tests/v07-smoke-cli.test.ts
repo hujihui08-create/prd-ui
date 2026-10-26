@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  defaultRunStructure,
   main,
   parseArgs,
   paritySkipReason,
@@ -39,6 +40,57 @@ function capture(): { stdout: string[]; stderr: string[]; io: { stdout: (line: s
 }
 
 const PAGES = ["today", "appointment-list"];
+
+const SPEC = {
+  meta: {
+    pageId: "today",
+    project: "fixture",
+    name: "Today",
+    target: "mobile",
+    profile: "b-mobile",
+    archetype: "home",
+    purpose: "fixture",
+    route: "/today",
+    roles: ["store_manager"],
+    reqRefs: ["REQ-APPT-001"],
+    version: "0.1.0",
+  },
+  layout: {
+    type: "MobileShell",
+    id: "today.page.root",
+    props: { title: "Today" },
+    slots: { content: [] },
+  },
+  states: { default: { name: "default" } },
+  interactions: [],
+  traceability: { reqMap: {}, designDefaults: [], unmapped: [] },
+};
+
+function renderMetrics(documentHeight: number): Record<string, unknown> {
+  return {
+    schemaVersion: "1.0",
+    project: "fixture",
+    pages: [
+      {
+        pageId: "today",
+        target: "mobile",
+        viewport: { width: 390, height: 844 },
+        documentHeight,
+        contentHeight: documentHeight,
+        scrollContainer: {
+          selector: ".app-scroll",
+          clientHeight: 844,
+          scrollHeight: documentHeight,
+          overflowY: "auto",
+        },
+        firstScreenNodes: 5,
+        widest: { width: 390, overflowX: false },
+        fixedFooter: { present: false, height: 0, overlapsContent: false },
+        contentBottomGap: 0,
+      },
+    ],
+  };
+}
 
 function passed(summary: Record<string, unknown> = {}): Promise<SmokeStepResult> {
   return Promise.resolve({ code: 0, summary });
@@ -125,7 +177,10 @@ describe("v07:smoke orchestration", () => {
     expect(code).toBe(0);
     expect(calls).toEqual(["conformance", "measure", "structure"]);
     const summary = JSON.parse(output.stdout.at(-1)!) as Record<string, unknown>;
-    expect(summary.passed).toBe(true);
+    expect(summary.executedGatesPassed).toBe(true);
+    expect(summary.complete).toBe(false);
+    expect(summary.paritySkipped).toBe(true);
+    expect(summary).not.toHaveProperty("passed");
     expect(summary.conformance).toMatchObject({ status: "passed", blockers: 0, pages: 8 });
     expect(summary.measure).toMatchObject({ status: "passed", pages: 8 });
     expect(summary.structure).toMatchObject({ status: "passed", warnings: 0 });
@@ -212,12 +267,75 @@ describe("v07:smoke orchestration", () => {
     expect(code).toBe(1);
     expect(calls).toEqual(["conformance"]);
     const summary = JSON.parse(output.stdout.at(-1)!) as Record<string, unknown>;
-    expect(summary.passed).toBe(false);
+    expect(summary.executedGatesPassed).toBe(false);
+    expect(summary.complete).toBe(false);
     expect(summary.stoppedAt).toBe("conformance");
     expect(summary.conformance).toMatchObject({ status: "failed", blockers: 2 });
     expect(summary.measure).toBeUndefined();
     expect(summary.structure).toBeUndefined();
     expect(summary.parity).toBeUndefined();
+  });
+
+  it("labels a parity skip as executed gates passed, not a full pass", async () => {
+    const out = await tempDir("v07-smoke-label-");
+    const output = capture();
+    const code = await main(
+      [
+        "--spec-run",
+        "/tmp/spec",
+        "--html",
+        "/tmp/html",
+        "--project",
+        "/tmp/project.yaml",
+        "--out",
+        out,
+        "--plans",
+        "/tmp/plans",
+      ],
+      output.io,
+      {
+        runConformance: () => passed({ blockers: 0, majors: 0, pages: 8 }),
+        runMeasure: () => passed({ pages: 8 }),
+        runStructure: () => passed({ warnings: 0, blockers: 0 }),
+        pageIds: async () => PAGES,
+      }
+    );
+    expect(code).toBe(0);
+    const lines = output.stdout.join("\n");
+    expect(lines).toContain("v07:smoke executed gates passed (parity skipped)");
+    expect(lines).not.toContain("v07:smoke passed");
+    expect(lines).not.toContain("all gates passed");
+  });
+
+  it("skips parity without reading the spec run when no parity inputs are supplied", async () => {
+    const out = await tempDir("v07-smoke-no-spec-");
+    const output = capture();
+    const code = await main(
+      [
+        "--spec-run",
+        "/does-not-exist",
+        "--html",
+        "/tmp/html",
+        "--project",
+        "/tmp/project.yaml",
+        "--out",
+        out,
+        "--plans",
+        "/tmp/plans",
+        "--json",
+      ],
+      output.io,
+      {
+        runConformance: () => passed({ blockers: 0, majors: 0, pages: 8 }),
+        runMeasure: () => passed({ pages: 8 }),
+        runStructure: () => passed({ warnings: 0, blockers: 0 }),
+      }
+    );
+    expect(code).toBe(0);
+    const summary = JSON.parse(output.stdout.at(-1)!) as Record<string, unknown>;
+    expect(summary.parity).toMatchObject({ status: "skipped" });
+    expect(summary.paritySkipped).toBe(true);
+    expect(summary.complete).toBe(false);
   });
 
   it("treats a measure infrastructure error as exit 2 and stops", async () => {
@@ -353,6 +471,9 @@ describe("v07:smoke orchestration", () => {
     expect(parityOut).toBe(path.join(figma, "parity"));
     const summary = JSON.parse(output.stdout.at(-1)!) as Record<string, unknown>;
     expect(summary.parity).toMatchObject({ status: "passed", passed: true, failed: 0 });
+    expect(summary.executedGatesPassed).toBe(true);
+    expect(summary.complete).toBe(true);
+    expect(summary).not.toHaveProperty("paritySkipped");
   });
 
   it("fails parity when the comparison fails", async () => {
@@ -459,9 +580,10 @@ describe("v07:smoke parity skip reasons", () => {
     expect(await paritySkipReason(options, PAGES)).toContain("--figma and --baseline");
   });
 
-  it("names the pages with missing Figma PNGs", async () => {
+  it("names the pages with missing Figma PNGs using a non-absolute path", async () => {
     const figma = await tempDir("v07-smoke-reason-figma-");
     const baseline = await tempDir("v07-smoke-reason-baseline-");
+    await writeFile(path.join(baseline, "manifest.json"), "{}\n");
     const options = parseArgs([
       "--spec-run",
       "/tmp/spec",
@@ -476,7 +598,12 @@ describe("v07:smoke parity skip reasons", () => {
       "--baseline",
       baseline,
     ]);
-    expect(await paritySkipReason(options, PAGES)).toContain("today, appointment-list");
+    const reason = await paritySkipReason(options, PAGES);
+    expect(reason).toContain("today, appointment-list");
+    expect(reason).not.toContain(figma);
+    expect(reason).not.toContain(os.tmpdir());
+    expect(reason).toContain("<external>/parity");
+    expect(reason).not.toMatch(/^\/(?:Users|tmp|private|home)\//);
   });
 
   it("requires a baseline manifest when PNGs exist", async () => {
@@ -501,5 +628,50 @@ describe("v07:smoke parity skip reasons", () => {
       baseline,
     ]);
     expect(await paritySkipReason(options, PAGES)).toContain("baseline manifest");
+  });
+});
+
+describe("v07:smoke default adapters", () => {
+  it("reads the structure report written by the real CLI", async () => {
+    const dir = await tempDir("v07-smoke-structure-adapter-");
+    const specDir = path.join(dir, "spec-run", "artifacts", "page-spec");
+    await mkdir(specDir, { recursive: true });
+    await writeFile(path.join(specDir, "today.json"), JSON.stringify(SPEC), "utf8");
+    const metricsPath = path.join(dir, "render-metrics.json");
+    await writeFile(metricsPath, JSON.stringify(renderMetrics(844)), "utf8");
+    const projectPath = path.join(dir, "project.yaml");
+    await writeFile(
+      projectPath,
+      ["project: fixture", "brief: brief.json", "manifests: {}", ""].join("\n"),
+      "utf8"
+    );
+    const out = path.join(dir, "out");
+
+    const result = await defaultRunStructure({
+      specRun: path.join(dir, "spec-run"),
+      metrics: metricsPath,
+      project: projectPath,
+      out,
+    });
+
+    expect(result.code).toBe(0);
+    expect(result.summary).toMatchObject({ warnings: 0, blockers: 0 });
+    const report = JSON.parse(
+      await readFile(path.join(out, "structure-measured.json"), "utf8")
+    ) as { summary: { warnings: number; blockers: number } };
+    expect(report.summary).toEqual({ warnings: 0, blockers: 0 });
+  });
+
+  it("returns the CLI exit code and no report summary on a usage error", async () => {
+    const dir = await tempDir("v07-smoke-structure-error-");
+    const result = await defaultRunStructure({
+      specRun: path.join(dir, "missing"),
+      metrics: path.join(dir, "missing.json"),
+      project: path.join(dir, "missing.yaml"),
+      out: path.join(dir, "out"),
+    });
+    expect(result.code).toBe(2);
+    expect(result.summary).toEqual({});
+    expect(result.stderr).not.toBeUndefined();
   });
 });

@@ -25,7 +25,7 @@
 | **v0.4.1** | **视觉小额补丁** | **S** | **已完成（signed）** |
 | **v0.5** | **视觉 + a11y 收口** | **M** | **已完成（signed）** |
 | v0.6 | Phase 3A：Figma + Studio | L | Implemented（Figma gate pending） |
-| v0.7 | Phase 3B：沙箱 + Test Subagent + Handoff | L | Implemented（自动门禁完成；Figma 重建/parity/签核待办，未签） |
+| v0.7 | 视觉门禁 + 结构优化 + 分块实验（原 Phase 3B 沙箱/Test Subagent/Handoff 范围已重定义） | L | Implemented（自动门禁；Figma 重建/parity/签核待办，未签） |
 | v0.8 | Phase 4A：真实项目试点 | L | 未开始 |
 | v0.9 | Release Candidate | M | 未开始 |
 | v1.0 | 最终交付 | — | 未开始 |
@@ -96,29 +96,35 @@
 - Studio 可完成一次 8 页构建；
 - 资产包与 LICENSES 完整。
 
-## 5. v0.7 Phase 3B：沙箱 + Test Subagent + Handoff
+## 5. v0.7：视觉门禁 + 结构优化 + 分块实验（原 Phase 3B 范围已重定义）
 
 **状态（2026-10-26）**：**可自动化部分已实现，未签核**。设计输入见 [v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)；实施记录见 [v0.7 实施交接](../../handoffs/2026-10-26-v07-implementation-handoff.md)。
 
-已完成：fail-closed 映射 + `plan-coverage.json`；`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；`structure:diff`；`block:verify` / `block:experiment`；`figma:parity`（CLI 完成，尚无真实 PNG）；`figma:serve` / `figma:sign`；`handoff:pack`（fail-closed）；`v07:smoke`。测试 945 passed / typecheck clean / test:dsh 4 passed。
+**原 Phase 3B 范围（scratch 沙箱、Test Subagent、Handoff Packager）已被 2026-10-26 设计输入重定义/推迟**：
 
-未完成（阻塞签核）：v0.6 人工签核 + baseline 重生成（Gate 0）；用修正后的 plan 重建 Figma 8 页并重跑 `figma:verify`（当前 3/8 对旧 readback 为红）；真实 `figma:parity`；`figma:sign`；完整 `handoff:pack`（当前 23 blockers）。分块实验结论 **rollback（¥0.3302）**，且运行于 conformance 修复前，需 v0.8 重评。
+- 视觉保真门禁（A1–A4）与结构优化（B1–B3）→ 本版实现；确定性校验器承担原 Test Subagent 的自动部分，模型型子代理仍推迟。
+- 分块生成（C）→ 本版只做实验（结论 rollback），推广推迟到 v0.8。
+- Handoff Packager（`handoff:pack`）→ 机制已实现且 fail-closed，但尚未完成一次完整打包（当前 23 blockers），**不能宣称已验证**；待 Figma 重建、parity、签核后复跑。
 
-**目标**：把验证和交付自动化，形成可独立实现的 Handoff。
+本版实际范围：
 
-范围：
+- fail-closed 映射 + `plan-coverage.json`；
+- `figma:conformance`（plan ↔ 渲染 HTML）；
+- `render:measure` + `structure:check --project` + `structure:diff`；
+- `figma:parity` CLI + `figma:serve` / `figma:sign`；
+- 分块：`block:verify` / `block:experiment`（真实试跑结论 rollback ¥0.3302，运行于 conformance 修复前，需 v0.8 重评）；
+- `handoff:pack`（fail-closed；完整包未验证）；
+- `v07:smoke`（顺序执行可无头门禁；parity 缺失时 `complete: false`，不冒充完整通过）。
 
-- scratch 沙箱：HTML/Figma/Asset/Spec 四类验证。
-- Test Subagent：Render & Layout、A11y & Interaction、Figma Verifier、Visual Critic；Contract/Asset Tester 保持确定性校验器。
-- 失败处理：infra 失败不判 pass；flaky 指标与重跑。
-- Handoff Packager：`HANDOFF.md`、`LICENSES.md`、切图包、规格包、评审包。
-- 交付包可让开发独立实现。
+已完成：`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；缺陷注入（按钮高度、行分隔线、未知组件）均能变红；测试 949 passed / typecheck clean / test:dsh 4 passed。
 
-退出标准：
+未完成（阻塞签核）：v0.6 人工签核 + baseline 重生成（Gate 0）；用修正后的 plan 重建 Figma 8 页并重跑 `figma:verify`（当前 3/8 对旧 readback 为红）；真实 `figma:parity`（文本注入未执行）；`figma:sign`；完整 `handoff:pack`（当前 23 blockers）。
 
-- 沙箱测试通过；infra 失败被显式标记；
-- Handoff 包完整、可离线阅读；
-- 一次完整 8 页构建 + 验证 + 打包通过。
+退出标准（本版实际）：
+
+- 可自动化门禁全绿并落盘（已满足）；
+- 缺陷注入能变红（conformance 两例 + `UNMAPPED_COMPONENT` 已满足；parity 文本注入待 Figma PNG）；
+- Figma 重建 + verify + parity + 签核，以及一次完整 8 页 `handoff:pack`（未满足，待 Gate 0）。
 
 ## 6. v0.8 Phase 4A：真实项目试点
 
