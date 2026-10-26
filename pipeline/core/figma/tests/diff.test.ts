@@ -266,7 +266,10 @@ describe("diffFigma", () => {
     target.borderBottom = "color/border/subtle";
     target.borderBottomWidth = 1;
     const diff = diffFigma(plan, readback);
-    expect(diff.findings.some((finding) => finding.code === "FIGMA_BORDER_MISMATCH")).toBe(true);
+    expect(diff.findings).toHaveLength(1);
+    expect(diff.findings[0]?.code).toBe("FIGMA_BORDER_MISMATCH");
+    expect(diff.findings[0]?.severity).toBe("major");
+    expect(diff.majorCount).toBe(1);
   });
 
   it("fails when a button radius differs", () => {
@@ -351,7 +354,13 @@ describe("diffFigma", () => {
     strip(readback.nodes[0]!);
     const diff = diffFigma(plan, readback);
     expect(diff.majorCount).toBe(0);
-    expect(diff.findings.some((finding) => finding.code === "READBACK_STYLE_UNSUPPORTED")).toBe(true);
+    expect(diff.findings.every((finding) => finding.severity === "minor")).toBe(true);
+    expect(diff.findings.some((finding) => finding.code === "FIGMA_BORDER_MISMATCH")).toBe(false);
+    expect(
+      diff.findings.some(
+        (finding) => finding.code === "READBACK_STYLE_UNSUPPORTED" && finding.severity === "minor"
+      )
+    ).toBe(true);
     expect(diff.passed).toBe(true);
   });
 });

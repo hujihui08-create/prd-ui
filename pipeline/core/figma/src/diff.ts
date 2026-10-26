@@ -406,10 +406,10 @@ export function diffFigma(
     for (const border of declaredBorders(plan, expected, variant)) {
       const actualBorder = node[border.property];
       if (actualBorder === undefined) {
-        // A readback that supports style fields but reports no border for a
-        // declared side is a concrete mismatch; a legacy readback can only be
-        // flagged as unsupported (minor) so old evidence does not fail.
-        styleUnsupported(findings, expected.specId, border.property);
+        // A legacy readback cannot distinguish "no border" from "not
+        // reported", so it gets the minor unsupported finding. A
+        // style-capable readback should have emitted the declared field, so
+        // its absence is a concrete mismatch. Exactly one finding per side.
         if (styleCapable) {
           findings.push(
             finding(
@@ -419,6 +419,8 @@ export function diffFigma(
               expected.specId
             )
           );
+        } else {
+          styleUnsupported(findings, expected.specId, border.property);
         }
         continue;
       }
