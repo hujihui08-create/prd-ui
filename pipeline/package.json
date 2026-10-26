@@ -21,7 +21,8 @@
     "asset:compile": "tsx runtimes/standalone/src/asset-compile-cli.ts",
     "studio:prepare": "tsx runtimes/standalone/src/studio-prepare-cli.ts",
     "studio:dev": "pnpm --dir studio dev",
-    "studio:build": "pnpm --dir studio build"
+    "studio:build": "pnpm --dir studio build",
+    "studio:smoke": "tsx runtimes/standalone/src/studio-smoke-cli.ts"
   },
   "dependencies": {
     "zod": "^4.6.7"
