@@ -55,7 +55,7 @@
 
 ## 3. v0.5 视觉 + a11y 收口
 
-**状态（2026-10-23）**：已完成并签核（胡冀徽，`acceptedMajors=[]`，`waivers=[]`）。真实 Critic 0 major / 4 minor / 0 blocker；baseline manifest `sha256:6c900b29…c79f`。4 个 minor 留 v0.5.x。见 [v0.5 交接](../../handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md)。
+**状态（2026-10-23）**：已完成并签核（胡冀徽，`acceptedMajors=[]`，`waivers=[]`）。真实 Critic 0 major / 4 minor / 0 blocker；baseline manifest `sha256:6c900b29…c79f`。4 个 minor 留 v0.5.x。**2026-10-26 已清 v0.5.x：3 项修复、周日 tint 复核不成立；CSS 变更使旧 baseline 过期，下一次视觉门禁需重新生成并签核。** 见 [v0.5 交接](../../handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md) 与 [v0.5.x 清理交接](../../handoffs/2026-10-26-v05x-v06x-debt-cleanup.md)。
 
 **目标**：把 Visual Critic 的剩余 major 和基础可访问性收口，作为 Phase 3 的视觉基线。
 
@@ -77,7 +77,7 @@
 
 ## 4. v0.6 Phase 3A：Figma + Studio + Asset Compiler
 
-**状态（2026-10-25）**：自动化部分已实现（Figma plan/plugin/readback diff、Asset Compiler、只读 Studio；688 tests）。真实 Figma scratch/delivery/readback 未执行，Brio MCP 未连接，**未签核**。见 [v0.6 进度交接](../../handoffs/2026-10-25-v06-phase3a-progress-handoff.md)。
+**状态（2026-10-26）**：自动化部分已实现（Figma plan/plugin/readback diff、Asset Compiler、只读 Studio；692 tests）。真实 Figma scratch/delivery/readback 未执行，Brio MCP 未连接，**未签核**。Studio Playwright 已接入 `pnpm studio:smoke`（8 页 / 8 iframe / 0 error）；Figma state frames、完整组件库、Material Symbols 矢量集、readback 编排仍留 v0.6.x。见 [v0.6 进度交接](../../handoffs/2026-10-25-v06-phase3a-progress-handoff.md) 与 [小债清理交接](../../handoffs/2026-10-26-v05x-v06x-debt-cleanup.md)。
 
 **目标**：把 Page Spec 变成可交付的 Figma 源文件和可用工作台。
 

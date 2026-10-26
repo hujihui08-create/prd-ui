@@ -56,6 +56,7 @@ pnpm figma:verify --plan /tmp/figma-v06/figma-plan.<page>.json --readback <downl
 pnpm asset:compile --library samples/assets/m0/library/index.json --source samples/assets/m0/library --licenses samples/assets/m0 --out /tmp/assets-m0
 pnpm studio:prepare --spec-run /tmp/spec-v05/run-2026-10-23T06-07-48-403Z --html /tmp/html-v05 --out studio/public
 pnpm studio:build
+pnpm studio:smoke --json
 
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
@@ -96,7 +97,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 
 ## Current state (v0.6 implemented, Figma gate pending, 2026-10-26)
 
-Verified: `pnpm test` 688 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
+Verified: `pnpm test` 694 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
 clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
@@ -104,21 +105,35 @@ v0.5 remains the last signed milestone. v0.6 Phase 3A is implemented in the
 automatable parts: `core/figma` plan compiler + readback diff, `runtimes/figma`
 plugin/UI/bundle, `core/asset-compiler` + `asset:compile`, and a read-only
 Studio (`studio/`, shadcn/Tailwind). `figma:plan` generates 8 plans; M0 assets
-package 13/13 and phase2 frozen icons 4/4. Real Figma scratch/delivery/readback
-has **not** run (Brio MCP is disconnected), so v0.6 is **not signed** and cannot
-be `passed` yet. Checked-in evidence:
+package 13/13 and phase2 frozen icons 4/4. Real Figma scratch has run for
+customer-search after the dynamic-page fixes; the remaining pages, delivery
+pages, and durable readback/diff evidence are still open, so v0.6 is **not signed**
+and cannot be `passed` yet. Checked-in evidence:
 `pipeline/artifacts/employee-app-phase2/figma/plans/` (8 plans),
 `pipeline/artifacts/employee-app-phase2/asset-compiler/`, and
 `pipeline/artifacts/employee-app-phase2/studio-v06.png`; `studio/public` is
 generated and gitignored. The `/tmp` evidence from 2026-10-25 has expired.
+
+v0.6 Figma gate is in progress (2026-10-26): the plugin now runs under
+`documentAccess: "dynamic-page"`, customer-search scratch built with a
+0 blocker / 0 major / 0 findings diff and visual check; see the latest handoff
+§11. Remaining: 6 pages, delivery pages, durable evidence, and human signoff.
+
+v0.5.x debt cleanup landed on 2026-10-26: disabled datetime container, loading
+selected-column skeleton, and `YYYY-MM-DD HH:mm` confirmed time; the Sunday
+column tint was not reproducible and needed no code change. `pnpm studio:smoke`
+is now a headless Playwright gate for the Studio (8 pages / 8 iframes / 0
+errors). **The v0.5 visual baseline is stale after those CSS changes**; the next
+visual gate must regenerate and re-sign it.
 
 Next: open Figma desktop (or Brio MCP), import
 `pipeline/runtimes/figma/manifest.json`, build scratch pages + readback, run
 `figma:verify`, then delivery pages and the v0.6 checklist. After signing v0.6,
 start v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9;
 final v1.0.
-Handoff: `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md`
-(overall session state); v0.6 details in
+Handoff: `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (latest);
+`docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` (overall session
+state); v0.6 details in
 `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
 
 ## Architecture boundaries
@@ -201,8 +216,9 @@ Handoff: `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md`
 - `docs/superpowers/specs/2026-10-23-v06-figma-studio-asset-compiler-design.md` — v0.6 implemented (automatable parts): Figma plan/plugin/readback diff, Asset Compiler, read-only Studio; Figma gate pending.
 - `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — current overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).
-- `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md` — detailed v0.6 progress handoff (Figma gate pending, 688 tests, Studio/Asset evidence).
+- `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — latest: v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
+- `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).
+- `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md` — detailed v0.6 progress handoff (Figma gate pending, 688 tests at Phase 3A, Studio/Asset evidence).
 - `docs/handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md` — v0.5 signed handoff (loading/empty/mode/a11y/stop rule, v0.5.x minors).
 - `docs/handoffs/2026-10-23-v041-implementation-handoff.md` — historical v0.4.1 signed handoff (7-column week, baseline/signoff).
 - `docs/handoffs/2026-10-23-v04-acceptance-handoff.md` — historical v0.4 acceptance handoff (motion, visual review/cache, picker/date).

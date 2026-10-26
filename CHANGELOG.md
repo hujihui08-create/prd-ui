@@ -3,6 +3,41 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.5.x/v0.6.x debt cleanup
+
+### Fixed
+
+- Disabled `datetime-local` fields keep their container: the display overlay is
+  inset by 1px so the input border survives, and the disabled input keeps
+  `opacity:1` (v0.5.x).
+- The selected calendar column shimmers like the rest of the grid while loading;
+  the static 4% tint override is gone (v0.5.x).
+- Runtime-confirmed treatment-notice time is `YYYY-MM-DD HH:mm` instead of
+  `YYYY/MM/DD HH:mm:ss` (v0.5.x).
+
+### Added
+
+- `studio:smoke`: headless Chromium runner over `studio/dist`; asserts 8 page
+  buttons, 8 iframe switches, and 0 console/page errors. `--json` prints a
+  machine-readable summary (v0.6.x).
+- `data-page-id` on Studio page-tree buttons for stable smoke selectors.
+
+### Verified
+
+- `pnpm test` **692 passed**；`pnpm typecheck` clean。
+- `pnpm studio:smoke --json` → `{"ok":true,"pages":8,"iframes":8,"consoleErrors":[],"pageErrors":[]}`.
+- Checkpoint commit `3ef75a6` persists the v0.4.1/v0.5 signoffs and v0.6 Phase 3A
+  automation; the debt-cleanup changes are uncommitted at the time of writing.
+
+### Not done
+
+- The v0.5 visual baseline is stale after the CSS changes; it was not regenerated
+  or re-signed (only a human runs `visual:baseline`). The next visual gate must
+  produce a fresh baseline/critic/signoff.
+- The real Figma gate remains pending; v0.6 is still unsigned.
+- v0.6.x: Figma state frames, full component library, Material Symbols vector set,
+  Figma readback/build orchestration.
+
 ## 2026-10-25 — Phase 3A implementation (v0.6, Figma gate pending)
 
 ### Added

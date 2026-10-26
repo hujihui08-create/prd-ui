@@ -2,7 +2,8 @@
 
 - 日期：2026-10-26
 - 状态：**v0.4.1 Signed / v0.5 Signed / v0.6 Implemented（未签核）**
-- 当前阻塞：Figma 插件没有在 Figma 文件内运行，Brio MCP `connected=false`
+- 当前阻塞：Figma 插件没有在 Figma 文件内运行，Brio MCP `connected=false`（**后续：2026-10-26 10:32 桥已连通；下午插件已在真实 Figma 运行，customer-search scratch 通过 `figma:verify` 0/0/0 且视觉复核完成；剩 6 页、delivery、durable evidence、签核，见 [小债清理交接](2026-10-26-v05x-v06x-debt-cleanup.md) §9–§11**）
+- 后续更新：v0.5.x/v0.6.x 小债已清理（3 修 + 1 复核不成立 + `studio:smoke`）；当前 `pnpm test` 694 passed。见 [小债清理交接](2026-10-26-v05x-v06x-debt-cleanup.md)；本文的 688 tests 与 v0.5.x 债务列表为 2026-10-26 早间快照。
 - v0.6 详细进度：[v0.6 Phase 3A 实施交接](2026-10-25-v06-phase3a-progress-handoff.md)
 - 上一版签核：[v0.5 交接](2026-10-23-v05-visual-a11y-closure-handoff.md)
 
