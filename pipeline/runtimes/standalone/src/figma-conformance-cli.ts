@@ -4,11 +4,14 @@ import { fileURLToPath } from "node:url";
 import {
   FigmaPlanSchema,
   PageSpecSchema,
+  isMaterialDerivedId,
   type ConformanceFinding,
   type ConformancePage,
   type ConformanceReport,
   type FigmaPlan,
+  type FigmaPlanNode,
   type PageSpec,
+  type StyleManifest,
 } from "@prd-ui/contracts";
 import { comparePlanToStyleManifest } from "@prd-ui/figma";
 import { getProfile } from "@prd-ui/design-system";
@@ -112,6 +115,39 @@ async function loadPlans(plansDir: string, specs: PageSpec[]): Promise<FigmaPlan
   return plans;
 }
 
+/** Whether the comparator would require at least one HTML node for this plan. */
+function planHasVisibleNode(plan: FigmaPlan): boolean {
+  const skipped = new Set(
+    (plan.coverage?.nodes ?? [])
+      .filter((node) => node.status === "skipped")
+      .map((node) => node.specId)
+  );
+  const visible = (node: FigmaPlanNode): boolean =>
+    (node.origin !== "derived" || isMaterialDerivedId(node.specId)) &&
+    !skipped.has(node.specId);
+  const walk = (node: FigmaPlanNode): boolean => {
+    if (node.type === "ABSOLUTE") {
+      if (visible(node)) return true;
+      return (node.child?.children ?? []).some(walk);
+    }
+    if (visible(node)) return true;
+    if (node.child !== undefined && walk(node.child)) return true;
+    return (node.children ?? []).some(walk);
+  };
+  return walk(plan.root);
+}
+
+/**
+ * A blank or wrong HTML file can return 200 with no `[data-node-id]` nodes.
+ * Without this guard the comparator reports every plan node as missing and the
+ * CLI exits 1, which is indistinguishable from a real design failure.
+ */
+export function assertManifestUsable(manifest: StyleManifest, plan: FigmaPlan): void {
+  if (manifest.nodes.length > 0) return;
+  if (!planHasVisibleNode(plan)) return;
+  throw new Error(`CONFORMANCE_MANIFEST_EMPTY: ${plan.pageId}`);
+}
+
 function countFindings(pages: ConformancePage[]): { blockers: number; majors: number } {
   let blockers = 0;
   let majors = 0;
@@ -186,6 +222,7 @@ export async function main(
       if (manifest === undefined) {
         throw new Error(`CONFORMANCE_MANIFEST_MISSING: ${plan.pageId}`);
       }
+      assertManifestUsable(manifest, plan);
       return comparePlanToStyleManifest({
         plan,
         manifest,

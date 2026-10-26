@@ -4,6 +4,7 @@ import { parseCssColor } from "@prd-ui/figma";
 import {
   DETERMINISTIC_CSS,
   FIXED_SCREENSHOT_TIME,
+  LAUNCH_ARGS,
   SCREENSHOT_TIMEZONE,
   createStaticServer,
 } from "../visual/screenshot.js";
@@ -12,8 +13,6 @@ export interface CaptureStyleInput {
   htmlDir: string;
   pages: Array<{ pageId: string; viewport: { width: number; height: number } }>;
 }
-
-const LAUNCH_ARGS = ["--force-color-profile=srgb", "--disable-lcd-text", "--disable-gpu"];
 
 /** A captured node with the background split so alpha is derived in Node. */
 type RawStyleNode = Omit<StyleNode, "background"> & { backgroundColor: string };
@@ -50,16 +49,24 @@ export async function captureStyleManifests(
       const context = await browser.newContext({
         viewport: page.viewport,
         deviceScaleFactor: 1,
+        locale: "zh-CN",
         timezoneId: SCREENSHOT_TIMEZONE,
         reducedMotion: "reduce",
       });
       try {
         const tab = await context.newPage();
         await tab.clock.setFixedTime(FIXED_SCREENSHOT_TIME);
-        await tab.goto(`${server.url}/${encodeURIComponent(page.pageId)}.html`, {
+        const response = await tab.goto(`${server.url}/${encodeURIComponent(page.pageId)}.html`, {
           waitUntil: "networkidle",
           timeout: 60_000,
         });
+        if (response === null || !response.ok()) {
+          throw new Error(
+            `PAGE_HTML_MISSING: ${page.pageId} (${
+              response === null ? "no response" : response.status()
+            })`
+          );
+        }
         // Fonts are a layout input; `document.fonts.ready` settles after either
         // load or failure, so an offline capture still completes.
         await tab.evaluate(
