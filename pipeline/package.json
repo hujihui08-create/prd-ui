@@ -16,6 +16,7 @@
     "structure:check": "tsx runtimes/standalone/src/structure-check-cli.ts",
     "structure:diff": "tsx runtimes/standalone/src/structure-diff-cli.ts",
     "block:verify": "tsx runtimes/standalone/src/block-verify-cli.ts",
+    "block:experiment": "tsx runtimes/standalone/src/block-experiment-cli.ts",
     "intake:run": "tsx runtimes/standalone/src/intake-cli.ts",
     "visual:review": "tsx runtimes/standalone/src/visual-review-cli.ts",
     "visual:baseline": "tsx runtimes/standalone/src/visual-baseline-cli.ts",

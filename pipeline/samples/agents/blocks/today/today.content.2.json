@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "today.content.2",
+  "root": {
+    "id": "today.card.callbacks",
+    "type": "Card",
+    "props": {
+      "title": "待回访"
+    },
+    "children": [
+      {
+        "id": "today.row.callback.0",
+        "motionGroup": "today.row.callback",
+        "type": "ListRow",
+        "props": {
+          "title": "张女士",
+          "subtitle": "小气泡",
+          "meta": "3 天前"
+        }
+      },
+      {
+        "id": "today.row.callback.1",
+        "motionGroup": "today.row.callback",
+        "type": "ListRow",
+        "props": {
+          "title": "李女士",
+          "subtitle": "补水",
+          "meta": "7 天前"
+        }
+      },
+      {
+        "id": "today.state.empty.2",
+        "type": "EmptyState",
+        "props": {
+          "title": "暂无待回访",
+          "description": "近 30 天服务过、尚未回访的记录会出现在这里",
+          "icon": "call"
+        }
+      }
+    ]
+  }
+}

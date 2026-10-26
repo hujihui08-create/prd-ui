@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "today.content.0",
+  "root": {
+    "id": "today.card.quick-actions",
+    "type": "Card",
+    "props": {
+      "title": "快捷操作"
+    },
+    "children": [
+      {
+        "id": "today.root.content.0.children.0.children.0",
+        "type": "Row",
+        "props": {
+          "gap": "space.2"
+        },
+        "children": [
+          {
+            "id": "today.quick.create-order",
+            "type": "QuickAction",
+            "props": {
+              "label": "开单",
+              "icon": "icon-plus",
+              "tone": "neutral"
+            }
+          },
+          {
+            "id": "today.quick.new-appointment",
+            "type": "QuickAction",
+            "props": {
+              "label": "预约",
+              "icon": "icon-plus",
+              "tone": "neutral"
+            }
+          },
+          {
+            "id": "today.quick.customer-search",
+            "type": "QuickAction",
+            "props": {
+              "label": "客户搜索",
+              "icon": "icon-search",
+              "tone": "customer"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
