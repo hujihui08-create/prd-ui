@@ -13,13 +13,19 @@ export interface BlockGenerateInput {
   prompt: string;
 }
 
+export interface BlockGenerationUsage {
+  usage?: AgentUsage;
+  /** True only when the transport reported usage for every model step. */
+  usageComplete: boolean;
+}
+
 export interface BlockGeneratorPort {
   generate(input: BlockGenerateInput): Promise<BlockContentDraft>;
   /**
    * Drain the model usage accumulated since the last call. Fixture mode does
    * not implement this (it makes no model calls), so cost stays 0.
    */
-  takeUsage?(): AgentUsage | undefined;
+  takeUsage?(): BlockGenerationUsage | undefined;
 }
 
 export interface BlockGeneratorContext {

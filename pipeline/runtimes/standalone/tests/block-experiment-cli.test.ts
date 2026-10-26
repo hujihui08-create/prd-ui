@@ -4,13 +4,18 @@ import type { BlockContentDraft, BlockSpec, ReviewPricing } from "@prd-ui/contra
 import {
   BlockBudgetExceededError,
   BlockCostBudget,
+  BlockUsageIncompleteError,
   MAX_BLOCK_RETRIES,
   generateBlockWithRetries,
   isBlockInfraError,
   main,
   parseArgs,
+  preservesBaselineNodeIds,
 } from "../src/block-experiment-cli.js";
-import type { BlockGeneratorPort } from "../src/block/generator.js";
+import type {
+  BlockGenerationUsage,
+  BlockGeneratorPort,
+} from "../src/block/generator.js";
 
 function collector(): {
   io: { stdout: (line: string) => void; stderr: (line: string) => void };
@@ -64,6 +69,26 @@ function generator(
     async generate(): Promise<BlockContentDraft> {
       state.calls += 1;
       return run();
+    },
+  };
+  return state;
+}
+
+function usageGenerator(
+  run: () => Promise<BlockContentDraft>,
+  usages: Array<BlockGenerationUsage | undefined>
+): BlockGeneratorPort & { calls: number } {
+  let index = 0;
+  const state = {
+    calls: 0,
+    async generate(): Promise<BlockContentDraft> {
+      state.calls += 1;
+      return run();
+    },
+    takeUsage(): BlockGenerationUsage | undefined {
+      const next = usages[index];
+      index += 1;
+      return next;
     },
   };
   return state;
@@ -225,7 +250,92 @@ describe("block experiment retries", () => {
     ).rejects.toBeInstanceOf(AgentRunnerError);
     expect(unavailable.calls).toBe(1);
     expect(isBlockInfraError(new AgentRunnerError("AGENT_UNAVAILABLE", "missing"))).toBe(true);
+    expect(isBlockInfraError(new AgentRunnerError("AGENT_TIMEOUT", "timeout"))).toBe(true);
+    expect(isBlockInfraError(new AgentRunnerError("AGENT_EXIT_NONZERO", "exit 1"))).toBe(true);
     expect(isBlockInfraError(new AgentRunnerError("AGENT_INVALID_OUTPUT", "bad"))).toBe(false);
+  });
+
+  it("stops instead of retrying when usage is incomplete", async () => {
+    const incomplete = usageGenerator(async () => draft, [
+      {
+        usage: { inputTokens: 100, outputTokens: 10, cacheReadTokens: 0 },
+        usageComplete: false,
+      },
+    ]);
+    const budget = new BlockCostBudget(100, pricing);
+    let cost = 0;
+    await expect(
+      generateBlockWithRetries({
+        pageId: "today",
+        block,
+        generator: incomplete,
+        onCost: (cny) => {
+          cost += cny;
+        },
+        budget,
+      })
+    ).rejects.toBeInstanceOf(BlockUsageIncompleteError);
+    expect(incomplete.calls).toBe(1);
+    // Partial usage is still charged before the stop.
+    expect(cost).toBeGreaterThan(0);
+    expect(budget.spentCny).toBeCloseTo(cost);
+  });
+
+  it("never dispatches a call when the budget is already exhausted", async () => {
+    const budget = new BlockCostBudget(0, pricing);
+    const never = generator(async () => draft);
+    await expect(
+      generateBlockWithRetries({
+        pageId: "today",
+        block,
+        generator: never,
+        onCost: () => {},
+        budget,
+      })
+    ).rejects.toBeInstanceOf(BlockBudgetExceededError);
+    expect(never.calls).toBe(0);
+    expect(() => budget.assertCanStart()).toThrow(/BUDGET_EXCEEDED/);
+  });
+});
+
+describe("conformance comparability", () => {
+  const baselineRoot = {
+    id: "today.card.appointments",
+    type: "Card",
+    children: [{ id: "today.row.0", type: "ListRow" }],
+  };
+
+  it("accepts a draft that keeps every baseline id, including new nodes", () => {
+    expect(
+      preservesBaselineNodeIds(baselineRoot, {
+        id: "today.card.appointments",
+        type: "Card",
+        children: [
+          { id: "today.row.0", type: "ListRow" },
+          { id: "today.content.1.row.new", type: "ListRow" },
+        ],
+      })
+    ).toBe(true);
+  });
+
+  it("rejects a draft that renames a baseline id", () => {
+    expect(
+      preservesBaselineNodeIds(baselineRoot, {
+        id: "today.content.1",
+        type: "Card",
+        children: [{ id: "today.row.0", type: "ListRow" }],
+      })
+    ).toBe(false);
+  });
+
+  it("rejects a draft that drops a baseline child id", () => {
+    expect(
+      preservesBaselineNodeIds(baselineRoot, {
+        id: "today.card.appointments",
+        type: "Card",
+        children: [],
+      })
+    ).toBe(false);
   });
 });
 

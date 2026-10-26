@@ -84,8 +84,10 @@ export function evaluateBlockExperiment(input: {
       heightDeltaPct?: number;
     }>;
     conformance: BlockConformanceStatus;
+    heightDeltaPct?: number;
     blockVerifyPassed?: boolean;
     parityPassed?: boolean;
+    conformanceComparable?: boolean;
   }>;
 }): BlockExperimentReport {
   const reasons: string[] = [];
@@ -94,9 +96,21 @@ export function evaluateBlockExperiment(input: {
   const seams = allMetrics.reduce((sum, metric) => sum + metric.seams, 0);
   const retries = allMetrics.reduce((sum, metric) => sum + metric.retries, 0);
   const cost = input.pages.reduce((sum, page) => sum + page.costCny, 0);
-  const heightDeltas = allMetrics
+  // Page-level height is the machine gate. Block-level deltas are kept as a
+  // second hard check, but they disappear when a model renames root ids, so
+  // they must never be the only height evidence.
+  const blockHeightDeltas = allMetrics
     .map((metric) => metric.heightDeltaPct)
     .filter((value): value is number => value !== undefined);
+  const pageHeightDeltas = input.pages
+    .map((page) => page.heightDeltaPct)
+    .filter((value): value is number => value !== undefined);
+  const heightDeltaExceeded = [...blockHeightDeltas, ...pageHeightDeltas].some(
+    (value) => Math.abs(value) > 5
+  );
+  const heightNotEvaluated =
+    input.pages.length === 0 ||
+    input.pages.some((page) => page.heightDeltaPct === undefined);
   const conformanceFailed = input.pages.some((page) => page.conformance === "failed");
   const blockVerifyFailed = input.pages.some((page) => page.blockVerifyPassed === false);
   const conformanceNotEvaluated =
@@ -105,6 +119,9 @@ export function evaluateBlockExperiment(input: {
   const conformancePassed =
     input.pages.length > 0 &&
     input.pages.every((page) => page.conformance === "passed");
+  const conformanceNotComparable = input.pages.some(
+    (page) => page.conformanceComparable === false
+  );
   const parityEvaluated =
     input.pages.length > 0 && input.pages.every((page) => page.parityPassed !== undefined);
   const parityFailed = input.pages.some((page) => page.parityPassed === false);
@@ -112,10 +129,12 @@ export function evaluateBlockExperiment(input: {
   if (seams > 0) reasons.push(`seams=${seams}`);
   if (retries > 6) reasons.push(`retries=${retries}`);
   if (cost > budget) reasons.push(`cost=${cost}`);
-  if (heightDeltas.some((value) => Math.abs(value) > 5)) reasons.push("heightDelta>5%");
+  if (heightDeltaExceeded) reasons.push("heightDelta>5%");
+  else if (heightNotEvaluated) reasons.push("height not evaluated");
   if (blockVerifyFailed) reasons.push("block verification failed");
   if (conformanceFailed) reasons.push("conformance failed");
   else if (conformanceNotEvaluated) reasons.push("conformance not evaluated");
+  if (conformanceNotComparable) reasons.push("conformance not comparable");
   if (parityFailed) reasons.push("parity failed");
   else if (!parityEvaluated) reasons.push("parity not evaluated");
 
@@ -123,13 +142,13 @@ export function evaluateBlockExperiment(input: {
     seams > 0 ||
     retries > 6 ||
     cost > budget ||
-    heightDeltas.some((value) => Math.abs(value) > 5) ||
+    heightDeltaExceeded ||
     blockVerifyFailed ||
     conformanceFailed ||
     parityFailed;
   const conclusion = hardFailure
     ? "rollback"
-    : conformancePassed && parityEvaluated
+    : conformancePassed && parityEvaluated && !heightNotEvaluated && !conformanceNotComparable
       ? "promote"
       : "insufficient_evidence";
 

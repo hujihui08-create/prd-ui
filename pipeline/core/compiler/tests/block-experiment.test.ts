@@ -17,6 +17,8 @@ function page(overrides: {
   conformance?: "passed" | "failed" | "not_evaluated";
   blockVerifyPassed?: boolean;
   parityPassed?: boolean;
+  heightDeltaPct?: number;
+  conformanceComparable?: boolean;
   metrics?: Array<{
     blockId: string;
     retries: number;
@@ -40,10 +42,16 @@ function page(overrides: {
         tokenDrift: 0,
       })),
     conformance: overrides.conformance ?? "passed",
+    ...(overrides.heightDeltaPct === undefined
+      ? { heightDeltaPct: 0 }
+      : { heightDeltaPct: overrides.heightDeltaPct }),
     ...(overrides.blockVerifyPassed === undefined
       ? {}
       : { blockVerifyPassed: overrides.blockVerifyPassed }),
     ...(overrides.parityPassed === undefined ? {} : { parityPassed: overrides.parityPassed }),
+    ...(overrides.conformanceComparable === undefined
+      ? {}
+      : { conformanceComparable: overrides.conformanceComparable }),
   };
 }
 
@@ -229,5 +237,68 @@ describe("block experiment metrics", () => {
     });
     expect(report.conclusion).toBe("rollback");
     expect(report.reasons).toContain("block verification failed");
+  });
+
+  it("gates on page-level height even when every block height is missing", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          heightDeltaPct: 99.88,
+          metrics: manifest.blocks.map((block) => ({
+            blockId: block.blockId,
+            retries: 0,
+            seams: 0,
+            tokenDrift: 0,
+          })),
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toContain("heightDelta>5%");
+  });
+
+  it("passes the height gate at exactly 5%", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [page({ conformance: "passed", parityPassed: true, heightDeltaPct: 5 })],
+    });
+    expect(report.conclusion).toBe("promote");
+    expect(report.reasons).not.toContain("heightDelta>5%");
+  });
+
+  it("withholds promotion when page height was not measured", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        {
+          ...page({ conformance: "passed", parityPassed: true }),
+          heightDeltaPct: undefined,
+        },
+      ],
+    });
+    expect(report.conclusion).toBe("insufficient_evidence");
+    expect(report.reasons).toContain("height not evaluated");
+  });
+
+  it("withholds promotion when conformance ids are not comparable", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          conformanceComparable: false,
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("insufficient_evidence");
+    expect(report.reasons).toContain("conformance not comparable");
   });
 });

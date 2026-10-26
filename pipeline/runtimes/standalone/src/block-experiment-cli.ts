@@ -22,6 +22,7 @@ import {
   type RenderMetrics,
   type RenderMetricsPage,
   type ReviewPricing,
+  type SpecNode,
   type StyleManifest,
   type UiBrief,
 } from "@prd-ui/contracts";
@@ -197,17 +198,35 @@ export const MAX_PAGE_RETRIES = 1;
 export class BlockBudgetExceededError extends Error {
   constructor(
     readonly spentCny: number,
-    readonly maxCostCny: number
+    readonly maxCostCny: number,
+    phase: "pre-call" | "post-call" = "post-call"
   ) {
-    super(`BUDGET_EXCEEDED: spent ¥${spentCny.toFixed(4)} > cap ¥${maxCostCny}`);
+    super(
+      phase === "pre-call"
+        ? `BUDGET_EXCEEDED: spent ¥${spentCny.toFixed(4)} >= cap ¥${maxCostCny} before dispatch`
+        : `BUDGET_EXCEEDED: spent ¥${spentCny.toFixed(4)} > cap ¥${maxCostCny}`
+    );
     this.name = "BlockBudgetExceededError";
   }
 }
 
 /**
+ * A model call completed but the transport could not attest complete usage.
+ * Treating it as a free call would let the run "fit" a budget it actually
+ * exceeded, so it stops the experiment instead.
+ */
+export class BlockUsageIncompleteError extends Error {
+  constructor(message: string) {
+    super(`USAGE_INCOMPLETE: ${message}`);
+    this.name = "BlockUsageIncompleteError";
+  }
+}
+
+/**
  * Whole-run cost accounting for the dsh experiment. Every model call is
- * charged, including calls that later failed; crossing the cap aborts the run
- * instead of producing a report that looks affordable.
+ * charged, including calls that later failed. A pre-call guard stops before
+ * dispatching once the cap is reached; a single in-flight call can still
+ * overshoot, which is the only residual overshoot and never yields `promote`.
  */
 export class BlockCostBudget {
   private spent = 0;
@@ -229,6 +248,17 @@ export class BlockCostBudget {
     return this.spent + this.costOf(usage) <= this.maxCostCny;
   }
 
+  canStart(): boolean {
+    return this.spent < this.maxCostCny;
+  }
+
+  /** Refuse to dispatch another call once the cap is already reached. */
+  assertCanStart(): void {
+    if (!this.canStart()) {
+      throw new BlockBudgetExceededError(this.spent, this.maxCostCny, "pre-call");
+    }
+  }
+
   /** Charge one call and fail closed once the cap is crossed. */
   charge(usage: AgentUsage | undefined): number {
     const cost = this.costOf(usage);
@@ -242,15 +272,19 @@ export class BlockCostBudget {
 
 /**
  * Infrastructure failures must never be retried as block failures: a missing
- * key, missing dsh binary, or an exhausted budget will not heal by asking the
- * model again, and treating it as content failure would fabricate evidence.
+ * key, missing dsh binary, timeout, non-zero exit, incomplete usage, or an
+ * exhausted budget will not heal by asking the model again. Only invalid
+ * model output is a retryable generation failure.
  */
 export function isBlockInfraError(error: unknown): boolean {
   if (error instanceof BlockBudgetExceededError) return true;
+  if (error instanceof BlockUsageIncompleteError) return true;
   if (error instanceof AgentRunnerError) {
-    return error.code === "AGENT_UNAVAILABLE";
+    return error.code !== "AGENT_INVALID_OUTPUT";
   }
-  return /CONFIGURATION_ERROR|DSH_UNAVAILABLE|BUDGET_EXCEEDED/.test(errorMessage(error));
+  return /CONFIGURATION_ERROR|DSH_UNAVAILABLE|BUDGET_EXCEEDED|USAGE_INCOMPLETE|BLOCK_EVIDENCE_WRITE_FAILED/.test(
+    errorMessage(error)
+  );
 }
 
 /** Assembly/verification failure is the only failure that retries the page. */
@@ -258,6 +292,27 @@ export class BlockAssemblyError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "BlockAssemblyError";
+  }
+}
+
+function accountUsage(input: {
+  blockId: string;
+  generator: BlockGeneratorPort;
+  budget?: BlockCostBudget;
+  onCost: (cny: number) => void;
+}): void {
+  const result = input.generator.takeUsage?.();
+  if (result === undefined) return;
+  // Charge whatever partial usage exists before failing closed, so an
+  // incomplete call is not silently free.
+  if (result.usage !== undefined) {
+    const cost = input.budget?.charge(result.usage);
+    if (cost !== undefined) input.onCost(cost);
+  }
+  if (result.usageComplete !== true) {
+    throw new BlockUsageIncompleteError(
+      `block ${input.blockId} did not report complete usage`
+    );
   }
 }
 
@@ -273,25 +328,54 @@ export async function generateBlockWithRetries(input: {
   const maxRetries = input.maxRetries ?? MAX_BLOCK_RETRIES;
   let retries = 0;
   for (;;) {
+    // Pre-call budget guard: never dispatch once the cap is reached. An
+    // in-flight call can still overshoot; that is the only residual overshoot.
+    input.budget?.assertCanStart();
     try {
       const draft = await input.generator.generate({
         pageId: input.pageId,
         blockId: input.block.blockId,
         prompt: `Regenerate block ${input.block.blockId} (${input.block.role}).`,
       });
-      input.onCost(input.budget?.charge(input.generator.takeUsage?.()) ?? 0);
+      accountUsage({ ...input, blockId: input.block.blockId });
       return { draft, retries };
     } catch (error) {
+      if (
+        error instanceof BlockUsageIncompleteError ||
+        error instanceof BlockBudgetExceededError
+      ) {
+        throw error;
+      }
       // Charge the failed call before deciding anything, so a budget stop
-      // still reflects every token spent.
-      const usage = input.generator.takeUsage?.();
-      const cost = input.budget?.charge(usage);
-      if (cost !== undefined) input.onCost(cost);
+      // still reflects every token spent. Incomplete usage also stops here.
+      accountUsage({ ...input, blockId: input.block.blockId });
       if (isBlockInfraError(error)) throw error;
       if (retries >= maxRetries) throw error;
       retries += 1;
     }
   }
+}
+
+function collectNodeIds(node: SpecNode, ids: Set<string> = new Set()): Set<string> {
+  if (node.id !== undefined) ids.add(node.id);
+  (node.children ?? []).forEach((child) => collectNodeIds(child, ids));
+  for (const nodes of Object.values(node.slots ?? {})) {
+    nodes.forEach((child) => collectNodeIds(child, ids));
+  }
+  return ids;
+}
+
+/**
+ * Conformance blocker diffs are comparable only when the regenerated block
+ * still contains every baseline node id. Renaming a root id re-keys the gate,
+ * which turns new/fixed blocker counts into noise.
+ */
+export function preservesBaselineNodeIds(
+  baseline: SpecNode,
+  experiment: SpecNode
+): boolean {
+  const experimentIds = collectNodeIds(experiment);
+  return [...collectNodeIds(baseline)].every((id) => experimentIds.has(id));
 }
 
 function selectPages(specs: PageSpec[], requested: string[] | undefined): PageSpec[] {
@@ -441,6 +525,7 @@ interface ConformanceGatePage {
   newBlockers: string[];
   fixedBlockers: string[];
   gateUsable: boolean;
+  comparable: boolean;
   conformance: BlockConformanceStatus;
 }
 
@@ -644,6 +729,15 @@ export async function runBlockExperiment(
       tokenDrift: countRawStyleValues(experimentManifest!.blocks[index]!.root),
     }));
 
+    // Renaming baseline ids re-keys conformance, so blocker diffs stop being
+    // evidence. Record that explicitly instead of reporting noisy counts.
+    const conformanceComparable = manifest.blocks.every((block, index) =>
+      preservesBaselineNodeIds(
+        block.root,
+        experimentManifest!.blocks[index]!.root
+      )
+    );
+
     const reportPage: BlockExperimentPage = {
       pageId,
       metrics,
@@ -651,6 +745,7 @@ export async function runBlockExperiment(
       costCny: pageCostCny,
       durationMs: Date.now() - started,
       conformance: "not_evaluated",
+      conformanceComparable,
     };
 
     outcomes.push({
@@ -792,6 +887,7 @@ export async function runBlockExperiment(
       newBlockers,
       fixedBlockers,
       gateUsable: baselineGate.passed,
+      comparable: outcome.report.conformanceComparable !== false,
       conformance,
     });
 
@@ -823,6 +919,16 @@ export async function runBlockExperiment(
       const height = blockHeights[index];
       if (height?.heightDeltaPct !== undefined) metric.heightDeltaPct = height.heightDeltaPct;
     });
+    // The page-level documentHeight delta is the height gate. Per-block
+    // lookups cannot substitute for it: they key on root ids, which a model
+    // may rename.
+    const pageHeightDelta = percentDelta(
+      baselinePageMetrics.documentHeight,
+      experimentPageMetrics.documentHeight
+    );
+    if (pageHeightDelta !== undefined) {
+      outcome.report.heightDeltaPct = pageHeightDelta;
+    }
     measurements.push({
       pageId,
       baseline: {
@@ -835,10 +941,7 @@ export async function runBlockExperiment(
         contentHeight: experimentPageMetrics.contentHeight,
         firstScreenNodes: experimentPageMetrics.firstScreenNodes,
       },
-      heightDeltaPct: percentDelta(
-        baselinePageMetrics.documentHeight,
-        experimentPageMetrics.documentHeight
-      ),
+      heightDeltaPct: pageHeightDelta,
       blocks: blockHeights.map((height, index) => ({
         blockId: outcome.experimentManifest.blocks[index]!.blockId,
         ...height,
@@ -960,23 +1063,31 @@ function renderMarkdown(input: {
   lines.push(`- 原因：${report.reasons.length === 0 ? "无" : report.reasons.join("；")}`, "");
   lines.push("## 页面指标", "");
   lines.push(
-    "| 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ | conformance | parity |"
+    "| 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ | 页高门禁 | conformance | parity |"
   );
-  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |");
+  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |");
   for (const page of report.pages) {
     const measurement = input.measurements.find((entry) => entry.pageId === page.pageId);
+    const pageDelta = page.heightDeltaPct ?? measurement?.heightDeltaPct;
     const tokenDrift = page.metrics.reduce((sum, metric) => sum + metric.tokenDrift, 0);
     const retries = page.metrics.reduce((sum, metric) => sum + metric.retries, 0);
-    const pageDelta =
-      measurement?.heightDeltaPct === undefined ? "未测量" : `${measurement.heightDeltaPct}%`;
+    const pageDeltaLabel = pageDelta === undefined ? "未测量" : `${pageDelta}%`;
+    const heightGate =
+      pageDelta === undefined
+        ? "未测量"
+        : Math.abs(pageDelta) > 5
+          ? "未通过"
+          : "通过";
     const conformance = recordedLabel(page.conformance);
     const parity = page.parityPassed === undefined ? "未评估" : page.parityPassed ? "通过" : "失败";
     lines.push(
-      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${page.pageRetries} | ${pageDelta} | ${conformance} | ${parity} |`
+      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${page.pageRetries} | ${pageDeltaLabel} | ${heightGate} | ${conformance} | ${parity} |`
     );
   }
   lines.push(
     "",
+    "> 页高门禁以页面级 `documentHeight` Δ 为准：|Δ| > 5% 是硬性 rollback 原因（`heightDelta>5%`），",
+    "> 与块级 root id 是否保留无关；块级 Δ 只作为附加诊断。",
     "> `durationMs` 在 fixture 模式只覆盖块生成/组装/校验，不含浏览器测量与 conformance 捕获；",
     "> dsh 模式下还包含模型调用，但同样不含浏览器测量与 conformance 捕获。",
     ""
@@ -997,11 +1108,14 @@ function renderMarkdown(input: {
     ""
   );
   lines.push("## Conformance gate", "");
-  lines.push("| 页面 | 基线 blocker | 实验 blocker | 新增 blocker | 基线 gate | conformance |");
-  lines.push("| --- | ---: | ---: | ---: | --- | --- |");
+  lines.push(
+    "| 页面 | 基线 blocker | 实验 blocker | 新增 blocker | id 可比 | 基线 gate | conformance |"
+  );
+  lines.push("| --- | ---: | ---: | ---: | --- | --- | --- |");
   for (const page of input.conformancePages) {
+    const newBlockers = page.comparable ? `${page.newBlockers.length}` : "不可比";
     lines.push(
-      `| ${page.pageId} | ${page.baseline.blockers} | ${page.experiment.blockers} | ${page.newBlockers.length} | ${page.gateUsable ? "通过" : "未通过"} | ${recordedLabel(page.conformance)} |`
+      `| ${page.pageId} | ${page.baseline.blockers} | ${page.experiment.blockers} | ${newBlockers} | ${page.comparable ? "可比" : "不可比"} | ${page.gateUsable ? "通过" : "未通过"} | ${recordedLabel(page.conformance)} |`
     );
   }
   const gateUnusable = input.conformancePages.filter((page) => !page.gateUsable).length;
@@ -1015,7 +1129,8 @@ function renderMarkdown(input: {
   lines.push(
     "",
     "> `conformance` 是 tri-state：`passed` 仅当 gate 运行且 0 blocker；`failed` 表示 gate 运行且有 blocker；",
-    "> `not_evaluated` 表示 gate 未运行。`新增 blocker` / `修复 blocker` 只是回归诊断，不会改写 tri-state。",
+    "> `not_evaluated` 表示 gate 未运行。`新增 blocker` / `修复 blocker` 只在 `id 可比` 时具有证据意义：",
+    "> 如果模型重命名 baseline 节点 id，gate 会按不同 key 比较，新增/修复数不可引用，也不能据此 promote。",
     ""
   );
   lines.push("", "## 页面校验与块校验", "");
@@ -1028,15 +1143,23 @@ function renderMarkdown(input: {
     );
   }
   lines.push("", "## 页高实测", "");
-  lines.push("| 页面 | 基线高度 | 实验高度 | Δ |");
-  lines.push("| --- | ---: | ---: | ---: |");
+  lines.push("| 页面 | 基线高度 | 实验高度 | Δ | 5% 门禁 |");
+  lines.push("| --- | ---: | ---: | ---: | --- |");
   for (const measurement of input.measurements) {
+    const delta = measurement.heightDeltaPct;
+    const gate =
+      delta === undefined ? "未测量" : Math.abs(delta) > 5 ? "未通过（回滚）" : "通过";
     lines.push(
       `| ${measurement.pageId} | ${measurement.baseline.documentHeight}px | ${measurement.experiment.documentHeight}px | ${
-        measurement.heightDeltaPct === undefined ? "未测量" : `${measurement.heightDeltaPct}%`
-      } |`
+        delta === undefined ? "未测量" : `${delta}%`
+      } | ${gate} |`
     );
   }
+  lines.push(
+    "",
+    "> 上表 Δ 是机器门禁输入；`|Δ| > 5%` 会写入 `reasons` 并强制 `rollback`。",
+    ""
+  );
   lines.push("", "## 证据路径", "");
   lines.push(`- \`${path.join(input.runDir, "block-experiment.json")}\``);
   lines.push(`- \`${path.join(input.runDir, "block-experiment.md")}\``);
@@ -1100,6 +1223,8 @@ export async function main(
           requiredStates: block.requiredStates,
           role: block.role,
           canRepair: (usage) => activeBudget.canAfford(usage),
+          remainingBudgetCny: () =>
+            Math.max(0, activeBudget.maxCostCny - activeBudget.spentCny),
         });
     } else {
       generatorSource = new FixtureBlockGenerator(options.fixtures!);

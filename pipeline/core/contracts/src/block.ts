@@ -71,9 +71,19 @@ export interface BlockExperimentPage {
   costCny: number;
   durationMs: number;
   conformance: BlockConformanceStatus;
+  /**
+   * Page-level documentHeight delta, measured from the baseline and
+   * experiment HTML. This is the height gate: |value| > 5 rolls back.
+   */
+  heightDeltaPct?: number;
   /** False when the assembled block manifest has structural blockers. */
   blockVerifyPassed?: boolean;
   parityPassed?: boolean;
+  /**
+   * False when a regenerated block no longer contains every baseline node id,
+   * so conformance blocker diffs key different nodes and are not evidence.
+   */
+  conformanceComparable?: boolean;
 }
 
 export interface BlockExperimentReport {
