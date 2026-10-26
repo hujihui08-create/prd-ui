@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-26T15:34:23.468Z",
+  "passed": true,
+  "conformance": {
+    "status": "passed",
+    "passed": true,
+    "blockers": 0,
+    "majors": 0,
+    "pages": 8
+  },
+  "measure": {
+    "status": "passed",
+    "pages": 8
+  },
+  "structure": {
+    "status": "passed",
+    "warnings": 0,
+    "blockers": 0
+  },
+  "parity": {
+    "status": "skipped",
+    "reason": "missing Figma PNGs in /Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"
+  }
+}

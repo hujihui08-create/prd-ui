@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-26T15:35:24.408Z",
+  "metrics": "render-metrics.json",
+  "findings": [],
+  "summary": {
+    "warnings": 0,
+    "blockers": 0
+  }
+}

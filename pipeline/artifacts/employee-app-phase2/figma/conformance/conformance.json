@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-26T15:34:52.083Z",
+  "pages": [
+    {
+      "pageId": "appointment-detail",
+      "passed": true,
+      "checked": 20,
+      "skipped": 0,
+      "findings": []
+    },
+    {
+      "pageId": "appointment-form",
+      "passed": true,
+      "checked": 17,
+      "skipped": 0,
+      "findings": []
+    },
+    {
+      "pageId": "appointment-list",
+      "passed": true,
+      "checked": 125,
+      "skipped": 8,
+      "findings": []
+    },
+    {
+      "pageId": "callback-register",
+      "passed": true,
+      "checked": 13,
+      "skipped": 0,
+      "findings": []
+    },
+    {
+      "pageId": "customer-detail",
+      "passed": true,
+      "checked": 17,
+      "skipped": 0,
+      "findings": []
+    },
+    {
+      "pageId": "customer-search",
+      "passed": true,
+      "checked": 4,
+      "skipped": 4,
+      "findings": []
+    },
+    {
+      "pageId": "today",
+      "passed": true,
+      "checked": 18,
+      "skipped": 2,
+      "findings": []
+    },
+    {
+      "pageId": "treatment-notice",
+      "passed": true,
+      "checked": 19,
+      "skipped": 0,
+      "findings": []
+    }
+  ],
+  "summary": {
+    "blockers": 0,
+    "majors": 0,
+    "pages": 8
+  }
+}

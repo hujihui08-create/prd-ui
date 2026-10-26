@@ -3,6 +3,56 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.7 implementation: visual gates, structure, blocks, handoff (not signed)
+
+### Added
+
+- `pnpm v07:smoke` (`runtimes/standalone/src/v07-smoke-cli.ts`): runs
+  `figma:conformance` → `render:measure` → `structure:check` → `figma:parity` in
+  order, stops at the first failure, and writes `<out>/v07-smoke.json` plus one
+  JSON summary line. Parity runs only with `--figma` + `--baseline` and every
+  `figma.<pageId>.png`; otherwise it is an explicit `skipped` (not a pass).
+- v0.7 gates and evidence (Tasks 1–19): fail-closed plan mapping +
+  `plan-coverage.json`, project-agnostic `figma:conformance`, `figma:parity`,
+  `figma:serve`/`figma:sign`, `render:measure`, `structure:check --project`,
+  `structure:diff`, `block:verify`, `block:experiment`, and the fail-closed
+  `handoff:pack`.
+- Committed evidence: `pipeline/artifacts/employee-app-phase2/figma/conformance/`,
+  `.../render/{metrics,structure}/`, `.../blocks/`, and `.../v07-smoke.json`.
+- `docs/handoffs/2026-10-26-v07-implementation-handoff.md`.
+
+### Verified
+
+- `pnpm test` **945 passed** (86 files); `pnpm test:dsh` **4 passed** (3 files);
+  `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
+- `figma:conformance`: **0 blocker / 0 major / 233 checked** on all 8 phase2
+  pages with freshly rendered HTML; `render:measure` 8 pages (no overflow);
+  `structure:check --project` 0 warnings / 0 blockers; `v07:smoke` exit 0
+  (`parity: skipped` for missing Figma PNGs).
+- Defect injections fail as intended: `ghost-chip` height 36 → 2
+  `CONFORMANCE_STYLE_MISMATCH height`; removed row divider → 1
+  `CONFORMANCE_STYLE_MISMATCH borderBottomWidth`; injected `Chart` →
+  `UNMAPPED_COMPONENT` with `specId today.chart.1` from `figma:verify`.
+- New-project check (`employee-app`, 2 pages): the gate chain runs without test
+  changes; `today` passes, `inventory-query` reports 6 real
+  `CONFORMANCE_NODE_MISSING` blockers for the unmapped `Switch`/`InventoryCard`
+  types (plan degraded, no HTML counterpart).
+
+### Not done / blocked
+
+- `figma:verify` is **3/8 passed** against the checked-in v0.6 readbacks (4
+  blocker / 53 major, all stale value diffs after the plan corrections). A manual
+  Figma rebuild (scratch + delivery) is required; v0.7 is **not signed**.
+- `figma:parity` has not run: no `figma/parity/figma.<page>.png` and the v0.5
+  baseline is stale after the v0.5.x CSS changes. Gate 0 (v0.6 human signoff +
+  regenerated, re-signed baseline) remains pending.
+- `handoff:pack` fails closed: exit 2 with the brief's asset path (no root
+  `manifest.json`), exit 1 with 23 blockers (missing parity evidence/diff PNGs,
+  readback `fileKey`, figma signoff, full spec-engineer gate). No partial package.
+- Block-generation pilot concluded **rollback at ¥0.3302** (7 generations, 0
+  retries, 0% height delta, 0 new seams, parity not evaluated); it ran before the
+  conformance remediation and needs a v0.8 re-evaluation.
+
 ## 2026-10-26 — v0.7 design input: gates, structure, block generation
 
 ### Added

@@ -6,7 +6,7 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
 - `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `asset-compiler`, `agents`, `spec-engineer`, `intake`, `visual-review`, `figma`.
-- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `studio:prepare`).
+- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `render:measure`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `figma:conformance`, `figma:parity`, `figma:serve`, `figma:sign`, `structure:check`, `structure:diff`, `block:verify`, `block:experiment`, `handoff:pack`, `v07:smoke`, `studio:prepare`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
 - `pipeline/runtimes/figma` — Figma sandbox plugin (`src/plugin.ts` + `src/ui.html`), bundled to gitignored `dist/` with esbuild; manual Figma gate.
 - `pipeline/studio` — read-only Vite/React/Tailwind v4 + shadcn workbench; reads generated `public/studio-data.json` + copied HTML; never orchestrates.
@@ -58,6 +58,25 @@ pnpm studio:prepare --spec-run /tmp/spec-v05/run-2026-10-23T06-07-48-403Z --html
 pnpm studio:build
 pnpm studio:smoke --json
 
+# v0.7: plan↔HTML conformance, render metrics, structure, parity, smoke, handoff
+rm -rf /tmp/html-v07-final
+pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final
+pnpm figma:conformance --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --plans artifacts/employee-app-phase2/figma/plans --out artifacts/employee-app-phase2/figma/conformance
+pnpm render:measure --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --out artifacts/employee-app-phase2/render/metrics
+pnpm structure:check --spec-run artifacts/employee-app-phase2/figma/spec-source --metrics artifacts/employee-app-phase2/render/metrics/render-metrics.json --project samples/projects/employee-app-phase2/project.yaml --out artifacts/employee-app-phase2/render/structure
+pnpm structure:diff --before <spec-run> --after <spec-run> --out /tmp/structure-diff.json
+pnpm block:verify --spec-run <spec-run> --json
+pnpm block:experiment --project samples/projects/employee-app-phase2/project.yaml --baseline artifacts/employee-app-phase2/figma/spec-source --pages today,appointment-list --fixtures samples/agents/blocks --runs /tmp/block-experiment
+# parity needs real Figma PNGs (<figma>/parity/figma.<page>.png) + a signed baseline
+pnpm figma:parity --figma artifacts/employee-app-phase2/figma/parity --baseline baselines/employee-app-phase2 --spec-run artifacts/employee-app-phase2/figma/spec-source --out artifacts/employee-app-phase2/figma/parity
+# one smoke runs conformance → render:measure → structure:check → figma:parity (stops at the first failure)
+pnpm v07:smoke --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --project samples/projects/employee-app-phase2/project.yaml --figma artifacts/employee-app-phase2/figma --baseline baselines/employee-app-phase2 --out artifacts/employee-app-phase2 --json
+# manual Figma gate: serve plans, build in the plugin, then verify/parity/sign
+pnpm figma:serve --figma artifacts/employee-app-phase2/figma --port 9600
+pnpm figma:verify --plan artifacts/employee-app-phase2/figma/plans/figma-plan.<page>.json --readback artifacts/employee-app-phase2/figma/readback/figma-readback.<page>.json --out artifacts/employee-app-phase2/figma/diff/figma-diff.<page>.json
+pnpm figma:sign --figma artifacts/employee-app-phase2/figma --baseline baselines/employee-app-phase2 --signoff-figma /tmp/signoff-figma.md
+pnpm handoff:pack --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --figma artifacts/employee-app-phase2/figma --visual-run artifacts/employee-app-phase2/visual-review --assets artifacts/employee-app-phase2/asset-compiler/phase2 --baseline baselines/employee-app-phase2 --out artifacts/employee-app-phase2/handoff --zip
+
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
 DSH_HOME="$PWD/dsh/home" pnpm asset:review --project samples/projects/employee-app/project.yaml --assets samples/assets/m0 --runtime dsh --runs /tmp/m0-runs-dsh
@@ -93,49 +112,87 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   waivers only apply to `VISUAL_CRITIC_BLOCKER`.
 - `pnpm test:dsh` fails with an install hint if the pinned dsh binary is
   missing; only `SKIP_DSH=1` skips it.
+- `figma:conformance` compares each committed plan against the **rendered** HTML
+  (Playwright computed styles) and exits 1 on blockers, 2 on infrastructure
+  errors. It needs fresh HTML: `artifacts/employee-app-phase2/html` predates the
+  v0.5.x colour tokens and the v0.7 `data-node-id` coverage, so re-render into
+  `/tmp` first.
+- `render:measure` writes `render-metrics.json`; `structure:check` consumes it
+  and **requires `--project`** (project overrides live in the YAML). The
+  measured-structure findings are warnings in v0.7; the CLI only exits 1 on a
+  blocker finding.
+- `figma:parity` needs real `<figma>/parity/figma.<pageId>.png` files plus a
+  signed baseline (`manifest.json`); it never updates the baseline. `v07:smoke`
+  reports `parity: {status: "skipped", reason}` when those inputs are missing
+  and does not fail only for that skip. Skipped parity is not a pass;
+  `handoff:pack` is the fail-closed final check.
+- `v07:smoke` runs conformance → render:measure → structure:check →
+  figma:parity (only with both `--figma` and `--baseline` and every Figma PNG
+  present) and stops at the first failure; it writes `<out>/v07-smoke.json` and
+  prints one JSON summary line. It does **not** run `figma:verify`, which needs
+  manual Figma readbacks.
+- `figma:serve` serves plans and accepts readback/PNG saves from the plugin;
+  `figma:sign` binds the five evidence hashes and refuses any `passed:false`
+  diff. `figma:verify` is green only after a real Figma rebuild (the checked-in
+  v0.6 readbacks predate the corrected plans).
+- `block:verify` verifies `artifacts/block-manifest/<pageId>.json`;
+  `block:experiment` is the block-generation pilot (`--fixtures` is the
+  deterministic free path, `--runtime dsh` the real one). The 2026-10-26 real
+  pilot concluded `rollback` at ¥0.3302.
+- `handoff:pack` is fail-closed: it checks plans/readbacks/diffs, conformance,
+  parity, the figma + visual signoffs, the signed baseline, the spec-engineer
+  gate, assets/licenses, and placeholders before staging; a failure leaves no
+  output directory. `--baseline` defaults to the visual run's baseline files.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-## Current state (v0.6 gate evidence complete, human signoff pending, 2026-10-26)
+## Current state (v0.7 automatable gates implemented, Figma rebuild + Gate 0 pending, 2026-10-26)
 
-Verified: `pnpm test` 704 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
-clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
+Verified: `pnpm test` **945 passed** (86 files), `pnpm test:dsh` **4 passed**
+(3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma typecheck` clean
+and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
-v0.5 remains the last signed milestone. v0.6 Phase 3A is implemented in the
-automatable parts: `core/figma` plan compiler + readback diff, `runtimes/figma`
-plugin/UI/bundle, `core/asset-compiler` + `asset:compile`, and a read-only
-Studio (`studio/`, shadcn/Tailwind). `figma:plan` generates 8 plans; M0 assets
-package 13/13 and phase2 frozen icons 4/4.
+**v0.7 is implemented in the parts that do not need Figma desktop, and is not
+signed.** `figma:conformance` is **0 blocker / 0 major / 233 checked** on the 8
+phase2 pages using freshly rendered HTML (`/tmp/html-v07-final`) and the
+committed corrected plans; `render:measure` is 8 pages with no overflow and
+`structure:check --project` is 0 warnings / 0 blockers. `v07:smoke` exits 0 with
+`parity: {status: "skipped"}` because no `figma/parity/figma.<page>.png` exist.
+Evidence: `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,v07-smoke.json}`.
 
-The real Figma gate ran on 2026-10-26: 8/8 scratch pages and 8/8 delivery pages
-built in Figma desktop, all `figma:verify` runs **passed (0 blocker / 0 major /
-0 findings)** with 16 `errors: []` readbacks. A second fidelity pass aligned
-buttons (incl. a `ghost-chip` variant), row dividers, tab labels/icons, input
-styles, select values, empty states and the calendar against the HTML
-baselines. Durable evidence lives in
-`pipeline/artifacts/employee-app-phase2/figma/` (`spec-source/`, `plans/`,
-`readback/{,delivery}/`, `diff/{,delivery}/`, `screenshots/`, `README.md`);
-Figma files are scratch `iL99qSPGhmh08BB9LketgF` and delivery
-`ne1JYKpfjDivRr0nK5jm4S` (Drafts). The gate exposed and fixed six real bugs
-(dynamic-page mainComponent, instance children, variable-paint opacity, dropped
-summary/fields slots, search rows, view-panel padding); `pnpm studio:smoke` is
-the headless Studio gate. v0.6 still needs the **human** side-by-side visual check
-and signoff, so it is **not signed** and cannot be `passed`.
+`figma:verify` is **red against the checked-in v0.6 readbacks** (3/8 passed;
+4 blocker / 53 major, all stale value diffs, no coverage findings) because
+Task 20a corrected the plans. A real Figma rebuild (scratch + delivery) is
+required before verify/parity/`figma:sign` can be green. `handoff:pack` fails
+closed: exit 2 with the brief's `--assets artifact-compiler` (no root
+manifest), exit 1 with 23 blockers (missing `figma/parity/`, parity diff PNGs,
+readback `fileKey`, figma signoff, and a full `spec-engineer-gate.json`); no
+partial package is written.
 
-v0.5.x debt cleanup landed on 2026-10-26: disabled datetime container, loading
-selected-column skeleton, and `YYYY-MM-DD HH:mm` confirmed time; the Sunday
-column tint was not reproducible and needed no code change. **The v0.5 visual
-baseline is stale after those CSS changes**; the next visual gate must regenerate
-and re-sign it.
+v0.5 remains the last signed milestone. **Gate 0 is still pending**: the v0.6
+human side-by-side visual signoff was never done, and the v0.5 visual baseline
+is stale after the v0.5.x CSS changes, so the next visual gate must regenerate
+and re-sign it (`visual:baseline` is human-only). The block-generation pilot
+concluded **rollback at ¥0.3302** (evidence copied to
+`pipeline/artifacts/employee-app-phase2/blocks/`); it ran before the conformance
+remediation, so a v0.8 re-evaluation is required before treating that as final.
 
-Next: run the manual Figma checklist in
-`pipeline/artifacts/employee-app-phase2/figma/README.md`, sign v0.6, then start
-v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9; final v1.0.
-Handoff: `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (latest);
-`docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (v0.5.x/v0.6.x debt);
+v0.6 Phase 3A (Figma plan compiler + plugin/readback diff, Asset Compiler, and
+the read-only Studio) remains implemented in its automatable parts; its
+2026-10-26 gate evidence (8/8 scratch + 8/8 delivery verify passed, 16
+`errors: []` readbacks) is historical and **not** v0.7-green because the plans
+changed afterwards. See the v0.6 note in
+`pipeline/artifacts/employee-app-phase2/figma/README.md`.
+
+Next: Gate 0 (v0.6 human check + regenerated baseline), then rebuild the 8 Figma
+pages from the corrected plans, re-run `figma:verify` + `figma:parity`, sign
+`figma:sign`, and re-run `handoff:pack` against a full spec run. Phase 4 pilot
+is v0.8; RC v0.9; final v1.0. Handoff (latest):
+`docs/handoffs/2026-10-26-v07-implementation-handoff.md`; then
+`docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (v0.6 evidence),
+`docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (v0.5.x/v0.6.x debt),
 `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` (overall session
-state); v0.6 details in
-`docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
+state).
 
 ## Architecture boundaries
 
@@ -218,7 +275,9 @@ state); v0.6 details in
 - `docs/superpowers/specs/2026-10-26-v07-visual-gates-structure-block-input.md` — v0.7 design input: fail-closed mapping, project-agnostic conformance/parity gates, structure lint, block generation experiment.
 - `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — latest: v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
+- `docs/handoffs/2026-10-26-v07-implementation-handoff.md` — latest: v0.7 gates/smoke/evidence, conformance 0/0, handoff:pack blockers, manual Figma/Gate 0 checklist.
+- `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` — v0.6 Figma gate evidence and fidelity pass (historical; readbacks predate the v0.7 plans).
+- `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
 - `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).
 - `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md` — detailed v0.6 progress handoff (Figma gate pending, 688 tests at Phase 3A, Studio/Asset evidence).
 - `docs/handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md` — v0.5 signed handoff (loading/empty/mode/a11y/stop rule, v0.5.x minors).

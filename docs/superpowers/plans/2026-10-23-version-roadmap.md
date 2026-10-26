@@ -25,7 +25,7 @@
 | **v0.4.1** | **视觉小额补丁** | **S** | **已完成（signed）** |
 | **v0.5** | **视觉 + a11y 收口** | **M** | **已完成（signed）** |
 | v0.6 | Phase 3A：Figma + Studio | L | Implemented（Figma gate pending） |
-| v0.7 | Phase 3B：沙箱 + Test Subagent + Handoff | L | 未开始 |
+| v0.7 | Phase 3B：沙箱 + Test Subagent + Handoff | L | Implemented（自动门禁完成；Figma 重建/parity/签核待办，未签） |
 | v0.8 | Phase 4A：真实项目试点 | L | 未开始 |
 | v0.9 | Release Candidate | M | 未开始 |
 | v1.0 | 最终交付 | — | 未开始 |
@@ -98,7 +98,11 @@
 
 ## 5. v0.7 Phase 3B：沙箱 + Test Subagent + Handoff
 
-**状态（2026-10-26）**：设计输入已准备：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)。核心是 fail-closed 映射、项目无关的 conformance/parity 门禁、结构 lint 与分块生成实验；资产（组件/内容）按项目生成，不固化。
+**状态（2026-10-26）**：**可自动化部分已实现，未签核**。设计输入见 [v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)；实施记录见 [v0.7 实施交接](../../handoffs/2026-10-26-v07-implementation-handoff.md)。
+
+已完成：fail-closed 映射 + `plan-coverage.json`；`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；`structure:diff`；`block:verify` / `block:experiment`；`figma:parity`（CLI 完成，尚无真实 PNG）；`figma:serve` / `figma:sign`；`handoff:pack`（fail-closed）；`v07:smoke`。测试 945 passed / typecheck clean / test:dsh 4 passed。
+
+未完成（阻塞签核）：v0.6 人工签核 + baseline 重生成（Gate 0）；用修正后的 plan 重建 Figma 8 页并重跑 `figma:verify`（当前 3/8 对旧 readback 为红）；真实 `figma:parity`；`figma:sign`；完整 `handoff:pack`（当前 23 blockers）。分块实验结论 **rollback（¥0.3302）**，且运行于 conformance 修复前，需 v0.8 重评。
 
 **目标**：把验证和交付自动化，形成可独立实现的 Handoff。
 
@@ -169,9 +173,9 @@
 
 ## 9. 当前建议
 
-1. **v0.4.1 已完成并签核**（视觉补丁）。
-2. **v0.5 已完成并签核**（结构视觉 + a11y + critic 停止规则；0 major / 4 minor，minor 留 v0.5.x）。
-3. 下一步进入 **v0.6/v0.7**：Figma/Studio/Asset Compiler，再 sandbox/Test Subagent/Handoff。
+1. **v0.4.1 / v0.5 已完成并签核**（v0.5：0 major / 4 minor，minor 留 v0.5.x）。
+2. **v0.6/v0.7 的自动门禁已实现**：conformance 0/0、measure、structure、block、handoff packager、`v07:smoke`；但 **v0.6 人工签核与 v0.5 baseline 重签（Gate 0）仍未完成，v0.7 未签核**。
+3. **下一步先做 Gate 0**：人工并排检查 + 用当前 CSS 重新生成并签核 baseline；然后重建 8 页 Figma、跑 `figma:verify` + `figma:parity` + `figma:sign`，最后用完整 spec run 打包 `handoff:pack`。
 4. **v0.8** 真实项目试点通过后，才进入 v0.9/v1.0。
 
 每进入一个版本，单独写 spec → plan → 执行 → 验收；不要把多个版本合并成一个大 spec。

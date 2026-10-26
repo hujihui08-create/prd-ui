@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pages": [
+    {
+      "pageId": "today",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 732,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 732,
+        "scrollHeight": 732,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 15,
+      "widest": {
+        "specId": "today.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": false,
+        "height": 0,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 0
+    },
+    {
+      "pageId": "appointment-list",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 804,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 804,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 113,
+      "widest": {
+        "specId": "appointment-list.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 16
+    }
+  ]
+}
