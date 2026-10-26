@@ -10,7 +10,7 @@ import {
 } from "@prd-ui/contracts";
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
-import { comparePlanToStyleManifest, compileFigmaPlans } from "../src/index.js";
+import { comparePlanToStyleManifest, compileFigmaPlans, parseCssColor } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(
   JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
@@ -65,6 +65,14 @@ function resolve(plan: FigmaPlan, value: string | undefined): string | undefined
   return value === undefined ? undefined : (plan.tokens[value] ?? value);
 }
 
+/** What `color-mix(in srgb, token alpha, white)` paints, as an opaque rgb(). */
+function mixWithWhite(color: string, alpha: number): string {
+  const parsed = parseCssColor(color);
+  if (parsed === undefined) return color;
+  const channel = (value: number): number => Math.round(value * alpha + 255 * (1 - alpha));
+  return `rgb(${channel(parsed.r)}, ${channel(parsed.g)}, ${channel(parsed.b)})`;
+}
+
 function expectedStyle(plan: FigmaPlan, node: FigmaPlanNode, specId = node.specId): StyleNode {
   const style = plainStyle(specId);
   if (node.type === "TEXT") {
@@ -93,14 +101,19 @@ function expectedStyle(plan: FigmaPlan, node: FigmaPlanNode, specId = node.specI
       style.padding.right = paddingX;
     }
     const fill = resolve(plan, node.fill ?? variant.fill);
+    const fillAlpha = node.fillAlpha ?? variant.fillAlpha ?? 1;
     if (fill !== undefined) {
-      style.background = { color: fill, alpha: node.fillAlpha ?? variant.fillAlpha ?? 1 };
+      style.background = {
+        color: fillAlpha < 1 ? mixWithWhite(fill, fillAlpha) : fill,
+        alpha: 1,
+      };
     }
     const stroke = resolve(plan, node.stroke ?? variant.stroke);
+    const strokeAlpha = variant.strokeAlpha ?? 1;
     if (stroke !== undefined) {
       style.border.top = {
         width: node.strokeWidth ?? variant.strokeWidth ?? 1,
-        color: stroke,
+        color: strokeAlpha < 1 ? mixWithWhite(stroke, strokeAlpha) : stroke,
       };
     }
     const labelFont = plan.textStyles[variant.labelTextStyle];
@@ -139,10 +152,11 @@ function expectedStyle(plan: FigmaPlan, node: FigmaPlanNode, specId = node.specI
     left: borderSide(node.borderLeft ?? node.stroke, node.borderLeftWidth ?? node.strokeWidth),
   };
   const fill = resolve(plan, node.fill);
+  const fillAlpha = node.fillAlpha ?? 1;
   style.background =
     fill === undefined
       ? { color: "rgba(0,0,0,0)", alpha: 0 }
-      : { color: fill, alpha: node.fillAlpha ?? 1 };
+      : { color: fillAlpha < 1 ? mixWithWhite(fill, fillAlpha) : fill, alpha: 1 };
   if (node.width !== undefined) style.rect.width = node.width;
   if (node.height !== undefined) style.rect.height = node.height;
   return style;
@@ -182,48 +196,118 @@ function manifestFor(plan: FigmaPlan): StyleManifest {
   };
 }
 
+function fixturePlan(root: FigmaPlanNode, coverageIds: string[] = [root.specId]): FigmaPlan {
+  return {
+    schemaVersion: "1.0",
+    project: "fixture",
+    pageId: "fixture",
+    pageName: "Fixture",
+    width: 390,
+    height: 844,
+    background: "color/surface/default",
+    tokens: { "color/surface/default": "#FFFFFF" },
+    textStyles: {},
+    components: { Button: { variants: {} } },
+    root,
+    coverage: {
+      nodes: coverageIds.map((specId) => ({
+        specId,
+        specType: "MobileShell",
+        path: "layout",
+        status: "mapped" as const,
+      })),
+      summary: {
+        spec: coverageIds.length,
+        derived: 0,
+        mapped: coverageIds.length,
+        degraded: 0,
+        unmapped: 0,
+        skipped: 0,
+      },
+    },
+    stats: { frames: 1, texts: 0, instances: 0, icons: 0, images: 0 },
+  };
+}
+
+function fixtureManifest(nodes: StyleNode[]): StyleManifest {
+  return {
+    schemaVersion: "1.0",
+    pageId: "fixture",
+    viewport: { width: 390, height: 844 },
+    capturedAt: "2026-10-26T00:00:00.000Z",
+    nodes,
+  };
+}
+
 describe("comparePlanToStyleManifest", () => {
   it("passes a minimal plan with matching defaults", () => {
-    const minimal: FigmaPlan = {
-      schemaVersion: "1.0",
-      project: "fixture",
-      pageId: "fixture",
-      pageName: "Fixture",
-      width: 390,
-      height: 844,
-      background: "color/surface/default",
-      tokens: { "color/surface/default": "#FFFFFF" },
-      textStyles: {},
-      components: { Button: { variants: {} } },
-      root: {
+    const minimal = fixturePlan({
+      specId: "fixture.root",
+      type: "FRAME",
+      name: "Root",
+      layoutMode: "VERTICAL",
+      children: [],
+      origin: "spec",
+      mapping: "mapped",
+    });
+    const page = comparePlanToStyleManifest({
+      plan: minimal,
+      manifest: fixtureManifest([plainStyle("fixture.root")]),
+      profile: getProfile("b-mobile"),
+    });
+    expect(page.findings.filter((finding) => finding.severity === "blocker")).toHaveLength(0);
+  });
+
+  it("flags an ABSOLUTE node without a style even when it is spec-origin", () => {
+    const fixture = fixturePlan(
+      {
         specId: "fixture.root",
         type: "FRAME",
         name: "Root",
         layoutMode: "VERTICAL",
-        children: [],
+        children: [
+          {
+            specId: "fixture.overlay",
+            type: "ABSOLUTE",
+            name: "Overlay",
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 40,
+            origin: "spec",
+            mapping: "mapped",
+            child: {
+              specId: "fixture.overlay.frame",
+              type: "FRAME",
+              name: "Overlay frame",
+              layoutMode: "VERTICAL",
+              children: [],
+              width: 100,
+              height: 40,
+              origin: "derived",
+              mapping: "mapped",
+            },
+          },
+        ],
         origin: "spec",
         mapping: "mapped",
       },
-      coverage: {
-        nodes: [
-          { specId: "fixture.root", specType: "MobileShell", path: "layout", status: "mapped" },
-        ],
-        summary: { spec: 1, derived: 0, mapped: 1, degraded: 0, unmapped: 0, skipped: 0 },
-      },
-      stats: { frames: 1, texts: 0, instances: 0, icons: 0, images: 0 },
-    };
+      ["fixture.root", "fixture.overlay"]
+    );
     const page = comparePlanToStyleManifest({
-      plan: minimal,
-      manifest: {
-        schemaVersion: "1.0",
-        pageId: "fixture",
-        viewport: { width: 390, height: 844 },
-        capturedAt: "2026-10-26T00:00:00.000Z",
-        nodes: [plainStyle("fixture.root")],
-      },
+      plan: fixture,
+      manifest: fixtureManifest([plainStyle("fixture.root")]),
       profile: getProfile("b-mobile"),
     });
-    expect(page.findings.filter((finding) => finding.severity === "blocker")).toHaveLength(0);
+    expect(
+      page.findings.some(
+        (finding) =>
+          finding.code === "CONFORMANCE_NODE_MISSING" &&
+          finding.specId === "fixture.overlay" &&
+          finding.severity === "blocker"
+      )
+    ).toBe(true);
+    expect(page.passed).toBe(false);
   });
 
   it("passes compiled plans whose manifest mirrors every visible node", () => {
@@ -317,6 +401,88 @@ describe("comparePlanToStyleManifest", () => {
           finding.property === "height"
       )
     ).toBe(true);
+  });
+
+  it("accepts a color-mix tint for a translucent danger border", () => {
+    const compiled = plan("appointment-detail");
+    const manifest = manifestFor(compiled);
+    const button = manifest.nodes.find(
+      (node) => node.specId === "appointment-detail.action.cancel"
+    )!;
+    // Chrome serialization of color-mix(in srgb, status.danger 40%, white).
+    button.border.top = { width: 1, color: "color(srgb 0.839216 0.643137 0.643137)" };
+    const page = comparePlanToStyleManifest({
+      plan: compiled,
+      manifest,
+      profile: getProfile("b-mobile"),
+    });
+    expect(page.findings.filter((finding) => finding.severity === "blocker")).toHaveLength(0);
+    expect(page.passed).toBe(true);
+  });
+
+  it("rejects a solid token border for a translucent danger variant", () => {
+    const compiled = plan("appointment-detail");
+    const manifest = manifestFor(compiled);
+    const button = manifest.nodes.find(
+      (node) => node.specId === "appointment-detail.action.cancel"
+    )!;
+    button.border.top = { width: 1, color: "#991B1B" };
+    const page = comparePlanToStyleManifest({
+      plan: compiled,
+      manifest,
+      profile: getProfile("b-mobile"),
+    });
+    expect(
+      page.findings.some(
+        (finding) =>
+          finding.code === "CONFORMANCE_STYLE_MISMATCH" &&
+          finding.specId === "appointment-detail.action.cancel" &&
+          finding.property === "borderTop" &&
+          finding.severity === "blocker"
+      )
+    ).toBe(true);
+  });
+
+  it("accepts an opaque color-mix fill for a selected translucent calendar day", () => {
+    const compiled = plan("appointment-list");
+    const manifest = manifestFor(compiled);
+    const day = manifest.nodes.find(
+      (node) => node.specId === "appointment-list.calendar.grid.day.2"
+    )!;
+    // color-mix(in srgb, status.info 14%, surface-subtle), serialized as rgb().
+    day.background = { color: "rgb(215, 222, 244)", alpha: 1 };
+    const page = comparePlanToStyleManifest({
+      plan: compiled,
+      manifest,
+      profile: getProfile("b-mobile"),
+    });
+    expect(page.findings.filter((finding) => finding.severity === "blocker")).toHaveLength(0);
+    expect(page.passed).toBe(true);
+  });
+
+  it("rejects a solid or wrong-hue fill for a selected calendar day", () => {
+    const dayId = "appointment-list.calendar.grid.day.2";
+    for (const color of ["#1D4ED8", "rgb(216, 244, 222)"]) {
+      const compiled = plan("appointment-list");
+      const manifest = manifestFor(compiled);
+      const day = manifest.nodes.find((node) => node.specId === dayId)!;
+      day.background = { color, alpha: 1 };
+      const page = comparePlanToStyleManifest({
+        plan: compiled,
+        manifest,
+        profile: getProfile("b-mobile"),
+      });
+      expect(
+        page.findings.some(
+          (finding) =>
+            finding.code === "CONFORMANCE_STYLE_MISMATCH" &&
+            finding.specId === dayId &&
+            finding.property === "background" &&
+            finding.severity === "blocker"
+        ),
+        color
+      ).toBe(true);
+    }
   });
 
   it("flags a material derived node missing from the html", () => {

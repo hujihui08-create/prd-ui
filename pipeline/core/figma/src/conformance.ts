@@ -16,7 +16,7 @@ interface Rgba {
   a: number;
 }
 
-/** Parse `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()` and `rgba()`. */
+/** Parse `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()` and `color(srgb ...)`. */
 export function parseCssColor(value: string): Rgba | undefined {
   const hex = /^#([0-9a-f]{3,8})$/i.exec(value.trim());
   if (hex?.[1]) {
@@ -46,6 +46,27 @@ export function parseCssColor(value: string): Rgba | undefined {
       return { r: parts[0]!, g: parts[1]!, b: parts[2]!, a: parts[3] ?? 1 };
     }
   }
+  // Chrome serializes color-mix() results as `color(srgb r g b / a)` with
+  // channels in 0..1, e.g. `color(srgb 0.839216 0.643137 0.643137)`.
+  const srgb = /^color\(srgb\s+([^)]+)\)$/i.exec(value.trim());
+  if (srgb?.[1]) {
+    const [channelsPart, alphaPart] = srgb[1].split("/");
+    const channels = (channelsPart ?? "")
+      .trim()
+      .split(/\s+/)
+      .map((part) => Number.parseFloat(part));
+    if (channels.length >= 3 && channels.every((part) => Number.isFinite(part))) {
+      const alpha = alphaPart === undefined ? 1 : Number.parseFloat(alphaPart.trim());
+      if (Number.isFinite(alpha)) {
+        return {
+          r: Math.round(channels[0]! * 255),
+          g: Math.round(channels[1]! * 255),
+          b: Math.round(channels[2]! * 255),
+          a: alpha,
+        };
+      }
+    }
+  }
   return undefined;
 }
 
@@ -60,6 +81,76 @@ export function sameColor(left: string, right: string, tolerance = 0): boolean {
     Math.abs(a.b - b.b) <= tolerance &&
     Math.abs(a.a - b.a) <= 0.01
   );
+}
+
+interface Hsl {
+  h: number | undefined;
+  s: number;
+  l: number;
+}
+
+function toHsl(color: Rgba): Hsl {
+  const r = color.r / 255;
+  const g = color.g / 255;
+  const b = color.b / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const delta = max - min;
+  if (delta === 0) return { h: undefined, s: 0, l };
+  const denominator = 1 - Math.abs(2 * l - 1);
+  const s = denominator === 0 ? 0 : delta / denominator;
+  let h: number;
+  if (max === r) h = 60 * (((g - b) / delta) % 6);
+  else if (max === g) h = 60 * ((b - r) / delta + 2);
+  else h = 60 * ((r - g) / delta + 4);
+  if (h < 0) h += 360;
+  return { h, s, l };
+}
+
+function relativeLuminance(color: Rgba): number {
+  const linear = (value: number): number => {
+    const channel = value / 255;
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linear(color.r) + 0.7152 * linear(color.g) + 0.0722 * linear(color.b);
+}
+
+function hueDistance(left: number, right: number): number {
+  const diff = Math.abs(left - right) % 360;
+  return diff > 180 ? 360 - diff : diff;
+}
+
+/**
+ * Compare a declared translucent color (a token plus an alpha) against what
+ * the browser actually paints.
+ *
+ * HTML renders tinted fills/strokes with `color-mix(in srgb, token N%, base)`,
+ * which serializes as an opaque lighter RGB (or `color(srgb ...)`), losing the
+ * original alpha. A capture may instead report `rgba(token, N)`. The tint check
+ * therefore requires the same hue as the token, a lighter result for opaque
+ * captures, and only checks alpha when the capture itself is translucent
+ * (within 0.05). Mixing may target white or `surface-subtle`; no exact base is
+ * assumed and no un-compositing is done.
+ */
+export function sameTint(expected: string, actual: string, alpha: number): boolean {
+  const token = parseCssColor(expected);
+  const rendered = parseCssColor(actual);
+  if (!token || !rendered) return expected.trim() === actual.trim();
+  const tokenHsl = toHsl(token);
+  const renderedHsl = toHsl(rendered);
+  if (tokenHsl.h !== undefined && tokenHsl.s >= 0.03) {
+    if (renderedHsl.h === undefined || renderedHsl.s < 0.03) return false;
+    if (hueDistance(tokenHsl.h, renderedHsl.h) > 12) return false;
+  }
+  const tokenLuminance = relativeLuminance(token);
+  if (rendered.a < 1) {
+    return (
+      Math.abs(rendered.a - alpha) <= 0.05 &&
+      relativeLuminance(rendered) >= tokenLuminance - 1e-6
+    );
+  }
+  return relativeLuminance(rendered) > tokenLuminance + 1e-6;
 }
 
 function resolveToken(plan: FigmaPlan, value: string | undefined): string | undefined {
@@ -135,6 +226,26 @@ function compareColor(
   }
 }
 
+function compareTint(
+  findings: ConformanceFinding[],
+  node: FigmaPlanNode,
+  property: string,
+  expected: string,
+  actual: string,
+  alpha: number
+): void {
+  if (!sameTint(expected, actual, alpha)) {
+    pushMismatch(
+      findings,
+      node,
+      property,
+      expected,
+      actual,
+      `${property} tint mismatch for alpha ${alpha}`
+    );
+  }
+}
+
 function compareNode(
   plan: FigmaPlan,
   node: FigmaPlanNode,
@@ -189,12 +300,22 @@ function compareNode(
         compareNumber(findings, node, "paddingLeft", paddingX, style.padding.left);
       }
       const fill = resolveToken(plan, node.fill ?? variant.fill);
+      const fillAlpha = node.fillAlpha ?? variant.fillAlpha ?? 1;
       if (fill !== undefined) {
-        compareColor(findings, node, "background", fill, style.background.color);
+        if (fillAlpha < 1) {
+          compareTint(findings, node, "background", fill, style.background.color, fillAlpha);
+        } else {
+          compareColor(findings, node, "background", fill, style.background.color);
+        }
       }
       const stroke = resolveToken(plan, node.stroke ?? variant.stroke);
+      const strokeAlpha = variant.strokeAlpha ?? 1;
       if (stroke !== undefined) {
-        compareColor(findings, node, "borderTop", stroke, style.border.top.color);
+        if (strokeAlpha < 1) {
+          compareTint(findings, node, "borderTop", stroke, style.border.top.color, strokeAlpha);
+        } else {
+          compareColor(findings, node, "borderTop", stroke, style.border.top.color);
+        }
       }
       const font = variant.labelTextStyle ? plan.textStyles[variant.labelTextStyle] : undefined;
       if (font) {
@@ -259,8 +380,12 @@ function compareNode(
   const fill = resolveToken(plan, node.fill);
   const expectedAlpha = node.fillAlpha ?? (fill === undefined ? 0 : 1);
   if (fill !== undefined) {
-    compareColor(findings, node, "background", fill, style.background.color);
-    compareNumber(findings, node, "backgroundAlpha", expectedAlpha, style.background.alpha, 0.01);
+    if (expectedAlpha < 1) {
+      compareTint(findings, node, "background", fill, style.background.color, expectedAlpha);
+    } else {
+      compareColor(findings, node, "background", fill, style.background.color);
+      compareNumber(findings, node, "backgroundAlpha", expectedAlpha, style.background.alpha, 0.01);
+    }
   } else if (style.background.alpha > 0.01) {
     pushMismatch(findings, node, "background", "transparent", style.background.color, "Unexpected background fill");
   }
@@ -298,16 +423,13 @@ export function comparePlanToStyleManifest(input: {
   );
 
   const walk = (node: FigmaPlanNode): void => {
+    const visible = node.origin !== "derived" || isMaterialDerivedId(node.specId);
     if (node.type === "ABSOLUTE") {
       const style = styles.get(node.specId);
       if (style && node.child) {
         seen.add(node.specId);
         compareNode(plan, { ...node.child, specId: node.specId }, style, findings);
-      } else if (
-        node.origin === "derived" &&
-        isMaterialDerivedId(node.specId) &&
-        !skipped.has(node.specId)
-      ) {
+      } else if (visible && !skipped.has(node.specId)) {
         findings.push({
           code: "CONFORMANCE_NODE_MISSING",
           severity: "blocker",
@@ -319,7 +441,6 @@ export function comparePlanToStyleManifest(input: {
       return;
     }
     const style = styles.get(node.specId);
-    const visible = node.origin !== "derived" || isMaterialDerivedId(node.specId);
     if (style) {
       seen.add(node.specId);
       compareNode(plan, node, style, findings);
