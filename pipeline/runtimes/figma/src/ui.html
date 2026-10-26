@@ -8,6 +8,8 @@
       h1 { font-size: 14px; margin: 0 0 4px; }
       p { color: #b3b3b3; margin: 0 0 14px; line-height: 1.5; }
       label { display: block; color: #b3b3b3; margin: 10px 0 6px; }
+      .modes { display: flex; gap: 16px; margin-bottom: 6px; }
+      .modes label { display: flex; align-items: center; gap: 6px; margin: 0; color: #ddd; }
       input[type="file"] { width: 100%; color: #ddd; }
       input[type="text"] { width: 100%; box-sizing: border-box; height: 36px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; padding: 0 8px; }
       textarea { width: 100%; box-sizing: border-box; min-height: 56px; resize: vertical; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; padding: 8px; }
@@ -33,11 +35,11 @@
     <label for="planUrl">或从 localhost 加载</label>
     <input id="planUrl" type="text" placeholder="http://127.0.0.1:8787/figma-plan.today.json" />
     <button id="loadUrl" disabled>Load plan URL</button>
-    <label for="mode">Build mode</label>
-    <select id="mode">
-      <option value="scratch">Scratch + readback</option>
-      <option value="delivery">Delivery page</option>
-    </select>
+    <label>Build mode</label>
+    <div class="modes">
+      <label><input type="radio" name="mode" value="scratch" checked /> Scratch + readback</label>
+      <label><input type="radio" name="mode" value="delivery" /> Delivery page</label>
+    </div>
     <button id="build" disabled>Build</button>
     <div id="status">Ready. 选择 plan 后开始。</div>
     <button id="copyReadback" hidden>Copy readback JSON</button>
@@ -48,7 +50,6 @@
       const loadText = document.getElementById("loadText");
       const planUrl = document.getElementById("planUrl");
       const loadUrl = document.getElementById("loadUrl");
-      const mode = document.getElementById("mode");
       const build = document.getElementById("build");
       const status = document.getElementById("status");
       const copyReadback = document.getElementById("copyReadback");
@@ -131,8 +132,9 @@
         if (!plan) return;
         build.disabled = true;
         setStatus("Building…");
+        const selected = document.querySelector('input[name="mode"]:checked');
         parent.postMessage(
-          { pluginMessage: { type: "build", plan, mode: mode.value } },
+          { pluginMessage: { type: "build", plan, mode: selected ? selected.value : "scratch" } },
           "*"
         );
       });

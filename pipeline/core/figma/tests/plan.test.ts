@@ -66,6 +66,34 @@ describe("compileFigmaPlans", () => {
     expect(texts.every((node) => node.textStyle?.startsWith("b-mobile/"))).toBe(true);
   });
 
+  it("keeps summary/fields slots inside Content for detail and notice pages", () => {
+    for (const pageId of ["customer-detail", "appointment-detail", "treatment-notice"]) {
+      const plan = plans.find((entry) => entry.pageId === pageId)!;
+      const content = plan.root.children?.find((node) => node.name === "Content");
+      expect(content, pageId).toBeDefined();
+      expect((content?.children ?? []).length, pageId).toBeGreaterThan(0);
+    }
+  });
+
+  it("drops search-result rows and keeps the idle empty state", () => {
+    const search = plans.find((plan) => plan.pageId === "customer-search")!;
+    const specIds: string[] = [];
+    walk(search.root, (node) => specIds.push(node.specId));
+    expect(specIds.some((id) => id.includes("row.result"))).toBe(false);
+    expect(specIds).toContain("customer-search.state.idle");
+  });
+
+  it("keeps vertical padding on view panels and drops horizontal padding", () => {
+    const list = plans.find((plan) => plan.pageId === "appointment-list")!;
+    let calendar: FigmaPlanNode | undefined;
+    walk(list.root, (node) => {
+      if (node.specId === "appointment-list.view.calendar") calendar = node;
+    });
+    expect(calendar?.padding).toBeUndefined();
+    expect(calendar?.paddingX).toBe(0);
+    expect(calendar?.paddingY).toBe(4);
+  });
+
   it("positions 16:30 calendar blocks after the 16:00 row", () => {
     const list = plans.find((plan) => plan.pageId === "appointment-list")!;
     const blocks: FigmaPlanNode[] = [];

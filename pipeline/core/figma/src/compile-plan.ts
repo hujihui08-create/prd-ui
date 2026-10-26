@@ -59,6 +59,8 @@ function childrenOf(node: SpecNode): SpecNode[] {
 function shouldSkip(node: SpecNode, ctx: Ctx): boolean {
   if (node.type === "Skeleton" || node.type === "ErrorState") return true;
   if (node.type === "EmptyState" && node.props?.emptyKind !== "idle") return true;
+  // Search results stay hidden until the query matches (renderer-html applySearch).
+  if (node.type === "ListRow" && typeof node.props?.searchText === "string") return true;
   if (
     node.type === "Section" &&
     typeof node.props?.viewPanel === "string" &&
@@ -106,7 +108,11 @@ function renderNode(
         "VERTICAL",
         renderChildren(childrenOf(node), ctx, `${path}.children`),
         {
-          padding: props.viewPanel === undefined ? spacePx(ctx.profile, str(props.padding)) : 0,
+          // A view panel keeps its vertical padding but drops horizontal padding,
+          // matching renderer-html's `[data-view-panel]` rule.
+          ...(typeof props.viewPanel === "string"
+            ? { paddingX: 0, paddingY: spacePx(ctx.profile, str(props.padding)) }
+            : { padding: spacePx(ctx.profile, str(props.padding)) }),
           gap: spacePx(ctx.profile, str(props.gap)),
         }
       );
@@ -184,7 +190,10 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
   const width = ctx.page.meta.target === "web" ? WEB_WIDTH : MOBILE_WIDTH;
   const height = ctx.page.meta.target === "web" ? WEB_HEIGHT : MOBILE_HEIGHT;
   const top = node.slots?.["top-bar"] ?? [];
-  const content = node.slots?.content ?? [];
+  // Mirror renderer-html's MobileShell slot order; detail/notice archetypes put
+  // their body in summary/fields, not content.
+  const contentSlots = ["title", "illustration", "body", "summary", "feed", "fields", "content"] as const;
+  const content = contentSlots.flatMap((name) => renderChildren(node.slots?.[name] ?? [], ctx, name));
   const actions = node.slots?.actions ?? [];
   const nav = node.slots?.["bottom-nav"] ?? [];
   const hasTop = top.length > 0;
@@ -209,7 +218,7 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
     `${specId}.content`,
     "Content",
     "VERTICAL",
-    renderChildren(content, ctx, "content"),
+    content,
     {
       layoutGrow: 1,
       fill: colorToken("surface.subtle"),

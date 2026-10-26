@@ -11,6 +11,7 @@ type FigmaStyle = any;
 const errors: string[] = [];
 const fonts: FigmaReadback["fonts"] = [];
 const variables: Record<string, FigmaNode> = {};
+const alphaVariables: Record<string, FigmaNode> = {};
 const textStyles: Record<string, FigmaStyle> = {};
 const componentVariants: Record<string, FigmaNode> = {};
 let variableCollection: FigmaNode | undefined;
@@ -53,28 +54,56 @@ async function loadFont(family: string, weight: number): Promise<{ family: strin
 }
 
 async function ensureCollection(plan: FigmaPlan): Promise<void> {
-  if (variableCollection !== undefined) return;
-  const name = `${profileName(plan)} Tokens`;
-  const collections = await figma.variables.getLocalVariableCollectionsAsync();
-  const existing = collections.find((collection: FigmaNode) => collection.name === name);
-  variableCollection =
-    existing ?? figma.variables.createVariableCollection(name);
+  if (variableCollection === undefined) {
+    const name = `${profileName(plan)} Tokens`;
+    const collections = await figma.variables.getLocalVariableCollectionsAsync();
+    const existing = collections.find((collection: FigmaNode) => collection.name === name);
+    variableCollection = existing ?? figma.variables.createVariableCollection(name);
+  }
   const modeId = variableCollection.modes[0].modeId;
-  for (const [token, value] of Object.entries(plan.tokens)) {
-    if (!token.startsWith("color/")) continue;
-    const existingVariable = (
+  const findVariable = async (name: string) =>
+    (
       await Promise.all(
         variableCollection.variableIds.map((id: string) =>
           figma.variables.getVariableByIdAsync(id)
         )
       )
-    ).find((variable: FigmaNode) => variable?.name === token);
+    ).find((variable: FigmaNode) => variable?.name === name);
+  for (const [token, value] of Object.entries(plan.tokens)) {
+    if (!token.startsWith("color/")) continue;
+    if (variables[token] !== undefined) continue;
+    const existingVariable = await findVariable(token);
     const variable =
       existingVariable ??
       figma.variables.createVariable(token, variableCollection, "COLOR");
     variable.setValueForMode(modeId, { ...hexToRgb(value), a: 1 });
     variables[token] = variable;
   }
+  // Figma drops paint opacity for variable-bound fills, so tinted tokens need
+  // their own RGBA variable (one per token+alpha pair used by the plan).
+  for (const node of planNodes(plan.root)) {
+    const fill = node.fill;
+    const alpha = node.fillAlpha;
+    if (fill === undefined || alpha === undefined || alpha >= 1) continue;
+    const key = `${fill}@${alpha}`;
+    if (alphaVariables[key] !== undefined) continue;
+    const name = `${fill}/alpha-${Math.round(alpha * 100)}`;
+    const existingVariable = await findVariable(name);
+    const variable =
+      existingVariable ??
+      figma.variables.createVariable(name, variableCollection, "COLOR");
+    const value = plan.tokens[fill];
+    variable.setValueForMode(modeId, {
+      ...(value === undefined ? { r: 0, g: 0, b: 0 } : hexToRgb(value)),
+      a: alpha,
+    });
+    alphaVariables[key] = variable;
+  }
+}
+function* planNodes(node: FigmaPlanNode): Generator<FigmaPlanNode> {
+  yield node;
+  if (node.child !== undefined) yield* planNodes(node.child);
+  for (const child of node.children ?? []) yield* planNodes(child);
 }
 function paint(token: string, plan: FigmaPlan, alpha = 1): any {
   const value = plan.tokens[token];
@@ -84,6 +113,16 @@ function paint(token: string, plan: FigmaPlan, alpha = 1): any {
     opacity: alpha,
   };
   const variable = variables[token];
+  if (alpha < 1) {
+    const alphaVariable = alphaVariables[`${token}@${alpha}`];
+    if (alphaVariable !== undefined) {
+      return figma.variables.setBoundVariableForPaint(
+        { ...solid, opacity: 1 },
+        "color",
+        alphaVariable
+      );
+    }
+  }
   return variable === undefined
     ? solid
     : figma.variables.setBoundVariableForPaint(solid, "color", variable);
@@ -357,12 +396,14 @@ async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<Figm
   throw new Error(`PLAN_NODE_UNSUPPORTED: ${planNode.type}`);
 }
 
-function readbackNode(node: FigmaNode): FigmaReadbackNode {
+async function readbackNode(node: FigmaNode): Promise<FigmaReadbackNode> {
   const kind = node.getPluginData("kind") || node.type;
   const fillToken = node.getPluginData("fillToken");
   const textStyleName = node.getPluginData("textStyleName");
   const variant = node.getPluginData("variant");
   const text = node.findOne?.((child: FigmaNode) => child.type === "TEXT");
+  const mainComponent =
+    node.type === "INSTANCE" ? await node.getMainComponentAsync() : null;
   const result: FigmaReadbackNode = {
     nodeId: node.id,
     type: kind,
@@ -395,15 +436,19 @@ function readbackNode(node: FigmaNode): FigmaReadbackNode {
       : {}),
     ...(node.type === "INSTANCE"
       ? {
-          componentName: node.mainComponent?.name,
+          componentName: mainComponent?.name,
           variantProperties: { emphasis: variant },
           characters: text?.characters,
         }
       : {}),
     children: [],
   };
-  const children = node.children ?? [];
-  result.children = children.map((child: FigmaNode) => readbackNode(child));
+  const children = node.type === "INSTANCE" ? [] : (node.children ?? []);
+  const childNodes: FigmaReadbackNode[] = [];
+  for (const child of children) {
+    childNodes.push(await readbackNode(child));
+  }
+  result.children = childNodes;
   return result;
 }
 
@@ -441,7 +486,7 @@ async function build(plan: FigmaPlan, mode: "scratch" | "delivery"): Promise<Fig
     variables: Object.keys(variables),
     textStyles: Object.keys(textStyles),
     components: [`${profileName(plan)}/Button`],
-    nodes: [readbackNode(root)],
+    nodes: [await readbackNode(root)],
     errors: [...errors],
   };
   return readback;
