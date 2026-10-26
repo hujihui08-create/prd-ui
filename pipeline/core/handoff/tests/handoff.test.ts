@@ -65,6 +65,14 @@ describe("handoff core", () => {
     expect(validateHandoff(data).some((issue) => issue.code === "HANDOFF_SIGNOFF_STALE")).toBe(true);
   });
 
+  it("rejects a missing signoff", () => {
+    const data = input();
+    data.signoffs = data.signoffs.filter((signoff) => signoff.type !== "figma");
+    expect(
+      validateHandoff(data).some((issue) => issue.code === "HANDOFF_SIGNOFF_MISSING")
+    ).toBe(true);
+  });
+
   it("rejects an asset without a license", () => {
     const data = input();
     data.assets = [{ path: "assets/icon.svg", license: "" }];

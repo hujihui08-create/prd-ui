@@ -55,6 +55,7 @@ export interface HandoffIssue {
     | "HANDOFF_GATE_FAILED"
     | "HANDOFF_PAGE_MISSING"
     | "HANDOFF_SIGNOFF_STALE"
+    | "HANDOFF_SIGNOFF_MISSING"
     | "HANDOFF_LICENSE_MISSING";
   severity: "blocker" | "warning";
   message: string;

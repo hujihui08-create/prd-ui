@@ -148,9 +148,14 @@ function canonical(value: unknown): string {
   return JSON.stringify(value) ?? "null";
 }
 
-function hashJson(value: unknown): string {
+export function hashJson(value: unknown): string {
   const canonicalValue = canonical(stripTimestamps(value));
   return `sha256:${createHash("sha256").update(canonicalValue).digest("hex")}`;
+}
+
+/** One signature hash that binds all five signed evidence hashes. */
+export function figmaSignHash(hashes: FigmaHashes): string {
+  return hashJson(hashes);
 }
 
 interface PageFile {
@@ -218,8 +223,14 @@ async function hashEvidenceFiles(files: string[]): Promise<string> {
 
 export async function computeFigmaHashes(input: {
   figmaDir: string;
-  baselineDir: string;
+  baselineDir?: string;
+  /** Explicit baseline manifest file; used when the manifest is not at <dir>/manifest.json. */
+  baselineFile?: string;
 }): Promise<FigmaHashes> {
+  const baselineFile =
+    input.baselineFile ??
+    (input.baselineDir === undefined ? undefined : path.join(input.baselineDir, "manifest.json"));
+  if (baselineFile === undefined) throw new Error("BASELINE_MANIFEST_MISSING");
   const plans = await listPlanFiles(input.figmaDir);
   const readbacks = await listReadbackFiles(input.figmaDir);
   return {
@@ -229,7 +240,7 @@ export async function computeFigmaHashes(input: {
       await readJson(path.join(input.figmaDir, "conformance", "conformance.json"))
     ),
     parityHash: hashJson(await readJson(path.join(input.figmaDir, "parity", "parity.json"))),
-    baselineHash: hashJson(await readJson(path.join(input.baselineDir, "manifest.json"))),
+    baselineHash: hashJson(await readJson(baselineFile)),
   };
 }
 

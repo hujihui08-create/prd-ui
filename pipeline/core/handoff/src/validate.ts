@@ -20,6 +20,15 @@ export function validateHandoff(input: HandoffInput): HandoffIssue[] {
       issues.push({ code: "HANDOFF_SIGNOFF_STALE", severity: "blocker", message: `${signoff.type} signoff hash is stale.` });
     }
   }
+  for (const type of ["figma", "visual"] as const) {
+    if (!input.signoffs.some((signoff) => signoff.type === type)) {
+      issues.push({
+        code: "HANDOFF_SIGNOFF_MISSING",
+        severity: "blocker",
+        message: `${type} signoff is missing.`,
+      });
+    }
+  }
   for (const asset of input.assets) {
     if (asset.license.trim().length === 0) {
       issues.push({ code: "HANDOFF_LICENSE_MISSING", severity: "blocker", message: `${asset.path} has no license record.` });

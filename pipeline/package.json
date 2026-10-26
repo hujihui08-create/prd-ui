@@ -27,6 +27,7 @@
     "figma:parity": "tsx runtimes/standalone/src/figma-parity-cli.ts",
     "figma:serve": "tsx runtimes/standalone/src/figma-serve-cli.ts",
     "figma:sign": "tsx runtimes/standalone/src/figma-sign-cli.ts",
+    "handoff:pack": "tsx runtimes/standalone/src/handoff-pack-cli.ts",
     "asset:compile": "tsx runtimes/standalone/src/asset-compile-cli.ts",
     "studio:prepare": "tsx runtimes/standalone/src/studio-prepare-cli.ts",
     "studio:dev": "pnpm --dir studio dev",
