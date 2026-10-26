@@ -69,12 +69,52 @@ describe("blocks", () => {
     expect(canonical(manifest)).toBe(manifestBefore);
   });
 
+  it("does not alias wrapper layout props into the page spec", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const spec = structuredClone(today);
+    const section = spec.layout.slots!.content![0]!;
+    section.props = { ...section.props, padding: { token: "space.4" } };
+    const manifest = splitBlocks(spec, getArchetype(spec.meta.archetype));
+    const wrapper = manifest.shell.wrappers[0]!;
+    expect(wrapper.padding).toEqual({ token: "space.4" });
+    expect(wrapper.padding).not.toBe(section.props.padding);
+  });
+
+  it("handles an id-less assembly wrapper end to end", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const spec = structuredClone(today);
+    const section = spec.layout.slots!.content![0]!;
+    delete section.id;
+    const manifest = splitBlocks(spec, getArchetype(spec.meta.archetype));
+    expect(manifest.shell.wrappers).toMatchObject([
+      { slot: "content", specId: "today.content.wrapper", type: "Section" },
+    ]);
+    expect(verifyBlockManifest(spec, manifest)).toHaveLength(0);
+    expect(canonical(assembleBlocks(spec, manifest))).toBe(canonical(spec));
+  });
+
   it("rejects duplicate node ids across blocks", () => {
     const today = specs.find((spec) => spec.meta.pageId === "today")!;
     const manifest = structuredClone(splitBlocks(today, getArchetype(today.meta.archetype)));
     manifest.blocks[1]!.root.id = manifest.blocks[0]!.root.id;
     const findings = verifyBlockManifest(today, manifest);
     expect(findings.some((finding) => finding.ruleId === "BLOCK_DUPLICATE_ID")).toBe(true);
+  });
+
+  it("rejects a block that reuses a shell node id", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = structuredClone(splitBlocks(today, getArchetype(today.meta.archetype)));
+    manifest.blocks[0]!.root.id = today.layout.slots!["bottom-nav"]![0]!.id;
+    const findings = verifyBlockManifest(today, manifest);
+    expect(findings.some((finding) => finding.ruleId === "BLOCK_DUPLICATE_ID")).toBe(true);
+  });
+
+  it("rejects a manifest with a deleted block", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = structuredClone(splitBlocks(today, getArchetype(today.meta.archetype)));
+    manifest.blocks.splice(0, 1);
+    const findings = verifyBlockManifest(today, manifest);
+    expect(findings.some((finding) => finding.ruleId === "BLOCK_ROUNDTRIP_MISMATCH")).toBe(true);
   });
 
   it("rejects blocks whose order does not match the page", () => {

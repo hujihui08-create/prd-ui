@@ -43,6 +43,23 @@ function findWrapper(
 }
 
 /**
+ * Resolve the node a wrapper entry refers to. An id-less wrapper is recorded
+ * with a synthetic specId, so fall back to the slot's single node — the same
+ * rule `splitBlocks` used to detect the wrapper.
+ */
+function resolveWrapperTarget(
+  nodes: SpecNode[],
+  wrapper: BlockManifest["shell"]["wrappers"][number]
+): SpecNode | undefined {
+  return nodes.find((node) => node.id === wrapper.specId) ?? (nodes.length === 1 ? nodes[0] : undefined);
+}
+
+/** The Section shape that `splitBlocks` treats as an assembly wrapper. */
+function isAssemblyWrapper(node: SpecNode | undefined): node is SpecNode {
+  return node !== undefined && node.type === "Section" && (node.children?.length ?? 0) >= 2;
+}
+
+/**
  * Split a Page Spec into independently regenerable blocks.
  *
  * Every non-shell root slot contributes its children as blocks. A content slot
@@ -56,14 +73,14 @@ export function splitBlocks(spec: PageSpec, archetype: ArchetypeDef): BlockManif
 
   for (const [slot, nodes] of contentSlots(spec)) {
     let candidates = nodes;
-    if (nodes.length === 1 && nodes[0]?.type === "Section" && (nodes[0].children?.length ?? 0) >= 2) {
-      const wrapper = nodes[0]!;
+    if (nodes.length === 1 && isAssemblyWrapper(nodes[0])) {
+      const wrapper = nodes[0];
       wrappers.push({
         slot,
         specId: wrapper.id ?? `${spec.meta.pageId}.${slot}.wrapper`,
         type: wrapper.type,
-        padding: wrapper.props?.padding,
-        gap: wrapper.props?.gap,
+        padding: structuredClone(wrapper.props?.padding),
+        gap: structuredClone(wrapper.props?.gap),
       });
       candidates = wrapper.children ?? [];
     }
@@ -112,8 +129,7 @@ export function assembleBlocks(spec: PageSpec, manifest: BlockManifest): PageSpe
       .map((block) => structuredClone(block.root));
     const wrapper = findWrapper(manifest, slot);
     if (wrapper) {
-      const target =
-        nodes.find((node) => node.id === wrapper.specId) ?? (nodes.length === 1 ? nodes[0] : undefined);
+      const target = resolveWrapperTarget(nodes, wrapper);
       if (target) target.children = slotBlocks;
     } else {
       assembled.layout.slots![slot] = slotBlocks;
@@ -134,10 +150,32 @@ function walk(
   }
 }
 
+/** Ids owned by the page shell, including valid assembly wrappers. */
+function shellNodeIds(spec: PageSpec, manifest: BlockManifest): Set<string> {
+  const ids = new Set<string>();
+  const collect = (node: SpecNode): void => {
+    walk(node, (current) => {
+      if (current.id) ids.add(current.id);
+    });
+  };
+  if (spec.layout.id) ids.add(spec.layout.id);
+  for (const [slot, nodes] of Object.entries(spec.layout.slots ?? {})) {
+    if (SHELL_SLOTS.has(slot)) nodes.forEach(collect);
+  }
+  for (const wrapper of manifest.shell.wrappers) {
+    const nodes = spec.layout.slots?.[wrapper.slot] ?? [];
+    if (nodes.length === 1 && isAssemblyWrapper(nodes[0])) {
+      const id = resolveWrapperTarget(nodes, wrapper)?.id;
+      if (id) ids.add(id);
+    }
+  }
+  return ids;
+}
+
 /**
  * Verify a block manifest against the page it was split from: no shell types,
- * no duplicate node ids, block order/count matches every content slot, and
- * split → assemble reproduces the page exactly.
+ * no duplicate node ids (including shell ids), block order/count matches every
+ * content slot, and split → assemble reproduces the page exactly.
  */
 export function verifyBlockManifest(spec: PageSpec, manifest: BlockManifest): Finding[] {
   const findings: Finding[] = [];
@@ -166,7 +204,7 @@ export function verifyBlockManifest(spec: PageSpec, manifest: BlockManifest): Fi
   }
 
   const knownSlots = new Set(contentSlots(spec).map(([slot]) => slot));
-  const ids = new Set<string>();
+  const ids = shellNodeIds(spec, manifest);
   for (const block of manifest.blocks) {
     if (!knownSlots.has(block.slot)) {
       push(
@@ -195,9 +233,7 @@ export function verifyBlockManifest(spec: PageSpec, manifest: BlockManifest): Fi
 
   for (const [slot, nodes] of contentSlots(spec)) {
     const wrapper = findWrapper(manifest, slot);
-    const roots = wrapper
-      ? (nodes.find((node) => node.id === wrapper.specId)?.children ?? [])
-      : nodes;
+    const roots = wrapper ? (resolveWrapperTarget(nodes, wrapper)?.children ?? []) : nodes;
     const actualIds = roots.map((node) => node.id ?? "");
     const blockIds = manifest.blocks
       .filter((block) => block.slot === slot)
