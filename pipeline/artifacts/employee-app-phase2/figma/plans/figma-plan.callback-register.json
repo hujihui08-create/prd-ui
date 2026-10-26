@@ -24,6 +24,7 @@
     "color/status/info": "#1D4ED8",
     "color/border/subtle": "#E5E7EB",
     "color/border/strong": "#D1D5DB",
+    "color/border/control": "#CBD5E1",
     "space/1": "4px",
     "space/2": "8px",
     "space/3": "12px",
@@ -77,6 +78,30 @@
       "fontSize": 12,
       "fontWeight": 500,
       "lineHeight": 16
+    },
+    "b-mobile/input.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.bold": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16
+    },
+    "b-mobile/caption": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 10,
+      "fontWeight": 400,
+      "lineHeight": 12
+    },
+    "b-mobile/date": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 11,
+      "fontWeight": 400,
+      "lineHeight": 13
     }
   },
   "components": {
@@ -85,21 +110,49 @@
         "primary": {
           "fill": "color/action/primary",
           "text": "color/text/onAction",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "secondary": {
           "fill": "color/surface/default",
+          "stroke": "color/border/control",
           "text": "color/text/primary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "ghost": {
-          "fill": "color/surface/default",
           "text": "color/text/secondary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost-chip": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/strong",
+          "text": "color/text/primary",
+          "height": 32,
+          "radius": 8,
+          "paddingX": 12,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "danger": {
           "fill": "color/surface/default",
+          "stroke": "color/status/danger",
+          "strokeAlpha": 0.4,
           "text": "color/status/danger",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         }
       }
@@ -162,8 +215,8 @@
                     "specId": "callback-register.field.customer.label",
                     "type": "TEXT",
                     "name": "Label",
-                    "characters": "客户 *",
-                    "textStyle": "b-mobile/label.sm",
+                    "characters": "客户*",
+                    "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary"
                   },
                   {
@@ -183,16 +236,16 @@
                             "type": "TEXT",
                             "name": "Placeholder",
                             "characters": "请输入客户",
-                            "textStyle": "b-mobile/body.md",
+                            "textStyle": "b-mobile/input.md",
                             "color": "color/text/tertiary"
                           }
                         ],
                         "height": 36,
                         "paddingX": 10,
                         "fill": "color/surface/default",
-                        "stroke": "color/border/strong",
+                        "stroke": "color/border/control",
                         "strokeWidth": 1,
-                        "radius": 6,
+                        "radius": 8,
                         "alignItems": "CENTER"
                       },
                       {
@@ -201,8 +254,7 @@
                         "name": "Button:选择",
                         "component": "Button",
                         "variant": "ghost",
-                        "label": "选择",
-                        "height": 36
+                        "label": "选择"
                       }
                     ],
                     "gap": 8,
@@ -221,8 +273,8 @@
                     "specId": "callback-register.field.service.label",
                     "type": "TEXT",
                     "name": "Label",
-                    "characters": "服务项目 *",
-                    "textStyle": "b-mobile/label.sm",
+                    "characters": "服务项目*",
+                    "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary"
                   },
                   {
@@ -236,16 +288,16 @@
                         "type": "TEXT",
                         "name": "Placeholder",
                         "characters": "请输入服务项目",
-                        "textStyle": "b-mobile/body.md",
+                        "textStyle": "b-mobile/input.md",
                         "color": "color/text/tertiary"
                       }
                     ],
                     "height": 36,
                     "paddingX": 10,
                     "fill": "color/surface/default",
-                    "stroke": "color/border/strong",
+                    "stroke": "color/border/control",
                     "strokeWidth": 1,
-                    "radius": 6,
+                    "radius": 8,
                     "alignItems": "CENTER"
                   }
                 ],
@@ -261,8 +313,8 @@
                     "specId": "callback-register.field.content.label",
                     "type": "TEXT",
                     "name": "Label",
-                    "characters": "回访内容 *",
-                    "textStyle": "b-mobile/label.sm",
+                    "characters": "回访内容*",
+                    "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary"
                   },
                   {
@@ -276,16 +328,16 @@
                         "type": "TEXT",
                         "name": "Placeholder",
                         "characters": "请输入回访内容",
-                        "textStyle": "b-mobile/body.md",
+                        "textStyle": "b-mobile/input.md",
                         "color": "color/text/tertiary"
                       }
                     ],
                     "height": 36,
                     "paddingX": 10,
                     "fill": "color/surface/default",
-                    "stroke": "color/border/strong",
+                    "stroke": "color/border/control",
                     "strokeWidth": 1,
-                    "radius": 6,
+                    "radius": 8,
                     "alignItems": "CENTER"
                   }
                 ],
@@ -301,8 +353,8 @@
                     "specId": "callback-register.field.result.label",
                     "type": "TEXT",
                     "name": "Label",
-                    "characters": "回访结果 *",
-                    "textStyle": "b-mobile/label.sm",
+                    "characters": "回访结果*",
+                    "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary"
                   },
                   {
@@ -315,8 +367,8 @@
                         "specId": "callback-register.root.content.0.children.3.children.0.value",
                         "type": "TEXT",
                         "name": "Value",
-                        "characters": "请选择回访结果",
-                        "textStyle": "b-mobile/body.md",
+                        "characters": "已联系",
+                        "textStyle": "b-mobile/input.md",
                         "color": "color/text/primary"
                       },
                       {
@@ -331,9 +383,9 @@
                     "height": 36,
                     "paddingX": 10,
                     "fill": "color/surface/default",
-                    "stroke": "color/border/strong",
+                    "stroke": "color/border/control",
                     "strokeWidth": 1,
-                    "radius": 6,
+                    "radius": 8,
                     "alignItems": "CENTER",
                     "justifyContent": "SPACE_BETWEEN"
                   }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "today",
-  "builtAt": "2026-10-26T07:51:17.663Z",
+  "builtAt": "2026-10-26T08:21:09.763Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -26,7 +26,8 @@
     "color/status/danger",
     "color/status/info",
     "color/border/subtle",
-    "color/border/strong"
+    "color/border/strong",
+    "color/border/control"
   ],
   "textStyles": [
     "b-mobile/body.md",
@@ -41,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "2:1629",
+      "nodeId": "4:16",
       "type": "FRAME",
       "name": "今日",
       "specId": "today.page.root",
@@ -62,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "2:1630",
+          "nodeId": "4:17",
           "type": "FRAME",
           "name": "TopBar",
           "specId": "today.root.top-bar.0",
@@ -83,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1631",
+              "nodeId": "4:18",
               "type": "FRAME",
               "name": "Store",
               "specId": "today.root.top-bar.0.left",
@@ -101,7 +102,7 @@
               "y": 12,
               "children": [
                 {
-                  "nodeId": "2:1632",
+                  "nodeId": "4:19",
                   "type": "TEXT",
                   "name": "StoreName",
                   "specId": "today.root.top-bar.0.store",
@@ -122,7 +123,7 @@
                   "children": []
                 },
                 {
-                  "nodeId": "2:1633",
+                  "nodeId": "4:20",
                   "type": "GLYPH",
                   "name": "Chevron",
                   "specId": "today.root.top-bar.0.chevron",
@@ -146,7 +147,7 @@
           ]
         },
         {
-          "nodeId": "2:1634",
+          "nodeId": "4:21",
           "type": "FRAME",
           "name": "Content",
           "specId": "today.page.root.content",
@@ -167,7 +168,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1635",
+              "nodeId": "4:22",
               "type": "FRAME",
               "name": "Section",
               "specId": "today.root.content.0",
@@ -180,12 +181,12 @@
                 "left": 16
               },
               "width": 390,
-              "height": 614,
+              "height": 619,
               "x": 0,
               "y": 0,
               "children": [
                 {
-                  "nodeId": "2:1636",
+                  "nodeId": "4:23",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.quick-actions",
@@ -206,7 +207,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "2:1637",
+                      "nodeId": "4:24",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.quick-actions.head",
@@ -224,7 +225,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "2:1638",
+                          "nodeId": "4:25",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.quick-actions.title",
@@ -247,7 +248,7 @@
                       ]
                     },
                     {
-                      "nodeId": "2:1639",
+                      "nodeId": "4:26",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.quick-actions.body",
@@ -265,7 +266,7 @@
                       "y": 48,
                       "children": [
                         {
-                          "nodeId": "2:1640",
+                          "nodeId": "4:27",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "today.root.content.0.children.0.children.0",
@@ -283,7 +284,7 @@
                           "y": 0,
                           "children": [
                             {
-                              "nodeId": "2:1641",
+                              "nodeId": "4:28",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.create-order",
@@ -304,7 +305,7 @@
                               ],
                               "children": [
                                 {
-                                  "nodeId": "2:1642",
+                                  "nodeId": "4:29",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.create-order.icon",
@@ -324,7 +325,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1643",
+                                  "nodeId": "4:30",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.create-order.label",
@@ -347,7 +348,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1644",
+                              "nodeId": "4:31",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.new-appointment",
@@ -368,7 +369,7 @@
                               ],
                               "children": [
                                 {
-                                  "nodeId": "2:1645",
+                                  "nodeId": "4:32",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.new-appointment.icon",
@@ -388,7 +389,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1646",
+                                  "nodeId": "4:33",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.new-appointment.label",
@@ -411,7 +412,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1647",
+                              "nodeId": "4:34",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.customer-search",
@@ -432,7 +433,7 @@
                               ],
                               "children": [
                                 {
-                                  "nodeId": "2:1648",
+                                  "nodeId": "4:35",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.customer-search.icon",
@@ -452,7 +453,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1649",
+                                  "nodeId": "4:36",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.customer-search.label",
@@ -481,7 +482,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1650",
+                  "nodeId": "4:37",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.appointments",
@@ -494,7 +495,7 @@
                     "left": 16
                   },
                   "width": 358,
-                  "height": 250,
+                  "height": 253,
                   "x": 16,
                   "y": 148,
                   "fills": [
@@ -502,7 +503,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "2:1651",
+                      "nodeId": "4:38",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.appointments.head",
@@ -520,7 +521,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "2:1652",
+                          "nodeId": "4:39",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.appointments.title",
@@ -541,7 +542,7 @@
                           "children": []
                         },
                         {
-                          "nodeId": "2:1653",
+                          "nodeId": "4:40",
                           "type": "TEXT",
                           "name": "Action",
                           "specId": "today.card.appointments.action",
@@ -564,7 +565,7 @@
                       ]
                     },
                     {
-                      "nodeId": "2:1654",
+                      "nodeId": "4:41",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.appointments.body",
@@ -577,12 +578,12 @@
                         "left": 0
                       },
                       "width": 326,
-                      "height": 186,
+                      "height": 189,
                       "x": 16,
                       "y": 48,
                       "children": [
                         {
-                          "nodeId": "2:1655",
+                          "nodeId": "4:42",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.0",
@@ -595,12 +596,12 @@
                             "left": 0
                           },
                           "width": 326,
-                          "height": 62,
+                          "height": 63,
                           "x": 0,
                           "y": 0,
                           "children": [
                             {
-                              "nodeId": "2:1656",
+                              "nodeId": "4:43",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.0.main",
@@ -618,7 +619,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1657",
+                                  "nodeId": "4:44",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.0.titleRow",
@@ -636,7 +637,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "2:1658",
+                                      "nodeId": "4:45",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.0.title",
@@ -657,7 +658,7 @@
                                       "children": []
                                     },
                                     {
-                                      "nodeId": "2:1659",
+                                      "nodeId": "4:46",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.0.badge",
@@ -678,7 +679,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "2:1660",
+                                          "nodeId": "4:47",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.0.badge.label",
@@ -703,7 +704,7 @@
                                   ]
                                 },
                                 {
-                                  "nodeId": "2:1661",
+                                  "nodeId": "4:48",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.0.subtitle",
@@ -726,7 +727,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1662",
+                              "nodeId": "4:49",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.0.meta",
@@ -744,7 +745,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "2:1663",
+                                  "nodeId": "4:50",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.0.metaText",
@@ -765,7 +766,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1664",
+                                  "nodeId": "4:51",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.0.chevron",
@@ -789,7 +790,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1665",
+                          "nodeId": "4:52",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.1",
@@ -802,12 +803,12 @@
                             "left": 0
                           },
                           "width": 326,
-                          "height": 62,
+                          "height": 63,
                           "x": 0,
-                          "y": 62,
+                          "y": 63,
                           "children": [
                             {
-                              "nodeId": "2:1666",
+                              "nodeId": "4:53",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.1.main",
@@ -825,7 +826,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1667",
+                                  "nodeId": "4:54",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.1.titleRow",
@@ -843,7 +844,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "2:1668",
+                                      "nodeId": "4:55",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.1.title",
@@ -864,7 +865,7 @@
                                       "children": []
                                     },
                                     {
-                                      "nodeId": "2:1669",
+                                      "nodeId": "4:56",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.1.badge",
@@ -885,7 +886,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "2:1670",
+                                          "nodeId": "4:57",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.1.badge.label",
@@ -910,7 +911,7 @@
                                   ]
                                 },
                                 {
-                                  "nodeId": "2:1671",
+                                  "nodeId": "4:58",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.1.subtitle",
@@ -933,7 +934,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1672",
+                              "nodeId": "4:59",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.1.meta",
@@ -951,7 +952,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "2:1673",
+                                  "nodeId": "4:60",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.1.metaText",
@@ -972,7 +973,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1674",
+                                  "nodeId": "4:61",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.1.chevron",
@@ -996,7 +997,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1675",
+                          "nodeId": "4:62",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.2",
@@ -1009,12 +1010,12 @@
                             "left": 0
                           },
                           "width": 326,
-                          "height": 62,
+                          "height": 63,
                           "x": 0,
-                          "y": 124,
+                          "y": 126,
                           "children": [
                             {
-                              "nodeId": "2:1676",
+                              "nodeId": "4:63",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.2.main",
@@ -1032,7 +1033,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1677",
+                                  "nodeId": "4:64",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.2.titleRow",
@@ -1050,7 +1051,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "2:1678",
+                                      "nodeId": "4:65",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.2.title",
@@ -1071,7 +1072,7 @@
                                       "children": []
                                     },
                                     {
-                                      "nodeId": "2:1679",
+                                      "nodeId": "4:66",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.2.badge",
@@ -1092,7 +1093,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "2:1680",
+                                          "nodeId": "4:67",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.2.badge.label",
@@ -1117,7 +1118,7 @@
                                   ]
                                 },
                                 {
-                                  "nodeId": "2:1681",
+                                  "nodeId": "4:68",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.2.subtitle",
@@ -1140,7 +1141,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1682",
+                              "nodeId": "4:69",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.2.meta",
@@ -1158,7 +1159,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "2:1683",
+                                  "nodeId": "4:70",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.2.metaText",
@@ -1179,7 +1180,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1684",
+                                  "nodeId": "4:71",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.2.chevron",
@@ -1207,7 +1208,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1685",
+                  "nodeId": "4:72",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.callbacks",
@@ -1220,15 +1221,15 @@
                     "left": 16
                   },
                   "width": 358,
-                  "height": 188,
+                  "height": 190,
                   "x": 16,
-                  "y": 410,
+                  "y": 413,
                   "fills": [
                     "color/surface/default"
                   ],
                   "children": [
                     {
-                      "nodeId": "2:1686",
+                      "nodeId": "4:73",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.callbacks.head",
@@ -1246,7 +1247,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "2:1687",
+                          "nodeId": "4:74",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.callbacks.title",
@@ -1269,7 +1270,7 @@
                       ]
                     },
                     {
-                      "nodeId": "2:1688",
+                      "nodeId": "4:75",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.callbacks.body",
@@ -1282,12 +1283,12 @@
                         "left": 0
                       },
                       "width": 326,
-                      "height": 124,
+                      "height": 126,
                       "x": 16,
                       "y": 48,
                       "children": [
                         {
-                          "nodeId": "2:1689",
+                          "nodeId": "4:76",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.callback.0",
@@ -1300,12 +1301,12 @@
                             "left": 0
                           },
                           "width": 326,
-                          "height": 62,
+                          "height": 63,
                           "x": 0,
                           "y": 0,
                           "children": [
                             {
-                              "nodeId": "2:1690",
+                              "nodeId": "4:77",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.callback.0.main",
@@ -1323,7 +1324,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1691",
+                                  "nodeId": "4:78",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.callback.0.titleRow",
@@ -1341,7 +1342,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "2:1692",
+                                      "nodeId": "4:79",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.callback.0.title",
@@ -1364,7 +1365,7 @@
                                   ]
                                 },
                                 {
-                                  "nodeId": "2:1693",
+                                  "nodeId": "4:80",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.callback.0.subtitle",
@@ -1387,7 +1388,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1694",
+                              "nodeId": "4:81",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.callback.0.meta",
@@ -1405,7 +1406,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "2:1695",
+                                  "nodeId": "4:82",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.callback.0.metaText",
@@ -1426,7 +1427,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1696",
+                                  "nodeId": "4:83",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.callback.0.chevron",
@@ -1450,7 +1451,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1697",
+                          "nodeId": "4:84",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.callback.1",
@@ -1463,12 +1464,12 @@
                             "left": 0
                           },
                           "width": 326,
-                          "height": 62,
+                          "height": 63,
                           "x": 0,
-                          "y": 62,
+                          "y": 63,
                           "children": [
                             {
-                              "nodeId": "2:1698",
+                              "nodeId": "4:85",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.callback.1.main",
@@ -1486,7 +1487,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1699",
+                                  "nodeId": "4:86",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.callback.1.titleRow",
@@ -1504,7 +1505,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "2:1700",
+                                      "nodeId": "4:87",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.callback.1.title",
@@ -1527,7 +1528,7 @@
                                   ]
                                 },
                                 {
-                                  "nodeId": "2:1701",
+                                  "nodeId": "4:88",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.callback.1.subtitle",
@@ -1550,7 +1551,7 @@
                               ]
                             },
                             {
-                              "nodeId": "2:1702",
+                              "nodeId": "4:89",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.callback.1.meta",
@@ -1568,7 +1569,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "2:1703",
+                                  "nodeId": "4:90",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.callback.1.metaText",
@@ -1589,7 +1590,7 @@
                                   "children": []
                                 },
                                 {
-                                  "nodeId": "2:1704",
+                                  "nodeId": "4:91",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.callback.1.chevron",
@@ -1621,7 +1622,7 @@
           ]
         },
         {
-          "nodeId": "2:1705",
+          "nodeId": "4:92",
           "type": "FRAME",
           "name": "TabBar",
           "specId": "today.root.bottom-nav.0",
@@ -1642,9 +1643,9 @@
           ],
           "children": [
             {
-              "nodeId": "2:1706",
+              "nodeId": "4:93",
               "type": "FRAME",
-              "name": "Tab:today",
+              "name": "Tab:今日",
               "specId": "today.root.bottom-nav.0.tab.0",
               "layoutMode": "VERTICAL",
               "itemSpacing": 2,
@@ -1654,24 +1655,24 @@
                 "bottom": 0,
                 "left": 0
               },
-              "width": 194,
+              "width": 195,
               "height": 40,
-              "x": 1,
-              "y": 12,
+              "x": 0,
+              "y": 12.5,
               "children": [
                 {
-                  "nodeId": "2:1707",
+                  "nodeId": "4:94",
                   "type": "GLYPH",
                   "name": "Icon",
                   "specId": "today.root.bottom-nav.0.tab.0.icon",
                   "width": 22,
                   "height": 22,
-                  "x": 86,
+                  "x": 86.5,
                   "y": 0,
                   "fills": [
                     "color/action/primary"
                   ],
-                  "characters": "circle",
+                  "characters": "home",
                   "fontName": {
                     "family": "Material Symbols Rounded",
                     "style": "Regular"
@@ -1680,19 +1681,19 @@
                   "children": []
                 },
                 {
-                  "nodeId": "2:1708",
+                  "nodeId": "4:95",
                   "type": "TEXT",
                   "name": "Label",
                   "specId": "today.root.bottom-nav.0.tab.0.label",
-                  "width": 33,
+                  "width": 24,
                   "height": 16,
-                  "x": 80.5,
+                  "x": 85.5,
                   "y": 24,
                   "fills": [
                     "color/action/primary"
                   ],
                   "textStyleName": "b-mobile/label.sm",
-                  "characters": "today",
+                  "characters": "今日",
                   "fontName": {
                     "family": "Noto Sans SC",
                     "style": "Regular"
@@ -1703,9 +1704,9 @@
               ]
             },
             {
-              "nodeId": "2:1709",
+              "nodeId": "4:96",
               "type": "FRAME",
-              "name": "Tab:appointment-list",
+              "name": "Tab:预约列表",
               "specId": "today.root.bottom-nav.0.tab.1",
               "layoutMode": "VERTICAL",
               "itemSpacing": 2,
@@ -1715,24 +1716,24 @@
                 "bottom": 0,
                 "left": 0
               },
-              "width": 194,
+              "width": 195,
               "height": 40,
               "x": 195,
-              "y": 12,
+              "y": 12.5,
               "children": [
                 {
-                  "nodeId": "2:1710",
+                  "nodeId": "4:97",
                   "type": "GLYPH",
                   "name": "Icon",
                   "specId": "today.root.bottom-nav.0.tab.1.icon",
                   "width": 22,
                   "height": 22,
-                  "x": 86,
+                  "x": 86.5,
                   "y": 0,
                   "fills": [
                     "color/text/tertiary"
                   ],
-                  "characters": "circle",
+                  "characters": "calendar_month",
                   "fontName": {
                     "family": "Material Symbols Rounded",
                     "style": "Regular"
@@ -1741,19 +1742,19 @@
                   "children": []
                 },
                 {
-                  "nodeId": "2:1711",
+                  "nodeId": "4:98",
                   "type": "TEXT",
                   "name": "Label",
                   "specId": "today.root.bottom-nav.0.tab.1.label",
-                  "width": 95,
+                  "width": 48,
                   "height": 16,
-                  "x": 49.5,
+                  "x": 73.5,
                   "y": 24,
                   "fills": [
                     "color/text/tertiary"
                   ],
                   "textStyleName": "b-mobile/label.sm",
-                  "characters": "appointment-list",
+                  "characters": "预约列表",
                   "fontName": {
                     "family": "Noto Sans SC",
                     "style": "Regular"

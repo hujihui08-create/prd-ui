@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "customer-search",
-  "builtAt": "2026-10-26T07:55:37.833Z",
+  "builtAt": "2026-10-26T08:33:56.295Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -26,7 +26,8 @@
     "color/status/danger",
     "color/status/info",
     "color/border/subtle",
-    "color/border/strong"
+    "color/border/strong",
+    "color/border/control"
   ],
   "textStyles": [
     "b-mobile/body.md",
@@ -41,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "1:123",
+      "nodeId": "3:106",
       "type": "FRAME",
       "name": "客户搜索",
       "specId": "customer-search.page.root",
@@ -62,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "1:124",
+          "nodeId": "3:107",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "customer-search.page.root.header",
@@ -83,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:125",
+              "nodeId": "3:108",
               "type": "GLYPH",
               "name": "Back",
               "specId": "customer-search.page.root.header.back",
@@ -103,7 +104,7 @@
               "children": []
             },
             {
-              "nodeId": "1:126",
+              "nodeId": "3:109",
               "type": "TEXT",
               "name": "Title",
               "specId": "customer-search.page.root.header.title",
@@ -126,7 +127,7 @@
           ]
         },
         {
-          "nodeId": "1:127",
+          "nodeId": "3:110",
           "type": "FRAME",
           "name": "Content",
           "specId": "customer-search.page.root.content",
@@ -147,7 +148,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:128",
+              "nodeId": "3:111",
               "type": "FRAME",
               "name": "Section",
               "specId": "customer-search.root.content.0",
@@ -160,12 +161,12 @@
                 "left": 16
               },
               "width": 390,
-              "height": 206,
+              "height": 162,
               "x": 0,
               "y": 0,
               "children": [
                 {
-                  "nodeId": "1:129",
+                  "nodeId": "3:112",
                   "type": "FRAME",
                   "name": "SearchBar",
                   "specId": "customer-search.root.content.0.children.0",
@@ -186,7 +187,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "1:130",
+                      "nodeId": "3:113",
                       "type": "GLYPH",
                       "name": "Search",
                       "specId": "customer-search.root.content.0.children.0.icon",
@@ -206,7 +207,7 @@
                       "children": []
                     },
                     {
-                      "nodeId": "1:131",
+                      "nodeId": "3:114",
                       "type": "TEXT",
                       "name": "Placeholder",
                       "specId": "customer-search.root.content.0.children.0.placeholder",
@@ -229,7 +230,7 @@
                   ]
                 },
                 {
-                  "nodeId": "1:132",
+                  "nodeId": "3:115",
                   "type": "FRAME",
                   "name": "EmptyState",
                   "specId": "customer-search.state.idle",
@@ -242,39 +243,19 @@
                     "left": 24
                   },
                   "width": 358,
-                  "height": 130,
+                  "height": 86,
                   "x": 16,
                   "y": 60,
                   "children": [
                     {
-                      "nodeId": "1:133",
-                      "type": "GLYPH",
-                      "name": "Icon",
-                      "specId": "customer-search.state.idle.icon",
-                      "width": 40,
-                      "height": 40,
-                      "x": 159,
-                      "y": 24,
-                      "fills": [
-                        "color/text/tertiary"
-                      ],
-                      "characters": "inbox",
-                      "fontName": {
-                        "family": "Material Symbols Rounded",
-                        "style": "Regular"
-                      },
-                      "fontSize": 40,
-                      "children": []
-                    },
-                    {
-                      "nodeId": "1:134",
+                      "nodeId": "3:116",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "customer-search.state.idle.title",
                       "width": 182,
                       "height": 18,
                       "x": 88,
-                      "y": 68,
+                      "y": 24,
                       "fills": [
                         "color/text/secondary"
                       ],
@@ -288,14 +269,14 @@
                       "children": []
                     },
                     {
-                      "nodeId": "1:135",
+                      "nodeId": "3:117",
                       "type": "TEXT",
                       "name": "Description",
                       "specId": "customer-search.state.idle.desc",
                       "width": 144,
                       "height": 16,
                       "x": 107,
-                      "y": 90,
+                      "y": 46,
                       "fills": [
                         "color/text/tertiary"
                       ],

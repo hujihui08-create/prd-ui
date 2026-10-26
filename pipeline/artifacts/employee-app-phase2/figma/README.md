@@ -1,6 +1,7 @@
 # employee-app-phase2 · Figma gate evidence (v0.6)
 
-Gate run: 2026-10-26, plugin bundle `sha256:3b133d0a1792…` (`runtimes/figma/dist/code.js`).
+Gate run: 2026-10-26 (structural gate + fidelity pass), plugin bundle
+`sha256:4f6aedcd6456…` (`runtimes/figma/dist/code.js`).
 
 ## Result
 
@@ -40,8 +41,32 @@ plans are regenerated from the **signed brief** with
 the M1 layer only annotates the base specs; the earlier hand-patched plan spacing is
 superseded by compiler fixes below.
 
-## Fixes found by the real gate
+## Fidelity pass (second run, 2026-10-26)
 
+The first pass only matched structure. A side-by-side audit against the HTML
+baselines (Playwright geometry + computed styles) found visual mismatches; all
+were fixed in the plan compiler and rebuilt:
+
+- **Buttons** now mirror the renderer's classes: `primary` (36h, radius 6,
+  paddingX 16), `secondary`/`danger` carry borders (`border.control`,
+  `status.danger` at 40% alpha), `ghost` is a transparent text button, and
+  `ghost-chip` (32h, radius 8, paddingX 12, `border.strong`) is used for
+  `.btn.ghost` inside `.filter-row`.
+- **Dividers**: list rows and detail rows carry a 1px `border/subtle` bottom
+  stroke, matching `.list-row` / `.list-text-row`.
+- **Tab bar** uses page names (今日 / 预约列表) instead of raw ids, real
+  Material Symbols glyphs (`home`, `calendar_month`), and a top-only border.
+- **Inputs/selects** are 14px / 400 with radius 8 and `border.control`; the
+  select shows its first option ("到店"), as a native `<select>` does.
+- **Empty states** omit the icon unless the spec supplies one.
+- **Calendar**: selected day uses a 600-weight label and a 2px info underline,
+  its cells carry the 4% info tint, and blocks have a 2px tone-colored left
+  border, 600-weight title and 10px subtitle/time. ABSOLUTE children now get
+  explicit sizes, so headers/cells/blocks fill their columns.
+- All 8 plans were regenerated; all 16 pages were rebuilt from scratch, and the
+  16 diffs remain `0 blocker / 0 major / 0 findings`.
+
+## Fixes found by the real gate
 Plugin (`runtimes/figma/src/plugin.ts`):
 
 1. `getMainComponent()` is rejected under `documentAccess: "dynamic-page"` → `getMainComponentAsync()`.

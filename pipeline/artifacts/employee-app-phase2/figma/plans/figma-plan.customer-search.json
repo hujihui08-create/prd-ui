@@ -24,6 +24,7 @@
     "color/status/info": "#1D4ED8",
     "color/border/subtle": "#E5E7EB",
     "color/border/strong": "#D1D5DB",
+    "color/border/control": "#CBD5E1",
     "space/1": "4px",
     "space/2": "8px",
     "space/3": "12px",
@@ -77,6 +78,30 @@
       "fontSize": 12,
       "fontWeight": 500,
       "lineHeight": 16
+    },
+    "b-mobile/input.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.bold": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16
+    },
+    "b-mobile/caption": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 10,
+      "fontWeight": 400,
+      "lineHeight": 12
+    },
+    "b-mobile/date": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 11,
+      "fontWeight": 400,
+      "lineHeight": 13
     }
   },
   "components": {
@@ -85,21 +110,49 @@
         "primary": {
           "fill": "color/action/primary",
           "text": "color/text/onAction",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "secondary": {
           "fill": "color/surface/default",
+          "stroke": "color/border/control",
           "text": "color/text/primary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "ghost": {
-          "fill": "color/surface/default",
           "text": "color/text/secondary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost-chip": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/strong",
+          "text": "color/text/primary",
+          "height": 32,
+          "radius": 8,
+          "paddingX": 12,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "danger": {
           "fill": "color/surface/default",
+          "stroke": "color/status/danger",
+          "strokeAlpha": 0.4,
           "text": "color/status/danger",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         }
       }
@@ -189,14 +242,6 @@
                 "layoutMode": "VERTICAL",
                 "children": [
                   {
-                    "specId": "customer-search.state.idle.icon",
-                    "type": "GLYPH",
-                    "name": "Icon",
-                    "glyph": "inbox",
-                    "size": 40,
-                    "color": "color/text/tertiary"
-                  },
-                  {
                     "specId": "customer-search.state.idle.title",
                     "type": "TEXT",
                     "name": "Title",
@@ -239,7 +284,7 @@
     "frames": 6,
     "texts": 4,
     "instances": 0,
-    "icons": 3,
+    "icons": 2,
     "images": 0
   }
 }

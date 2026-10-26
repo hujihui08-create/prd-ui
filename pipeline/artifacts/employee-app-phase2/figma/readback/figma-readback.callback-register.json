@@ -1,10 +1,15 @@
 {
   "schemaVersion": "1.0",
   "pageId": "callback-register",
-  "builtAt": "2026-10-26T07:51:49.865Z",
+  "builtAt": "2026-10-26T08:21:41.735Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    },
+    {
+      "family": "Noto Sans SC",
       "style": "Regular",
       "fallback": false
     }
@@ -26,7 +31,8 @@
     "color/status/danger",
     "color/status/info",
     "color/border/subtle",
-    "color/border/strong"
+    "color/border/strong",
+    "color/border/control"
   ],
   "textStyles": [
     "b-mobile/body.md",
@@ -34,14 +40,15 @@
     "b-mobile/label.sm",
     "b-mobile/heading.3",
     "b-mobile/label.strong",
-    "b-mobile/body.sm"
+    "b-mobile/body.sm",
+    "b-mobile/input.md"
   ],
   "components": [
     "b-mobile/Button"
   ],
   "nodes": [
     {
-      "nodeId": "2:1902",
+      "nodeId": "4:288",
       "type": "FRAME",
       "name": "回访登记",
       "specId": "callback-register.page.root",
@@ -62,7 +69,7 @@
       ],
       "children": [
         {
-          "nodeId": "2:1903",
+          "nodeId": "4:289",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "callback-register.page.root.header",
@@ -83,7 +90,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1904",
+              "nodeId": "4:290",
               "type": "GLYPH",
               "name": "Back",
               "specId": "callback-register.page.root.header.back",
@@ -103,7 +110,7 @@
               "children": []
             },
             {
-              "nodeId": "2:1905",
+              "nodeId": "4:291",
               "type": "TEXT",
               "name": "Title",
               "specId": "callback-register.page.root.header.title",
@@ -126,7 +133,7 @@
           ]
         },
         {
-          "nodeId": "2:1906",
+          "nodeId": "4:292",
           "type": "FRAME",
           "name": "Content",
           "specId": "callback-register.page.root.content",
@@ -147,7 +154,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1907",
+              "nodeId": "4:293",
               "type": "FRAME",
               "name": "Section",
               "specId": "callback-register.root.content.0",
@@ -160,12 +167,12 @@
                 "left": 16
               },
               "width": 390,
-              "height": 300,
+              "height": 308,
               "x": 0,
               "y": 0,
               "children": [
                 {
-                  "nodeId": "2:1908",
+                  "nodeId": "4:294",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.customer",
@@ -178,33 +185,33 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 58,
+                  "height": 60,
                   "x": 16,
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "2:1909",
+                      "nodeId": "4:295",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.customer.label",
                       "width": 358,
-                      "height": 16,
+                      "height": 18,
                       "x": 0,
                       "y": 0,
                       "fills": [
                         "color/text/secondary"
                       ],
-                      "textStyleName": "b-mobile/label.sm",
-                      "characters": "客户 *",
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "客户*",
                       "fontName": {
                         "family": "Noto Sans SC",
-                        "style": "Regular"
+                        "style": "Medium"
                       },
-                      "fontSize": 12,
+                      "fontSize": 13,
                       "children": []
                     },
                     {
-                      "nodeId": "2:1910",
+                      "nodeId": "4:296",
                       "type": "FRAME",
                       "name": "Row",
                       "specId": "callback-register.root.content.0.children.0.children.0",
@@ -219,10 +226,10 @@
                       "width": 358,
                       "height": 36,
                       "x": 0,
-                      "y": 22,
+                      "y": 24,
                       "children": [
                         {
-                          "nodeId": "2:1911",
+                          "nodeId": "4:297",
                           "type": "FRAME",
                           "name": "Input",
                           "specId": "callback-register.root.content.0.children.0.children.0.children.0",
@@ -234,7 +241,7 @@
                             "bottom": 0,
                             "left": 10
                           },
-                          "width": 87,
+                          "width": 92,
                           "height": 36,
                           "x": 0,
                           "y": 0,
@@ -243,44 +250,44 @@
                           ],
                           "children": [
                             {
-                              "nodeId": "2:1912",
+                              "nodeId": "4:299",
                               "type": "TEXT",
                               "name": "Placeholder",
                               "specId": "callback-register.root.content.0.children.0.children.0.children.0.placeholder",
-                              "width": 65,
+                              "width": 70,
                               "height": 18,
                               "x": 11,
                               "y": 9,
                               "fills": [
                                 "color/text/tertiary"
                               ],
-                              "textStyleName": "b-mobile/body.md",
+                              "textStyleName": "b-mobile/input.md",
                               "characters": "请输入客户",
                               "fontName": {
                                 "family": "Noto Sans SC",
-                                "style": "Medium"
+                                "style": "Regular"
                               },
-                              "fontSize": 13,
+                              "fontSize": 14,
                               "children": []
                             }
                           ]
                         },
                         {
-                          "nodeId": "2:1913",
+                          "nodeId": "4:300",
                           "type": "INSTANCE",
                           "name": "Button:选择",
                           "specId": "callback-register.action.pick-customer",
                           "layoutMode": "HORIZONTAL",
                           "itemSpacing": 0,
                           "padding": {
-                            "top": 8,
+                            "top": 0,
                             "right": 16,
-                            "bottom": 8,
+                            "bottom": 0,
                             "left": 16
                           },
                           "width": 58,
                           "height": 36,
-                          "x": 95,
+                          "x": 100,
                           "y": 0,
                           "componentName": "Emphasis=ghost",
                           "variantProperties": {
@@ -294,7 +301,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1915",
+                  "nodeId": "4:302",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.service",
@@ -307,33 +314,33 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 58,
+                  "height": 60,
                   "x": 16,
-                  "y": 86,
+                  "y": 88,
                   "children": [
                     {
-                      "nodeId": "2:1916",
+                      "nodeId": "4:303",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.service.label",
                       "width": 358,
-                      "height": 16,
+                      "height": 18,
                       "x": 0,
                       "y": 0,
                       "fills": [
                         "color/text/secondary"
                       ],
-                      "textStyleName": "b-mobile/label.sm",
-                      "characters": "服务项目 *",
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "服务项目*",
                       "fontName": {
                         "family": "Noto Sans SC",
-                        "style": "Regular"
+                        "style": "Medium"
                       },
-                      "fontSize": 12,
+                      "fontSize": 13,
                       "children": []
                     },
                     {
-                      "nodeId": "2:1917",
+                      "nodeId": "4:304",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.1.children.0",
@@ -348,30 +355,30 @@
                       "width": 358,
                       "height": 36,
                       "x": 0,
-                      "y": 22,
+                      "y": 24,
                       "fills": [
                         "color/surface/default"
                       ],
                       "children": [
                         {
-                          "nodeId": "2:1918",
+                          "nodeId": "4:305",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.1.children.0.placeholder",
-                          "width": 91,
+                          "width": 98,
                           "height": 18,
                           "x": 11,
                           "y": 9,
                           "fills": [
                             "color/text/tertiary"
                           ],
-                          "textStyleName": "b-mobile/body.md",
+                          "textStyleName": "b-mobile/input.md",
                           "characters": "请输入服务项目",
                           "fontName": {
                             "family": "Noto Sans SC",
-                            "style": "Medium"
+                            "style": "Regular"
                           },
-                          "fontSize": 13,
+                          "fontSize": 14,
                           "children": []
                         }
                       ]
@@ -379,7 +386,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1919",
+                  "nodeId": "4:306",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.content",
@@ -392,33 +399,33 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 58,
+                  "height": 60,
                   "x": 16,
-                  "y": 156,
+                  "y": 160,
                   "children": [
                     {
-                      "nodeId": "2:1920",
+                      "nodeId": "4:307",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.content.label",
                       "width": 358,
-                      "height": 16,
+                      "height": 18,
                       "x": 0,
                       "y": 0,
                       "fills": [
                         "color/text/secondary"
                       ],
-                      "textStyleName": "b-mobile/label.sm",
-                      "characters": "回访内容 *",
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "回访内容*",
                       "fontName": {
                         "family": "Noto Sans SC",
-                        "style": "Regular"
+                        "style": "Medium"
                       },
-                      "fontSize": 12,
+                      "fontSize": 13,
                       "children": []
                     },
                     {
-                      "nodeId": "2:1921",
+                      "nodeId": "4:308",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.2.children.0",
@@ -433,30 +440,30 @@
                       "width": 358,
                       "height": 36,
                       "x": 0,
-                      "y": 22,
+                      "y": 24,
                       "fills": [
                         "color/surface/default"
                       ],
                       "children": [
                         {
-                          "nodeId": "2:1922",
+                          "nodeId": "4:309",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.2.children.0.placeholder",
-                          "width": 91,
+                          "width": 98,
                           "height": 18,
                           "x": 11,
                           "y": 9,
                           "fills": [
                             "color/text/tertiary"
                           ],
-                          "textStyleName": "b-mobile/body.md",
+                          "textStyleName": "b-mobile/input.md",
                           "characters": "请输入回访内容",
                           "fontName": {
                             "family": "Noto Sans SC",
-                            "style": "Medium"
+                            "style": "Regular"
                           },
-                          "fontSize": 13,
+                          "fontSize": 14,
                           "children": []
                         }
                       ]
@@ -464,7 +471,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1923",
+                  "nodeId": "4:310",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.result",
@@ -477,33 +484,33 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 58,
+                  "height": 60,
                   "x": 16,
-                  "y": 226,
+                  "y": 232,
                   "children": [
                     {
-                      "nodeId": "2:1924",
+                      "nodeId": "4:311",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.result.label",
                       "width": 358,
-                      "height": 16,
+                      "height": 18,
                       "x": 0,
                       "y": 0,
                       "fills": [
                         "color/text/secondary"
                       ],
-                      "textStyleName": "b-mobile/label.sm",
-                      "characters": "回访结果 *",
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "回访结果*",
                       "fontName": {
                         "family": "Noto Sans SC",
-                        "style": "Regular"
+                        "style": "Medium"
                       },
-                      "fontSize": 12,
+                      "fontSize": 13,
                       "children": []
                     },
                     {
-                      "nodeId": "2:1925",
+                      "nodeId": "4:312",
                       "type": "FRAME",
                       "name": "Select",
                       "specId": "callback-register.root.content.0.children.3.children.0",
@@ -518,34 +525,34 @@
                       "width": 358,
                       "height": 36,
                       "x": 0,
-                      "y": 22,
+                      "y": 24,
                       "fills": [
                         "color/surface/default"
                       ],
                       "children": [
                         {
-                          "nodeId": "2:1926",
+                          "nodeId": "4:313",
                           "type": "TEXT",
                           "name": "Value",
                           "specId": "callback-register.root.content.0.children.3.children.0.value",
-                          "width": 91,
+                          "width": 42,
                           "height": 18,
                           "x": 11,
                           "y": 9,
                           "fills": [
                             "color/text/primary"
                           ],
-                          "textStyleName": "b-mobile/body.md",
-                          "characters": "请选择回访结果",
+                          "textStyleName": "b-mobile/input.md",
+                          "characters": "已联系",
                           "fontName": {
                             "family": "Noto Sans SC",
-                            "style": "Medium"
+                            "style": "Regular"
                           },
-                          "fontSize": 13,
+                          "fontSize": 14,
                           "children": []
                         },
                         {
-                          "nodeId": "2:1927",
+                          "nodeId": "4:314",
                           "type": "GLYPH",
                           "name": "Chevron",
                           "specId": "callback-register.root.content.0.children.3.children.0.chevron",
@@ -573,7 +580,7 @@
           ]
         },
         {
-          "nodeId": "2:1928",
+          "nodeId": "4:315",
           "type": "FRAME",
           "name": "Actions",
           "specId": "callback-register.page.root.actions",
@@ -594,16 +601,16 @@
           ],
           "children": [
             {
-              "nodeId": "2:1929",
+              "nodeId": "4:316",
               "type": "INSTANCE",
               "name": "Button:保存回访",
               "specId": "callback-register.action.save",
               "layoutMode": "HORIZONTAL",
               "itemSpacing": 0,
               "padding": {
-                "top": 8,
+                "top": 0,
                 "right": 16,
-                "bottom": 8,
+                "bottom": 0,
                 "left": 16
               },
               "width": 364,

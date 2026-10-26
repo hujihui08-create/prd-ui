@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "customer-detail",
-  "builtAt": "2026-10-26T07:51:28.386Z",
+  "builtAt": "2026-10-26T08:21:20.139Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -26,7 +26,8 @@
     "color/status/danger",
     "color/status/info",
     "color/border/subtle",
-    "color/border/strong"
+    "color/border/strong",
+    "color/border/control"
   ],
   "textStyles": [
     "b-mobile/body.md",
@@ -41,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "2:1727",
+      "nodeId": "4:113",
       "type": "FRAME",
       "name": "客户详情",
       "specId": "customer-detail.page.root",
@@ -62,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "2:1728",
+          "nodeId": "4:114",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "customer-detail.page.root.header",
@@ -83,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1729",
+              "nodeId": "4:115",
               "type": "GLYPH",
               "name": "Back",
               "specId": "customer-detail.page.root.header.back",
@@ -103,7 +104,7 @@
               "children": []
             },
             {
-              "nodeId": "2:1730",
+              "nodeId": "4:116",
               "type": "TEXT",
               "name": "Title",
               "specId": "customer-detail.page.root.header.title",
@@ -126,7 +127,7 @@
           ]
         },
         {
-          "nodeId": "2:1731",
+          "nodeId": "4:117",
           "type": "FRAME",
           "name": "Content",
           "specId": "customer-detail.page.root.content",
@@ -147,7 +148,7 @@
           ],
           "children": [
             {
-              "nodeId": "2:1732",
+              "nodeId": "4:118",
               "type": "FRAME",
               "name": "Card",
               "specId": "customer-detail.root.summary.0",
@@ -160,7 +161,7 @@
                 "left": 16
               },
               "width": 390,
-              "height": 406,
+              "height": 415,
               "x": 0,
               "y": 0,
               "fills": [
@@ -168,7 +169,7 @@
               ],
               "children": [
                 {
-                  "nodeId": "2:1733",
+                  "nodeId": "4:119",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "customer-detail.root.summary.0.head",
@@ -186,7 +187,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "2:1734",
+                      "nodeId": "4:120",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "customer-detail.root.summary.0.title",
@@ -209,7 +210,7 @@
                   ]
                 },
                 {
-                  "nodeId": "2:1735",
+                  "nodeId": "4:121",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "customer-detail.root.summary.0.body",
@@ -222,12 +223,12 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 342,
+                  "height": 351,
                   "x": 16,
                   "y": 48,
                   "children": [
                     {
-                      "nodeId": "2:1736",
+                      "nodeId": "4:122",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "customer-detail.root.summary.0.children.0",
@@ -240,12 +241,12 @@
                         "left": 0
                       },
                       "width": 358,
-                      "height": 342,
+                      "height": 351,
                       "x": 0,
                       "y": 0,
                       "children": [
                         {
-                          "nodeId": "2:1737",
+                          "nodeId": "4:123",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.0",
@@ -258,12 +259,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
                           "y": 0,
                           "children": [
                             {
-                              "nodeId": "2:1738",
+                              "nodeId": "4:124",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.0.label",
@@ -276,35 +277,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1739",
+                                  "nodeId": "4:125",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.0.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "姓名",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1740",
+                              "nodeId": "4:126",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.0.value",
@@ -327,7 +328,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1741",
+                          "nodeId": "4:127",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.1",
@@ -340,12 +341,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 38,
+                          "y": 39,
                           "children": [
                             {
-                              "nodeId": "2:1742",
+                              "nodeId": "4:128",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.1.label",
@@ -358,35 +359,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1743",
+                                  "nodeId": "4:129",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.1.labelText",
-                                  "width": 36,
-                                  "height": 16,
+                                  "width": 39,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "手机号",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1744",
+                              "nodeId": "4:130",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.1.value",
@@ -409,7 +410,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1745",
+                          "nodeId": "4:131",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.2",
@@ -422,12 +423,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 76,
+                          "y": 78,
                           "children": [
                             {
-                              "nodeId": "2:1746",
+                              "nodeId": "4:132",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.2.label",
@@ -440,35 +441,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1747",
+                                  "nodeId": "4:133",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.2.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "等级",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1748",
+                              "nodeId": "4:134",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.2.value",
@@ -491,7 +492,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1749",
+                          "nodeId": "4:135",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.3",
@@ -504,12 +505,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 114,
+                          "y": 117,
                           "children": [
                             {
-                              "nodeId": "2:1750",
+                              "nodeId": "4:136",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.3.label",
@@ -522,35 +523,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1751",
+                                  "nodeId": "4:137",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.3.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "余额",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1752",
+                              "nodeId": "4:138",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.3.value",
@@ -573,7 +574,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1753",
+                          "nodeId": "4:139",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.4",
@@ -586,12 +587,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 152,
+                          "y": 156,
                           "children": [
                             {
-                              "nodeId": "2:1754",
+                              "nodeId": "4:140",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.4.label",
@@ -604,35 +605,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1755",
+                                  "nodeId": "4:141",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.4.labelText",
-                                  "width": 48,
-                                  "height": 16,
+                                  "width": 52,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "累计消费",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1756",
+                              "nodeId": "4:142",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.4.value",
@@ -655,7 +656,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1757",
+                          "nodeId": "4:143",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.5",
@@ -668,12 +669,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 190,
+                          "y": 195,
                           "children": [
                             {
-                              "nodeId": "2:1758",
+                              "nodeId": "4:144",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.5.label",
@@ -686,35 +687,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1759",
+                                  "nodeId": "4:145",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.5.labelText",
-                                  "width": 36,
-                                  "height": 16,
+                                  "width": 39,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "卡张数",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1760",
+                              "nodeId": "4:146",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.5.value",
@@ -737,7 +738,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1761",
+                          "nodeId": "4:147",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.6",
@@ -750,12 +751,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 228,
+                          "y": 234,
                           "children": [
                             {
-                              "nodeId": "2:1762",
+                              "nodeId": "4:148",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.6.label",
@@ -768,35 +769,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1763",
+                                  "nodeId": "4:149",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.6.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "标签",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1764",
+                              "nodeId": "4:150",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.6.value",
@@ -819,7 +820,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1765",
+                          "nodeId": "4:151",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.7",
@@ -832,12 +833,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 266,
+                          "y": 273,
                           "children": [
                             {
-                              "nodeId": "2:1766",
+                              "nodeId": "4:152",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.7.label",
@@ -850,35 +851,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1767",
+                                  "nodeId": "4:153",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.7.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "备注",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1768",
+                              "nodeId": "4:154",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.7.value",
@@ -901,7 +902,7 @@
                           ]
                         },
                         {
-                          "nodeId": "2:1769",
+                          "nodeId": "4:155",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.8",
@@ -914,12 +915,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 304,
+                          "y": 312,
                           "children": [
                             {
-                              "nodeId": "2:1770",
+                              "nodeId": "4:156",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.8.label",
@@ -932,35 +933,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "2:1771",
+                                  "nodeId": "4:157",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.8.labelText",
-                                  "width": 48,
-                                  "height": 16,
+                                  "width": 52,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "服务记录",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "2:1772",
+                              "nodeId": "4:158",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.8.value",
@@ -989,7 +990,7 @@
               ]
             },
             {
-              "nodeId": "2:1773",
+              "nodeId": "4:159",
               "type": "FRAME",
               "name": "Row",
               "specId": "customer-detail.root.fields.0",
@@ -1002,78 +1003,78 @@
                 "left": 0
               },
               "width": 390,
-              "height": 36,
+              "height": 32,
               "x": 0,
-              "y": 406,
+              "y": 415,
               "children": [
                 {
-                  "nodeId": "2:1774",
+                  "nodeId": "4:160",
                   "type": "INSTANCE",
                   "name": "Button:新增预约",
                   "specId": "customer-detail.action.new-appointment",
                   "layoutMode": "HORIZONTAL",
                   "itemSpacing": 0,
                   "padding": {
-                    "top": 8,
-                    "right": 16,
-                    "bottom": 8,
-                    "left": 16
+                    "top": 0,
+                    "right": 12,
+                    "bottom": 0,
+                    "left": 12
                   },
-                  "width": 84,
-                  "height": 36,
+                  "width": 78,
+                  "height": 32,
                   "x": 0,
                   "y": 0,
-                  "componentName": "Emphasis=ghost",
+                  "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
-                    "emphasis": "ghost"
+                    "emphasis": "ghost-chip"
                   },
                   "characters": "新增预约",
                   "children": []
                 },
                 {
-                  "nodeId": "2:1776",
+                  "nodeId": "4:162",
                   "type": "INSTANCE",
                   "name": "Button:查看告知",
                   "specId": "customer-detail.action.view-notice",
                   "layoutMode": "HORIZONTAL",
                   "itemSpacing": 0,
                   "padding": {
-                    "top": 8,
-                    "right": 16,
-                    "bottom": 8,
-                    "left": 16
+                    "top": 0,
+                    "right": 12,
+                    "bottom": 0,
+                    "left": 12
                   },
-                  "width": 84,
-                  "height": 36,
-                  "x": 92,
+                  "width": 78,
+                  "height": 32,
+                  "x": 86,
                   "y": 0,
-                  "componentName": "Emphasis=ghost",
+                  "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
-                    "emphasis": "ghost"
+                    "emphasis": "ghost-chip"
                   },
                   "characters": "查看告知",
                   "children": []
                 },
                 {
-                  "nodeId": "2:1778",
+                  "nodeId": "4:164",
                   "type": "INSTANCE",
                   "name": "Button:回访登记",
                   "specId": "customer-detail.action.callback",
                   "layoutMode": "HORIZONTAL",
                   "itemSpacing": 0,
                   "padding": {
-                    "top": 8,
-                    "right": 16,
-                    "bottom": 8,
-                    "left": 16
+                    "top": 0,
+                    "right": 12,
+                    "bottom": 0,
+                    "left": 12
                   },
-                  "width": 84,
-                  "height": 36,
-                  "x": 184,
+                  "width": 78,
+                  "height": 32,
+                  "x": 172,
                   "y": 0,
-                  "componentName": "Emphasis=ghost",
+                  "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
-                    "emphasis": "ghost"
+                    "emphasis": "ghost-chip"
                   },
                   "characters": "回访登记",
                   "children": []
@@ -1083,7 +1084,7 @@
           ]
         },
         {
-          "nodeId": "2:1780",
+          "nodeId": "4:166",
           "type": "FRAME",
           "name": "Actions",
           "specId": "customer-detail.page.root.actions",
@@ -1104,16 +1105,16 @@
           ],
           "children": [
             {
-              "nodeId": "2:1781",
+              "nodeId": "4:167",
               "type": "INSTANCE",
               "name": "Button:查看预约",
               "specId": "customer-detail.action.view-appointment",
               "layoutMode": "HORIZONTAL",
               "itemSpacing": 0,
               "padding": {
-                "top": 8,
+                "top": 0,
                 "right": 16,
-                "bottom": 8,
+                "bottom": 0,
                 "left": 16
               },
               "width": 364,

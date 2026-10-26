@@ -24,6 +24,7 @@
     "color/status/info": "#1D4ED8",
     "color/border/subtle": "#E5E7EB",
     "color/border/strong": "#D1D5DB",
+    "color/border/control": "#CBD5E1",
     "space/1": "4px",
     "space/2": "8px",
     "space/3": "12px",
@@ -77,6 +78,30 @@
       "fontSize": 12,
       "fontWeight": 500,
       "lineHeight": 16
+    },
+    "b-mobile/input.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.bold": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16
+    },
+    "b-mobile/caption": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 10,
+      "fontWeight": 400,
+      "lineHeight": 12
+    },
+    "b-mobile/date": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 11,
+      "fontWeight": 400,
+      "lineHeight": 13
     }
   },
   "components": {
@@ -85,21 +110,49 @@
         "primary": {
           "fill": "color/action/primary",
           "text": "color/text/onAction",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "secondary": {
           "fill": "color/surface/default",
+          "stroke": "color/border/control",
           "text": "color/text/primary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "ghost": {
-          "fill": "color/surface/default",
           "text": "color/text/secondary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost-chip": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/strong",
+          "text": "color/text/primary",
+          "height": 32,
+          "radius": 8,
+          "paddingX": 12,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "danger": {
           "fill": "color/surface/default",
+          "stroke": "color/status/danger",
+          "strokeAlpha": 0.4,
           "text": "color/status/danger",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         }
       }
@@ -200,7 +253,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "姓名",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -218,7 +271,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.1",
@@ -237,7 +292,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "手机号",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -255,7 +310,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.2",
@@ -274,7 +331,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "等级",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -292,7 +349,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.3",
@@ -311,7 +370,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "余额",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -329,7 +388,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.4",
@@ -348,7 +409,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "累计消费",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -366,7 +427,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.5",
@@ -385,7 +448,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "卡张数",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -403,7 +466,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.6",
@@ -422,7 +487,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "标签",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -440,7 +505,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.7",
@@ -459,7 +526,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "备注",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -477,7 +544,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "customer-detail.root.summary.0.children.0.row.8",
@@ -496,7 +565,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "服务记录",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -514,7 +583,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       }
                     ],
                     "gap": 0
@@ -540,27 +611,24 @@
                 "type": "INSTANCE",
                 "name": "Button:新增预约",
                 "component": "Button",
-                "variant": "ghost",
-                "label": "新增预约",
-                "height": 36
+                "variant": "ghost-chip",
+                "label": "新增预约"
               },
               {
                 "specId": "customer-detail.action.view-notice",
                 "type": "INSTANCE",
                 "name": "Button:查看告知",
                 "component": "Button",
-                "variant": "ghost",
-                "label": "查看告知",
-                "height": 36
+                "variant": "ghost-chip",
+                "label": "查看告知"
               },
               {
                 "specId": "customer-detail.action.callback",
                 "type": "INSTANCE",
                 "name": "Button:回访登记",
                 "component": "Button",
-                "variant": "ghost",
-                "label": "回访登记",
-                "height": 36
+                "variant": "ghost-chip",
+                "label": "回访登记"
               }
             ],
             "gap": 8,

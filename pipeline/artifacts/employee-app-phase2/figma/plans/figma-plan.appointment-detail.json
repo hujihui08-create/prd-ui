@@ -24,6 +24,7 @@
     "color/status/info": "#1D4ED8",
     "color/border/subtle": "#E5E7EB",
     "color/border/strong": "#D1D5DB",
+    "color/border/control": "#CBD5E1",
     "space/1": "4px",
     "space/2": "8px",
     "space/3": "12px",
@@ -77,6 +78,30 @@
       "fontSize": 12,
       "fontWeight": 500,
       "lineHeight": 16
+    },
+    "b-mobile/input.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.bold": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16
+    },
+    "b-mobile/caption": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 10,
+      "fontWeight": 400,
+      "lineHeight": 12
+    },
+    "b-mobile/date": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 11,
+      "fontWeight": 400,
+      "lineHeight": 13
     }
   },
   "components": {
@@ -85,21 +110,49 @@
         "primary": {
           "fill": "color/action/primary",
           "text": "color/text/onAction",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "secondary": {
           "fill": "color/surface/default",
+          "stroke": "color/border/control",
           "text": "color/text/primary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "ghost": {
-          "fill": "color/surface/default",
           "text": "color/text/secondary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost-chip": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/strong",
+          "text": "color/text/primary",
+          "height": 32,
+          "radius": 8,
+          "paddingX": 12,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         },
         "danger": {
           "fill": "color/surface/default",
+          "stroke": "color/status/danger",
+          "strokeAlpha": 0.4,
           "text": "color/status/danger",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
           "labelTextStyle": "b-mobile/body.md"
         }
       }
@@ -223,7 +276,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "客户",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -241,7 +294,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.1",
@@ -260,7 +315,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "手机号",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -278,7 +333,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.2",
@@ -297,7 +354,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "项目",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -315,7 +372,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.3",
@@ -334,7 +393,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "时间段",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -352,7 +411,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.4",
@@ -371,7 +432,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "护理师",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -389,7 +450,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.5",
@@ -408,7 +471,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "门店",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -426,7 +489,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.6",
@@ -445,7 +510,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "来源",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -463,7 +528,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.7",
@@ -482,7 +549,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "创建人",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -500,7 +567,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.8",
@@ -519,7 +588,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "创建时间",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -537,7 +606,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.9",
@@ -556,7 +627,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "委派留痕",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -574,7 +645,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.10",
@@ -593,7 +666,7 @@
                                 "type": "TEXT",
                                 "name": "Label",
                                 "characters": "服务完成",
-                                "textStyle": "b-mobile/label.sm",
+                                "textStyle": "b-mobile/body.sm",
                                 "color": "color/text/tertiary"
                               }
                             ],
@@ -611,7 +684,9 @@
                         ],
                         "paddingY": 10,
                         "gap": 12,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "borderBottom": "color/border/subtle",
+                        "borderBottomWidth": 1
                       }
                     ],
                     "gap": 0
@@ -637,18 +712,16 @@
                 "type": "INSTANCE",
                 "name": "Button:改期",
                 "component": "Button",
-                "variant": "ghost",
-                "label": "改期",
-                "height": 36
+                "variant": "ghost-chip",
+                "label": "改期"
               },
               {
                 "specId": "appointment-detail.action.customer",
                 "type": "INSTANCE",
                 "name": "Button:客户详情",
                 "component": "Button",
-                "variant": "ghost",
-                "label": "客户详情",
-                "height": 36
+                "variant": "ghost-chip",
+                "label": "客户详情"
               },
               {
                 "specId": "appointment-detail.action.cancel",
@@ -656,8 +729,7 @@
                 "name": "Button:取消",
                 "component": "Button",
                 "variant": "danger",
-                "label": "取消",
-                "height": 36
+                "label": "取消"
               }
             ],
             "gap": 8,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "treatment-notice",
-  "builtAt": "2026-10-26T07:55:59.608Z",
+  "builtAt": "2026-10-26T08:34:20.024Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -26,7 +26,8 @@
     "color/status/danger",
     "color/status/info",
     "color/border/subtle",
-    "color/border/strong"
+    "color/border/strong",
+    "color/border/control"
   ],
   "textStyles": [
     "b-mobile/body.md",
@@ -41,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "1:263",
+      "nodeId": "3:245",
       "type": "FRAME",
       "name": "术后告知",
       "specId": "treatment-notice.page.root",
@@ -62,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "1:264",
+          "nodeId": "3:246",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "treatment-notice.page.root.header",
@@ -83,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:265",
+              "nodeId": "3:247",
               "type": "GLYPH",
               "name": "Back",
               "specId": "treatment-notice.page.root.header.back",
@@ -103,7 +104,7 @@
               "children": []
             },
             {
-              "nodeId": "1:266",
+              "nodeId": "3:248",
               "type": "TEXT",
               "name": "Title",
               "specId": "treatment-notice.page.root.header.title",
@@ -126,7 +127,7 @@
           ]
         },
         {
-          "nodeId": "1:267",
+          "nodeId": "3:249",
           "type": "FRAME",
           "name": "Content",
           "specId": "treatment-notice.page.root.content",
@@ -147,7 +148,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:268",
+              "nodeId": "3:250",
               "type": "FRAME",
               "name": "Card",
               "specId": "treatment-notice.card.summary",
@@ -160,7 +161,7 @@
                 "left": 16
               },
               "width": 390,
-              "height": 216,
+              "height": 220,
               "x": 0,
               "y": 0,
               "fills": [
@@ -168,7 +169,7 @@
               ],
               "children": [
                 {
-                  "nodeId": "1:269",
+                  "nodeId": "3:251",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "treatment-notice.card.summary.head",
@@ -186,7 +187,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "1:270",
+                      "nodeId": "3:252",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "treatment-notice.card.summary.title",
@@ -207,7 +208,7 @@
                       "children": []
                     },
                     {
-                      "nodeId": "1:271",
+                      "nodeId": "3:253",
                       "type": "FRAME",
                       "name": "Badge",
                       "specId": "treatment-notice.card.summary.badge",
@@ -228,7 +229,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "1:272",
+                          "nodeId": "3:254",
                           "type": "TEXT",
                           "name": "Label",
                           "specId": "treatment-notice.card.summary.badge.label",
@@ -253,7 +254,7 @@
                   ]
                 },
                 {
-                  "nodeId": "1:273",
+                  "nodeId": "3:255",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "treatment-notice.card.summary.body",
@@ -266,12 +267,12 @@
                     "left": 0
                   },
                   "width": 358,
-                  "height": 152,
+                  "height": 156,
                   "x": 16,
                   "y": 48,
                   "children": [
                     {
-                      "nodeId": "1:274",
+                      "nodeId": "3:256",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "treatment-notice.root.summary.0.children.0",
@@ -284,12 +285,12 @@
                         "left": 0
                       },
                       "width": 358,
-                      "height": 152,
+                      "height": 156,
                       "x": 0,
                       "y": 0,
                       "children": [
                         {
-                          "nodeId": "1:275",
+                          "nodeId": "3:257",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "treatment-notice.root.summary.0.children.0.row.0",
@@ -302,12 +303,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
                           "y": 0,
                           "children": [
                             {
-                              "nodeId": "1:276",
+                              "nodeId": "3:258",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "treatment-notice.root.summary.0.children.0.row.0.label",
@@ -320,35 +321,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "1:277",
+                                  "nodeId": "3:259",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "treatment-notice.root.summary.0.children.0.row.0.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "客户",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "1:278",
+                              "nodeId": "3:260",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "treatment-notice.root.summary.0.children.0.row.0.value",
@@ -371,7 +372,7 @@
                           ]
                         },
                         {
-                          "nodeId": "1:279",
+                          "nodeId": "3:261",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "treatment-notice.root.summary.0.children.0.row.1",
@@ -384,12 +385,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 38,
+                          "y": 39,
                           "children": [
                             {
-                              "nodeId": "1:280",
+                              "nodeId": "3:262",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "treatment-notice.root.summary.0.children.0.row.1.label",
@@ -402,35 +403,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "1:281",
+                                  "nodeId": "3:263",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "treatment-notice.root.summary.0.children.0.row.1.labelText",
-                                  "width": 24,
-                                  "height": 16,
+                                  "width": 26,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "单号",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "1:282",
+                              "nodeId": "3:264",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "treatment-notice.root.summary.0.children.0.row.1.value",
@@ -453,7 +454,7 @@
                           ]
                         },
                         {
-                          "nodeId": "1:283",
+                          "nodeId": "3:265",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "treatment-notice.root.summary.0.children.0.row.2",
@@ -466,12 +467,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 76,
+                          "y": 78,
                           "children": [
                             {
-                              "nodeId": "1:284",
+                              "nodeId": "3:266",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "treatment-notice.root.summary.0.children.0.row.2.label",
@@ -484,35 +485,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "1:285",
+                                  "nodeId": "3:267",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "treatment-notice.root.summary.0.children.0.row.2.labelText",
-                                  "width": 36,
-                                  "height": 16,
+                                  "width": 39,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "确认人",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "1:286",
+                              "nodeId": "3:268",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "treatment-notice.root.summary.0.children.0.row.2.value",
@@ -535,7 +536,7 @@
                           ]
                         },
                         {
-                          "nodeId": "1:287",
+                          "nodeId": "3:269",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "treatment-notice.root.summary.0.children.0.row.3",
@@ -548,12 +549,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 38,
+                          "height": 39,
                           "x": 0,
-                          "y": 114,
+                          "y": 117,
                           "children": [
                             {
-                              "nodeId": "1:288",
+                              "nodeId": "3:270",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "treatment-notice.root.summary.0.children.0.row.3.label",
@@ -566,35 +567,35 @@
                                 "left": 0
                               },
                               "width": 72,
-                              "height": 16,
+                              "height": 18,
                               "x": 0,
-                              "y": 11,
+                              "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "1:289",
+                                  "nodeId": "3:271",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "treatment-notice.root.summary.0.children.0.row.3.labelText",
-                                  "width": 48,
-                                  "height": 16,
+                                  "width": 52,
+                                  "height": 18,
                                   "x": 0,
                                   "y": 0,
                                   "fills": [
                                     "color/text/tertiary"
                                   ],
-                                  "textStyleName": "b-mobile/label.sm",
+                                  "textStyleName": "b-mobile/body.sm",
                                   "characters": "确认时间",
                                   "fontName": {
                                     "family": "Noto Sans SC",
                                     "style": "Regular"
                                   },
-                                  "fontSize": 12,
+                                  "fontSize": 13,
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "nodeId": "1:290",
+                              "nodeId": "3:272",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "treatment-notice.root.summary.0.children.0.row.3.value",
@@ -623,7 +624,7 @@
               ]
             },
             {
-              "nodeId": "1:291",
+              "nodeId": "3:273",
               "type": "FRAME",
               "name": "Row",
               "specId": "treatment-notice.root.summary.1",
@@ -638,10 +639,10 @@
               "width": 390,
               "height": 22,
               "x": 0,
-              "y": 216,
+              "y": 220,
               "children": [
                 {
-                  "nodeId": "1:292",
+                  "nodeId": "3:274",
                   "type": "TEXT",
                   "name": "Text",
                   "specId": "treatment-notice.root.summary.1.children.0",
@@ -664,7 +665,7 @@
               ]
             },
             {
-              "nodeId": "1:293",
+              "nodeId": "3:275",
               "type": "FRAME",
               "name": "Card",
               "specId": "treatment-notice.root.summary.2",
@@ -679,13 +680,13 @@
               "width": 390,
               "height": 100,
               "x": 0,
-              "y": 238,
+              "y": 242,
               "fills": [
                 "color/surface/default"
               ],
               "children": [
                 {
-                  "nodeId": "1:294",
+                  "nodeId": "3:276",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "treatment-notice.root.summary.2.head",
@@ -703,7 +704,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "1:295",
+                      "nodeId": "3:277",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "treatment-notice.root.summary.2.title",
@@ -726,7 +727,7 @@
                   ]
                 },
                 {
-                  "nodeId": "1:296",
+                  "nodeId": "3:278",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "treatment-notice.root.summary.2.body",
@@ -744,7 +745,7 @@
                   "y": 48,
                   "children": [
                     {
-                      "nodeId": "1:297",
+                      "nodeId": "3:279",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "treatment-notice.root.summary.2.children.0",
@@ -762,7 +763,7 @@
                       "y": 0,
                       "children": [
                         {
-                          "nodeId": "1:298",
+                          "nodeId": "3:280",
                           "type": "TEXT",
                           "name": "Item",
                           "specId": "treatment-notice.root.summary.2.children.0.row.0",
@@ -783,7 +784,7 @@
                           "children": []
                         },
                         {
-                          "nodeId": "1:299",
+                          "nodeId": "3:281",
                           "type": "TEXT",
                           "name": "Item",
                           "specId": "treatment-notice.root.summary.2.children.0.row.1",
@@ -810,7 +811,7 @@
               ]
             },
             {
-              "nodeId": "1:300",
+              "nodeId": "3:282",
               "type": "FRAME",
               "name": "Card",
               "specId": "treatment-notice.root.summary.3",
@@ -825,13 +826,13 @@
               "width": 390,
               "height": 100,
               "x": 0,
-              "y": 338,
+              "y": 342,
               "fills": [
                 "color/surface/default"
               ],
               "children": [
                 {
-                  "nodeId": "1:301",
+                  "nodeId": "3:283",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "treatment-notice.root.summary.3.head",
@@ -849,7 +850,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "1:302",
+                      "nodeId": "3:284",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "treatment-notice.root.summary.3.title",
@@ -872,7 +873,7 @@
                   ]
                 },
                 {
-                  "nodeId": "1:303",
+                  "nodeId": "3:285",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "treatment-notice.root.summary.3.body",
@@ -890,7 +891,7 @@
                   "y": 48,
                   "children": [
                     {
-                      "nodeId": "1:304",
+                      "nodeId": "3:286",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "treatment-notice.root.summary.3.children.0",
@@ -908,7 +909,7 @@
                       "y": 0,
                       "children": [
                         {
-                          "nodeId": "1:305",
+                          "nodeId": "3:287",
                           "type": "TEXT",
                           "name": "Item",
                           "specId": "treatment-notice.root.summary.3.children.0.row.0",
@@ -929,7 +930,7 @@
                           "children": []
                         },
                         {
-                          "nodeId": "1:306",
+                          "nodeId": "3:288",
                           "type": "TEXT",
                           "name": "Item",
                           "specId": "treatment-notice.root.summary.3.children.0.row.1",
@@ -956,7 +957,7 @@
               ]
             },
             {
-              "nodeId": "1:307",
+              "nodeId": "3:289",
               "type": "FRAME",
               "name": "Row",
               "specId": "treatment-notice.root.fields.0",
@@ -971,13 +972,13 @@
               "width": 390,
               "height": 100,
               "x": 0,
-              "y": 438,
+              "y": 442,
               "children": []
             }
           ]
         },
         {
-          "nodeId": "1:308",
+          "nodeId": "3:290",
           "type": "FRAME",
           "name": "Actions",
           "specId": "treatment-notice.page.root.actions",
@@ -998,16 +999,16 @@
           ],
           "children": [
             {
-              "nodeId": "1:309",
+              "nodeId": "3:291",
               "type": "INSTANCE",
               "name": "Button:确认已当面告知",
               "specId": "treatment-notice.action.confirm",
               "layoutMode": "HORIZONTAL",
               "itemSpacing": 0,
               "padding": {
-                "top": 8,
+                "top": 0,
                 "right": 16,
-                "bottom": 8,
+                "bottom": 0,
                 "left": 16
               },
               "width": 364,
