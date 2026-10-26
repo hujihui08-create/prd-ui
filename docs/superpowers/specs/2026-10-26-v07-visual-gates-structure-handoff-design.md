@@ -345,10 +345,10 @@ CLI 退出码：0 无 blocker；1 有 blocker；2 用法或 infra 错误。
 2. 通过本地 server `POST /save/figma.<pageId>.png` 落盘。
 3. 同时 `POST /save/figma-readback.<pageId>.json` 自动保存 readback（剪贴板保留为 fallback）。
 
-`figma:serve --plans <dir> --out <dir> [--port 9600]`：
+`figma:serve --figma <dir> [--port 9600]`：
 
-- `GET /plans/<file>` 返回 plan。
-- `POST /save/<name>` 写入 out；只允许 `.json`、`.png`；文件名白名单 `figma-*` / `figma.*`；拒绝路径穿越。
+- `GET /plans/<file>` 从 `<dir>/plans/` 返回 plan。
+- `POST /save/<name>` 按文件名路由：`figma-readback.<page>.json` → `<dir>/readback/`，`figma.<page>.png` → `<dir>/parity/`。只允许这两种名字；拒绝路径穿越。
 - 带 CORS 头，供插件 UI 使用。
 - 该命令替代 v0.6 的 `/tmp` 临时脚本，属于仓库内可复现设施。
 
@@ -526,9 +526,10 @@ readback 节点增加可选字段：
 **块边界**：
 
 - 块 = 页面主内容槽下直属的 `Section` 或 `Card`。
-- 页面壳（`MobileShell` / `PageShell`）、TopBar、TabBar、BottomNav、固定 actions/footer/CTA 永远属于组装层，不属于任何块。
+- 如果内容槽只有一个 `Section` 包裹且其直接子节点 ≥2，则该 Section 归组装层（负责 padding/gap），它的直接子节点各自成块。这样 today 的多卡片、appointment-list 的筛选/日历/列表才能按块拆分。
+- 页面壳（`MobileShell` / `PageShell`）、TopBar、TabBar、BottomNav、固定 actions/footer/CTA、上述包裹 Section 永远属于组装层，不属于任何块。
 - 嵌套 Section/Card 留在父块内部，不单独成块。
-- 主内容槽由 archetype 声明（如 `content`、`summary`、`fields`、`sections`）；shell 槽（`top-bar`、`tab-bar`、`actions`、`footer`）不是块来源。
+- 主内容槽由 archetype 声明（如 `content`、`summary`、`fields`、`sections`）；shell 槽（`top-bar`、`tab-bar`、`bottom-nav`、`actions`、`footer`）不是块来源。
 
 `BlockSpec`：
 
@@ -684,7 +685,7 @@ handoff/
   assets/
     <asset files>
   baseline/
-    baseline-manifest.json
+    manifest.json
     screenshots/<caseId>.png
   signoffs/
     figma-sign.json
