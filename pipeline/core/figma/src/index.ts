@@ -1,3 +1,4 @@
 export * from "./styles.js";
 export * from "./compile-plan.js";
+export * from "./coverage.js";
 export * from "./diff.js";

@@ -7,6 +7,12 @@ import type {
   SpecNode,
 } from "@prd-ui/contracts";
 import {
+  KNOWN_PARTIAL_TYPES,
+  applyCoverage,
+  buildCoverage,
+  skipReason,
+} from "./coverage.js";
+import {
   MOBILE_HEIGHT,
   MOBILE_WIDTH,
   WEB_HEIGHT,
@@ -57,21 +63,6 @@ function childrenOf(node: SpecNode): SpecNode[] {
   return node.children ?? [];
 }
 
-function shouldSkip(node: SpecNode, ctx: Ctx): boolean {
-  if (node.type === "Skeleton" || node.type === "ErrorState") return true;
-  if (node.type === "EmptyState" && node.props?.emptyKind !== "idle") return true;
-  // Search results stay hidden until the query matches (renderer-html applySearch).
-  if (node.type === "ListRow" && typeof node.props?.searchText === "string") return true;
-  if (
-    node.type === "Section" &&
-    typeof node.props?.viewPanel === "string" &&
-    node.props.viewPanel !== ctx.defaultView
-  ) {
-    return true;
-  }
-  return false;
-}
-
 function renderChildren(
   nodes: SpecNode[],
   ctx: Ctx,
@@ -90,7 +81,7 @@ function renderNode(
   path: string,
   options: { inFooter?: boolean; inFilterRow?: boolean } = {}
 ): FigmaPlanNode | null {
-  if (shouldSkip(node, ctx)) return null;
+  if (skipReason(node, ctx.defaultView)) return null;
   const props = node.props ?? {};
   const specId = node.id ?? `${ctx.page.meta.pageId}.${path}`;
   const inFooter = options.inFooter === true;
@@ -184,14 +175,23 @@ function renderNode(
         fill: colorToken("surface.subtle"),
         radius: radiusPx(ctx.profile, "lg"),
       });
-    default:
+    default: {
+      // Fail closed: a type the compiler does not know is never silently a plain
+      // frame. Known-but-unmapped types keep their generic frame but degrade.
+      const known = KNOWN_PARTIAL_TYPES.has(node.type);
       return frame(
         specId,
-        node.type,
+        known ? node.type : `Unmapped:${node.type}`,
         "VERTICAL",
         renderChildren(childrenOf(node), ctx, `${path}.children`),
-        { gap: 0 }
+        {
+          gap: 0,
+          ...(known
+            ? { mapping: "degraded" as const, reason: `PARTIAL_MAPPING:${node.type}` }
+            : { mapping: "unmapped" as const, reason: `UNMAPPED_COMPONENT:${node.type}` }),
+        }
       );
+    }
   }
 }
 
@@ -845,7 +845,7 @@ export function compileFigmaPlan(
     "VERTICAL",
     []
   );
-  return {
+  const plan: FigmaPlan = {
     schemaVersion: "1.0",
     project: page.meta.project,
     pageId: page.meta.pageId,
@@ -859,6 +859,9 @@ export function compileFigmaPlan(
     root,
     stats: countStats(root),
   };
+  const coverage = buildCoverage(page, plan);
+  applyCoverage(plan, coverage);
+  return plan;
 }
 
 export function compileFigmaPlans(
