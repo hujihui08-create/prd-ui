@@ -29,6 +29,55 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
   };
 }
 
+function colorToHex(color: { r: number; g: number; b: number } | undefined): string {
+  if (color === undefined) return "#000000";
+  const channel = (value: number): string =>
+    Math.round(Math.max(0, Math.min(1, value)) * 255)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${channel(color.r)}${channel(color.g)}${channel(color.b)}`.toUpperCase();
+}
+
+function solidPaintColor(value: any): { r: number; g: number; b: number } | undefined {
+  if (value === null || typeof value !== "object") return undefined;
+  if (value.type !== undefined && value.type !== "SOLID") return undefined;
+  const color = value.color;
+  if (color === undefined || typeof color.r !== "number") return undefined;
+  return color;
+}
+
+/**
+ * Effective alpha of a paint. Figma reports opacity 1 for paints bound to an
+ * RGBA variable (the plugin tints via `token/alpha-NN` variables), so resolve
+ * the bound variable's alpha when present.
+ */
+async function paintAlpha(value: any): Promise<number> {
+  const opacity = typeof value?.opacity === "number" ? value.opacity : 1;
+  if (opacity !== 1) return opacity;
+  const bound = value?.boundVariables?.color;
+  const alias = Array.isArray(bound) ? bound[0] : bound;
+  const id = typeof alias === "string" ? alias : alias?.id;
+  if (typeof id === "string") {
+    try {
+      const variable = await figma.variables.getVariableByIdAsync(id);
+      const values = variable?.valuesByMode ?? {};
+      for (const entry of Object.values(values)) {
+        const alpha = (entry as any)?.a;
+        if (typeof alpha === "number") return alpha;
+      }
+    } catch {
+      // Unreadable variable: fall back to the paint's own opacity.
+    }
+  }
+  return opacity;
+}
+
+function sideWeight(node: FigmaNode, side: "Top" | "Bottom" | "Left"): number | undefined {
+  const perSide = node[`stroke${side}Weight`];
+  if (typeof perSide === "number") return perSide;
+  return typeof node.strokeWeight === "number" ? node.strokeWeight : undefined;
+}
+
 function profileName(plan: FigmaPlan): string {
   const first = Object.keys(plan.textStyles)[0] ?? "b-mobile/body.md";
   return first.split("/")[0] ?? "b-mobile";
@@ -484,6 +533,46 @@ async function readbackNode(node: FigmaNode): Promise<FigmaReadbackNode> {
       : {}),
     children: [],
   };
+  const fills = Array.isArray(node.fills) ? node.fills : [];
+  const fillDetails: Array<{ color: string; alpha: number }> = [];
+  for (const paintValue of fills) {
+    const color = solidPaintColor(paintValue);
+    if (color === undefined) continue;
+    fillDetails.push({ color: colorToHex(color), alpha: await paintAlpha(paintValue) });
+  }
+  if (fillDetails.length > 0) result.fillDetails = fillDetails;
+  if (typeof node.cornerRadius === "number") result.cornerRadius = node.cornerRadius;
+  if (Array.isArray(node.strokes) && node.strokes.length > 0) {
+    const strokeColor = solidPaintColor(node.strokes[0]);
+    if (strokeColor !== undefined) {
+      const border = (
+        property: "borderTop" | "borderBottom" | "borderLeft",
+        side: "Top" | "Bottom" | "Left"
+      ): void => {
+        const width = sideWeight(node, side);
+        if (width === undefined) return;
+        result[property] = { width, color: colorToHex(strokeColor) };
+      };
+      border("borderTop", "Top");
+      border("borderBottom", "Bottom");
+      border("borderLeft", "Left");
+    }
+  }
+  if (node.type === "TEXT") {
+    if (typeof node.fontWeight === "number") result.fontWeight = node.fontWeight;
+    const textPaint = fills.find((paintValue: any) => solidPaintColor(paintValue) !== undefined);
+    const textColor = solidPaintColor(textPaint);
+    if (textColor !== undefined) result.textColor = colorToHex(textColor);
+    const lineHeight = node.lineHeight;
+    if (
+      lineHeight !== null &&
+      typeof lineHeight === "object" &&
+      lineHeight.unit === "PIXELS" &&
+      typeof lineHeight.value === "number"
+    ) {
+      result.lineHeight = lineHeight.value;
+    }
+  }
   const children = node.type === "INSTANCE" ? [] : (node.children ?? []);
   const childNodes: FigmaReadbackNode[] = [];
   for (const child of children) {

@@ -1,4 +1,5 @@
 import type {
+  FigmaButtonVariant,
   FigmaDiff,
   FigmaDiffFinding,
   FigmaPlan,
@@ -6,6 +7,7 @@ import type {
   FigmaReadback,
   FigmaReadbackNode,
 } from "@prd-ui/contracts";
+import { sameColor } from "./conformance.js";
 
 function finding(
   code: string,
@@ -14,6 +16,61 @@ function finding(
   specId?: string
 ): FigmaDiffFinding {
   return { code, severity, message, ...(specId === undefined ? {} : { specId }) };
+}
+
+function styleUnsupported(
+  findings: FigmaDiffFinding[],
+  specId: string,
+  property: string
+): void {
+  findings.push(
+    finding(
+      "READBACK_STYLE_UNSUPPORTED",
+      "minor",
+      `${specId}: readback reports no ${property}`,
+      specId
+    )
+  );
+}
+
+function resolveTokenColor(plan: FigmaPlan, token: string | undefined): string | undefined {
+  if (token === undefined) return undefined;
+  return plan.tokens[token] ?? token;
+}
+
+interface DeclaredBorder {
+  property: "borderTop" | "borderBottom" | "borderLeft";
+  width: number;
+  color: string;
+}
+
+/**
+ * Borders the plan declares for a node. A uniform `stroke`/`strokeWidth` maps
+ * to the readback's top border, mirroring how the plugin reads a Figma stroke
+ * back (one strokes array, per-side weights).
+ */
+function declaredBorders(
+  plan: FigmaPlan,
+  node: FigmaPlanNode,
+  variant: FigmaButtonVariant | undefined
+): DeclaredBorder[] {
+  const borders: DeclaredBorder[] = [];
+  const add = (
+    property: DeclaredBorder["property"],
+    token: string | undefined,
+    width: number | undefined
+  ): void => {
+    if (token === undefined) return;
+    borders.push({ property, width: width ?? 1, color: resolveTokenColor(plan, token)! });
+  };
+  add(
+    "borderTop",
+    node.borderTop ?? node.stroke ?? variant?.stroke,
+    node.borderTopWidth ?? node.strokeWidth ?? variant?.strokeWidth
+  );
+  add("borderBottom", node.borderBottom, node.borderBottomWidth);
+  add("borderLeft", node.borderLeft, node.borderLeftWidth);
+  return borders;
 }
 
 function flattenPlan(node: FigmaPlanNode, parent?: FigmaPlanNode): Array<{
@@ -122,6 +179,19 @@ export function diffFigma(
     name: plan.pageName,
     children: readback.nodes,
   });
+  // Readbacks produced before the style extension carry none of these fields;
+  // they can only be reported as unsupported, not as a concrete mismatch.
+  const styleCapable = readbackEntries.some(
+    ({ node }) =>
+      node.cornerRadius !== undefined ||
+      node.borderTop !== undefined ||
+      node.borderBottom !== undefined ||
+      node.borderLeft !== undefined ||
+      node.fillDetails !== undefined ||
+      node.fontWeight !== undefined ||
+      node.textColor !== undefined ||
+      node.lineHeight !== undefined
+  );
   const readbackBySpec = new Map(
     readbackEntries
       .filter((entry) => entry.node.specId !== undefined)
@@ -309,6 +379,133 @@ export function diffFigma(
             )
           );
         }
+      }
+    }
+
+    const variant =
+      expected.type === "INSTANCE"
+        ? plan.components.Button.variants[expected.variant ?? ""]
+        : undefined;
+
+    const radius = expected.radius ?? variant?.radius;
+    if (radius !== undefined) {
+      if (node.cornerRadius === undefined) {
+        styleUnsupported(findings, expected.specId, "cornerRadius");
+      } else if (!nearly(radius, node.cornerRadius, 0.5)) {
+        findings.push(
+          finding(
+            "FIGMA_RADIUS_MISMATCH",
+            "major",
+            `${expected.specId}: radius ${node.cornerRadius} != ${radius}`,
+            expected.specId
+          )
+        );
+      }
+    }
+
+    for (const border of declaredBorders(plan, expected, variant)) {
+      const actualBorder = node[border.property];
+      if (actualBorder === undefined) {
+        // A readback that supports style fields but reports no border for a
+        // declared side is a concrete mismatch; a legacy readback can only be
+        // flagged as unsupported (minor) so old evidence does not fail.
+        styleUnsupported(findings, expected.specId, border.property);
+        if (styleCapable) {
+          findings.push(
+            finding(
+              "FIGMA_BORDER_MISMATCH",
+              "major",
+              `${expected.specId}: ${border.property} missing (expected ${border.width}px ${border.color})`,
+              expected.specId
+            )
+          );
+        }
+        continue;
+      }
+      const problems: string[] = [];
+      if (!nearly(border.width, actualBorder.width, 0.5)) {
+        problems.push(`width ${actualBorder.width} != ${border.width}`);
+      }
+      if (border.width > 0 && !sameColor(border.color, actualBorder.color, 1)) {
+        problems.push(`color ${actualBorder.color} != ${border.color}`);
+      }
+      if (problems.length > 0) {
+        findings.push(
+          finding(
+            "FIGMA_BORDER_MISMATCH",
+            "major",
+            `${expected.specId}: ${border.property} ${problems.join(", ")}`,
+            expected.specId
+          )
+        );
+      }
+    }
+
+    const fillToken = expected.fill ?? variant?.fill;
+    if (fillToken !== undefined) {
+      const fillColor = resolveTokenColor(plan, fillToken)!;
+      const fillAlpha = expected.fillAlpha ?? variant?.fillAlpha ?? 1;
+      const actualFill = node.fillDetails?.[0];
+      if (actualFill === undefined) {
+        styleUnsupported(findings, expected.specId, "fillDetails");
+      } else if (
+        !sameColor(fillColor, actualFill.color, 1) ||
+        Math.abs(fillAlpha - actualFill.alpha) > 0.01
+      ) {
+        findings.push(
+          finding(
+            "FIGMA_FILL_MISMATCH",
+            "major",
+            `${expected.specId}: fill ${actualFill.color}@${actualFill.alpha} != ${fillColor}@${fillAlpha}`,
+            expected.specId
+          )
+        );
+      }
+    }
+
+    if (expected.type === "TEXT" && expected.textStyle !== undefined) {
+      const style = plan.textStyles[expected.textStyle];
+      if (style !== undefined) {
+        if (node.fontWeight === undefined) {
+          styleUnsupported(findings, expected.specId, "fontWeight");
+        } else if (node.fontWeight !== style.fontWeight) {
+          findings.push(
+            finding(
+              "FIGMA_FONT_WEIGHT_MISMATCH",
+              "major",
+              `${expected.specId}: font weight ${node.fontWeight} != ${style.fontWeight}`,
+              expected.specId
+            )
+          );
+        }
+        if (node.lineHeight === undefined) {
+          styleUnsupported(findings, expected.specId, "lineHeight");
+        } else if (!nearly(node.lineHeight, style.lineHeight, 0.5)) {
+          findings.push(
+            finding(
+              "FIGMA_LINE_HEIGHT_MISMATCH",
+              "major",
+              `${expected.specId}: line height ${node.lineHeight} != ${style.lineHeight}`,
+              expected.specId
+            )
+          );
+        }
+      }
+    }
+
+    if ((expected.type === "TEXT" || expected.type === "GLYPH") && expected.color !== undefined) {
+      const textColor = resolveTokenColor(plan, expected.color)!;
+      if (node.textColor === undefined) {
+        styleUnsupported(findings, expected.specId, "textColor");
+      } else if (!sameColor(textColor, node.textColor, 1)) {
+        findings.push(
+          finding(
+            "FIGMA_TEXT_COLOR_MISMATCH",
+            "major",
+            `${expected.specId}: text color ${node.textColor} != ${textColor}`,
+            expected.specId
+          )
+        );
       }
     }
 
