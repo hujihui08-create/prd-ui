@@ -34,6 +34,7 @@ interface Ctx {
   catalog: Catalog;
   defaultView: string | undefined;
   inFooter: boolean;
+  pageNames: Record<string, string>;
 }
 
 function str(value: unknown): string {
@@ -75,7 +76,7 @@ function renderChildren(
   nodes: SpecNode[],
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean } = {}
+  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
 ): FigmaPlanNode[] {
   return nodes.flatMap((node, index) => {
     const result = renderNode(node, ctx, `${path}.${index}`, options);
@@ -87,12 +88,13 @@ function renderNode(
   node: SpecNode,
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean } = {}
+  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
 ): FigmaPlanNode | null {
   if (shouldSkip(node, ctx)) return null;
   const props = node.props ?? {};
   const specId = node.id ?? `${ctx.page.meta.pageId}.${path}`;
   const inFooter = options.inFooter === true;
+  const inFilterRow = options.inFilterRow === true;
 
   switch (node.type) {
     case "MobileShell":
@@ -118,11 +120,16 @@ function renderNode(
       );
     case "Card":
       return renderCard(node, ctx, specId, path);
-    case "Row":
-      return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`), {
+    case "Row": {
+      const isFilterRow = str(props.variant) === "filter";
+      return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`, {
+        ...options,
+        inFilterRow: isFilterRow,
+      }), {
         gap: spacePx(ctx.profile, str(props.gap)),
         alignItems: "CENTER",
       });
+    }
     case "Stack":
       return frame(specId, "Stack", "VERTICAL", renderChildren(childrenOf(node), ctx, `${path}.children`), {
         gap: 0,
@@ -135,11 +142,14 @@ function renderNode(
       return text(specId, "Text", str(props.text), ctx.profile, node.textRole ?? "body.md");
     case "QuickAction":
       return renderQuickAction(props, ctx, specId);
-    case "Button":
-      return instance(specId, str(props.label), str(props.emphasis) || "primary", {
-        height: inFooter ? 44 : 36,
-        ...(inFooter ? { layoutGrow: 1 } : {}),
+    case "Button": {
+      const emphasis = str(props.emphasis) || "primary";
+      // `.filter-row .btn.ghost` is the bordered chip; plain ghost is a text button.
+      const variant = emphasis === "ghost" && inFilterRow ? "ghost-chip" : emphasis;
+      return instance(specId, str(props.label), variant, {
+        ...(inFooter ? { height: 44, layoutGrow: 1 } : {}),
       });
+    }
     case "Badge":
       return renderBadge(props, ctx, specId);
     case "SearchBar":
@@ -299,12 +309,30 @@ function renderTopBar(props: Record<string, unknown>, ctx: Ctx, specId: string):
   });
 }
 
-function tabGlyph(label: string): string {
-  if (label.includes("今日")) return "home";
-  if (label.includes("预约")) return "calendar_month";
-  if (label.includes("客户")) return "person";
-  if (label.includes("库存")) return "inventory_2";
-  return "circle";
+function tabGlyph(id: string): string {
+  const glyphs: Record<string, string> = {
+    today: "home",
+    今日: "home",
+    "appointment-list": "calendar_month",
+    预约列表: "calendar_month",
+    "customer-search": "search",
+    客户搜索: "search",
+    customer: "person",
+    客户: "person",
+    callback: "call",
+    回访登记: "call",
+    workbench: "grid_view",
+    mine: "settings",
+    settings: "settings",
+    "home-feed": "home",
+    "orders-overview": "dashboard",
+    "orders-list": "format_list_bulleted",
+    "order-detail": "receipt_long",
+    "order-form": "add_box",
+    auth: "login",
+    "item-detail": "shopping_bag",
+  };
+  return glyphs[id] ?? "circle";
 }
 
 function renderTabBar(props: Record<string, unknown>, ctx: Ctx, specId: string): FigmaPlanNode {
@@ -314,14 +342,15 @@ function renderTabBar(props: Record<string, unknown>, ctx: Ctx, specId: string):
     specId,
     "TabBar",
     "HORIZONTAL",
-    items.map((label, index) =>
-      frame(`${specId}.tab.${index}`, `Tab:${label}`, "VERTICAL", [
+    items.map((id, index) => {
+      const label = ctx.pageNames[id] ?? id;
+      return frame(`${specId}.tab.${index}`, `Tab:${label}`, "VERTICAL", [
         glyph(
           `${specId}.tab.${index}.icon`,
           "Icon",
-          tabGlyph(label),
+          tabGlyph(id),
           22,
-          label === active ? colorToken("action.primary") : colorToken("text.tertiary")
+          id === active ? colorToken("action.primary") : colorToken("text.tertiary")
         ),
         text(
           `${specId}.tab.${index}.label`,
@@ -329,20 +358,20 @@ function renderTabBar(props: Record<string, unknown>, ctx: Ctx, specId: string):
           label,
           ctx.profile,
           "label.sm",
-          { color: label === active ? colorToken("action.primary") : colorToken("text.tertiary") }
+          { color: id === active ? colorToken("action.primary") : colorToken("text.tertiary") }
         ),
       ], {
         layoutGrow: 1,
         gap: 2,
         alignItems: "CENTER",
         justifyContent: "CENTER",
-      })
-    ),
+      });
+    }),
     {
       height: 64,
       fill: colorToken("surface.default"),
-      stroke: colorToken("border.subtle"),
-      strokeWidth: 1,
+      borderTop: colorToken("border.subtle"),
+      borderTopWidth: 1,
       alignItems: "CENTER",
     }
   );
@@ -476,7 +505,7 @@ function renderFormField(node: SpecNode, ctx: Ctx, specId: string, path: string)
   const label = str(props.label);
   const required = bool(props.required);
   return frame(specId, "FormField", "VERTICAL", [
-    text(`${specId}.label`, "Label", `${label}${required ? " *" : ""}`, ctx.profile, "label.sm", {
+    text(`${specId}.label`, "Label", `${label}${required ? "*" : ""}`, ctx.profile, "body.md", {
       color: colorToken("text.secondary"),
     }),
     ...renderChildren(childrenOf(node), ctx, `${path}.children`),
@@ -487,33 +516,36 @@ function renderFormField(node: SpecNode, ctx: Ctx, specId: string, path: string)
 
 function renderInput(props: Record<string, unknown>, ctx: Ctx, specId: string): FigmaPlanNode {
   return frame(specId, "Input", "HORIZONTAL", [
-    text(`${specId}.placeholder`, "Placeholder", str(props.placeholder), ctx.profile, "body.md", {
+    text(`${specId}.placeholder`, "Placeholder", str(props.placeholder), ctx.profile, "input.md", {
       color: colorToken("text.tertiary"),
     }),
   ], {
     height: 36,
     paddingX: 10,
     fill: colorToken("surface.default"),
-    stroke: colorToken("border.strong"),
+    stroke: colorToken("border.control"),
     strokeWidth: 1,
-    radius: radiusPx(ctx.profile, "md"),
+    radius: 8,
     alignItems: "CENTER",
   });
 }
 
 function renderSelect(props: Record<string, unknown>, ctx: Ctx, specId: string): FigmaPlanNode {
   const options = array(props.options).map((item) => String(item));
-  const label = str(props.placeholder) || options[0] || "";
+  // A native <select> shows the first option; the placeholder is only a hint.
+  const label = str(props.value) || options[0] || str(props.placeholder);
   return frame(specId, "Select", "HORIZONTAL", [
-    text(`${specId}.value`, "Value", label, ctx.profile, "body.md"),
+    text(`${specId}.value`, "Value", label, ctx.profile, "input.md", {
+      color: colorToken("text.primary"),
+    }),
     glyph(`${specId}.chevron`, "Chevron", "expand_more", 16, colorToken("text.tertiary")),
   ], {
     height: 36,
     paddingX: 10,
     fill: colorToken("surface.default"),
-    stroke: colorToken("border.strong"),
+    stroke: colorToken("border.control"),
     strokeWidth: 1,
-    radius: radiusPx(ctx.profile, "md"),
+    radius: 8,
     alignItems: "CENTER",
     justifyContent: "SPACE_BETWEEN",
   });
@@ -560,6 +592,8 @@ function renderListRow(props: Record<string, unknown>, ctx: Ctx, specId: string)
     paddingY: 10,
     gap: spacePx(ctx.profile, "3"),
     alignItems: "CENTER",
+    borderBottom: colorToken("border.subtle"),
+    borderBottomWidth: 1,
   });
 }
 
@@ -584,7 +618,7 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
       const record = item as Record<string, unknown>;
       return frame(`${specId}.row.${index}`, "Row", "HORIZONTAL", [
         frame(`${specId}.row.${index}.label`, "Label", "HORIZONTAL", [
-          text(`${specId}.row.${index}.labelText`, "Label", str(record.label), ctx.profile, "label.sm", {
+          text(`${specId}.row.${index}.labelText`, "Label", str(record.label), ctx.profile, "body.sm", {
             color: colorToken("text.tertiary"),
           }),
         ], { width: 72 }),
@@ -595,6 +629,8 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
         paddingY: 10,
         gap: spacePx(ctx.profile, "3"),
         alignItems: "CENTER",
+        borderBottom: colorToken("border.subtle"),
+        borderBottomWidth: 1,
       });
     }
     return text(`${specId}.row.${index}`, "Item", String(item), ctx.profile, "body.md");
@@ -630,22 +666,27 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       width: DAY_WIDTH,
       height: HEADER_HEIGHT,
       child: frame(`${specId}.day.${dayIndex}.frame`, "Day", "VERTICAL", [
-        text(`${specId}.day.${dayIndex}.label`, "Label", label, ctx.profile, "label.sm", {
+        text(`${specId}.day.${dayIndex}.label`, "Label", label, ctx.profile, selected ? "label.bold" : "label.sm", {
           color: selected ? colorToken("status.info") : colorToken("text.secondary"),
         }),
         ...(date === ""
           ? []
           : [
-              text(`${specId}.day.${dayIndex}.date`, "Date", date.slice(5), ctx.profile, "label.sm", {
+              text(`${specId}.day.${dayIndex}.date`, "Date", date.slice(5), ctx.profile, "date", {
                 color: selected ? colorToken("status.info") : colorToken("text.tertiary"),
               }),
             ]),
       ], {
+        width: DAY_WIDTH,
+        height: HEADER_HEIGHT,
         fill: selected ? colorToken("status.info") : colorToken("surface.subtle"),
         fillAlpha: selected ? 0.14 : 1,
         gap: 1,
         alignItems: "CENTER",
         justifyContent: "CENTER",
+        ...(selected
+          ? { borderBottom: colorToken("status.info"), borderBottomWidth: 2 }
+          : {}),
       }),
     });
   });
@@ -660,17 +701,22 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       width: TIME_WIDTH,
       height: ROW_HEIGHT,
       child: frame(`${specId}.hour.${rowIndex}.frame`, "Hour", "VERTICAL", [
-        text(`${specId}.hour.${rowIndex}.label`, "Label", hour, ctx.profile, "label.sm", {
+        text(`${specId}.hour.${rowIndex}.label`, "Label", hour, ctx.profile, "date", {
           color: colorToken("text.tertiary"),
           align: "RIGHT",
         }),
       ], {
+        width: TIME_WIDTH,
+        height: ROW_HEIGHT,
         paddingX: 4,
         alignItems: "END",
         justifyContent: "START",
       }),
     });
     for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+      const day = days[dayIndex];
+      const selected =
+        day !== null && typeof day === "object" && bool((day as Record<string, unknown>).selected);
       children.push({
         type: "ABSOLUTE",
         specId: `${specId}.cell.${rowIndex}.${dayIndex}`,
@@ -680,7 +726,10 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
         width: DAY_WIDTH,
         height: ROW_HEIGHT,
         child: frame(`${specId}.cell.${rowIndex}.${dayIndex}.frame`, "Cell", "NONE", [], {
-          fill: colorToken("surface.default"),
+          width: DAY_WIDTH,
+          height: ROW_HEIGHT,
+          fill: selected ? colorToken("status.info") : colorToken("surface.default"),
+          fillAlpha: selected ? 0.04 : 1,
           stroke: colorToken("border.subtle"),
           strokeWidth: 0.5,
         }),
@@ -708,21 +757,25 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       width: DAY_WIDTH - 2,
       height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
       child: frame(`${specId}.block.${index}.frame`, "Block", "VERTICAL", [
-        text(`${specId}.block.${index}.title`, "Title", title, ctx.profile, "label.strong"),
+        text(`${specId}.block.${index}.title`, "Title", title, ctx.profile, "label.bold"),
         ...(subtitle === ""
           ? []
-          : [text(`${specId}.block.${index}.subtitle`, "Subtitle", subtitle, ctx.profile, "label.sm", {
+          : [text(`${specId}.block.${index}.subtitle`, "Subtitle", subtitle, ctx.profile, "caption", {
               color: colorToken("text.secondary"),
             })]),
-        text(`${specId}.block.${index}.time`, "Time", timeLabel, ctx.profile, "label.sm", {
+        text(`${specId}.block.${index}.time`, "Time", timeLabel, ctx.profile, "caption", {
           color: colorToken("text.tertiary"),
         }),
       ], {
+        width: DAY_WIDTH - 2,
+        height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
         padding: 2,
         gap: 0,
         fill: statusColor(tone),
         fillAlpha: 0.1,
         radius: radiusPx(ctx.profile, "sm"),
+        borderLeft: statusColor(tone),
+        borderLeftWidth: 2,
       }),
     });
   });
@@ -738,8 +791,10 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
 
 function renderEmptyState(node: SpecNode, ctx: Ctx, specId: string, path: string): FigmaPlanNode {
   const props = node.props ?? {};
+  const icon = str(props.icon);
   return frame(specId, "EmptyState", "VERTICAL", [
-    glyph(`${specId}.icon`, "Icon", str(props.icon) || "inbox", 40, colorToken("text.tertiary")),
+    // renderer-html only draws an icon when the spec provides one.
+    ...(icon === "" ? [] : [glyph(`${specId}.icon`, "Icon", icon, 40, colorToken("text.tertiary"))]),
     text(`${specId}.title`, "Title", str(props.title), ctx.profile, "body.md", {
       color: colorToken("text.secondary"),
       align: "CENTER",
@@ -778,11 +833,12 @@ function countStats(root: FigmaPlanNode): FigmaPlan["stats"] {
 export function compileFigmaPlan(
   page: PageSpec,
   profile: Profile,
-  catalog: Catalog
+  catalog: Catalog,
+  pageNames: Record<string, string> = {}
 ): FigmaPlan {
   void buttonMapping(catalog);
   const defaultView = page.defaultView ?? page.views?.[0];
-  const ctx: Ctx = { page, profile, catalog, defaultView, inFooter: false };
+  const ctx: Ctx = { page, profile, catalog, defaultView, inFooter: false, pageNames };
   const root = renderNode(page.layout, ctx, "root") ?? frame(
     `${page.meta.pageId}.root`,
     page.meta.name,
@@ -810,7 +866,12 @@ export function compileFigmaPlans(
   profileFor: (page: PageSpec) => Profile,
   catalogFor: (page: PageSpec) => Catalog
 ): FigmaPlan[] {
-  return pages.map((page) => compileFigmaPlan(page, profileFor(page), catalogFor(page)));
+  const pageNames = Object.fromEntries(
+    pages.map((page) => [page.meta.pageId, page.meta.name])
+  );
+  return pages.map((page) =>
+    compileFigmaPlan(page, profileFor(page), catalogFor(page), pageNames)
+  );
 }
 
 export function textStyleToken(profile: Profile, role: string): string {

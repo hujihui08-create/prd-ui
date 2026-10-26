@@ -27,6 +27,7 @@ export const bMobileProfile: Profile = {
     "status.info": "#1D4ED8",
     "border.subtle": "#E5E7EB",
     "border.strong": "#D1D5DB",
+    "border.control": "#CBD5E1",
   },
   space: {
     "1": "4px",

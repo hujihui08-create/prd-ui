@@ -95,12 +95,43 @@ export function planTokens(profile: Profile): Record<string, string> {
 }
 
 export function planTextStyles(profile: Profile): FigmaPlan["textStyles"] {
-  return Object.fromEntries(
+  const base = Object.fromEntries(
     Object.entries(profile.typography).map(([role, style]) => [
       textStyleName(profile, role),
       style,
     ])
   );
+  const fallback = { fontFamily: "Noto Sans SC", fontSize: 13, fontWeight: 400, lineHeight: 18 };
+  const body = profile.typography["body.sm"] ?? profile.typography["body.md"] ?? fallback;
+  const label = profile.typography["label.sm"] ?? body;
+  return {
+    ...base,
+    // Plan-only roles that mirror renderer-html control and calendar styles.
+    [textStyleName(profile, "input.md")]: {
+      fontFamily: body.fontFamily,
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 18,
+    },
+    [textStyleName(profile, "label.bold")]: {
+      fontFamily: label.fontFamily,
+      fontSize: label.fontSize,
+      fontWeight: 600,
+      lineHeight: label.lineHeight,
+    },
+    [textStyleName(profile, "caption")]: {
+      fontFamily: label.fontFamily,
+      fontSize: 10,
+      fontWeight: 400,
+      lineHeight: 12,
+    },
+    [textStyleName(profile, "date")]: {
+      fontFamily: label.fontFamily,
+      fontSize: 11,
+      fontWeight: 400,
+      lineHeight: 13,
+    },
+  };
 }
 
 export function planButtonComponents(profile: Profile): FigmaPlan["components"] {
@@ -111,21 +142,50 @@ export function planButtonComponents(profile: Profile): FigmaPlan["components"] 
         primary: {
           fill: colorToken("action.primary"),
           text: colorToken("text.onAction"),
+          height: 36,
+          radius: 6,
+          paddingX: 16,
+          paddingY: 0,
           labelTextStyle: labelStyle,
         },
         secondary: {
           fill: colorToken("surface.default"),
+          stroke: colorToken("border.control"),
           text: colorToken("text.primary"),
+          height: 36,
+          radius: 6,
+          paddingX: 16,
+          paddingY: 0,
           labelTextStyle: labelStyle,
         },
         ghost: {
-          fill: colorToken("surface.default"),
           text: colorToken("text.secondary"),
+          height: 36,
+          radius: 6,
+          paddingX: 16,
+          paddingY: 0,
+          labelTextStyle: labelStyle,
+        },
+        // `.filter-row .btn.ghost` — a bordered chip, not a text button.
+        "ghost-chip": {
+          fill: colorToken("surface.default"),
+          stroke: colorToken("border.strong"),
+          text: colorToken("text.primary"),
+          height: 32,
+          radius: 8,
+          paddingX: 12,
+          paddingY: 0,
           labelTextStyle: labelStyle,
         },
         danger: {
           fill: colorToken("surface.default"),
+          stroke: colorToken("status.danger"),
+          strokeAlpha: 0.4,
           text: colorToken("status.danger"),
+          height: 36,
+          radius: 6,
+          paddingX: 16,
+          paddingY: 0,
           labelTextStyle: labelStyle,
         },
       },

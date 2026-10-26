@@ -27,6 +27,13 @@ export interface FigmaPlanNode {
   fillAlpha?: number;
   stroke?: string;
   strokeWidth?: number;
+  /** Per-side borders mirror CSS border-{top,bottom,left}; width defaults to 1. */
+  borderTop?: string;
+  borderTopWidth?: number;
+  borderBottom?: string;
+  borderBottomWidth?: number;
+  borderLeft?: string;
+  borderLeftWidth?: number;
   shadow?: boolean;
   radius?: number;
   clip?: boolean;
@@ -50,6 +57,20 @@ export interface FigmaPlanNode {
   children?: FigmaPlanNode[];
 }
 
+export interface FigmaButtonVariant {
+  fill?: string;
+  fillAlpha?: number;
+  text: string;
+  stroke?: string;
+  strokeWidth?: number;
+  strokeAlpha?: number;
+  radius?: number;
+  paddingX?: number;
+  paddingY?: number;
+  height?: number;
+  labelTextStyle: string;
+}
+
 export interface FigmaPlan {
   schemaVersion: "1.0";
   project: string;
@@ -62,10 +83,7 @@ export interface FigmaPlan {
   textStyles: Record<string, TextStyleDef>;
   components: {
     Button: {
-      variants: Record<
-        "primary" | "secondary" | "ghost" | "danger",
-        { fill: string; text: string; labelTextStyle: string }
-      >;
+      variants: Record<string, FigmaButtonVariant>;
     };
   };
   root: FigmaPlanNode;
@@ -150,6 +168,12 @@ const FigmaPlanNodeSchema: z.ZodType<FigmaPlanNode> = z.lazy(() =>
       fillAlpha: z.number().min(0).max(1).optional(),
       stroke: z.string().min(1).optional(),
       strokeWidth: z.number().nonnegative().optional(),
+      borderTop: z.string().min(1).optional(),
+      borderTopWidth: z.number().nonnegative().optional(),
+      borderBottom: z.string().min(1).optional(),
+      borderBottomWidth: z.number().nonnegative().optional(),
+      borderLeft: z.string().min(1).optional(),
+      borderLeftWidth: z.number().nonnegative().optional(),
       shadow: z.boolean().optional(),
       radius: z.number().nonnegative().optional(),
       clip: z.boolean().optional(),
@@ -226,11 +250,19 @@ export const FigmaPlanSchema: z.ZodType<FigmaPlan> = z
         Button: z
           .object({
             variants: z.record(
-              z.enum(["primary", "secondary", "ghost", "danger"]),
+              z.string().min(1),
               z
                 .object({
-                  fill: z.string().min(1),
+                  fill: z.string().min(1).optional(),
+                  fillAlpha: z.number().min(0).max(1).optional(),
                   text: z.string().min(1),
+                  stroke: z.string().min(1).optional(),
+                  strokeWidth: z.number().nonnegative().optional(),
+                  strokeAlpha: z.number().min(0).max(1).optional(),
+                  radius: z.number().nonnegative().optional(),
+                  paddingX: z.number().nonnegative().optional(),
+                  paddingY: z.number().nonnegative().optional(),
+                  height: z.number().nonnegative().optional(),
                   labelTextStyle: z.string().min(1),
                 })
                 .strict()

@@ -81,10 +81,18 @@ async function ensureCollection(plan: FigmaPlan): Promise<void> {
   }
   // Figma drops paint opacity for variable-bound fills, so tinted tokens need
   // their own RGBA variable (one per token+alpha pair used by the plan).
+  const alphaPairs: Array<{ token: string; alpha: number }> = [];
   for (const node of planNodes(plan.root)) {
-    const fill = node.fill;
-    const alpha = node.fillAlpha;
-    if (fill === undefined || alpha === undefined || alpha >= 1) continue;
+    if (node.fill !== undefined && node.fillAlpha !== undefined && node.fillAlpha < 1) {
+      alphaPairs.push({ token: node.fill, alpha: node.fillAlpha });
+    }
+  }
+  for (const style of Object.values(plan.components.Button.variants)) {
+    if (style.stroke !== undefined && style.strokeAlpha !== undefined && style.strokeAlpha < 1) {
+      alphaPairs.push({ token: style.stroke, alpha: style.strokeAlpha });
+    }
+  }
+  for (const { token: fill, alpha } of alphaPairs) {
     const key = `${fill}@${alpha}`;
     if (alphaVariables[key] !== undefined) continue;
     const name = `${fill}/alpha-${Math.round(alpha * 100)}`;
@@ -169,16 +177,32 @@ async function ensureButtonSet(plan: FigmaPlan, page: FigmaNode): Promise<void> 
     component.layoutMode = "HORIZONTAL";
     component.primaryAxisSizingMode = "AUTO";
     component.counterAxisSizingMode = "AUTO";
-    component.paddingLeft = 16;
-    component.paddingRight = 16;
-    component.paddingTop = 8;
-    component.paddingBottom = 8;
-    component.cornerRadius = 6;
-    component.fills = [paint(style.fill, plan)];
+    component.paddingLeft = style.paddingX ?? 16;
+    component.paddingRight = style.paddingX ?? 16;
+    component.paddingTop = style.paddingY ?? 8;
+    component.paddingBottom = style.paddingY ?? 8;
+    component.cornerRadius = style.radius ?? 6;
+    component.fills =
+      style.fill === undefined ? [] : [paint(style.fill, plan, style.fillAlpha ?? 1)];
+    if (style.stroke !== undefined) {
+      component.strokes = [paint(style.stroke, plan, style.strokeAlpha ?? 1)];
+      component.strokeWeight = style.strokeWidth ?? 1;
+      component.strokeAlign = "INSIDE";
+    } else {
+      component.strokes = [];
+    }
+    if (style.height !== undefined) {
+      component.resize(component.width, style.height);
+      component.counterAxisSizingMode = "FIXED";
+    }
+    const variantLabelStyle = await ensureTextStyle(
+      plan,
+      style.labelTextStyle ?? bodyStyle
+    );
     const label = figma.createText();
     label.name = "Label";
-    await figma.loadFontAsync(labelStyle.fontName);
-    await label.setTextStyleIdAsync(labelStyle.id);
+    await figma.loadFontAsync(variantLabelStyle.fontName);
+    await label.setTextStyleIdAsync(variantLabelStyle.id);
     label.characters = "按钮";
     label.fills = [paint(style.text, plan)];
     component.appendChild(label);
@@ -235,9 +259,26 @@ function applyFrameStyle(node: FigmaNode, planNode: FigmaPlanNode, plan: FigmaPl
   } else {
     node.fills = [];
   }
-  if (planNode.stroke !== undefined) {
+  const borderTop = planNode.borderTop;
+  const borderBottom = planNode.borderBottom;
+  const borderLeft = planNode.borderLeft;
+  if (borderTop !== undefined || borderBottom !== undefined || borderLeft !== undefined) {
+    const token = borderTop ?? borderBottom ?? borderLeft!;
+    node.strokes = [paint(token, plan)];
+    node.strokeAlign = "INSIDE";
+    node.strokeTopWeight =
+      borderTop === undefined ? 0 : (planNode.borderTopWidth ?? 1);
+    node.strokeBottomWeight =
+      borderBottom === undefined ? 0 : (planNode.borderBottomWidth ?? 1);
+    node.strokeLeftWeight =
+      borderLeft === undefined ? 0 : (planNode.borderLeftWidth ?? 1);
+    node.strokeRightWeight = 0;
+    node.setPluginData("strokeToken", token);
+  } else if (planNode.stroke !== undefined) {
     node.strokes = [paint(planNode.stroke, plan)];
     node.strokeWeight = planNode.strokeWidth ?? 1;
+    node.strokeAlign = "INSIDE";
+    node.setPluginData("strokeToken", planNode.stroke);
   }
   if (planNode.radius !== undefined) node.cornerRadius = planNode.radius;
   if (planNode.shadow === true) {
