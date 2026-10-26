@@ -327,6 +327,59 @@ describe("spec:engineer CLI", () => {
     ).resolves.toContain("SPEC_ASSET_UNUSED");
   });
 
+  it("writes a block manifest for every page", async () => {
+    const agentRun = await makeM1Run();
+    const runs = await tempDir("prd-ui-spec-out-");
+
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await singleRunDir(runs);
+    for (const page of ["today", "inventory-query"]) {
+      const manifest = JSON.parse(
+        await readFile(
+          path.join(runDir, "artifacts", "block-manifest", `${page}.json`),
+          "utf8"
+        )
+      ) as { pageId: string; project: string; blocks: unknown[] };
+      expect(manifest.blocks.length).toBeGreaterThan(0);
+      expect(manifest.pageId).toBe(page);
+      expect(manifest.project).toBe("employee-app");
+    }
+  });
+
+  it("writes no block manifests when the spec gate fails", async () => {
+    const agentRun = await makeM1Run({
+      motionBindings: [
+        { pageId: "today", nodeId: "today.unknown-node", preset: "page-enter" },
+      ],
+    });
+    const runs = await tempDir("prd-ui-spec-out-");
+
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+      "--strict-motion",
+    ]);
+    expect(result.code).toBe(1);
+
+    const runDir = await singleRunDir(runs);
+    await expect(
+      readFile(path.join(runDir, "artifacts", "block-manifest", "today.json"), "utf8")
+    ).rejects.toThrow();
+  });
+
   it("writes a warning-only structure lint report", async () => {
     const agentRun = await makeM1Run();
     const runs = await tempDir("prd-ui-spec-out-");

@@ -11,7 +11,7 @@ import {
   type StructureLintReport,
   type UiBrief,
 } from "@prd-ui/contracts";
-import { compileProject } from "@prd-ui/compiler";
+import { compileProject, splitBlocks } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import {
   IaMapArtifactSchema,
@@ -403,6 +403,8 @@ export async function main(
     if (result.gate.passed) {
       for (const spec of result.specs) {
         await store.writeJson(`artifacts/page-spec/${spec.meta.pageId}.json`, spec);
+        const manifest = splitBlocks(spec, getArchetype(spec.meta.archetype));
+        await store.writeJson(`artifacts/block-manifest/${spec.meta.pageId}.json`, manifest);
       }
     }
 
