@@ -1037,7 +1037,6 @@ body[data-state="error"] .app[data-page-archetype="mobile-list"] .empty-state{di
 .loading-grid i{display:block;border-radius:2px;background:#E7E9ED;}
 body[data-state="loading"] .calendar-block{display:none;}
 body[data-state="loading"] .calendar-cell{background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-color:var(--color-border-strong);}
-body[data-state="loading"] .calendar-cell.selected{background:color-mix(in srgb,var(--color-status-info) 4%,white);}
 body[data-state="loading"] .app[data-page-archetype="detail"] .badge,
 body[data-state="loading"] .app[data-page-archetype="detail"] .app-scroll .filter-row,
 body[data-state="loading"] .app[data-page-archetype="detail"] .app-actions{visibility:hidden;}
@@ -1129,10 +1128,11 @@ body[data-page-kind="form"] .form-field[data-field=customer] .input:disabled{bac
 .input,.select{height:36px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;padding:0 10px;font:inherit;font-size:14px;color:#0F172A;width:100%;}
 .input:focus,.select:focus{outline:2px solid #BFDBFE;border-color:#2563EB;}
 .datetime-control{position:relative;display:block;}
-.datetime-display{position:absolute;inset:0 34px 0 10px;display:flex;align-items:center;background:#fff;color:#94A3B8;font-size:14px;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.datetime-display{position:absolute;inset:1px 34px 1px 10px;display:flex;align-items:center;background:#fff;color:#94A3B8;font-size:14px;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .datetime-display.filled{color:#0F172A;}
 .datetime-control:focus-within .datetime-display{display:none;}
 .datetime-control:has(.input:disabled) .datetime-display{background:var(--color-surface-subtle);color:var(--color-text-tertiary);opacity:1;}
+.datetime-control .input:disabled{opacity:1;}
 .form-field .row{align-items:center;}
 .form-field .row .input{flex:1;min-width:0;}
 .form-field .row .btn{flex:0 0 auto;}
@@ -1203,6 +1203,10 @@ function renderInteractionScript(): string {
     const noteHost = document.querySelector(".app-scroll");
     const rowLabel = (row) => row.querySelector(".list-text-label")?.textContent ?? "";
     const rowValue = (row) => row.querySelector(".list-text-value");
+    const pad2 = (value) => String(value).padStart(2, "0");
+    const formatDateTime = (date) =>
+      date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate()) +
+      " " + pad2(date.getHours()) + ":" + pad2(date.getMinutes());
     const summaryValue = (label) => {
       for (const row of qsa(".app-scroll .list-text-row")) {
         if (rowLabel(row) !== label) continue;
@@ -1278,7 +1282,7 @@ function renderInteractionScript(): string {
             ? confirmedAt.textContent
             : atSummary !== "" && atSummary !== "—"
               ? atSummary
-              : new Date().toLocaleString("zh-CN", { hour12: false });
+              : formatDateTime(new Date());
         if (confirmedBy && (confirmedBy.textContent ?? "").trim() === "—") {
           confirmedBy.textContent = byValue;
         }

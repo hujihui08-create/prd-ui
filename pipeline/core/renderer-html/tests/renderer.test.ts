@@ -566,6 +566,57 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(detail).toContain("action !== \"术后告知\"");
   });
 
+  it("keeps the datetime container visible when disabled", () => {
+    const form = renderDocument(
+      phase2ById.get("appointment-form")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(form).toContain(
+      ".datetime-display{position:absolute;inset:1px 34px 1px 10px;"
+    );
+    expect(form).toContain(".datetime-control .input:disabled{opacity:1;}");
+  });
+
+  it("shimmers the selected calendar column while loading", () => {
+    const list = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(list).toContain(
+      'body[data-state="loading"] .calendar-cell{background:linear-gradient'
+    );
+    expect(list).not.toContain(
+      'body[data-state="loading"] .calendar-cell.selected'
+    );
+  });
+
+  it("formats the runtime confirmed time without seconds", () => {
+    const notice = renderDocument(
+      phase2ById.get("treatment-notice")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(notice).toContain("const formatDateTime = (date) =>");
+    expect(notice).toContain("formatDateTime(new Date())");
+    expect(notice).not.toContain('toLocaleString("zh-CN", { hour12: false })');
+  });
+
+  it("keeps all seven calendar columns on the same style contract", () => {
+    const list = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    const days = list.match(/class="calendar-day[^"]*"/g) ?? [];
+    expect(days).toHaveLength(7);
+    expect(list).toContain(
+      ".app .calendar-grid{grid-template-columns:36px repeat(7,minmax(0,1fr));min-width:0;}"
+    );
+    expect(list).not.toContain("calendar-day.sunday");
+  });
+
   it("carries page archetypes and validates the runtime picker return target", () => {
     const search = renderDocument(
       phase2ById.get("customer-search")!,
