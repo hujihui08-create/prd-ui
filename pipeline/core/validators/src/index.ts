@@ -8,4 +8,5 @@ export * from "./asset.js";
 export * from "./traceability.js";
 export * from "./semantic.js";
 export * from "./structure.js";
+export * from "./structure-measured.js";
 export * from "./validate.js";
