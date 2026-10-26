@@ -229,6 +229,8 @@ export const bDenseCatalog: Catalog = {
         title: { type: "string", required: true },
         badge: { type: "string" },
         badgeTone: { type: "enum", enum: ["neutral", "success", "warning", "danger"] },
+        actionLabel: { type: "string" },
+        actionRoute: { type: "string" },
       },
       variants: ["default", "interactive"],
       states: ["default", "hover", "loading"],

@@ -1,0 +1,929 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "today",
+  "pageName": "今日",
+  "width": 390,
+  "height": 844,
+  "background": "color/surface/subtle",
+  "tokens": {
+    "color/surface/default": "#FFFFFF",
+    "color/surface/subtle": "#F5F6F8",
+    "color/surface/raised": "#FFFFFF",
+    "color/text/primary": "#111827",
+    "color/text/secondary": "#4B5563",
+    "color/text/tertiary": "#5B6472",
+    "color/text/onAction": "#FFFFFF",
+    "color/action/primary": "#111827",
+    "color/action/secondary": "#F3F4F6",
+    "color/accent/customer": "#2563EB",
+    "color/accent/inventory": "#F97316",
+    "color/status/success": "#166534",
+    "color/status/warning": "#92400E",
+    "color/status/danger": "#991B1B",
+    "color/status/info": "#1D4ED8",
+    "color/border/subtle": "#E5E7EB",
+    "color/border/strong": "#D1D5DB",
+    "space/1": "4px",
+    "space/2": "8px",
+    "space/3": "12px",
+    "space/4": "16px",
+    "space/6": "24px",
+    "space/8": "32px",
+    "radius/sm": "4px",
+    "radius/md": "6px",
+    "radius/lg": "12px",
+    "radius/full": "9999px"
+  },
+  "textStyles": {
+    "b-mobile/heading.1": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 24,
+      "fontWeight": 600,
+      "lineHeight": 32
+    },
+    "b-mobile/heading.2": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "lineHeight": 24
+    },
+    "b-mobile/heading.3": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 22
+    },
+    "b-mobile/body.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 500,
+      "lineHeight": 18
+    },
+    "b-mobile/body.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16
+    },
+    "b-mobile/label.strong": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "lineHeight": 16
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "fill": "color/action/primary",
+          "text": "color/text/onAction",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "secondary": {
+          "fill": "color/surface/default",
+          "text": "color/text/primary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost": {
+          "fill": "color/surface/default",
+          "text": "color/text/secondary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "danger": {
+          "fill": "color/surface/default",
+          "text": "color/status/danger",
+          "labelTextStyle": "b-mobile/body.md"
+        }
+      }
+    }
+  },
+  "root": {
+    "specId": "today.page.root",
+    "type": "FRAME",
+    "name": "今日",
+    "layoutMode": "VERTICAL",
+    "children": [
+      {
+        "specId": "today.root.top-bar.0",
+        "type": "FRAME",
+        "name": "TopBar",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "today.root.top-bar.0.left",
+            "type": "FRAME",
+            "name": "Store",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "today.root.top-bar.0.store",
+                "type": "TEXT",
+                "name": "StoreName",
+                "characters": "星光店",
+                "textStyle": "b-mobile/heading.2",
+                "color": "color/text/primary"
+              },
+              {
+                "specId": "today.root.top-bar.0.chevron",
+                "type": "GLYPH",
+                "name": "Chevron",
+                "glyph": "expand_more",
+                "size": 20,
+                "color": "color/text/secondary"
+              }
+            ],
+            "gap": 2,
+            "alignItems": "CENTER",
+            "justifyContent": "START"
+          }
+        ],
+        "height": 48,
+        "paddingX": 16,
+        "fill": "color/surface/subtle",
+        "alignItems": "CENTER",
+        "justifyContent": "SPACE_BETWEEN"
+      },
+      {
+        "specId": "today.page.root.content",
+        "type": "FRAME",
+        "name": "Content",
+        "layoutMode": "VERTICAL",
+        "children": [
+          {
+            "specId": "today.root.content.0",
+            "type": "FRAME",
+            "name": "Section",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "today.card.quick-actions",
+                "type": "FRAME",
+                "name": "Card",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "today.card.quick-actions.head",
+                    "type": "FRAME",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "today.card.quick-actions.title",
+                        "type": "TEXT",
+                        "name": "Title",
+                        "characters": "快捷操作",
+                        "textStyle": "b-mobile/heading.2",
+                        "color": "color/text/primary"
+                      }
+                    ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN"
+                  },
+                  {
+                    "specId": "today.card.quick-actions.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "today.root.content.0.children.0.children.0",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.quick.create-order",
+                            "type": "FRAME",
+                            "name": "QuickAction",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.quick.create-order.icon",
+                                "type": "GLYPH",
+                                "name": "Icon",
+                                "glyph": "add",
+                                "size": 24,
+                                "color": "color/action/primary"
+                              },
+                              {
+                                "specId": "today.quick.create-order.label",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "开单",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary"
+                              }
+                            ],
+                            "height": 56,
+                            "layoutGrow": 1,
+                            "fill": "color/surface/subtle",
+                            "fillAlpha": 1,
+                            "radius": 6,
+                            "gap": 8,
+                            "alignItems": "CENTER",
+                            "justifyContent": "CENTER"
+                          },
+                          {
+                            "specId": "today.quick.new-appointment",
+                            "type": "FRAME",
+                            "name": "QuickAction",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.quick.new-appointment.icon",
+                                "type": "GLYPH",
+                                "name": "Icon",
+                                "glyph": "add",
+                                "size": 24,
+                                "color": "color/action/primary"
+                              },
+                              {
+                                "specId": "today.quick.new-appointment.label",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "预约",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary"
+                              }
+                            ],
+                            "height": 56,
+                            "layoutGrow": 1,
+                            "fill": "color/surface/subtle",
+                            "fillAlpha": 1,
+                            "radius": 6,
+                            "gap": 8,
+                            "alignItems": "CENTER",
+                            "justifyContent": "CENTER"
+                          },
+                          {
+                            "specId": "today.quick.customer-search",
+                            "type": "FRAME",
+                            "name": "QuickAction",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.quick.customer-search.icon",
+                                "type": "GLYPH",
+                                "name": "Icon",
+                                "glyph": "search",
+                                "size": 24,
+                                "color": "color/accent/customer"
+                              },
+                              {
+                                "specId": "today.quick.customer-search.label",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "客户搜索",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary"
+                              }
+                            ],
+                            "height": 56,
+                            "layoutGrow": 1,
+                            "fill": "color/accent/customer",
+                            "fillAlpha": 0.1,
+                            "radius": 6,
+                            "gap": 8,
+                            "alignItems": "CENTER",
+                            "justifyContent": "CENTER"
+                          }
+                        ],
+                        "gap": 0,
+                        "alignItems": "CENTER"
+                      }
+                    ],
+                    "gap": 0
+                  }
+                ],
+                "padding": 16,
+                "gap": 8,
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true
+              },
+              {
+                "specId": "today.card.appointments",
+                "type": "FRAME",
+                "name": "Card",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "today.card.appointments.head",
+                    "type": "FRAME",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "today.card.appointments.title",
+                        "type": "TEXT",
+                        "name": "Title",
+                        "characters": "我的预约",
+                        "textStyle": "b-mobile/heading.2",
+                        "color": "color/text/primary"
+                      },
+                      {
+                        "specId": "today.card.appointments.action",
+                        "type": "TEXT",
+                        "name": "Action",
+                        "characters": "查看全部 ›",
+                        "textStyle": "b-mobile/label.sm",
+                        "color": "color/text/secondary"
+                      }
+                    ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN"
+                  },
+                  {
+                    "specId": "today.card.appointments.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "today.row.appointment.0",
+                        "type": "FRAME",
+                        "name": "ListRow",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.row.appointment.0.main",
+                            "type": "FRAME",
+                            "name": "Main",
+                            "layoutMode": "VERTICAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.0.titleRow",
+                                "type": "FRAME",
+                                "name": "TitleRow",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "today.row.appointment.0.title",
+                                    "type": "TEXT",
+                                    "name": "Title",
+                                    "characters": "张女士",
+                                    "textStyle": "b-mobile/heading.3",
+                                    "color": "color/text/primary"
+                                  },
+                                  {
+                                    "specId": "today.row.appointment.0.badge",
+                                    "type": "FRAME",
+                                    "name": "Badge",
+                                    "layoutMode": "HORIZONTAL",
+                                    "children": [
+                                      {
+                                        "specId": "today.row.appointment.0.badge.label",
+                                        "type": "TEXT",
+                                        "name": "Label",
+                                        "characters": "已登记",
+                                        "textStyle": "b-mobile/label.strong",
+                                        "color": "color/status/warning"
+                                      }
+                                    ],
+                                    "height": 20,
+                                    "paddingX": 6,
+                                    "radius": 4,
+                                    "fill": "color/status/warning",
+                                    "fillAlpha": 0.12,
+                                    "alignItems": "CENTER",
+                                    "justifyContent": "CENTER"
+                                  }
+                                ],
+                                "gap": 6,
+                                "alignItems": "CENTER"
+                              },
+                              {
+                                "specId": "today.row.appointment.0.subtitle",
+                                "type": "TEXT",
+                                "name": "Subtitle",
+                                "characters": "小气泡",
+                                "textStyle": "b-mobile/body.sm",
+                                "color": "color/text/secondary"
+                              }
+                            ],
+                            "layoutGrow": 1,
+                            "gap": 2
+                          },
+                          {
+                            "specId": "today.row.appointment.0.meta",
+                            "type": "FRAME",
+                            "name": "Meta",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.0.metaText",
+                                "type": "TEXT",
+                                "name": "Meta",
+                                "characters": "10:00-11:00",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/secondary"
+                              },
+                              {
+                                "specId": "today.row.appointment.0.chevron",
+                                "type": "GLYPH",
+                                "name": "Chevron",
+                                "glyph": "chevron_right",
+                                "size": 16,
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "gap": 2,
+                            "alignItems": "CENTER"
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "today.row.appointment.1",
+                        "type": "FRAME",
+                        "name": "ListRow",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.row.appointment.1.main",
+                            "type": "FRAME",
+                            "name": "Main",
+                            "layoutMode": "VERTICAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.1.titleRow",
+                                "type": "FRAME",
+                                "name": "TitleRow",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "today.row.appointment.1.title",
+                                    "type": "TEXT",
+                                    "name": "Title",
+                                    "characters": "李女士",
+                                    "textStyle": "b-mobile/heading.3",
+                                    "color": "color/text/primary"
+                                  },
+                                  {
+                                    "specId": "today.row.appointment.1.badge",
+                                    "type": "FRAME",
+                                    "name": "Badge",
+                                    "layoutMode": "HORIZONTAL",
+                                    "children": [
+                                      {
+                                        "specId": "today.row.appointment.1.badge.label",
+                                        "type": "TEXT",
+                                        "name": "Label",
+                                        "characters": "已到店",
+                                        "textStyle": "b-mobile/label.strong",
+                                        "color": "color/status/success"
+                                      }
+                                    ],
+                                    "height": 20,
+                                    "paddingX": 6,
+                                    "radius": 4,
+                                    "fill": "color/status/success",
+                                    "fillAlpha": 0.12,
+                                    "alignItems": "CENTER",
+                                    "justifyContent": "CENTER"
+                                  }
+                                ],
+                                "gap": 6,
+                                "alignItems": "CENTER"
+                              },
+                              {
+                                "specId": "today.row.appointment.1.subtitle",
+                                "type": "TEXT",
+                                "name": "Subtitle",
+                                "characters": "补水",
+                                "textStyle": "b-mobile/body.sm",
+                                "color": "color/text/secondary"
+                              }
+                            ],
+                            "layoutGrow": 1,
+                            "gap": 2
+                          },
+                          {
+                            "specId": "today.row.appointment.1.meta",
+                            "type": "FRAME",
+                            "name": "Meta",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.1.metaText",
+                                "type": "TEXT",
+                                "name": "Meta",
+                                "characters": "14:00-15:00",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/secondary"
+                              },
+                              {
+                                "specId": "today.row.appointment.1.chevron",
+                                "type": "GLYPH",
+                                "name": "Chevron",
+                                "glyph": "chevron_right",
+                                "size": 16,
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "gap": 2,
+                            "alignItems": "CENTER"
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "today.row.appointment.2",
+                        "type": "FRAME",
+                        "name": "ListRow",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.row.appointment.2.main",
+                            "type": "FRAME",
+                            "name": "Main",
+                            "layoutMode": "VERTICAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.2.titleRow",
+                                "type": "FRAME",
+                                "name": "TitleRow",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "today.row.appointment.2.title",
+                                    "type": "TEXT",
+                                    "name": "Title",
+                                    "characters": "王女士",
+                                    "textStyle": "b-mobile/heading.3",
+                                    "color": "color/text/primary"
+                                  },
+                                  {
+                                    "specId": "today.row.appointment.2.badge",
+                                    "type": "FRAME",
+                                    "name": "Badge",
+                                    "layoutMode": "HORIZONTAL",
+                                    "children": [
+                                      {
+                                        "specId": "today.row.appointment.2.badge.label",
+                                        "type": "TEXT",
+                                        "name": "Label",
+                                        "characters": "已登记",
+                                        "textStyle": "b-mobile/label.strong",
+                                        "color": "color/status/warning"
+                                      }
+                                    ],
+                                    "height": 20,
+                                    "paddingX": 6,
+                                    "radius": 4,
+                                    "fill": "color/status/warning",
+                                    "fillAlpha": 0.12,
+                                    "alignItems": "CENTER",
+                                    "justifyContent": "CENTER"
+                                  }
+                                ],
+                                "gap": 6,
+                                "alignItems": "CENTER"
+                              },
+                              {
+                                "specId": "today.row.appointment.2.subtitle",
+                                "type": "TEXT",
+                                "name": "Subtitle",
+                                "characters": "肩颈",
+                                "textStyle": "b-mobile/body.sm",
+                                "color": "color/text/secondary"
+                              }
+                            ],
+                            "layoutGrow": 1,
+                            "gap": 2
+                          },
+                          {
+                            "specId": "today.row.appointment.2.meta",
+                            "type": "FRAME",
+                            "name": "Meta",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.row.appointment.2.metaText",
+                                "type": "TEXT",
+                                "name": "Meta",
+                                "characters": "16:30-17:30",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/secondary"
+                              },
+                              {
+                                "specId": "today.row.appointment.2.chevron",
+                                "type": "GLYPH",
+                                "name": "Chevron",
+                                "glyph": "chevron_right",
+                                "size": 16,
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "gap": 2,
+                            "alignItems": "CENTER"
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      }
+                    ],
+                    "gap": 0
+                  }
+                ],
+                "padding": 16,
+                "gap": 8,
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true
+              },
+              {
+                "specId": "today.card.callbacks",
+                "type": "FRAME",
+                "name": "Card",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "today.card.callbacks.head",
+                    "type": "FRAME",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "today.card.callbacks.title",
+                        "type": "TEXT",
+                        "name": "Title",
+                        "characters": "待回访",
+                        "textStyle": "b-mobile/heading.2",
+                        "color": "color/text/primary"
+                      }
+                    ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN"
+                  },
+                  {
+                    "specId": "today.card.callbacks.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "today.row.callback.0",
+                        "type": "FRAME",
+                        "name": "ListRow",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.row.callback.0.main",
+                            "type": "FRAME",
+                            "name": "Main",
+                            "layoutMode": "VERTICAL",
+                            "children": [
+                              {
+                                "specId": "today.row.callback.0.titleRow",
+                                "type": "FRAME",
+                                "name": "TitleRow",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "today.row.callback.0.title",
+                                    "type": "TEXT",
+                                    "name": "Title",
+                                    "characters": "张女士",
+                                    "textStyle": "b-mobile/heading.3",
+                                    "color": "color/text/primary"
+                                  }
+                                ],
+                                "gap": 6,
+                                "alignItems": "CENTER"
+                              },
+                              {
+                                "specId": "today.row.callback.0.subtitle",
+                                "type": "TEXT",
+                                "name": "Subtitle",
+                                "characters": "小气泡",
+                                "textStyle": "b-mobile/body.sm",
+                                "color": "color/text/secondary"
+                              }
+                            ],
+                            "layoutGrow": 1,
+                            "gap": 2
+                          },
+                          {
+                            "specId": "today.row.callback.0.meta",
+                            "type": "FRAME",
+                            "name": "Meta",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.row.callback.0.metaText",
+                                "type": "TEXT",
+                                "name": "Meta",
+                                "characters": "3 天前",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/secondary"
+                              },
+                              {
+                                "specId": "today.row.callback.0.chevron",
+                                "type": "GLYPH",
+                                "name": "Chevron",
+                                "glyph": "chevron_right",
+                                "size": 16,
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "gap": 2,
+                            "alignItems": "CENTER"
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "today.row.callback.1",
+                        "type": "FRAME",
+                        "name": "ListRow",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "today.row.callback.1.main",
+                            "type": "FRAME",
+                            "name": "Main",
+                            "layoutMode": "VERTICAL",
+                            "children": [
+                              {
+                                "specId": "today.row.callback.1.titleRow",
+                                "type": "FRAME",
+                                "name": "TitleRow",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "today.row.callback.1.title",
+                                    "type": "TEXT",
+                                    "name": "Title",
+                                    "characters": "李女士",
+                                    "textStyle": "b-mobile/heading.3",
+                                    "color": "color/text/primary"
+                                  }
+                                ],
+                                "gap": 6,
+                                "alignItems": "CENTER"
+                              },
+                              {
+                                "specId": "today.row.callback.1.subtitle",
+                                "type": "TEXT",
+                                "name": "Subtitle",
+                                "characters": "补水",
+                                "textStyle": "b-mobile/body.sm",
+                                "color": "color/text/secondary"
+                              }
+                            ],
+                            "layoutGrow": 1,
+                            "gap": 2
+                          },
+                          {
+                            "specId": "today.row.callback.1.meta",
+                            "type": "FRAME",
+                            "name": "Meta",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "today.row.callback.1.metaText",
+                                "type": "TEXT",
+                                "name": "Meta",
+                                "characters": "7 天前",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/secondary"
+                              },
+                              {
+                                "specId": "today.row.callback.1.chevron",
+                                "type": "GLYPH",
+                                "name": "Chevron",
+                                "glyph": "chevron_right",
+                                "size": 16,
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "gap": 2,
+                            "alignItems": "CENTER"
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      }
+                    ],
+                    "gap": 0
+                  }
+                ],
+                "padding": 16,
+                "gap": 8,
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true
+              }
+            ],
+            "padding": 0,
+            "gap": 0
+          }
+        ],
+        "layoutGrow": 1,
+        "fill": "color/surface/subtle",
+        "gap": 0,
+        "clip": true
+      },
+      {
+        "specId": "today.root.bottom-nav.0",
+        "type": "FRAME",
+        "name": "TabBar",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "today.root.bottom-nav.0.tab.0",
+            "type": "FRAME",
+            "name": "Tab:today",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "today.root.bottom-nav.0.tab.0.icon",
+                "type": "GLYPH",
+                "name": "Icon",
+                "glyph": "circle",
+                "size": 22,
+                "color": "color/action/primary"
+              },
+              {
+                "specId": "today.root.bottom-nav.0.tab.0.label",
+                "type": "TEXT",
+                "name": "Label",
+                "characters": "today",
+                "textStyle": "b-mobile/label.sm",
+                "color": "color/action/primary"
+              }
+            ],
+            "layoutGrow": 1,
+            "gap": 2,
+            "alignItems": "CENTER",
+            "justifyContent": "CENTER"
+          },
+          {
+            "specId": "today.root.bottom-nav.0.tab.1",
+            "type": "FRAME",
+            "name": "Tab:appointment-list",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "today.root.bottom-nav.0.tab.1.icon",
+                "type": "GLYPH",
+                "name": "Icon",
+                "glyph": "circle",
+                "size": 22,
+                "color": "color/text/tertiary"
+              },
+              {
+                "specId": "today.root.bottom-nav.0.tab.1.label",
+                "type": "TEXT",
+                "name": "Label",
+                "characters": "appointment-list",
+                "textStyle": "b-mobile/label.sm",
+                "color": "color/text/tertiary"
+              }
+            ],
+            "layoutGrow": 1,
+            "gap": 2,
+            "alignItems": "CENTER",
+            "justifyContent": "CENTER"
+          }
+        ],
+        "height": 64,
+        "fill": "color/surface/default",
+        "stroke": "color/border/subtle",
+        "strokeWidth": 1,
+        "alignItems": "CENTER"
+      }
+    ],
+    "width": 390,
+    "height": 844,
+    "fill": "color/surface/subtle",
+    "clip": true
+  },
+  "stats": {
+    "frames": 44,
+    "texts": 28,
+    "instances": 0,
+    "icons": 11,
+    "images": 0
+  }
+}

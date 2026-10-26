@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root { color-scheme: dark; font-family: Inter, "PingFang SC", sans-serif; }
+      body { margin: 0; padding: 16px; background: #1e1e1e; color: #f5f5f5; font-size: 12px; }
+      h1 { font-size: 14px; margin: 0 0 4px; }
+      p { color: #b3b3b3; margin: 0 0 14px; line-height: 1.5; }
+      label { display: block; color: #b3b3b3; margin: 10px 0 6px; }
+      input[type="file"] { width: 100%; color: #ddd; }
+      select, button { width: 100%; height: 36px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: #fff; font: inherit; }
+      button { margin-top: 12px; background: #fff; color: #111; border: 0; font-weight: 600; cursor: pointer; }
+      button:disabled { opacity: .5; cursor: default; }
+      #status { margin-top: 14px; padding: 10px; border-radius: 6px; background: #2a2a2a; color: #b3b3b3; line-height: 1.5; white-space: pre-wrap; }
+      #status.error { background: #3a1f1f; color: #ffb4b4; }
+      #status.ok { background: #1f3a2a; color: #b4ffd0; }
+      a { color: #9ecbff; }
+      .muted { color: #888; font-size: 11px; }
+    </style>
+  </head>
+  <body>
+    <h1>PRD UI Figma Renderer</h1>
+    <p>选择 <code>figma-plan.&lt;page&gt;.json</code>，先做 scratch build + readback；diff 通过后再 build delivery page。</p>
+    <label for="plan">Plan file</label>
+    <input id="plan" type="file" accept="application/json,.json" />
+    <label for="mode">Build mode</label>
+    <select id="mode">
+      <option value="scratch">Scratch + readback</option>
+      <option value="delivery">Delivery page</option>
+    </select>
+    <button id="build" disabled>Build</button>
+    <div id="status">Ready. 选择 plan 后开始。</div>
+    <p class="muted">插件不能 headless；delivery page 已存在时会阻止。readback 下载后可交给 <code>pnpm figma:verify</code>。</p>
+    <script>
+      const input = document.getElementById("plan");
+      const mode = document.getElementById("mode");
+      const build = document.getElementById("build");
+      const status = document.getElementById("status");
+      let plan = null;
+
+      function setStatus(text, kind) {
+        status.textContent = text;
+        status.className = kind || "";
+      }
+
+      input.addEventListener("change", async () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        try {
+          plan = JSON.parse(await file.text());
+          build.disabled = false;
+          setStatus(`已加载 ${plan.pageId || plan.pageName || file.name}`);
+        } catch (error) {
+          plan = null;
+          build.disabled = true;
+          setStatus(`Plan 解析失败：${error.message}`, "error");
+        }
+      });
+
+      build.addEventListener("click", () => {
+        if (!plan) return;
+        build.disabled = true;
+        setStatus("Building…");
+        parent.postMessage(
+          { pluginMessage: { type: "build", plan, mode: mode.value } },
+          "*"
+        );
+      });
+
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+        if (message.type === "status") {
+          setStatus(message.message || "Working…");
+          return;
+        }
+        if (message.type === "error") {
+          build.disabled = false;
+          setStatus(`构建失败：${message.message}`, "error");
+          return;
+        }
+        if (message.type === "readback") {
+          build.disabled = false;
+          const readback = message.readback;
+          const text = JSON.stringify(readback, null, 2);
+          const blob = new Blob([text], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          status.className = "ok";
+          status.innerHTML = "";
+          const lines = [
+            `Built ${readback.pageId}`,
+            `${readback.fonts.length} fonts, ${readback.variables.length} variables, ${readback.textStyles.length} text styles`,
+            readback.errors.length > 0 ? `errors: ${readback.errors.join("; ")}` : "no plugin errors",
+          ];
+          for (const line of lines) {
+            const div = document.createElement("div");
+            div.textContent = line;
+            status.append(div);
+          }
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `figma-readback.${readback.pageId}.json`;
+          link.textContent = "下载 readback JSON";
+          status.append(link);
+        }
+      };
+    </script>
+  </body>
+</html>

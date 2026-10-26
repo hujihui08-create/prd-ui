@@ -22,15 +22,17 @@
 | v0.3 | Phase 2 验收交付（sample waiver） | L | 已完成，被 v0.3.1 替代 |
 | v0.3.1 | Clean Phase 2 收尾 | M | 已完成 |
 | v0.4 | 动效 + 视觉回归 | L | 已完成，6 条 major 转入 v0.5 |
-| **v0.4.1** | **视觉小额补丁** | **S** | **建议下一步** |
-| **v0.5** | **视觉 + a11y 收口** | **M** | 未开始 |
-| v0.6 | Phase 3A：Figma + Studio | L | 未开始 |
+| **v0.4.1** | **视觉小额补丁** | **S** | **已完成（signed）** |
+| **v0.5** | **视觉 + a11y 收口** | **M** | **已完成（signed）** |
+| v0.6 | Phase 3A：Figma + Studio | L | Implemented（Figma gate pending） |
 | v0.7 | Phase 3B：沙箱 + Test Subagent + Handoff | L | 未开始 |
 | v0.8 | Phase 4A：真实项目试点 | L | 未开始 |
 | v0.9 | Release Candidate | M | 未开始 |
 | v1.0 | 最终交付 | — | 未开始 |
 
 ## 2. v0.4.1 视觉小额补丁
+
+**状态（2026-10-23）**：已完成并签核（胡冀徽，`waivers=[]`）。6 项目标 finding 已修复；剩余 v0.5 的 empty/loading/mode-pills major 和既有 `取消` 危险语义 major 作为 v0.5 债务。baseline 已更新。见 [实施交接](../../handoffs/2026-10-23-v041-implementation-handoff.md)。
 
 **目标**：清掉“明显没收尾”的视觉项，不引入新能力。
 
@@ -53,6 +55,8 @@
 
 ## 3. v0.5 视觉 + a11y 收口
 
+**状态（2026-10-23）**：已完成并签核（胡冀徽，`acceptedMajors=[]`，`waivers=[]`）。真实 Critic 0 major / 4 minor / 0 blocker；baseline manifest `sha256:6c900b29…c79f`。4 个 minor 留 v0.5.x。见 [v0.5 交接](../../handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md)。
+
 **目标**：把 Visual Critic 的剩余 major 和基础可访问性收口，作为 Phase 3 的视觉基线。
 
 范围：
@@ -72,6 +76,8 @@
 - 全量回归绿。
 
 ## 4. v0.6 Phase 3A：Figma + Studio + Asset Compiler
+
+**状态（2026-10-25）**：自动化部分已实现（Figma plan/plugin/readback diff、Asset Compiler、只读 Studio；688 tests）。真实 Figma scratch/delivery/readback 未执行，Brio MCP 未连接，**未签核**。见 [v0.6 进度交接](../../handoffs/2026-10-25-v06-phase3a-progress-handoff.md)。
 
 **目标**：把 Page Spec 变成可交付的 Figma 源文件和可用工作台。
 
@@ -161,9 +167,9 @@
 
 ## 9. 当前建议
 
-1. 先做 **v0.4.1**：低风险视觉补丁，1 轮。
-2. 再做 **v0.5**：结构视觉 + a11y + critic 停止规则。
-3. v0.5 通过后再进 **v0.6/v0.7**，避免 Figma/沙箱复制未收口的视觉债。
+1. **v0.4.1 已完成并签核**（视觉补丁）。
+2. **v0.5 已完成并签核**（结构视觉 + a11y + critic 停止规则；0 major / 4 minor，minor 留 v0.5.x）。
+3. 下一步进入 **v0.6/v0.7**：Figma/Studio/Asset Compiler，再 sandbox/Test Subagent/Handoff。
 4. **v0.8** 真实项目试点通过后，才进入 v0.9/v1.0。
 
-每进入一个版本，单独写 spec → plan → 执行 → 验收；不要把 v0.4.1 和 v0.5 合并成一个大 spec。
+每进入一个版本，单独写 spec → plan → 执行 → 验收；不要把多个版本合并成一个大 spec。

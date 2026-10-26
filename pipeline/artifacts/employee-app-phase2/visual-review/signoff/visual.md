@@ -2,10 +2,13 @@
 
 <!-- signoff
 {
-  "signer": "Sample Reviewer",
-  "date": "2026-10-22",
-  "manifestHash": "sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6",
-  "findingsHash": "sha256:70a435f32b2b0b09c9eca6f6973a9fb1879a887fd06b0a67301ba1d2936d4455",
+  "signer": "胡冀徽",
+  "date": "2026-10-23",
+  "manifestHash": "sha256:6c900b2913d4f96207272ed19d751c8fa6098fa53a7078d0856d3a45ef70c79f",
+  "findingsHash": "sha256:57c9a5b412610dafd5f251173dcbc33f2beed4b58009b78c82491c10a8bab623",
+  "acceptedMajors": [],
   "waivers": []
 }
 -->
+
+v0.5 visual + a11y closure：0 blocker、0 major、4 minor。loading/empty/mode/cancel/a11y 均已收口；4 个 minor 记录为 v0.5.x 视觉债。

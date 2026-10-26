@@ -1,0 +1,7 @@
+{"type":"run_started","runId":"run-2026-10-23T06-10-08-791Z","project":"employee-app-phase2","cases":24,"runtime":"dsh","profile":"prd-ui-visual","timestamp":"2026-10-23T06:10:08.792Z"}
+{"type":"screenshots_captured","screenshots":24,"failed":0,"timestamp":"2026-10-23T06:11:29.990Z"}
+{"type":"diff_finished","passed":24,"failed":0,"missing":0,"timestamp":"2026-10-23T06:11:30.423Z"}
+{"type":"critic_cache_miss","cacheKey":"sha256:1d467f26ef93ee96870d60bb7a65307b3da04486f854d1764d7b3c13242b025f","reason":"no-cache-entry","timestamp":"2026-10-23T06:11:30.425Z"}
+{"type":"critic_finished","runtime":"dsh","model":"deepseek-flash","findings":4,"costCny":0.4105417824,"costSource":"pricing","usageComplete":true,"cacheHit":false,"cacheKey":"sha256:1d467f26ef93ee96870d60bb7a65307b3da04486f854d1764d7b3c13242b025f","timestamp":"2026-10-23T06:15:29.598Z"}
+{"type":"run_finished","status":"awaiting_signoff","findings":4,"blockers":0,"signoffValid":false,"timestamp":"2026-10-23T06:15:29.600Z"}
+{"type":"signoff_finalized","runId":"run-2026-10-23T06-10-08-791Z","status":"success","signer":"胡冀徽","manifestHash":"sha256:6c900b2913d4f96207272ed19d751c8fa6098fa53a7078d0856d3a45ef70c79f","findingsHash":"sha256:57c9a5b412610dafd5f251173dcbc33f2beed4b58009b78c82491c10a8bab623","waivedFindings":[],"cachePersisted":true,"timestamp":"2026-10-23T06:17:43.016Z"}

@@ -278,7 +278,7 @@ function stateSwitcher(): string {
 </nav>`;
 }
 
-function statePanels(): string {
+function loadingPanel(): string {
   return `
   <div class="state-panel loading" aria-hidden="true">
     <div class="skeleton short"></div>
@@ -293,8 +293,13 @@ function statePanels(): string {
       </div>
       <div class="loading-grid">${Array.from({ length: 56 }, () => "<i></i>").join("")}</div>
     </div>
-  </div>
-  <div class="state-panel error" aria-hidden="true">
+  </div>`;
+}
+
+function errorPanel(variant: "inline" | "overlay"): string {
+  const className = variant === "inline" ? "state-panel error inline" : "state-panel error";
+  return `
+  <div class="${className}" aria-hidden="true">
     <div class="error-box">
       <span class="material-symbols-rounded error-icon">cloud_off</span>
       <div class="error-title">加载失败</div>
@@ -336,7 +341,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   <div class="page-main">
     <header class="page-header-web"><h1>${esc(title)}</h1></header>
     <main class="page-body">${blocks}</main>
-    ${statePanels()}
+    ${loadingPanel()}
+    ${errorPanel("overlay")}
   </div>
 </div>`;
     }
@@ -381,6 +387,9 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       // A single tab cannot fill a bottom bar; omit the bar entirely.
       const showTabs = props.showTabs !== false && tabCount > 1;
       const back = bool(props.back);
+      const listArchetype = renderSpec?.meta.archetype === "mobile-list";
+      const inlineLoading =
+        listArchetype || renderSpec?.meta.archetype === "detail";
       const header =
         top ||
         (back
@@ -390,10 +399,11 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
             : "");
       return `<div class="app ${showTabs ? "has-tabs" : ""}" ${shellInteractionAttrs()}${motion.attrs}${inlineStyle("", motion.style)}>
   ${header}
-  <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}</main>
+  <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}${listArchetype ? errorPanel("inline") : ""}</main>
   ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
   ${showTabs ? `<nav class="tabbar">${nav}</nav>` : ""}
-  ${statePanels()}
+  ${inlineLoading ? "" : loadingPanel()}
+  ${listArchetype ? "" : errorPanel("overlay")}
 </div>`;
     }
     case "TopBar": {
@@ -521,7 +531,12 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const placeholder = str(props.placeholder);
       const inputType = str(props.inputType) || "text";
       const value = str(props.value);
-      return `<input class="input" name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${value ? ` value="${esc(value)}"` : ""} />`;
+      const required = bool(props.required);
+      const control = `<input class="input" name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${required ? ' required aria-required="true"' : ""}${value ? ` value="${esc(value)}"` : ""} />`;
+      if (inputType === "datetime-local") {
+        return `<span class="datetime-control">${control}<span class="datetime-display" aria-hidden="true">${esc(placeholder)}</span></span>`;
+      }
+      return control;
     }
     case "Select": {
       const options = stringArray(props.options);
@@ -548,10 +563,17 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const badge = str(props.badge);
       const badgeTone = str(props.badgeTone) || "neutral";
       const art = illustrationSvg(str(props.illustration));
+      const actionLabel = str(props.actionLabel);
+      const actionHref = routeHref(str(props.actionRoute));
+      const action =
+        actionLabel !== "" && actionHref !== undefined
+          ? `<a class="card-action" href="${esc(actionHref)}">${esc(actionLabel)}<span class="card-action-chevron" aria-hidden="true">›</span></a>`
+          : "";
       const motion = motionAttrs(node, renderMotionContext);
       return `<section class="card"${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="card-head">
     <h2 class="card-title">${esc(title)}${badge ? `<span class="badge tone-${esc(badgeTone)}">${esc(badge)}</span>` : ""}</h2>
+    ${action}
     ${art}
   </div>
   <div class="card-body">${children}</div>
@@ -586,27 +608,33 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const hours = stringArray(props.hours);
       const blocks = Array.isArray(props.blocks) ? props.blocks : [];
       const dayItems = days.map((entry) => {
-        if (typeof entry === "string") return { label: entry, date: "", today: false };
+        if (typeof entry === "string") {
+          return { label: entry, date: "", today: false, selected: false };
+        }
         const record = entry as Record<string, unknown>;
         return {
           label: str(record.label),
           date: str(record.date),
           today: bool(record.today),
+          selected: bool(record.selected),
         };
       });
       const rowCount = Math.max(hours.length, 1);
       const header = `<div class="calendar-corner"></div>${dayItems
-        .map(
-          (day) =>
-            `<div class="calendar-day${day.today ? " today" : ""}"><span>${esc(day.label)}</span><span class="calendar-date">${esc(day.date)}</span></div>`
-        )
+        .map((day) => {
+          const classes = ["calendar-day", day.selected ? "selected" : "", day.today ? "today" : ""]
+            .filter(Boolean)
+            .join(" ");
+          const shortDate = day.date.length === 10 ? day.date.slice(5) : day.date;
+          return `<div class="${classes}"${day.selected ? ' data-selected="true"' : ""}><span>${esc(day.label)}</span><span class="calendar-date"><span class="calendar-date-full">${esc(day.date)}</span><span class="calendar-date-short">${esc(shortDate)}</span></span></div>`;
+        })
         .join("")}`;
       const cells = hours
         .map((hour, hourIndex) => {
           const row = dayItems
             .map(
               (day, dayIndex) =>
-                `<div class="calendar-cell" data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
+                `<div class="calendar-cell${day.selected ? " selected" : ""}" data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
             )
             .join("");
           return `<div class="calendar-hour" style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
@@ -621,25 +649,40 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
               : 0;
           const start = typeof record.start === "number" ? record.start : 9;
           const duration = typeof record.duration === "number" ? record.duration : 1;
-          const rowStart = Math.max(0, Math.min(rowCount - 1, start - 9)) + 2;
-          const span = Math.max(1, Math.min(duration, rowCount - (rowStart - 2)));
+          const startHour = Math.floor(start);
+          const startMinute = Math.round((start - startHour) * 60);
+          const rowIndex = Math.max(0, Math.min(rowCount - 1, startHour - 9));
+          const rowStart = rowIndex + 2;
+          const span = Math.max(
+            1,
+            Math.min(Math.ceil(duration), rowCount - rowIndex)
+          );
+          const minuteOffset = Math.round((start - startHour) * 44);
+          const blockHeight = Math.max(22, Math.round(duration * 44));
           const tone = str(record.tone) || "neutral";
           const payload = {
             title: str(record.title),
             subtitle: str(record.subtitle),
             status: str(record.status),
             date: dayItems[day]?.date ?? "",
-            time: `${String(start).padStart(2, "0")}:00`,
+            time: `${String(startHour).padStart(2, "0")}:${String(startMinute).padStart(2, "0")}`,
           };
-          return `<div class="calendar-block tone-${esc(tone)}" data-block="${esc(JSON.stringify(payload))}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span}" title="${esc(record.title)} ${esc(record.subtitle)}">
+          return `<div class="calendar-block tone-${esc(tone)}" data-block="${esc(JSON.stringify(payload))}" role="button" tabindex="0" aria-label="${esc(record.title)} ${esc(record.subtitle)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span};margin-top:${minuteOffset}px;height:${blockHeight}px;align-self:start;" title="${esc(record.title)} ${esc(record.subtitle)}">
   <span class="calendar-block-title">${esc(record.title)}</span>
   <span class="calendar-block-subtitle">${esc(record.subtitle)}</span>
+  <span class="calendar-block-time">${esc(payload.time)}</span>
 </div>`;
         })
         .join("");
       const viewPanel = str(props.viewPanel);
       const motion = motionAttrs(node, renderMotionContext);
-      return `<div class="calendar"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}><div class="calendar-scroll"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div></div>`;
+      return `<div class="calendar"${viewPanel ? ` data-view-panel="${esc(viewPanel)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
+  <div class="calendar-hint" aria-hidden="true">左右滑动查看整周 ›</div>
+  <div class="calendar-viewport">
+    <div class="calendar-scroll" tabindex="0" aria-label="预约周历，可左右滑动查看整周"><div class="calendar-grid" style="grid-template-rows:36px repeat(${rowCount},44px)">${header}${cells}${blockHtml}</div></div>
+    <span class="calendar-fade" aria-hidden="true"></span>
+  </div>
+</div>`;
     }
     case "ListRow": {
       const title = str(props.title);
@@ -649,7 +692,9 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const statusTone = str(props.statusTone) || "neutral";
       const searchText = str(props.searchText);
       const motion = motionAttrs(node, renderMotionContext);
-      return `<div class="list-row"${searchText ? ` data-search-text="${esc(searchText)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
+      const linkable =
+        renderPageId === "customer-search" || renderPageId === "appointment-list";
+      return `<div class="list-row"${linkable ? ' role="button" tabindex="0"' : ""}${searchText ? ` data-search-text="${esc(searchText)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="list-row-main">
     <div class="list-row-title">
       <span class="row-title">${esc(title)}</span>
@@ -739,8 +784,17 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   ${children ? `<div class="empty-actions">${children}</div>` : ""}
 </div>`;
     }
-    case "Skeleton":
+    case "Skeleton": {
+      const variant = str(props.variant) || "card";
+      if (variant === "list") {
+        return `<div class="list-skeleton" aria-hidden="true">${Array.from(
+          { length: 12 },
+          () =>
+            `<div class="skeleton-list-row"><span></span><span></span><span></span></div>`
+        ).join("")}</div>`;
+      }
       return `<div class="skeleton card"></div>`;
+    }
     case "ErrorState": {
       const title = str(props.title);
       const description = str(props.description);
@@ -821,7 +875,8 @@ ${typeClasses(profile)}
 .app-scroll::-webkit-scrollbar{display:none;}
 .app-actions{flex:0 0 auto;padding:var(--space-3) var(--space-4);background:var(--color-surface-default);border-top:1px solid var(--color-border-subtle);display:flex;gap:var(--space-2);}
 .app-actions .section{display:flex;gap:var(--space-2);width:100%;flex-wrap:nowrap;}
-.app-actions .btn{flex:1;white-space:nowrap;}
+.app-actions .btn{flex:1;white-space:nowrap;height:44px;}
+.app-scroll .section[data-view-panel]{padding-left:0 !important;padding-right:0 !important;}
 .topbar{height:48px;flex:0 0 48px;padding:0 var(--space-4);display:flex;align-items:center;justify-content:space-between;background:var(--color-surface-subtle);position:relative;z-index:5;}
 .topbar-store{font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;gap:2px;}
 .topbar-chevron{font-size:20px;color:var(--color-text-secondary);}
@@ -835,7 +890,7 @@ ${typeClasses(profile)}
 .tab.active{color:var(--color-action-primary);}
 .tab-icon{font-size:22px;}
 .tab-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);font-weight:var(--type-label-sm-weight);}
-.section{display:flex;flex-direction:column;}
+.section{display:flex;flex-direction:column;min-width:0;}
 .row{display:flex;align-items:stretch;}
 .stack{display:flex;flex-direction:column;}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);}
@@ -844,6 +899,8 @@ ${typeClasses(profile)}
 .card-illustration{width:80px;height:56px;flex:0 0 80px;display:block;}
 .card-title{margin:0;font-size:var(--type-heading-2-size);line-height:var(--type-heading-2-line);font-weight:var(--type-heading-2-weight);display:flex;align-items:center;}
 .card-title .badge{margin-left:8px;}
+.card-action{margin-left:auto;display:inline-flex;align-items:center;gap:2px;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);font-weight:var(--type-body-md-weight);color:var(--color-text-secondary);white-space:nowrap;}
+.card-action-chevron{font-size:16px;color:var(--color-text-tertiary);}
 .card-body{margin-top:var(--space-2);display:flex;flex-direction:column;gap:0;}
 .card-body>.list-row:not(:last-child){border-bottom:1px solid var(--color-border-subtle);}
 .quick-action{flex:1;height:56px;border:0;border-radius:var(--radius-md);background:var(--color-surface-subtle);display:flex;align-items:center;justify-content:center;gap:var(--space-2);transition:transform var(--motion-fast) ease,background var(--motion-normal) ease;}
@@ -876,8 +933,11 @@ ${typeClasses(profile)}
 .search-icon{font-size:20px;}
 .search-placeholder{font-size:var(--type-body-sm-size);line-height:var(--type-body-sm-line);}
 .search-input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:var(--type-body-sm-size);color:var(--color-text-primary);outline:none;}
+.searchbar:focus-within{box-shadow:0 0 0 2px var(--color-action-primary);}
+.search-input:focus-visible{outline:none;}
 .filter-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
+.filter-row .btn.danger{margin-left:auto;}
 .filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
@@ -892,19 +952,39 @@ ${typeClasses(profile)}
 .switch.on .switch-thumb{transform:translateX(16px);}
 .switch-value{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .summary{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);padding:0 2px;}
-.calendar{background:var(--color-surface-default);border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(17,24,39,.04);overflow:hidden;}
-.calendar-scroll{overflow-x:auto;overflow-y:hidden;}
+.calendar{position:relative;min-width:0;background:var(--color-surface-default);border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(17,24,39,.04);overflow:hidden;}
+.calendar-viewport{position:relative;min-width:0;}
+.calendar-scroll{min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
+.calendar-scroll::-webkit-scrollbar{display:none;}
+.calendar-hint{display:none;justify-content:flex-end;align-items:center;gap:4px;padding:8px 12px 0;font-size:10px;line-height:14px;color:var(--color-text-tertiary);}
+.calendar-fade{position:absolute;top:0;right:0;bottom:0;width:24px;background:linear-gradient(90deg,transparent,var(--color-surface-default));pointer-events:none;opacity:0;}
+.calendar[data-scrollable="true"] .calendar-hint{display:flex;}
+.calendar[data-scrollable="true"] .calendar-fade{opacity:1;}
+.calendar[data-scroll-end="true"] .calendar-hint{display:none;}
+.calendar[data-scroll-end="true"] .calendar-fade{opacity:0;}
+@media (max-width:719px){
+  .calendar:not([data-scrollable="false"]):not([data-scroll-end="true"]) .calendar-hint{display:flex;}
+  .calendar:not([data-scrollable="false"]):not([data-scroll-end="true"]) .calendar-fade{opacity:1;}
+}
 .calendar-grid{display:grid;grid-template-columns:44px repeat(7,minmax(88px,1fr));min-width:720px;position:relative;}
+.app .calendar-grid{grid-template-columns:36px repeat(7,minmax(0,1fr));min-width:0;}
+.app .calendar-date-full{display:none;}
+.app .calendar-date-short{display:inline;}
 .calendar-corner{grid-column:1;grid-row:1;background:var(--color-surface-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day{grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-secondary);background:var(--color-surface-subtle);border-left:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);}
 .calendar-day.today{background:color-mix(in srgb,var(--color-status-info) 10%,white);color:var(--color-status-info);font-weight:600;}
-.calendar-date{font-size:10px;line-height:12px;color:var(--color-text-tertiary);white-space:nowrap;}
+.calendar-day.selected{background:color-mix(in srgb,var(--color-status-info) 14%,var(--color-surface-subtle));color:var(--color-status-info);font-weight:600;box-shadow:inset 0 -2px 0 var(--color-status-info);}
+.calendar-date{font-size:11px;line-height:13px;color:var(--color-text-tertiary);white-space:nowrap;}
+.calendar-date-short{display:none;}
 .calendar-day.today .calendar-date{color:var(--color-status-info);}
-.calendar-hour{grid-column:1;font-size:9px;line-height:11px;color:var(--color-text-tertiary);display:flex;justify-content:flex-end;padding:2px 4px 0 0;}
+.calendar-day.selected .calendar-date{color:var(--color-status-info);}
+.calendar-hour{grid-column:1;font-size:11px;line-height:13px;color:var(--color-text-tertiary);display:flex;justify-content:flex-end;padding:2px 4px 0 0;}
 .calendar-cell{border-top:1px solid var(--color-border-subtle);border-left:1px solid var(--color-border-subtle);}
-.calendar-block{margin:1px;padding:3px 4px;border-radius:var(--radius-sm);overflow:hidden;z-index:1;background:var(--color-surface-subtle);border-left:3px solid var(--color-border-strong);font-size:9px;line-height:11px;}
+.calendar-cell.selected{background:color-mix(in srgb,var(--color-status-info) 4%,white);}
+.calendar-block{margin:0;padding:2px;border-radius:var(--radius-sm);overflow:hidden;z-index:1;background:var(--color-surface-subtle);border-left:2px solid var(--color-border-strong);font-size:12px;line-height:14px;}
 .calendar-block-title{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.calendar-block-subtitle{display:block;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calendar-block-subtitle{display:block;color:var(--color-text-secondary);font-size:10px;line-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calendar-block-time{display:block;color:var(--color-text-tertiary);font-size:10px;line-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .calendar-block.tone-success{background:color-mix(in srgb,var(--color-status-success) 10%,white);border-left-color:var(--color-status-success);}
 .calendar-block.tone-warning{background:color-mix(in srgb,var(--color-status-warning) 12%,white);border-left-color:var(--color-status-warning);}
 .calendar-block.tone-danger{background:color-mix(in srgb,var(--color-status-danger) 10%,white);border-left-color:var(--color-status-danger);}
@@ -929,7 +1009,7 @@ ${typeClasses(profile)}
 .empty-actions{margin-top:var(--space-2);}
 .empty-state[data-empty-kind]{display:flex;}
 body[data-state="empty"] .empty-state{display:flex;}
-body[data-state="empty"] .empty-calendar{position:fixed;top:230px;left:24px;right:24px;z-index:10;background:#fff;border-radius:var(--radius-lg);padding:24px 16px;box-shadow:0 8px 24px rgba(15,23,42,.12);}
+body[data-state="empty"] .empty-state.empty-inline{width:100%;padding:var(--space-4);margin-bottom:var(--space-4);border-top:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);background:var(--color-surface-subtle);box-shadow:none;border-radius:0;}
 body[data-state="empty"] .list-row,body[data-state="empty"] .inventory-card{display:none;}
 body[data-state="empty"] .calendar-block{display:none;}
 body[data-state="empty"] .calendar-grid{opacity:.55;}
@@ -938,6 +1018,12 @@ body[data-state="empty"] .summary{display:none;}
 .app.has-tabs .state-panel{bottom:64px;}
 body[data-state="loading"] .state-panel.loading{display:flex;}
 body[data-state="error"] .state-panel.error{display:flex;align-items:center;justify-content:center;}
+.state-panel.error.inline{position:static;display:none;background:transparent;padding:var(--space-4);}
+body[data-state="error"] .state-panel.error.inline{display:flex;}
+.app[data-page-archetype="mobile-list"] .state-panel.error.inline .error-box{width:100%;background:var(--color-surface-default);border-radius:var(--radius-lg);padding:var(--space-6) var(--space-4);box-shadow:0 1px 2px rgba(17,24,39,.04);}
+body[data-state="error"] .app[data-page-archetype="mobile-list"] .calendar,
+body[data-state="error"] .app[data-page-archetype="mobile-list"] [data-view-panel="list"],
+body[data-state="error"] .app[data-page-archetype="mobile-list"] .empty-state{display:none;}
 .skeleton{border-radius:var(--radius-lg);background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
 .skeleton.short{height:48px;}
 .skeleton.card{height:140px;}
@@ -949,6 +1035,26 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .loading-legend span{height:20px;font-size:10px;}
 .loading-grid{display:grid;grid-template-columns:36px repeat(7,1fr);grid-auto-rows:16px;gap:2px;}
 .loading-grid i{display:block;border-radius:2px;background:#E7E9ED;}
+body[data-state="loading"] .calendar-block{display:none;}
+body[data-state="loading"] .calendar-cell{background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-color:var(--color-border-strong);}
+body[data-state="loading"] .calendar-cell.selected{background:color-mix(in srgb,var(--color-status-info) 4%,white);}
+body[data-state="loading"] .app[data-page-archetype="detail"] .badge,
+body[data-state="loading"] .app[data-page-archetype="detail"] .app-scroll .filter-row,
+body[data-state="loading"] .app[data-page-archetype="detail"] .app-actions{visibility:hidden;}
+body[data-state="loading"] .calendar-hint,
+body[data-state="loading"] .calendar-fade{display:none;}
+body[data-state="loading"] .list-row{display:none;}
+.list-skeleton{display:none;flex-direction:column;}
+body[data-state="loading"] .list-skeleton{display:flex;}
+.skeleton-list-row{height:56px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 2px;border-bottom:1px solid var(--color-border-subtle);}
+.skeleton-list-row span{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
+.skeleton-list-row span:nth-child(1){width:36%;}
+.skeleton-list-row span:nth-child(2){width:58%;}
+.skeleton-list-row span:nth-child(3){width:24%;}
+body[data-state="loading"] .app-scroll .list-text-value{color:transparent;position:relative;}
+body[data-state="loading"] .app-scroll .list-text-value::after{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:70%;height:12px;border-radius:4px;background:linear-gradient(90deg,#E7E9ED 25%,#FCFCFD 37%,#E7E9ED 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
+body[data-state="loading"] .app-actions .btn{pointer-events:none;opacity:.6;}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .error-box{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
 .error-icon{font-size:40px;color:var(--color-text-tertiary);}
 .error-title{font-size:var(--type-heading-3-size);line-height:var(--type-heading-3-line);font-weight:var(--type-heading-3-weight);}
@@ -957,17 +1063,20 @@ body[data-state="error"] .state-panel.error{display:flex;align-items:center;just
 .btn.primary{background:var(--color-action-primary);color:var(--color-text-onAction);}
 .btn.secondary{background:#fff;border:1px solid #CBD5E1;color:var(--color-text-primary);}
 .btn.ghost{background:transparent;color:var(--color-text-secondary);}
+.btn.danger{background:#fff;color:var(--color-status-danger);border:1px solid color-mix(in srgb,var(--color-status-danger) 40%,white);}
 .btn:disabled,.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed;}
+:where(a,button,.btn,.tab,.input,.select,.search-input,.calendar-scroll,.list-row[role="button"],[data-block]):focus-visible{outline:2px solid var(--color-action-primary);outline-offset:2px;}
 .btn:disabled{background:var(--color-surface-subtle);color:var(--color-text-tertiary);}
 body[data-state="disabled"] .app-scroll input,
 body[data-state="disabled"] .app-scroll select,
 body[data-state="disabled"] .app-scroll textarea{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
+body[data-state="disabled"] .app-scroll input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator{opacity:0;}
 body[data-state="disabled"] .app-actions .btn.primary{opacity:1;background:#E5E7EB;color:#6B7280;border:1px solid #D1D5DB;}
-body[data-state="disabled"] .mode-tabs button,
-body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surface-subtle);color:var(--color-text-tertiary);border-color:var(--color-border-subtle);}
 .readonly-banner{margin:12px 16px;padding:12px;border:1px solid color-mix(in srgb,var(--color-status-warning) 30%,white);border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-status-warning) 10%,white);color:var(--color-text-secondary);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);}
 .app-scroll > .row{padding-left:var(--space-4);padding-right:var(--space-4);}
-.list-row > .row-chevron{flex:0 0 auto;margin-left:4px;}
+.list-row > .row-chevron{flex:0 0 auto;margin-left:4px;align-self:center;}
+body[data-page-kind="form"] .form-field[data-field=customer] .input:disabled{background:var(--color-surface-subtle);border-color:var(--color-border-subtle);color:var(--color-text-tertiary);opacity:1;}
 .page-shell{display:flex;min-height:100vh;background:#F5F6F8;}
 .page-sidebar{width:232px;flex:0 0 232px;background:#0F172A;color:#CBD5E1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;}
 .page-brand{font-size:16px;font-weight:600;color:#F8FAFC;letter-spacing:.02em;}
@@ -992,7 +1101,7 @@ body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surf
 .list-text-row{padding:10px 0;border-bottom:1px solid var(--color-border-subtle);font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);color:var(--color-text-primary);}
 .list-text-row:last-child{border-bottom:0;}
 .list-text-row.summary-row{display:flex;align-items:baseline;gap:var(--space-3);}
-.list-text-label{flex:0 0 auto;color:var(--color-text-tertiary);}
+.list-text-label{flex:0 0 72px;color:var(--color-text-tertiary);}
 .list-text-value{flex:1;min-width:0;font-weight:var(--type-body-md-weight);word-break:break-word;}
 .list-placeholder-row{display:grid;grid-template-columns:2fr 1fr 60px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9;}
 .skeleton-line{display:block;height:10px;border-radius:6px;background:#E7E9ED;}
@@ -1019,6 +1128,11 @@ body[data-state="disabled"] .mode-tabs button.active{background:var(--color-surf
 .form-value{display:block;min-height:20px;padding:8px 10px;border-radius:6px;background:#F8FAFC;color:#0F172A;font-size:14px;}
 .input,.select{height:36px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;padding:0 10px;font:inherit;font-size:14px;color:#0F172A;width:100%;}
 .input:focus,.select:focus{outline:2px solid #BFDBFE;border-color:#2563EB;}
+.datetime-control{position:relative;display:block;}
+.datetime-display{position:absolute;inset:0 34px 0 10px;display:flex;align-items:center;background:#fff;color:#94A3B8;font-size:14px;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.datetime-display.filled{color:#0F172A;}
+.datetime-control:focus-within .datetime-display{display:none;}
+.datetime-control:has(.input:disabled) .datetime-display{background:var(--color-surface-subtle);color:var(--color-text-tertiary);opacity:1;}
 .form-field .row{align-items:center;}
 .form-field .row .input{flex:1;min-width:0;}
 .form-field .row .btn{flex:0 0 auto;}
@@ -1037,10 +1151,9 @@ body[data-state="empty"] .data-table,body[data-state="empty"] .table-wrap,body[d
 .state-switcher-label{font-weight:600;color:#111827;}
 .state-switcher a{padding:2px 0;}
 .state-switcher a:hover{color:#111827;}
-.mode-tabs{display:flex;gap:8px;padding:12px 16px 0;}
-.mode-tabs button{height:32px;border:1px solid var(--color-border-strong);border-radius:6px;background:#fff;font:inherit;font-size:13px;}
-.mode-tabs button.active{background:var(--color-action-primary);color:#fff;border-color:var(--color-action-primary);}
-.appointment-id{font-size:12px;color:var(--color-text-tertiary);padding:4px 16px;}
+.reschedule-context{display:flex;flex-direction:column;gap:2px;margin:0 var(--space-4) var(--space-2);padding:10px 12px;border-radius:var(--radius-md);background:color-mix(in srgb,var(--color-status-info) 8%,white);border:1px solid color-mix(in srgb,var(--color-status-info) 22%,white);font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-secondary);}
+.reschedule-context strong{font-size:var(--type-body-sm-size);color:var(--color-text-primary);}
+.reschedule-id{font-size:10px;color:var(--color-text-tertiary);}
 .state-note{padding:12px 16px;font-size:13px;color:var(--color-text-secondary);}
 .detail-drawer{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.35);display:flex;align-items:flex-end;}
 .detail-drawer-card{width:100%;background:#fff;border-radius:12px 12px 0 0;padding:16px;display:flex;flex-direction:column;gap:8px;}
@@ -1059,6 +1172,17 @@ function renderInteractionScript(): string {
   const config = JSON.parse(raw);
   const qsa = (selector) => Array.from(document.querySelectorAll(selector));
   const showHint = (message) => window.alert(message);
+  if (new URLSearchParams(location.search).get("state") === "loading") {
+    const busyHost = document.querySelector(".app-scroll");
+    if (busyHost) {
+      busyHost.setAttribute("aria-busy", "true");
+      const status = document.createElement("span");
+      status.className = "visually-hidden";
+      status.setAttribute("role", "status");
+      status.textContent = "正在加载";
+      busyHost.prepend(status);
+    }
+  }
 
   function applyBusinessStates() {
     const states = config.businessStates;
@@ -1103,6 +1227,16 @@ function renderInteractionScript(): string {
         const isAllowed = allowedActions.includes(button.dataset.action);
         button.hidden = !isAllowed;
         if (isAllowed && bar && bar.contains(button)) visibleInBar += 1;
+      }
+      const visibleBarActions = bar
+        ? qsa("[data-action]").filter(
+            (button) => bar.contains(button) && !button.hidden
+          )
+        : [];
+      if (visibleBarActions.length === 1) {
+        const only = visibleBarActions[0];
+        only.classList.remove("secondary", "ghost");
+        only.classList.add("primary");
       }
       if (bar) bar.hidden = visibleInBar === 0;
       const badge = document.querySelector(".app-scroll .badge");
@@ -1237,38 +1371,19 @@ function renderInteractionScript(): string {
     const modes = config.formModes;
     if (!modes) return;
     const params = new URLSearchParams(location.search);
-    const lockEntryMode = params.get("mode") === "reschedule";
-    let current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
+    const current = modes.find((mode) => mode.name === params.get("mode")) ?? modes[0];
     const submit = document.querySelector(".app-actions [data-action]");
     const customer = document.querySelector('[data-field=customer] input');
     const host = document.querySelector(".app-scroll");
-    const tabs = document.createElement("div");
-    tabs.className = "mode-tabs";
     const rawAppointmentId = params.get("appointmentId") ?? config.referenceId;
     const appointmentId =
       rawAppointmentId && rawAppointmentId !== "null" && rawAppointmentId !== "undefined"
         ? rawAppointmentId
         : null;
-    if (modes.length > 1 && host) {
-      for (const mode of modes) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.dataset.mode = mode.name;
-        button.textContent = config.formModeLabels?.[mode.name] ?? mode.label;
-        button.addEventListener("click", () => {
-          current = mode;
-          history.replaceState(
-            null,
-            "",
-            "?mode=" +
-              mode.name +
-              (appointmentId ? "&appointmentId=" + encodeURIComponent(appointmentId) : "")
-          );
-          apply();
-        });
-        tabs.append(button);
-      }
-      host.prepend(tabs);
+    const pageTitle = document.querySelector(".page-title");
+    if (pageTitle) {
+      pageTitle.textContent =
+        current.name === "reschedule" ? "改期预约" : "新增预约";
     }
     const dateParam = params.get("date");
     const timeParam = params.get("time");
@@ -1296,11 +1411,13 @@ function renderInteractionScript(): string {
     }
     const recordKey =
       params.get("recordId") ?? params.get("appointmentId") ?? config.referenceId;
+    let rescheduleRecord = null;
     if (current.name === "reschedule" && recordKey && !(dateParam && timeParam)) {
       const rawRecord = sessionStorage.getItem("prd-ui:appointment:" + recordKey);
       if (rawRecord) {
         try {
           const record = JSON.parse(rawRecord);
+          rescheduleRecord = record;
           const pad = (value) => String(value).padStart(2, "0");
           const timeText = typeof record.time === "string" ? record.time : "";
           const dateMatch = /(\\d{1,2})-(\\d{1,2})\\s*周([一二三四五六日])/.exec(timeText);
@@ -1356,31 +1473,46 @@ function renderInteractionScript(): string {
       '[data-field=customer] [data-action="选择客户"]'
     );
     const apply = () => {
-      for (const button of Array.from(tabs.children)) {
-        button.classList.toggle("active", button.dataset.mode === current.name);
-        if (lockEntryMode) {
-          button.hidden = button.dataset.mode !== current.name;
-          button.disabled = true;
-        }
-      }
       if (submit) {
         submit.textContent = current.actions[0] ?? submit.textContent;
         submit.dataset.action = current.actions[0] ?? submit.dataset.action;
+        if (current.name === "reschedule" && rescheduleRecord === null) {
+          submit.disabled = true;
+        } else {
+          submit.disabled = false;
+        }
       }
       if (customer) customer.disabled = current.customerLocked === true;
       if (customerPickerButton) {
         customerPickerButton.disabled = current.customerLocked === true;
       }
-      let id = document.querySelector(".appointment-id");
-      if (current.name === "reschedule" && appointmentId) {
-        if (!id && host) {
-          id = document.createElement("div");
-          id.className = "appointment-id";
-          host.prepend(id);
+      let banner = document.querySelector(".reschedule-context");
+      if (current.name === "reschedule" && host) {
+        if (!banner) {
+          banner = document.createElement("div");
+          banner.className = "reschedule-context";
+          host.prepend(banner);
         }
-        if (id) id.textContent = "预约 " + appointmentId;
-      } else if (id) {
-        id.remove();
+        const title = document.createElement("strong");
+        title.textContent = "正在改期";
+        const summary = document.createElement("span");
+        const parts = [
+          rescheduleRecord === null ? "" : rescheduleRecord.customer,
+          rescheduleRecord === null ? "" : rescheduleRecord.project,
+          rescheduleRecord === null ? "" : rescheduleRecord.time,
+          rescheduleRecord === null ? "" : rescheduleRecord.therapist,
+        ].filter((part) => typeof part === "string" && part.length > 0);
+        summary.textContent =
+          parts.length > 0 ? parts.join(" · ") : "请从预约详情进入改期";
+        banner.replaceChildren(title, summary);
+        if (appointmentId) {
+          const id = document.createElement("span");
+          id.className = "reschedule-id";
+          id.textContent = "预约 " + appointmentId;
+          banner.append(id);
+        }
+      } else if (banner) {
+        banner.remove();
       }
     };
     apply();
@@ -1437,6 +1569,12 @@ function renderInteractionScript(): string {
       row.addEventListener("click", () => {
         location.href = target;
       });
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          row.click();
+        }
+      });
     }
   }
 
@@ -1469,6 +1607,12 @@ function renderInteractionScript(): string {
       });
     }
     for (const block of qsa("[data-block]")) {
+      block.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          block.click();
+        }
+      });
       block.addEventListener("click", () => {
         let data = {};
         try {
@@ -1479,6 +1623,8 @@ function renderInteractionScript(): string {
         const labels = { title: "客户", subtitle: "项目", status: "状态", date: "日期", time: "时间" };
         const drawer = document.createElement("div");
         drawer.className = "detail-drawer";
+        drawer.setAttribute("role", "dialog");
+        drawer.setAttribute("aria-modal", "true");
         const card = document.createElement("div");
         card.className = "detail-drawer-card";
         for (const key of Object.keys(labels)) {
@@ -1499,13 +1645,24 @@ function renderInteractionScript(): string {
         close.type = "button";
         close.className = "btn secondary";
         close.textContent = "关闭";
-        close.addEventListener("click", () => drawer.remove());
+        const closeDrawer = () => {
+          drawer.remove();
+          block.focus();
+        };
+        close.addEventListener("click", closeDrawer);
+        drawer.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            closeDrawer();
+          }
+        });
         card.append(detail, close);
         drawer.append(card);
         drawer.addEventListener("click", (event) => {
-          if (event.target === drawer) drawer.remove();
+          if (event.target === drawer) closeDrawer();
         });
         document.body.append(drawer);
+        detail.focus();
       });
     }
     apply();
@@ -1637,7 +1794,7 @@ function renderInteractionScript(): string {
     )) {
       control.disabled = true;
     }
-    for (const button of qsa(".app-actions .btn, .app-scroll .btn, .mode-tabs button")) {
+    for (const button of qsa(".app-actions .btn, .app-scroll .btn")) {
       button.disabled = true;
     }
     if (document.body.dataset.pageKind === "form") {
@@ -1659,11 +1816,59 @@ function renderInteractionScript(): string {
     }
   }
 
+  function formatDateTime(value) {
+    const match = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})/.exec(value);
+    return match === null
+      ? value
+      : match[1] + "-" + match[2] + "-" + match[3] + " " + match[4] + ":" + match[5];
+  }
+
+  function applyDateTimeDisplay() {
+    for (const control of qsa(".datetime-control")) {
+      const input = control.querySelector("input");
+      const display = control.querySelector(".datetime-display");
+      if (!input || !display) continue;
+      const sync = () => {
+        display.textContent = input.value ? formatDateTime(input.value) : input.placeholder;
+        display.classList.toggle("filled", input.value !== "");
+      };
+      input.addEventListener("input", sync);
+      input.addEventListener("change", sync);
+      sync();
+    }
+  }
+
+  function applyCalendarScroll() {
+    const sync = (calendar) => {
+      const scroll = calendar.querySelector(".calendar-scroll");
+      if (!scroll) return;
+      const overflow = scroll.scrollWidth > scroll.clientWidth + 1;
+      const atEnd =
+        !overflow || scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 1;
+      calendar.dataset.scrollable = overflow ? "true" : "false";
+      calendar.dataset.scrollEnd = atEnd ? "true" : "false";
+    };
+    const calendars = qsa(".calendar");
+    for (const calendar of calendars) {
+      const scroll = calendar.querySelector(".calendar-scroll");
+      if (!scroll) continue;
+      scroll.addEventListener("scroll", () => sync(calendar), { passive: true });
+      sync(calendar);
+    }
+    window.addEventListener(
+      "resize",
+      () => calendars.forEach((calendar) => sync(calendar)),
+      { passive: true }
+    );
+  }
+
   applyBusinessStates();
   applyFormModes();
+  applyDateTimeDisplay();
   applySearch();
   applyRowLinks();
   applyViews();
+  applyCalendarScroll();
   applyPicker();
   applyReadonlyState();
   applyFilterActions();

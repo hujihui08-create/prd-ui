@@ -9,3 +9,9 @@ pipeline/.env
 
 # spike bridge logs
 spike/artifacts/figma/*.log
+
+# generated Figma bundle and Studio build/data
+pipeline/runtimes/figma/dist/
+pipeline/studio/dist/
+pipeline/studio/public/html/
+pipeline/studio/public/studio-data.json

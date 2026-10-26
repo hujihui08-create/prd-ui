@@ -1533,4 +1533,31 @@ html,body{margin:0;background:#fff;}
     expect(evidence[0]?.overflow).toBe(false);
     await expect(stat(evidence[0]!.path)).resolves.toBeTruthy();
   });
+
+  it.skipIf(!hasChromium)("seeds sessionStorage before capture", async () => {
+    const root = await tempDir("prd-ui-visual-storage-");
+    const htmlDir = path.join(root, "html");
+    await mkdir(htmlDir, { recursive: true });
+    await writeFile(
+      path.join(htmlDir, "storage.html"),
+      `<script>if (sessionStorage.getItem("prd-ui:test") !== "seeded") throw new Error("missing storage");</script>`,
+      "utf8"
+    );
+
+    const evidence = await captureVisualCases({
+      htmlDir,
+      outDir: path.join(root, "out"),
+      cases: [
+        {
+          id: "storage.seeded",
+          pageId: "storage",
+          state: "default",
+          storage: { "prd-ui:test": "seeded" },
+          viewport: { width: 120, height: 80 },
+        },
+      ],
+    });
+
+    expect(evidence[0]?.consoleErrors).toBe(0);
+  });
 });

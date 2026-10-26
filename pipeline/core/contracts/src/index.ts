@@ -15,3 +15,4 @@ export * from "./pricing.js";
 export * from "./redact.js";
 export * from "./findings.js";
 export * from "./run.js";
+export * from "./figma.js";

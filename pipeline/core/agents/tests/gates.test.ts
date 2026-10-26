@@ -164,6 +164,38 @@ describe("signoff parsing", () => {
     expect(parsed.waivers).toHaveLength(1);
   });
 
+  it("parses acceptedMajors for visual signoff", () => {
+    const parsed = parseSignoffMarkdown(`# Visual signoff
+
+<!-- signoff
+${JSON.stringify({
+  signer: "Sample Reviewer",
+  date: "2026-10-23",
+  manifestHash: "sha256:manifest",
+  findingsHash: "sha256:findings",
+  acceptedMajors: [
+    {
+      findingId: "VC-1",
+      reason: "v0.5 debt",
+      owner: "design",
+      reviewBy: "v0.6",
+    },
+  ],
+  waivers: [],
+})}
+-->
+`);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.acceptedMajors).toEqual([
+      {
+        findingId: "VC-1",
+        reason: "v0.5 debt",
+        owner: "design",
+        reviewBy: "v0.6",
+      },
+    ]);
+  });
+
   it("reports a missing or malformed block", () => {
     expect(parseSignoffMarkdown("# no block").present).toBe(false);
     expect(parseSignoffMarkdown("<!-- signoff {not json} -->").valid).toBe(false);

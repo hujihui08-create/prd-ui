@@ -1,0 +1,17 @@
+{
+  "name": "@prd-ui/figma",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@prd-ui/contracts": "workspace:*",
+    "@prd-ui/design-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@prd-ui/compiler": "workspace:*"
+  }
+}

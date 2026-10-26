@@ -419,6 +419,7 @@ export async function runM1(input: RunM1Input): Promise<M1RunResult> {
           present: false,
           valid: false,
           waivers: [],
+          acceptedMajors: [],
           answers: [],
           approvals: [],
         },

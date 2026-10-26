@@ -14,6 +14,76 @@ const REPRESENTATIVE_STATES: Readonly<Record<string, readonly string[]>> = {
   "appointment-form": ["disabled"],
 };
 
+function collectNodes(node: SpecNode, nodes: SpecNode[] = []): SpecNode[] {
+  nodes.push(node);
+  for (const slot of Object.values(node.slots ?? {})) {
+    for (const child of slot) collectNodes(child, nodes);
+  }
+  for (const child of node.children ?? []) collectNodes(child, nodes);
+  return nodes;
+}
+
+function isLabelValueItem(value: unknown): value is { label: string; value: string } {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return typeof record.label === "string" && typeof record.value === "string";
+}
+
+interface RescheduleContext {
+  key: string;
+  record: Record<string, string>;
+  queryKey: "recordId" | "appointmentId";
+}
+
+/**
+ * Reproduce the detail → form reschedule entry for a static screenshot. The
+ * form Page Spec has no appointment data, so the summary List of the linked
+ * detail page provides the record. Other detail pages can also link to the
+ * same form (customer-detail/treatment-notice fall back to the first form), so
+ * candidates without a customer and time are skipped.
+ */
+function rescheduleContext(
+  specs: PageSpec[],
+  form: PageSpec
+): RescheduleContext | undefined {
+  const candidates = specs.filter(
+    (entry) =>
+      entry.meta.pageId !== form.meta.pageId &&
+      entry.linkedRoutes?.form === form.meta.route
+  );
+
+  for (const detail of candidates) {
+    const summaryCard = collectNodes(detail.layout).find(
+      (node) => node.type === "Card" && String(node.props?.title ?? "").includes("摘要")
+    );
+    const items: Array<{ label: string; value: string }> = [];
+    for (const node of collectNodes(summaryCard ?? detail.layout)) {
+      if (node.type !== "List" || !Array.isArray(node.props?.items)) continue;
+      for (const item of node.props.items as unknown[]) {
+        if (isLabelValueItem(item)) items.push(item);
+      }
+    }
+
+    const pick = (labels: string[]): string =>
+      items.find((item) => labels.some((label) => item.label.includes(label)))?.value ?? "";
+    const record = {
+      customer: pick(["客户"]),
+      project: pick(["项目"]),
+      time: pick(["时间段", "时间"]),
+      therapist: pick(["护理师", "护理"]),
+    };
+    if (record.customer === "" || record.time === "") continue;
+
+    const key = detail.referenceId ?? detail.meta.pageId;
+    return {
+      key,
+      record,
+      queryKey: detail.referenceId === undefined ? "recordId" : "appointmentId",
+    };
+  }
+  return undefined;
+}
+
 function isConfirmedBusinessState(name: string): boolean {
   return name === "已确认" || name.trim().toLowerCase() === "confirmed";
 }
@@ -114,11 +184,22 @@ export function buildVisualMatrix(specs: PageSpec[]): VisualCase[] {
 
     // The first form mode is the page default; only alternates need a case.
     for (const mode of (spec.formModes ?? []).slice(1)) {
+      const context = mode.name === "reschedule" ? rescheduleContext(specs, spec) : undefined;
       cases.push({
         id: `${pageId}.mode.${mode.name}`,
         pageId,
         state: `mode:${mode.name}`,
-        query: { mode: mode.name },
+        query: {
+          mode: mode.name,
+          ...(context === undefined ? {} : { [context.queryKey]: context.key }),
+        },
+        ...(context === undefined
+          ? {}
+          : {
+              storage: {
+                [`prd-ui:appointment:${context.key}`]: JSON.stringify(context.record),
+              },
+            }),
         viewport,
       });
     }

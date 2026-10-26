@@ -1,0 +1,177 @@
+{
+  "project": "m0-library",
+  "profile": "b-mobile",
+  "assets": [
+    {
+      "id": "icon-home",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/home.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:96c480b6e288a140240098d991b492c104062e9051d3984081a0df68e0c0c570"
+    },
+    {
+      "id": "icon-package",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/package.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:8f6c3a4cfe807b6c8ce371408332a5844e1541f133fa45807e3c6878ec24218f"
+    },
+    {
+      "id": "icon-search",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/search.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:4dbb8a0b2f58265aee2ecfe868fea30e45592c354a31c80ae52c099a7440dbd2"
+    },
+    {
+      "id": "icon-plus",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/plus.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:0254bf1f5f5f72563c3fb1ae4f1a8cbfdcbafec31e1041a2186e594c3382c93e"
+    },
+    {
+      "id": "icon-minus",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/minus.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:5bce4cb22a34c8b3a46934e39f6aee5a3d9bf6e65ebda7ed6fe2f82bddcf9203"
+    },
+    {
+      "id": "icon-chevron-left",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/chevron-left.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:ba2769ce52b1fea644ad5aaffc7f8e74c07535bfceb7335391feb407322eaa2f"
+    },
+    {
+      "id": "icon-chevron-right",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/chevron-right.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:baae270a479212b85a4dc73243c1d81dfb8c624c98a738f74aadc30605eae46d"
+    },
+    {
+      "id": "icon-circle-alert",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/circle-alert.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:72cce35b1889a23df450f2a422f1e86c4bfc963f359d6279180908b9db85dbb9"
+    },
+    {
+      "id": "icon-refresh-cw",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/refresh-cw.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:ca8d8f9d3bb6f12a510b46a93e1e0f32425d3c0dc50572bca2ada0a5dde376ec"
+    },
+    {
+      "id": "icon-user",
+      "kind": "icon",
+      "library": "lucide",
+      "files": [
+        {
+          "path": "icons/user.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "hash": "sha256:b842630b4ef94ee317794b342be1b55f38f6f61c073dab00b4a50e013f9528d1"
+    },
+    {
+      "id": "illus-empty-inventory",
+      "kind": "illustration",
+      "library": "local-test-fixture",
+      "files": [
+        {
+          "path": "illustrations/empty-inventory.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "test-fixture",
+      "hash": "sha256:011351d4fec40e7a7cad43fa974b9ac2f4601e05c84b6746a407730a7711658d"
+    },
+    {
+      "id": "illus-network-error",
+      "kind": "illustration",
+      "library": "local-test-fixture",
+      "files": [
+        {
+          "path": "illustrations/network-error.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "test-fixture",
+      "hash": "sha256:951e7f90ff9afe36cecd10e3391ab282079bfc4bea3faeada2fc7ceffcedc4aa"
+    },
+    {
+      "id": "illus-sync-loading",
+      "kind": "illustration",
+      "library": "local-test-fixture",
+      "files": [
+        {
+          "path": "illustrations/sync-loading.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "test-fixture",
+      "hash": "sha256:a8dc00da1fe14b2309f4ae0d0bf61085647b41dd352f38dd7d9be5d7991b6168"
+    }
+  ],
+  "placeholders": [],
+  "complete": true
+}

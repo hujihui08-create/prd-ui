@@ -5,6 +5,8 @@ export interface VisualCase {
   state: string;
   query?: Record<string, string>;
   actions?: VisualAction[];
+  /** Session storage seeded before navigation to reproduce a real entry path. */
+  storage?: Record<string, string>;
   viewport: { width: number; height: number };
 }
 

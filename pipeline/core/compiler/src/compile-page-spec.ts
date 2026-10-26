@@ -206,11 +206,21 @@ function linkedRoutesFor(
     (formPages.find((entry) => entry.id.includes(moduleKey)) ?? formPages[0])?.route;
   const customerPage = brief.ia.pages.find((entry) => entry.id === "customer-detail");
   const noticePage = brief.ia.pages.find((entry) => (entry.noticeBlocks ?? []).length > 0);
+  const listPages = brief.ia.pages.filter(
+    (entry) => entry.archetype === "mobile-list" && entry.id !== "customer-search"
+  );
+  const listPage =
+    listPages.find((entry) => entry.id.includes(moduleKey)) ??
+    (page.id === "today"
+      ? listPages.find((entry) => entry.id.includes("appointment"))
+      : undefined) ??
+    listPages[0];
   return {
     ...(formRoute === undefined ? {} : { create: formRoute, form: formRoute }),
     ...(detailRoute === undefined ? {} : { detail: detailRoute }),
     ...(customerPage === undefined ? {} : { customer: customerPage.route }),
     ...(noticePage === undefined ? {} : { notice: noticePage.route }),
+    ...(listPage === undefined ? {} : { list: listPage.route }),
   };
 }
 
@@ -357,6 +367,7 @@ export function compilePageSpec(input: {
     views,
     searchIdleTitle,
     ...(calendarWeekStart === undefined ? {} : { calendarWeekStart }),
+    ...(resolvedRowDate === undefined ? {} : { selectedDate: resolvedRowDate }),
   });
   assignNodeIds(page, layout);
   const states = Object.fromEntries(
@@ -419,6 +430,7 @@ function buildLayout(
     views?: InteractionView[];
     searchIdleTitle?: string;
     calendarWeekStart?: string;
+    selectedDate?: string;
   }
 ): SpecNode {
   const nav = brief.ia.navigation.primary;
@@ -614,6 +626,7 @@ function buildLayout(
       const callbacks = content.callbacks ?? [];
       const storeName = content.storeName ?? "星光店";
       const hasMessage = content.hasMessage ?? true;
+      const listRoute = linkedRoutesFor(brief, page).list;
       // The page itself always owns a tab; the brief's tabs append to it so a
       // single-tab brief cannot render an empty TabBar.
       const homeTabs = [...new Set([page.id, ...(brief.ia.navigation.tabs ?? nav)])];
@@ -657,7 +670,12 @@ function buildLayout(
                 },
                 {
                   type: "Card",
-                  props: { title: "我的预约" },
+                  props: {
+                    title: "我的预约",
+                    ...(listRoute === undefined
+                      ? {}
+                      : { actionLabel: "查看全部", actionRoute: listRoute }),
+                  },
                   children: [
                     ...appointments.map((appointment) => ({
                       type: "ListRow",
@@ -841,17 +859,31 @@ function buildLayout(
       const parseTime = (value: string | undefined): { start: number; duration: number } => {
         const match = /(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/.exec(value ?? "");
         if (match === null) return { start: 9, duration: 1 };
-        const startHour = Number(match[1]);
-        const endHour = Number(match[3]);
+        const startMinutes = Number(match[1]) * 60 + Number(match[2]);
+        const endMinutes = Number(match[3]) * 60 + Number(match[4]);
         return {
-          start: Math.min(20, Math.max(9, startHour)),
-          duration: Math.max(1, Math.min(3, endHour - startHour || 1)),
+          start: Math.min(20 * 60, Math.max(9 * 60, startMinutes)) / 60,
+          duration: Math.max(
+            0.5,
+            Math.min(3, (endMinutes - startMinutes) / 60 || 1)
+          ),
         };
       };
       const weekStart = interaction.calendarWeekStart ?? mondayOf(brief.meta.date);
+      const weekEnd = isoAddDays(weekStart, 6);
+      const selectedDate =
+        interaction.selectedDate ??
+        (brief.meta.date >= weekStart && brief.meta.date <= weekEnd
+          ? brief.meta.date
+          : undefined);
       const calendarDays = WEEKDAY_LABELS.map((label, index) => {
         const date = isoAddDays(weekStart, index);
-        return { label, date, today: date === brief.meta.date };
+        return {
+          label,
+          date,
+          today: date === brief.meta.date,
+          selected: date === selectedDate,
+        };
       });
       const calendarHours = Array.from(
         { length: 12 },
@@ -930,18 +962,25 @@ function buildLayout(
             : {}),
         };
       };
-      const emptyNode = emptyStateNode(
-        page,
-        page.emptyTitle ?? `暂无${page.name}`,
-        "调整筛选条件后重试",
-        searchField === undefined ? undefined : "empty"
-      );
-      if (searchField !== undefined) {
-        emptyNode.children = [btn("清空关键词", "secondary")];
-      } else {
-        emptyNode.children = [btn("清空筛选", "secondary")];
-        emptyNode.props = { ...emptyNode.props, variant: "calendar" };
-      }
+      const inlineEmpty = (): SpecNode => {
+        const node = emptyStateNode(
+          page,
+          page.emptyTitle ?? `暂无${page.name}`,
+          activeDateLabel === undefined
+            ? "调整筛选条件后重试"
+            : `${activeDateLabel} · 调整筛选条件后重试`,
+          searchField === undefined ? undefined : "empty"
+        );
+        node.children =
+          searchField === undefined
+            ? [btn("清空筛选", "secondary")]
+            : [btn("清空关键词", "secondary")];
+        if (searchField === undefined) {
+          node.props = { ...node.props, variant: "inline" };
+        }
+        return node;
+      };
+      const emptyNode = inlineEmpty();
       // Group the list view by the row date so the list keeps the same date
       // anchor as the calendar; a date-less row stays ungrouped.
       const listNodes: SpecNode[] = (() => {
@@ -977,7 +1016,9 @@ function buildLayout(
                         type: "SearchBar",
                         props: {
                           placeholder:
-                            interaction.searchIdleTitle ?? `搜索${labelFor(searchField)}`,
+                            searchField === "keyword" || searchField === "search"
+                              ? "搜索客户"
+                              : `搜索${labelFor(searchField)}`,
                         },
                       },
                     ]),
@@ -1051,6 +1092,7 @@ function buildLayout(
                             props: { gap: "space.1", variant: "legend" },
                             children: legend,
                           },
+                          ...(searchField === undefined ? [inlineEmpty()] : []),
                           {
                             type: "CalendarGrid" as const,
                             props: {
@@ -1062,7 +1104,6 @@ function buildLayout(
                                 : { viewPanel: "calendar" }),
                             },
                           },
-                          text("列表", "heading.3"),
                         ],
                       },
                     ]
@@ -1077,10 +1118,21 @@ function buildLayout(
                           gap: "space.2",
                           viewPanel: "list",
                         },
-                        children: listNodes,
+                        children: [
+                          ...listNodes,
+                          ...(searchField === undefined ? [inlineEmpty()] : []),
+                          ...(searchField === undefined
+                            ? [
+                                {
+                                  type: "Skeleton" as const,
+                                  props: { variant: "list" },
+                                },
+                              ]
+                            : []),
+                        ],
                       },
                     ]),
-                emptyNode,
+                ...(interaction.views === undefined ? [emptyNode] : []),
               ],
             },
           ],
@@ -1126,11 +1178,14 @@ function buildLayout(
                 const label = labelFor(field);
                 const options = optionsFor(field);
                 const inputType = inputTypeFor(field);
+                const placeholder =
+                  inputType === "datetime-local" ? `请选择${label}` : `请输入${label}`;
                 const input = {
                   type: "Input" as const,
                   props: {
                     name: field,
-                    placeholder: `请输入${label}`,
+                    placeholder,
+                    required: true,
                     ...(inputType === undefined ? {} : { inputType }),
                   },
                 };
@@ -1262,7 +1317,13 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
   const actions = primaryLabels.map((label, index) =>
     btn(label, index === 0 ? "primary" : "secondary")
   );
-  const secondaryActions = secondaryLabels.map((label) => btn(label, "ghost"));
+  const orderedSecondaryLabels = [
+    ...secondaryLabels.filter((label) => label !== "取消"),
+    ...secondaryLabels.filter((label) => label === "取消"),
+  ];
+  const secondaryActions = orderedSecondaryLabels.map((label) =>
+    btn(label, label === "取消" ? "danger" : "ghost")
+  );
   const noticeBlocks = page.noticeBlocks ?? [];
   const hasNoticeBlocks = noticeBlocks.length > 0;
   const visibleFields = fields.filter(

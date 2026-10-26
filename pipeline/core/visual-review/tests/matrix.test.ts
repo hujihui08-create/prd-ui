@@ -408,4 +408,37 @@ describe("buildVisualMatrix", () => {
       specs.find((spec) => spec.meta.pageId === "treatment-notice")?.noticeBlocks
     ).toHaveLength(2);
   });
+
+  it("seeds the reschedule screenshot from the appointment detail summary", () => {
+    const brief = UiBriefSchema.parse(
+      JSON.parse(
+        readFileSync(
+          path.join(
+            pipelineRoot,
+            "samples",
+            "projects",
+            "employee-app-phase2",
+            "ui-brief.json"
+          ),
+          "utf8"
+        )
+      )
+    );
+    const specs = compileProject(brief, { getProfile, getCatalog, getArchetype });
+    const reschedule = buildVisualMatrix(specs).find(
+      (entry) => entry.id === "appointment-form.mode.reschedule"
+    )!;
+    expect(reschedule.query).toEqual({
+      mode: "reschedule",
+      recordId: "appointment-detail",
+    });
+    expect(reschedule.storage).toBeDefined();
+    const record = JSON.parse(Object.values(reschedule.storage!)[0]!);
+    expect(record).toMatchObject({
+      customer: "张女士",
+      project: "小气泡",
+      time: "11-05 周三 10:00-11:00",
+      therapist: "王美容",
+    });
+  });
 });

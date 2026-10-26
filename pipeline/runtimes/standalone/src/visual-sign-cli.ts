@@ -29,12 +29,14 @@ The signoff must carry the review's manifestHash and findingsHash.
 Options:
   --run <dir>                Visual review run directory (required)
   --signoff-visual <path>    Visual signoff markdown
+  --max-major <n>            Max accepted major findings (default 2)
   --json                     Print one JSON summary to stdout
   -h, --help                 Print this help and exit`;
 
 export interface VisualSignOptions {
   runDir?: string;
   signoffVisualPath?: string;
+  maxMajor?: number;
   json: boolean;
   help: boolean;
 }
@@ -71,6 +73,14 @@ export function parseArgs(argv: string[]): VisualSignOptions {
       case "--signoff-visual":
         options.signoffVisualPath = path.resolve(value());
         break;
+      case "--max-major": {
+        const parsed = Number(value());
+        if (!Number.isInteger(parsed) || parsed < 0) {
+          throw new VisualSignUsageError("--max-major must be a non-negative integer");
+        }
+        options.maxMajor = parsed;
+        break;
+      }
       case "--json":
         options.json = true;
         break;
@@ -291,6 +301,7 @@ export async function main(
       manifestHash,
       findingsHash,
       now: new Date(),
+      ...(options.maxMajor === undefined ? {} : { maxMajor: options.maxMajor }),
     });
     if (!validation.ok) {
       throw new Error(validation.error ?? "VISUAL_SIGNOFF_INVALID");

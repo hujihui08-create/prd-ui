@@ -47,6 +47,7 @@ export function validateVisualSignoff(input: {
   manifestHash: string;
   findingsHash: string;
   now: Date;
+  maxMajor?: number;
 }): VisualSignoffValidation {
   const { parsed, findings, manifestHash, findingsHash, now } = input;
   if (!parsed.valid) {
@@ -72,6 +73,50 @@ export function validateVisualSignoff(input: {
   }
 
   const byId = new Map(findings.map((finding) => [finding.id, finding]));
+  const maxMajor = input.maxMajor ?? 2;
+  const majors = findings.filter((finding) => finding.severity === "major");
+  if (majors.length > maxMajor) {
+    return {
+      ok: false,
+      waivedFindings: [],
+      error: `VISUAL_MAJOR_LIMIT: ${majors.length} > ${maxMajor}`,
+    };
+  }
+  const accepted = new Map<string, (typeof parsed.acceptedMajors)[number]>();
+  for (const entry of parsed.acceptedMajors) {
+    if (accepted.has(entry.findingId)) {
+      return {
+        ok: false,
+        waivedFindings: [],
+        error: `VISUAL_MAJOR_DUPLICATE: ${entry.findingId}`,
+      };
+    }
+    const finding = byId.get(entry.findingId);
+    if (finding === undefined) {
+      return {
+        ok: false,
+        waivedFindings: [],
+        error: `VISUAL_MAJOR_UNKNOWN: ${entry.findingId}`,
+      };
+    }
+    if (finding.severity !== "major") {
+      return {
+        ok: false,
+        waivedFindings: [],
+        error: `VISUAL_MAJOR_NOT_MAJOR: ${entry.findingId}`,
+      };
+    }
+    accepted.set(entry.findingId, entry);
+  }
+  for (const major of majors) {
+    if (!accepted.has(major.id)) {
+      return {
+        ok: false,
+        waivedFindings: [],
+        error: `VISUAL_MAJOR_UNACCEPTED: ${major.id}`,
+      };
+    }
+  }
   const waivers = new Map<string, IaWaiver>();
   for (const waiver of parsed.waivers) {
     if (waivers.has(waiver.findingId)) {

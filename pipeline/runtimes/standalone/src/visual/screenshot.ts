@@ -224,6 +224,13 @@ async function captureCase(
   try {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.clock.setFixedTime(FIXED_SCREENSHOT_TIME);
+    if (visualCase.storage !== undefined) {
+      await page.addInitScript((entries: Record<string, string>) => {
+        for (const [key, value] of Object.entries(entries)) {
+          sessionStorage.setItem(key, value);
+        }
+      }, visualCase.storage);
+    }
     const query = new URLSearchParams(visualCase.query ?? {}).toString();
     const url = `${serverUrl}/${encodeURIComponent(visualCase.pageId)}.html${
       query ? `?${query}` : ""

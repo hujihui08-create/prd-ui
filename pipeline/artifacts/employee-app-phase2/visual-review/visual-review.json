@@ -1,6 +1,6 @@
 {
-  "runDir": ".",
-  "runId": "run-2026-10-22T13-55-24-469Z",
+  "runDir": "/tmp/visual-v05d/run-2026-10-23T06-10-08-791Z",
+  "runId": "run-2026-10-23T06-10-08-791Z",
   "project": "employee-app-phase2",
   "status": "passed",
   "cases": 24,
@@ -13,96 +13,51 @@
   "findings": [
     {
       "id": "VC-001",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
-      "pageId": "today",
-      "state": "default",
-      "message": "The 我的预约 section header lacks the required “查看全部” link, so the card has no path to the full appointment list and the header reads as unfinished. Proposal: Add a right-aligned “查看全部 ›” text link in the 我的预约 card header, styled as a secondary/ghost action and routing to /appointments.",
-      "evidence": "screenshots/today.default.png — the right side of the 「我的预约」card header (about y=224, x≈330–358) is empty; no 「查看全部」 entry appears."
+      "severity": "minor",
+      "code": "VISUAL_CRITIC_MINOR",
+      "pageId": "appointment-form",
+      "state": "disabled",
+      "message": "The native datetime inputs lose their field container in the read-only state, so they read as static text rather than disabled fields and break the otherwise consistent field rhythm of the form. Proposal: Keep the same disabled container (background, radius, border) for 开始时间/结束时间 as the other fields, and dim only the text and calendar icon.",
+      "evidence": "screenshots/appointment-form.state.disabled.png — the 开始时间 and 结束时间 rows (below 项目, y≈285–360): both fields show only placeholder text and a nearly invisible calendar glyph, with no disabled fill or border, while 客户/项目/护理师/来源 keep a visible disabled box."
     },
     {
       "id": "VC-002",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
+      "severity": "minor",
+      "code": "VISUAL_CRITIC_MINOR",
       "pageId": "appointment-list",
-      "state": "default",
-      "message": "The seven-day calendar is visually reduced to three wide day columns with no cue that more days exist; the week reads as a three-day grid and Thursday–Sunday cannot be discovered. Proposal: Present all seven days at a compact width, or add an explicit horizontal-scroll/page affordance with a partial next column and a week label; keep the selected/today column highlighted.",
-      "evidence": "screenshots/appointment-list.default.png — the calendar header shows only 「周一 11-03」「周二 11-04」「周三 11-05」 three columns (about y=205–260); Thursday–Sunday have no visible entry, paging, or scroll affordance."
+      "state": "loading",
+      "message": "The skeleton covers six days but skips the selected day, so the highlighted column looks already loaded or intentionally empty while the rest still looks pending; the grid reads as a partially loaded or disabled calendar. Proposal: Apply the skeleton treatment to the whole grid including the 周三 column, and indicate selection with an overlay border/accent instead of leaving the column un-skeletonized.",
+      "evidence": "screenshots/appointment-list.state.loading.png — calendar grid, selected 周三 column (x≈146–190): the selected day column is solid white while the other six day columns are gray skeleton cells; no block-level skeleton placeholders are drawn."
     },
     {
       "id": "VC-003",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
+      "severity": "minor",
+      "code": "VISUAL_CRITIC_MINOR",
       "pageId": "appointment-list",
-      "state": "loading",
-      "message": "The loading state does not preserve the loaded calendar's structure or controls: the short 7×6 block replaces a 12-hour grid, and the date heading and view toggle vanish, so the page jumps and loses context when data arrives. Proposal: Mirror the final grid in the skeleton (seven columns, hourly rows, time labels) and keep the date heading and view toggle visible but disabled during loading.",
-      "evidence": "screenshots/appointment-list.state.loading.png — the skeleton below the filter row is a short 7-column × ~6-row bar block (about y=132–255), with no time labels or date heading, and the 「切换日历/列表」control visible in the default state is gone."
+      "state": "default",
+      "message": "The single grayed day column reads as disabled or out of range even though it is part of the current week; shading only Sunday implies an unstated availability rule and competes with the selected-day highlight. Proposal: Remove the gray tint and lighter label if 11-09 is selectable; if it is a closure, state the reason in the date header or legend and apply an explicit rule instead of shading only one day.",
+      "evidence": "screenshots/appointment-list.default.png — rightmost calendar column and header 周日 11-09 (x≈328–374): the column background is gray and the weekday label is lighter than the other six days, while 周六 11-08 is white with dark text."
     },
     {
       "id": "VC-004",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
-      "pageId": "appointment-list",
-      "state": "empty",
-      "message": "The empty state is rendered as an overlay floating above the calendar instead of an inline state; it masks the day header and morning slots and looks like an accidental modal over the grid. Proposal: Render the empty message inline in the calendar area (or directly below the legend) without covering the day headers or time axis, keeping the grid structure visible.",
-      "evidence": "screenshots/appointment-list.state.empty.png — the white 「当前条件没有预约」card floats over the calendar (about y=225–365), covering the day header and the 09:00–12:00 rows while the grid below 12:00 remains visible."
-    },
-    {
-      "id": "VC-005",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
-      "pageId": "appointment-form",
-      "state": "default",
-      "message": "This mode switch is not part of the page spec and reads as an internal route/debug control; it duplicates the title, competes with the form's primary action, and implies users can switch to reschedule without an appointment context. Proposal: Remove the pills; use the title plus a context banner for reschedule, and let the entry point decide the mode.",
-      "evidence": "screenshots/appointment-form.default.png — below the page title 「新增/改期预约」 there are 「新增预约」「改期」 pill buttons (about y=57–88), with 「新增预约」 filled black; the reschedule screenshot leaves only a single black 「改期」pill."
-    },
-    {
-      "id": "VC-006",
-      "severity": "major",
-      "code": "VISUAL_CRITIC_MAJOR",
-      "pageId": "appointment-form",
-      "state": "reschedule",
-      "message": "Reschedule mode should restore the appointment; instead it presents a disabled, empty customer field and a blank form with no indication of which appointment is being changed, so the state looks broken and users cannot verify they are rescheduling the right booking. Proposal: Prefill the locked customer and the appointment's current project/time/therapist, add a compact “正在改期：… 原时段 …” context, and show a skeleton or ErrorState until the document is available.",
-      "evidence": "screenshots/appointment-form.mode.reschedule.png — the 客户 field is disabled but shows the placeholder 「请输入客户」 (about y=132–172); 项目, 开始/结束时间, and 护理师 are all empty, and there is no summary of the original appointment or time slot."
-    },
-    {
-      "id": "VC-007",
       "severity": "minor",
       "code": "VISUAL_CRITIC_MINOR",
-      "pageId": "appointment-form",
-      "state": "default",
-      "message": "The date-time placeholders are in US English format, breaking localization and the otherwise consistent Chinese brand voice. Proposal: Localize the picker/placeholder to zh-CN (for example YYYY-MM-DD HH:mm) or use the app's custom date-time control.",
-      "evidence": "screenshots/appointment-form.default.png — the native 开始时间/结束时间 inputs show the English placeholder 「mm/dd/yyyy, --:-- --」 (about y=234 and y=306) inside an otherwise Chinese UI."
-    },
-    {
-      "id": "VC-008",
-      "severity": "minor",
-      "code": "VISUAL_CRITIC_MINOR",
-      "pageId": "appointment-list",
-      "state": "default",
-      "message": "The current/selected day column is not highlighted, so the calendar loses its temporal anchor even though the date filter and heading both indicate 11-05. Proposal: Apply a subtle selected/today tint to the 周三 column and its header, distinct from the status colors.",
-      "evidence": "screenshots/appointment-list.default.png — the 「周三 11-05」 column header and background are identical to the adjacent days (about y=211–253); no current-day highlight is visible."
-    },
-    {
-      "id": "VC-009",
-      "severity": "minor",
-      "code": "VISUAL_CRITIC_MINOR",
-      "pageId": "appointment-list",
-      "state": "error",
-      "message": "The error state drops the date/filter/view context, so the user cannot see which day or filter failed, and retry has no visible context. Proposal: Keep the filter/date row and view toggle visible above the error block (disabled if necessary) so the failed query remains identifiable.",
-      "evidence": "screenshots/appointment-list.state.error.png — the page shows only the centered error state (about y=340–475); the 状态/日期 filters, the view switch, and the 「日历 11-05 周三」 heading are all gone."
+      "pageId": "treatment-notice",
+      "state": "已确认",
+      "message": "The confirmed timestamp uses a slash-separated, seconds-precision format that differs from the hyphenated YYYY-MM-DD HH:mm format elsewhere, breaking date/time consistency across detail pages. Proposal: Render 确认时间 with the shared product date pattern (e.g. 2026-10-22 09:00) and drop the seconds.",
+      "evidence": "screenshots/treatment-notice.business.已确认.png — summary card, 确认时间 row (y≈250): '2026/10/22 09:00:00'; compare appointment-detail.default.png 创建时间 '2026-11-01 15:20'."
     }
   ],
-  "costCny": 0,
+  "costCny": 0.4105417824,
   "usageComplete": true,
-  "manifestHash": "sha256:3321dd61e7acc59cd5670d5dbc44eb3c479c6085e4f3e90d4428c07d322ca5c6",
-  "findingsHash": "sha256:70a435f32b2b0b09c9eca6f6973a9fb1879a887fd06b0a67301ba1d2936d4455",
-  "specHash": "sha256:730dbca1faa2b4b6c3be49b0f56d6151c9732f35eb59cd8dc81821e398ebf624",
-  "cacheKey": "sha256:93ae567d1c3b7b2223ee109f63b4c9b976365871056bfe0990dc2771ca3bf62f",
+  "manifestHash": "sha256:6c900b2913d4f96207272ed19d751c8fa6098fa53a7078d0856d3a45ef70c79f",
+  "findingsHash": "sha256:57c9a5b412610dafd5f251173dcbc33f2beed4b58009b78c82491c10a8bab623",
+  "specHash": "sha256:a019edb1745162d5b1cff30a6af0db22a3e036a06b2025427eafc49e56a2b9d7",
+  "cacheKey": "sha256:1d467f26ef93ee96870d60bb7a65307b3da04486f854d1764d7b3c13242b025f",
   "signoff": {
     "valid": true,
-    "signer": "Sample Reviewer",
-    "date": "2026-10-22",
+    "signer": "胡冀徽",
+    "date": "2026-10-23",
     "waivedFindings": []
   },
   "critic": {
@@ -110,9 +65,6 @@
     "profile": "prd-ui-visual",
     "model": "deepseek-flash",
     "budgetEnforced": true,
-    "costSource": "cache",
-    "cacheHit": true,
-    "cacheKey": "sha256:93ae567d1c3b7b2223ee109f63b4c9b976365871056bfe0990dc2771ca3bf62f",
-    "cacheSource": "signed-cache"
+    "costSource": "pricing"
   }
 }

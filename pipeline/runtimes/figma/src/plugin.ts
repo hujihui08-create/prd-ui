@@ -1,0 +1,437 @@
+import type {
+  FigmaPlan,
+  FigmaPlanNode,
+  FigmaReadback,
+  FigmaReadbackNode,
+} from "@prd-ui/contracts";
+
+type FigmaNode = any;
+type FigmaStyle = any;
+
+const errors: string[] = [];
+const fonts: FigmaReadback["fonts"] = [];
+const variables: Record<string, FigmaNode> = {};
+const textStyles: Record<string, FigmaStyle> = {};
+const componentVariants: Record<string, FigmaNode> = {};
+let variableCollection: FigmaNode | undefined;
+
+function post(type: string, payload: Record<string, unknown>): void {
+  figma.ui.postMessage({ type, ...payload });
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const value = hex.replace("#", "");
+  return {
+    r: Number.parseInt(value.slice(0, 2), 16) / 255,
+    g: Number.parseInt(value.slice(2, 4), 16) / 255,
+    b: Number.parseInt(value.slice(4, 6), 16) / 255,
+  };
+}
+
+function profileName(plan: FigmaPlan): string {
+  const first = Object.keys(plan.textStyles)[0] ?? "b-mobile/body.md";
+  return first.split("/")[0] ?? "b-mobile";
+}
+
+function recordFont(family: string, style: string, fallback: boolean): void {
+  if (fonts.some((font) => font.family === family && font.style === style)) return;
+  fonts.push({ family, style, fallback });
+}
+
+async function loadFont(family: string, weight: number): Promise<{ family: string; style: string }> {
+  const style = weight >= 600 ? "SemiBold" : weight >= 500 ? "Medium" : "Regular";
+  try {
+    await figma.loadFontAsync({ family, style });
+    recordFont(family, style, false);
+    return { family, style };
+  } catch {
+    const fallback = { family: "PingFang SC", style: "Regular" };
+    await figma.loadFontAsync(fallback);
+    recordFont(fallback.family, fallback.style, true);
+    return fallback;
+  }
+}
+
+function ensureCollection(plan: FigmaPlan): void {
+  if (variableCollection !== undefined) return;
+  const name = `${profileName(plan)} Tokens`;
+  const collections = figma.variables.getLocalVariableCollections();
+  const existing = collections.find((collection: FigmaNode) => collection.name === name);
+  variableCollection =
+    existing ?? figma.variables.createVariableCollection(name);
+  const modeId = variableCollection.modes[0].modeId;
+  for (const [token, value] of Object.entries(plan.tokens)) {
+    if (!token.startsWith("color/")) continue;
+    const existingVariable = variableCollection.variableIds
+      .map((id: string) => figma.variables.getVariableById(id))
+      .find((variable: FigmaNode) => variable?.name === token);
+    const variable =
+      existingVariable ??
+      figma.variables.createVariable(token, variableCollection, "COLOR");
+    variable.setValueForMode(modeId, { ...hexToRgb(value), a: 1 });
+    variables[token] = variable;
+  }
+}
+
+function paint(token: string, plan: FigmaPlan, alpha = 1): any {
+  const value = plan.tokens[token];
+  const solid: any = {
+    type: "SOLID",
+    color: value === undefined ? { r: 0, g: 0, b: 0 } : hexToRgb(value),
+    opacity: alpha,
+  };
+  const variable = variables[token];
+  return variable === undefined
+    ? solid
+    : figma.variables.setBoundVariableForPaint(solid, "color", variable);
+}
+
+async function ensureTextStyle(plan: FigmaPlan, name: string): Promise<FigmaStyle> {
+  const existing = textStyles[name] ?? figma.getLocalTextStyles().find((style: FigmaStyle) => style.name === name);
+  if (existing !== undefined) {
+    textStyles[name] = existing;
+    return existing;
+  }
+  const definition = plan.textStyles[name];
+  if (definition === undefined) throw new Error(`TEXT_STYLE_MISSING: ${name}`);
+  const font = await loadFont(definition.fontFamily, definition.fontWeight);
+  const style = figma.createTextStyle();
+  style.name = name;
+  style.fontName = font;
+  style.fontSize = definition.fontSize;
+  style.lineHeight = { unit: "PIXELS", value: definition.lineHeight };
+  textStyles[name] = style;
+  return style;
+}
+
+async function ensureButtonSet(plan: FigmaPlan, page: FigmaNode): Promise<void> {
+  if (Object.keys(componentVariants).length > 0) return;
+  const name = `${profileName(plan)}/Button`;
+  const existing = figma.root.findAll(
+    (node: FigmaNode) => node.type === "COMPONENT_SET" && node.name === name
+  )[0];
+  if (existing !== undefined) {
+    for (const child of existing.children ?? []) {
+      const match = /Emphasis=(.+)/.exec(child.name ?? "");
+      if (match?.[1] !== undefined) componentVariants[match[1]] = child;
+    }
+    return;
+  }
+  const bodyStyle = Object.keys(plan.textStyles).find((name) => name.endsWith("/body.md")) ?? Object.keys(plan.textStyles)[0] ?? "b-mobile/body.md";
+  const labelStyle = await ensureTextStyle(plan, bodyStyle);
+  const components: FigmaNode[] = [];
+  for (const [variant, style] of Object.entries(plan.components.Button.variants)) {
+    const component = figma.createComponent();
+    component.name = `Emphasis=${variant}`;
+    component.layoutMode = "HORIZONTAL";
+    component.primaryAxisSizingMode = "AUTO";
+    component.counterAxisSizingMode = "AUTO";
+    component.paddingLeft = 16;
+    component.paddingRight = 16;
+    component.paddingTop = 8;
+    component.paddingBottom = 8;
+    component.cornerRadius = 6;
+    component.fills = [paint(style.fill, plan)];
+    const label = figma.createText();
+    label.name = "Label";
+    label.textStyleId = labelStyle.id;
+    label.characters = "按钮";
+    label.fills = [paint(style.text, plan)];
+    component.appendChild(label);
+    components.push(component);
+    componentVariants[variant] = component;
+  }
+  const set = figma.combineAsVariants(components, page);
+  set.name = name;
+  set.x = plan.width + 100;
+  set.y = 0;
+  for (const component of components) {
+    const match = /Emphasis=(.+)/.exec(component.name);
+    if (match?.[1] !== undefined) componentVariants[match[1]] = component;
+  }
+}
+
+function applyFrameStyle(node: FigmaNode, planNode: FigmaPlanNode, plan: FigmaPlan): void {
+  const layoutMode = planNode.layoutMode ?? "NONE";
+  if (layoutMode !== "NONE") {
+    node.layoutMode = layoutMode;
+    const width = planNode.width;
+    const height = planNode.height;
+    node.resize(width ?? 100, height ?? 100);
+    node.primaryAxisSizingMode = height === undefined ? "AUTO" : "FIXED";
+    node.counterAxisSizingMode = width === undefined ? "AUTO" : "FIXED";
+    node.itemSpacing = planNode.gap ?? 0;
+    const padding = planNode.padding;
+    const paddingX = planNode.paddingX;
+    const paddingY = planNode.paddingY;
+    node.paddingLeft = padding ?? paddingX ?? 0;
+    node.paddingRight = padding ?? paddingX ?? 0;
+    node.paddingTop = padding ?? paddingY ?? 0;
+    node.paddingBottom = padding ?? paddingY ?? 0;
+    const alignMap: Record<string, string> = { START: "MIN", CENTER: "CENTER", END: "MAX" };
+    if (planNode.alignItems !== undefined) {
+      node.counterAxisAlignItems = alignMap[planNode.alignItems] ?? "MIN";
+    }
+    if (planNode.justifyContent !== undefined) {
+      node.primaryAxisAlignItems =
+        planNode.justifyContent === "SPACE_BETWEEN"
+          ? "SPACE_BETWEEN"
+          : alignMap[planNode.justifyContent] ?? "MIN";
+    }
+  } else {
+    node.resize(planNode.width ?? 100, planNode.height ?? 100);
+  }
+  if (planNode.clip !== undefined) node.clipsContent = planNode.clip;
+  if (planNode.fill !== undefined) {
+    node.fills = [paint(planNode.fill, plan, planNode.fillAlpha ?? 1)];
+    node.setPluginData("fillToken", planNode.fill);
+  }
+  if (planNode.stroke !== undefined) {
+    node.strokes = [paint(planNode.stroke, plan)];
+    node.strokeWeight = planNode.strokeWidth ?? 1;
+  }
+  if (planNode.radius !== undefined) node.cornerRadius = planNode.radius;
+  if (planNode.shadow === true) {
+    node.effects = [
+      {
+        type: "DROP_SHADOW",
+        color: { r: 0, g: 0, b: 0, a: 0.06 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
+        visible: true,
+        blendMode: "NORMAL",
+      },
+    ];
+  }
+}
+
+function applyLayoutChild(node: FigmaNode, planNode: FigmaPlanNode): void {
+  if (planNode.layoutGrow !== undefined) node.layoutGrow = planNode.layoutGrow;
+  if (planNode.layoutAlign !== undefined) node.layoutAlign = planNode.layoutAlign;
+}
+
+async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<FigmaNode> {
+  if (planNode.type === "ABSOLUTE") {
+    const wrapper = figma.createFrame();
+    wrapper.name = planNode.name;
+    wrapper.layoutMode = "NONE";
+    wrapper.resize(planNode.width, planNode.height);
+    wrapper.x = planNode.x;
+    wrapper.y = planNode.y;
+    wrapper.clipsContent = false;
+    wrapper.setPluginData("specId", planNode.specId);
+    wrapper.setPluginData("kind", "ABSOLUTE");
+    const child = await buildNode(planNode.child!, plan);
+    wrapper.appendChild(child);
+    child.x = 0;
+    child.y = 0;
+    return wrapper;
+  }
+
+  if (planNode.type === "FRAME") {
+    const node = figma.createFrame();
+    node.name = planNode.name;
+    node.setPluginData("specId", planNode.specId);
+    node.setPluginData("kind", "FRAME");
+    applyFrameStyle(node, planNode, plan);
+    for (const childPlan of planNode.children ?? []) {
+      const child = await buildNode(childPlan, plan);
+      node.appendChild(child);
+      applyLayoutChild(child, childPlan);
+    }
+    return node;
+  }
+
+  if (planNode.type === "TEXT") {
+    const styleName = planNode.textStyle;
+    if (styleName === undefined) throw new Error(`TEXT_STYLE_MISSING: ${planNode.specId}`);
+    const style = await ensureTextStyle(plan, styleName);
+    await figma.loadFontAsync(style.fontName);
+    const node = figma.createText();
+    node.name = planNode.name;
+    node.setPluginData("specId", planNode.specId);
+    node.setPluginData("kind", "TEXT");
+    node.textStyleId = style.id;
+    node.setPluginData("textStyleName", styleName);
+    node.characters = planNode.characters ?? "";
+    if (planNode.color !== undefined) {
+      node.fills = [paint(planNode.color, plan)];
+      node.setPluginData("fillToken", planNode.color);
+    }
+    if (planNode.align !== undefined) {
+      node.textAlignHorizontal =
+        planNode.align === "CENTER" ? "CENTER" : planNode.align === "RIGHT" ? "RIGHT" : "LEFT";
+    }
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
+    return node;
+  }
+
+  if (planNode.type === "INSTANCE") {
+    const component = componentVariants[planNode.variant ?? "primary"];
+    if (component === undefined) throw new Error(`BUTTON_VARIANT_MISSING: ${planNode.variant}`);
+    const instance = component.createInstance();
+    instance.name = planNode.name;
+    instance.setPluginData("specId", planNode.specId);
+    instance.setPluginData("kind", "INSTANCE");
+    instance.setPluginData("variant", planNode.variant ?? "");
+    if (planNode.height !== undefined) instance.resize(instance.width, planNode.height);
+    const label = instance.findOne((node: FigmaNode) => node.type === "TEXT");
+    if (label !== undefined && planNode.label !== undefined) {
+      await figma.loadFontAsync(label.fontName);
+      label.characters = planNode.label;
+    }
+    return instance;
+  }
+
+  if (planNode.type === "GLYPH") {
+    let font = { family: "Material Symbols Rounded", style: "Regular" };
+    try {
+      await figma.loadFontAsync(font);
+      recordFont(font.family, font.style, false);
+    } catch {
+      font = await loadFont("Noto Sans SC", 400);
+      errors.push(`GLYPH_FONT_FALLBACK: ${planNode.specId}`);
+    }
+    const node = figma.createText();
+    node.name = planNode.name;
+    node.setPluginData("specId", planNode.specId);
+    node.setPluginData("kind", "GLYPH");
+    node.fontName = font;
+    node.characters = planNode.glyph ?? "";
+    node.fontSize = planNode.size ?? 24;
+    node.textAutoResize = "NONE";
+    node.resize(planNode.size ?? 24, planNode.size ?? 24);
+    node.textAlignHorizontal = "CENTER";
+    node.textAlignVertical = "CENTER";
+    if (planNode.color !== undefined) {
+      node.fills = [paint(planNode.color, plan)];
+      node.setPluginData("fillToken", planNode.color);
+    }
+    return node;
+  }
+
+  if (planNode.type === "VECTOR") {
+    const node = figma.createNodeFromSvg(planNode.svg ?? "");
+    node.name = planNode.name;
+    node.setPluginData("specId", planNode.specId);
+    node.setPluginData("kind", "VECTOR");
+    node.resize(planNode.size ?? node.width, planNode.size ?? node.height);
+    return node;
+  }
+
+  if (planNode.type === "IMAGE") {
+    const node = figma.createRectangle();
+    node.name = planNode.name;
+    node.setPluginData("specId", planNode.specId);
+    node.setPluginData("kind", "IMAGE");
+    node.resize(planNode.width, planNode.height);
+    const base64 = (planNode.dataUrl ?? "").split(",")[1] ?? "";
+    const image = figma.createImage(figma.base64Decode(base64));
+    node.fills = [{ type: "IMAGE", imageHash: image.hash, scaleMode: "FILL" }];
+    node.setPluginData("fillToken", "image");
+    if (planNode.radius !== undefined) node.cornerRadius = planNode.radius;
+    return node;
+  }
+
+  throw new Error(`PLAN_NODE_UNSUPPORTED: ${planNode.type}`);
+}
+
+function readbackNode(node: FigmaNode): FigmaReadbackNode {
+  const kind = node.getPluginData("kind") || node.type;
+  const fillToken = node.getPluginData("fillToken");
+  const textStyleName = node.getPluginData("textStyleName");
+  const variant = node.getPluginData("variant");
+  const text = node.findOne?.((child: FigmaNode) => child.type === "TEXT");
+  const result: FigmaReadbackNode = {
+    nodeId: node.id,
+    type: kind,
+    name: node.name,
+    ...(node.getPluginData("specId") ? { specId: node.getPluginData("specId") } : {}),
+    ...(node.layoutMode ? { layoutMode: node.layoutMode } : {}),
+    ...(node.itemSpacing !== undefined ? { itemSpacing: node.itemSpacing } : {}),
+    ...(node.paddingLeft !== undefined
+      ? {
+          padding: {
+            top: node.paddingTop,
+            right: node.paddingRight,
+            bottom: node.paddingBottom,
+            left: node.paddingLeft,
+          },
+        }
+      : {}),
+    ...(node.width !== undefined ? { width: node.width } : {}),
+    ...(node.height !== undefined ? { height: node.height } : {}),
+    ...(node.x !== undefined ? { x: node.x } : {}),
+    ...(node.y !== undefined ? { y: node.y } : {}),
+    ...(fillToken ? { fills: [fillToken] } : {}),
+    ...(textStyleName ? { textStyleName } : {}),
+    ...(node.characters !== undefined ? { characters: node.characters } : {}),
+    ...(node.fontName !== undefined && node.fontName !== figma.mixed
+      ? { fontName: { family: node.fontName.family, style: node.fontName.style } }
+      : {}),
+    ...(node.fontSize !== undefined && node.fontSize !== figma.mixed
+      ? { fontSize: node.fontSize }
+      : {}),
+    ...(node.type === "INSTANCE"
+      ? {
+          componentName: node.mainComponent?.name,
+          variantProperties: { emphasis: variant },
+          characters: text?.characters,
+        }
+      : {}),
+    children: [],
+  };
+  const children = node.children ?? [];
+  result.children = children.map((child: FigmaNode) => readbackNode(child));
+  return result;
+}
+
+async function build(plan: FigmaPlan, mode: "scratch" | "delivery"): Promise<FigmaReadback> {
+  errors.length = 0;
+  fonts.length = 0;
+  const pageName = mode === "scratch" ? `${plan.pageName} [scratch]` : plan.pageName;
+  const existing = figma.root.children.find((page: FigmaNode) => page.name === pageName);
+  if (existing !== undefined) {
+    if (mode === "delivery") throw new Error(`PAGE_EXISTS: ${pageName}`);
+    existing.remove();
+    for (const key of Object.keys(componentVariants)) delete componentVariants[key];
+  }
+  const page = figma.createPage();
+  page.name = pageName;
+  await figma.setCurrentPageAsync(page);
+  ensureCollection(plan);
+  await ensureButtonSet(plan, page);
+  const root = await buildNode(plan.root, plan);
+  page.appendChild(root);
+  figma.viewport.scrollAndZoomIntoView([root]);
+  const readback: FigmaReadback = {
+    schemaVersion: "1.0",
+    pageId: plan.pageId,
+    ...(figma.fileKey ? { fileKey: figma.fileKey } : {}),
+    builtAt: new Date().toISOString(),
+    fonts: [...fonts],
+    variables: Object.keys(variables),
+    textStyles: Object.keys(textStyles),
+    components: [`${profileName(plan)}/Button`],
+    nodes: [readbackNode(root)],
+    errors: [...errors],
+  };
+  return readback;
+}
+
+figma.showUI(__html__, { width: 440, height: 680, themeColors: true });
+
+figma.ui.onmessage = async (message: any) => {
+  if (message?.type === "build") {
+    try {
+      post("status", { message: "building" });
+      const plan = message.plan as FigmaPlan;
+      const mode = message.mode === "delivery" ? "delivery" : "scratch";
+      const readback = await build(plan, mode);
+      post("readback", { readback });
+    } catch (error) {
+      post("error", { message: error instanceof Error ? error.message : String(error) });
+    }
+  }
+};

@@ -260,6 +260,27 @@ describe("design-system baselines", () => {
     }
   });
 
+  it("declares the Card header action props for every library", () => {
+    for (const catalog of [bDenseCatalog, bMobileCatalog, cExpressiveCatalog]) {
+      const card = component(catalog, "Card");
+      expect(card.props.actionLabel?.type).toBe("string");
+      expect(card.props.actionRoute?.type).toBe("string");
+    }
+  });
+
+  it("declares inline EmptyState and danger Button variants", () => {
+    const empty = component(bMobileCatalog, "EmptyState");
+    expect(empty.props.variant?.enum).toEqual(["default", "calendar", "inline"]);
+    const button = component(bMobileCatalog, "Button");
+    expect(button.props.emphasis?.enum).toEqual([
+      "primary",
+      "secondary",
+      "ghost",
+      "danger",
+    ]);
+    expect(button.variants).toContain("danger");
+  });
+
   it("declares the props and slots used by the compiler templates", () => {
     for (const library of libraryNames) {
       const catalog = getCatalog(library);
@@ -276,7 +297,12 @@ describe("design-system baselines", () => {
     expect(button.props.emphasis?.enum).toEqual(["primary", "secondary", "ghost", "danger"]);
     expect(button.props.size?.enum).toEqual(["sm", "md", "lg"]);
     const mobileButton = component(bMobileCatalog, "Button");
-    expect(mobileButton.props.emphasis?.enum).toEqual(["primary", "secondary", "ghost"]);
+    expect(mobileButton.props.emphasis?.enum).toEqual([
+      "primary",
+      "secondary",
+      "ghost",
+      "danger",
+    ]);
     expect(component(bDenseCatalog, "Input").props.inputType?.enum).toEqual([
       "text",
       "email",

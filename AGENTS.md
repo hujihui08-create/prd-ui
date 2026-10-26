@@ -5,11 +5,13 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 ## Layout
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
-- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `agents`, `spec-engineer`, `intake`, `visual-review`.
-- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`).
+- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `asset-compiler`, `agents`, `spec-engineer`, `intake`, `visual-review`, `figma`.
+- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `studio:prepare`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
+- `pipeline/runtimes/figma` — Figma sandbox plugin (`src/plugin.ts` + `src/ui.html`), bundled to gitignored `dist/` with esbuild; manual Figma gate.
+- `pipeline/studio` — read-only Vite/React/Tailwind v4 + shadcn workbench; reads generated `public/studio-data.json` + copied HTML; never orchestrates.
 - `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). `pipeline/dsh/home/profiles/prd-ui-visual` — Visual Critic profile (vision provider, 65536 maxTokens; kept tools are `read`, `read_image`, `glob`, `grep`, `skill`, `working_directory`, and session-state tools; no write/edit/bash/workflow/subagent/web; see `pipeline/dsh/README.md`). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
-- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
+- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`), plus Visual Critic fixtures (`agents/visual-critic`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
 - `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page Phase 2 exit HTML, screenshots, and asset review evidence.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
 - `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption; `pipeline/docs/prd-review-briefer.md` — PRD review, UI Brief, signoffs, resume, publish.
@@ -41,11 +43,19 @@ pnpm spec:engineer --project samples/project.demo-orders-intake.yaml --agent-run
 pnpm render:html --run /tmp/spec-8p/<runId> --out /tmp/html-8p
 
 # v0.4 visual acceptance: strict motion → render → baseline → real critic → sign
-pnpm spec:engineer --project samples/projects/employee-app-phase2/project.yaml --agent-run /tmp/m1-final2/run-2026-10-22T03-16-05-257Z --runs /tmp/spec-v04 --strict-motion
+pnpm spec:engineer --project samples/projects/employee-app-phase2/project.yaml --agent-run /tmp/m1-final2/<runId> --runs /tmp/spec-v04 --strict-motion
 pnpm render:html --run /tmp/spec-v04/<runId> --out /tmp/html-v04
 pnpm visual:baseline --project samples/projects/employee-app-phase2/project.yaml --spec-run /tmp/spec-v04/<runId> --html /tmp/html-v04 --out baselines/employee-app-phase2
 DSH_HOME="$PWD/dsh/home" pnpm visual:review --project samples/projects/employee-app-phase2/project.yaml --spec-run /tmp/spec-v04/<runId> --html /tmp/html-v04 --baseline baselines/employee-app-phase2 --runtime dsh --profile prd-ui-visual --runs /tmp/visual-v04 --max-cost-cny 3 --json
 pnpm visual:sign --run /tmp/visual-v04/<runId> --signoff-visual /tmp/signoff-visual.md
+
+# v0.6 Phase 3A: Figma plan/diff, asset package, read-only Studio
+pnpm figma:plan --spec-run /tmp/spec-v05/run-2026-10-23T06-07-48-403Z --out /tmp/figma-v06
+pnpm --dir runtimes/figma build
+pnpm figma:verify --plan /tmp/figma-v06/figma-plan.<page>.json --readback <downloaded>.json
+pnpm asset:compile --library samples/assets/m0/library/index.json --source samples/assets/m0/library --licenses samples/assets/m0 --out /tmp/assets-m0
+pnpm studio:prepare --spec-run /tmp/spec-v05/run-2026-10-23T06-07-48-403Z --html /tmp/html-v05 --out studio/public
+pnpm studio:build
 
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
@@ -53,8 +63,9 @@ DSH_HOME="$PWD/dsh/home" pnpm asset:review --project samples/projects/employee-a
 DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/project.yaml --runtime dsh --runs /tmp/m1-agent-dsh
 ```
 
-- With no options, `pnpm phase1:verify` runs the 8-page `demo-orders` sample; the
-  employee-app project is the current 2-page acceptance slice.
+- With no options, `pnpm phase1:verify` runs `samples/project.demo-orders.yaml`
+  (8 pages); `employee-app` is the 2-page acceptance slice and
+  `project.demo-orders-intake.yaml` is the signed 8-page acceptance project.
 - `--runtime dsh` for asset review needs a vision key; `standalone` with the
   scripted reviewer is the keyless path.
 - `agent:run` defaults to `standalone` scripted fixtures; `--runtime dsh` uses
@@ -83,72 +94,32 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-Current expected evidence: 644 tests passing, `pnpm test:dsh` 4 passed,
-typecheck clean, `Phase 1A OK: 2 pages, 0 blockers` for employee-app,
-`13 assets / 13 passed` standalone, scenarios `1 passed / 1 unresolved`, and
-real dsh `deepseek-flash` `13 assets / 13 passed` with
-`usageSource=json-events`, `usageComplete=true`, review cost ≈¥0.35
-(10 CNY default cap). M1 real dsh: three agents, `success`,
-`gates={ia:passed, interaction:passed, visualStyle:passed}`, 10 asset briefs,
-¥0.1973, `usageComplete=true`, no waiver. Earlier waived runs were ¥0.2081 /
-¥0.2487; the employee-app slice IA blockers (dead tabs, missing inventory entry,
-warehouse dead-end, quick-action permission mismatch) are fixed.
-Spec Engineer v0 on the clean M1 run: 2 Page Specs, 0 blockers, 28 expected
-warnings (19 unresolved motion node ids, 9 unused asset briefs). Intake v0:
-8-page sample PRD review/brief passes all gates and publishes a signed
-`ui-brief.json`; employee-app 2-page fixture passes the brief gate and waits
-for signoff. Real dsh intake: 2-page employee-app completes (success + publish,
-¥0.6948); the 8-page sample uses the `prd-ui-intake` profile (65536 maxTokens),
-waives its real F-001/IA-001/IA-002 sample gaps, and completes with publish
-(¥0.90666). Phase 2 8-page exit: `phase1:verify` `8 pages / 0 blockers`;
-real dsh M1 `ia:waived / interaction:passed / visualStyle:passed`, then
-`agent:sign` finalized the visual-style signoff without a model call
-(`status=success`, ¥0.3298); Spec Engineer 8 Page Specs, 0 blockers; renderer
-8 HTML + index. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across
-the demo-orders, employee-app, 03-slice, and phase2 projects. Renderer now
-covers PageShell/MobileShell slots and generic
-components, mock data, and localized labels; the 8-page visual scan renders
-real content and states. M1 keeps `prd-ui-agents` at 32768; the 8-page M1 run
-uses `prd-ui-intake`. Task 1 briefer data: scripted 8-page intake now produces
-`fieldLabels`/`mockData`/`feedItems` and passes the brief gate; clean real dsh
-8-page intake (sample PRD-001 waiver) produced 5 list rows, 5 detail values,
-4 overview items, 4 feed items, 8 pages, brief gate passed, `awaiting_signoff`,
-cost ¥0.5938, `usageComplete=true`. 03 real-PRD slice: 4 pages
-(`appointment-detail`, `appointment-form`, `treatment-notice`,
-`appointment-list`), real dsh intake ¥0.5147 and M1 ¥0.2746
-(`ia:waived / interaction:passed / visualStyle:passed`), Spec Engineer
-4 Page Specs / 0 blockers, `phase1:verify` 4 pages / 0 blockers. The
-`mobile-list` and `mobile-form` archetypes and b-mobile form/list catalog
-components were added for this slice. Visual v0.1 adds `CalendarGrid` (seven-day
-grid), a fixed mobile action footer with primary/secondary split, single-CTA
-mobile form with an alternate-mode note, and `noticeBlocks` per-project notice
-cards. Phase 2 clean exit (v0.3.1): `employee-app-phase2` 8-page real PRD
-slice, PRD readiness ready, **0 waivers and 0 manual brief patches**, brief hash
-`sha256:b558b57a…b8335`, intake ¥0.8978; M1
-`ia:passed / interaction:passed / visualStyle:passed` (0 waivers, ¥0.44),
-Spec Engineer 8 Page Specs / 0 blockers / 36 warnings, assets missing=0,
-asset review 4/4 passed (¥0.1698), render 8 HTML + index,
-`phase1:verify` 8 pages / 0 blockers; Playwright
-interaction checks (search idle/filter/clear/empty, calendar/list toggle,
-empty-cell prefill, drawer, form new/reschedule with customer lock, detail
-status actions, notice confirmation) with 19 screenshots checked in. The
-earlier 2026-10-21 exit with sample IA waivers and one brief patch is
-superseded. Per-profile M1 real run on the 8-page demo-orders
-sample: prompt contains b-dense + c-expressive, interaction passed (¥0.5105).
-Asset chain: 4 standard briefs, `asset:review --briefs` 4/4 passed. v0.4 completed the motion HTML, Visual Critic, screenshot diff, customer
-picker, and full-date prefill work: Spec Engineer `--strict-motion` gives 8
-Page Specs / 0 blockers / 0 motion unresolved, baseline is 24 cases, and the
-follow-up concrete-major fixes (debug route chip, disabled styling, duplicate
-check-in, premature notice, search/list CTAs, list row density, read-only action
-row, notice label, status tones, reschedule prefill, mode lock, calendar/date
-consistency, loading/empty structures) are implemented. The final real-dsh
-review is `status=passed` after signing per the stopping rule: 24/24
-screenshots, 0 console / 0 overflow / 0 diff failures, 9 findings (6 major /
-3 minor / 0 blocker), ¥0 (signed-critique cache hit, 0 model calls), `waivers=[]`. The critic verdict remains
-`changes`; the 6 residual majors are v0.5 debt (today 查看全部, 3-day calendar
-cue, loading skeleton completeness, empty overlay, mode pills, reschedule
-matrix context). Failure attempts (console-error, max-tokens) and costs are
-recorded; deterministic critic replay and Phase 3/4 work remain.
+## Current state (v0.6 implemented, Figma gate pending, 2026-10-26)
+
+Verified: `pnpm test` 688 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
+clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
+demo-orders, employee-app, 03-slice, and phase2 projects.
+
+v0.5 remains the last signed milestone. v0.6 Phase 3A is implemented in the
+automatable parts: `core/figma` plan compiler + readback diff, `runtimes/figma`
+plugin/UI/bundle, `core/asset-compiler` + `asset:compile`, and a read-only
+Studio (`studio/`, shadcn/Tailwind). `figma:plan` generates 8 plans; M0 assets
+package 13/13 and phase2 frozen icons 4/4. Real Figma scratch/delivery/readback
+has **not** run (Brio MCP is disconnected), so v0.6 is **not signed** and cannot
+be `passed` yet. Checked-in evidence:
+`pipeline/artifacts/employee-app-phase2/figma/plans/` (8 plans),
+`pipeline/artifacts/employee-app-phase2/asset-compiler/`, and
+`pipeline/artifacts/employee-app-phase2/studio-v06.png`; `studio/public` is
+generated and gitignored. The `/tmp` evidence from 2026-10-25 has expired.
+
+Next: open Figma desktop (or Brio MCP), import
+`pipeline/runtimes/figma/manifest.json`, build scratch pages + readback, run
+`figma:verify`, then delivery pages and the v0.6 checklist. After signing v0.6,
+start v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9;
+final v1.0.
+Handoff: `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md`
+(overall session state); v0.6 details in
+`docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
 
 ## Architecture boundaries
 
@@ -167,8 +138,10 @@ recorded; deterministic critic replay and Phase 3/4 work remain.
   human signoffs. `DshAgentRunner` owns one model call plus one schema repair.
 - New runtime-neutral behavior belongs in `core/`; file-system, model, and
   process wiring belongs in `runtimes/`.
-- `runtimes/dsh` is the only package that builds `dist/` (esbuild `prepare`);
-  the other packages are consumed as TypeScript source via tsx/vitest.
+- `core/figma` consumes `contracts` + `design-system`; `core/asset-compiler`
+  consumes `contracts`; `studio` is an independent read-only app.
+- `runtimes/dsh` and `runtimes/figma` build `dist/` with esbuild; the other
+  packages are consumed as TypeScript source via tsx/vitest.
 - SVG→PNG rendering lives in `runtimes/standalone`; `@resvg/resvg-js` must not
   be imported by `runtimes/dsh` or its esbuild bundle.
 - dsh review tasks use `--json -` with the task on stdin; verdict comes from
@@ -203,8 +176,8 @@ recorded; deterministic critic replay and Phase 3/4 work remain.
   consumes a completed `manifest.json` (`complete: true`). M1 outputs stay under
   `runs/<runId>/`; `asset-briefs/*.json` are plain `AssetBrief` objects so the
   M0 asset review can consume them.
-- `README.md`'s Phase 1A section still shows the 8-page sample; use the
-  employee-app commands above for the current slice.
+- `.zcode/` holds local ZCode session/plan state; it is untracked today, so do
+  not commit it.
 
 ## Rules
 
@@ -222,8 +195,17 @@ recorded; deterministic critic replay and Phase 3/4 work remain.
 - `docs/superpowers/specs/2026-10-20-phase-2-prd-review-ui-briefer-design.md` — Phase 2 front half: PRD Review + UI Briefer.
 - `docs/superpowers/specs/2026-10-21-8page-renderer-mockdata-visual-fixes-design.md` — 8-page renderer/slots/mockData/fieldLabels fixes.
 - `docs/superpowers/specs/2026-10-21-visual-fidelity-v01-design.md` — calendar, fixed action footer, form CTA, notice blocks.
+- `docs/superpowers/specs/2026-10-22-v04-motion-visual-regression-design.md` — motion presets, semantic node ids, visual review/gates/cache, picker/date.
+- `docs/superpowers/specs/2026-10-23-v041-visual-patch-design.md` — v0.4.1 signed patch: today CTA, 7-column week, inline error, datetime display, reschedule storage.
+- `docs/superpowers/specs/2026-10-23-v05-visual-a11y-closure-design.md` — v0.5 signed: loading/empty/mode/a11y/critic stop rule.
+- `docs/superpowers/specs/2026-10-23-v06-figma-studio-asset-compiler-design.md` — v0.6 implemented (automatable parts): Figma plan/plugin/readback diff, Asset Compiler, read-only Studio; Figma gate pending.
+- `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-23-v04-acceptance-handoff.md` — current v0.4 acceptance handoff (motion, visual review/cache, picker/date, v0.5 debt, next steps).
+- `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — current overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).
+- `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md` — detailed v0.6 progress handoff (Figma gate pending, 688 tests, Studio/Asset evidence).
+- `docs/handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md` — v0.5 signed handoff (loading/empty/mode/a11y/stop rule, v0.5.x minors).
+- `docs/handoffs/2026-10-23-v041-implementation-handoff.md` — historical v0.4.1 signed handoff (7-column week, baseline/signoff).
+- `docs/handoffs/2026-10-23-v04-acceptance-handoff.md` — historical v0.4 acceptance handoff (motion, visual review/cache, picker/date).
 - `docs/handoffs/2026-10-21-8page-renderer-handoff.md` — historical 8-page/renderer handoff (v0.3.1/v0.4 increments).
 - `docs/handoffs/2026-10-21-8page-renderer-handoff-dialogue.md` — Q&A handoff and next-agent prompt.
 - `docs/superpowers/plans/2026-10-23-version-roadmap.md` — confirmed v0.4.1 → v1.0 release path.

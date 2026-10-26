@@ -1,0 +1,391 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "callback-register",
+  "pageName": "回访登记",
+  "width": 390,
+  "height": 844,
+  "background": "color/surface/subtle",
+  "tokens": {
+    "color/surface/default": "#FFFFFF",
+    "color/surface/subtle": "#F5F6F8",
+    "color/surface/raised": "#FFFFFF",
+    "color/text/primary": "#111827",
+    "color/text/secondary": "#4B5563",
+    "color/text/tertiary": "#5B6472",
+    "color/text/onAction": "#FFFFFF",
+    "color/action/primary": "#111827",
+    "color/action/secondary": "#F3F4F6",
+    "color/accent/customer": "#2563EB",
+    "color/accent/inventory": "#F97316",
+    "color/status/success": "#166534",
+    "color/status/warning": "#92400E",
+    "color/status/danger": "#991B1B",
+    "color/status/info": "#1D4ED8",
+    "color/border/subtle": "#E5E7EB",
+    "color/border/strong": "#D1D5DB",
+    "space/1": "4px",
+    "space/2": "8px",
+    "space/3": "12px",
+    "space/4": "16px",
+    "space/6": "24px",
+    "space/8": "32px",
+    "radius/sm": "4px",
+    "radius/md": "6px",
+    "radius/lg": "12px",
+    "radius/full": "9999px"
+  },
+  "textStyles": {
+    "b-mobile/heading.1": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 24,
+      "fontWeight": 600,
+      "lineHeight": 32
+    },
+    "b-mobile/heading.2": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "lineHeight": 24
+    },
+    "b-mobile/heading.3": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 22
+    },
+    "b-mobile/body.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 500,
+      "lineHeight": 18
+    },
+    "b-mobile/body.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16
+    },
+    "b-mobile/label.strong": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "lineHeight": 16
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "fill": "color/action/primary",
+          "text": "color/text/onAction",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "secondary": {
+          "fill": "color/surface/default",
+          "text": "color/text/primary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost": {
+          "fill": "color/surface/default",
+          "text": "color/text/secondary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "danger": {
+          "fill": "color/surface/default",
+          "text": "color/status/danger",
+          "labelTextStyle": "b-mobile/body.md"
+        }
+      }
+    }
+  },
+  "root": {
+    "specId": "callback-register.page.root",
+    "type": "FRAME",
+    "name": "回访登记",
+    "layoutMode": "VERTICAL",
+    "children": [
+      {
+        "specId": "callback-register.page.root.header",
+        "type": "FRAME",
+        "name": "PageHeader",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "callback-register.page.root.header.back",
+            "type": "GLYPH",
+            "name": "Back",
+            "glyph": "arrow_back_ios_new",
+            "size": 20,
+            "color": "color/text/primary"
+          },
+          {
+            "specId": "callback-register.page.root.header.title",
+            "type": "TEXT",
+            "name": "Title",
+            "characters": "回访登记",
+            "textStyle": "b-mobile/heading.2",
+            "color": "color/text/primary"
+          }
+        ],
+        "height": 48,
+        "paddingX": 16,
+        "gap": 8,
+        "fill": "color/surface/subtle",
+        "alignItems": "CENTER"
+      },
+      {
+        "specId": "callback-register.page.root.content",
+        "type": "FRAME",
+        "name": "Content",
+        "layoutMode": "VERTICAL",
+        "children": [
+          {
+            "specId": "callback-register.root.content.0",
+            "type": "FRAME",
+            "name": "Section",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "callback-register.field.customer",
+                "type": "FRAME",
+                "name": "FormField",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "callback-register.field.customer.label",
+                    "type": "TEXT",
+                    "name": "Label",
+                    "characters": "客户 *",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/secondary"
+                  },
+                  {
+                    "specId": "callback-register.root.content.0.children.0.children.0",
+                    "type": "FRAME",
+                    "name": "Row",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "callback-register.root.content.0.children.0.children.0.children.0",
+                        "type": "FRAME",
+                        "name": "Input",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "callback-register.root.content.0.children.0.children.0.children.0.placeholder",
+                            "type": "TEXT",
+                            "name": "Placeholder",
+                            "characters": "请输入客户",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/tertiary"
+                          }
+                        ],
+                        "height": 36,
+                        "paddingX": 10,
+                        "fill": "color/surface/default",
+                        "stroke": "color/border/strong",
+                        "strokeWidth": 1,
+                        "radius": 6,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "callback-register.action.pick-customer",
+                        "type": "INSTANCE",
+                        "name": "Button:选择",
+                        "component": "Button",
+                        "variant": "ghost",
+                        "label": "选择",
+                        "height": 36
+                      }
+                    ],
+                    "gap": 0,
+                    "alignItems": "CENTER"
+                  }
+                ],
+                "gap": 6
+              },
+              {
+                "specId": "callback-register.field.service",
+                "type": "FRAME",
+                "name": "FormField",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "callback-register.field.service.label",
+                    "type": "TEXT",
+                    "name": "Label",
+                    "characters": "服务项目 *",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/secondary"
+                  },
+                  {
+                    "specId": "callback-register.root.content.0.children.1.children.0",
+                    "type": "FRAME",
+                    "name": "Input",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "callback-register.root.content.0.children.1.children.0.placeholder",
+                        "type": "TEXT",
+                        "name": "Placeholder",
+                        "characters": "请输入服务项目",
+                        "textStyle": "b-mobile/body.md",
+                        "color": "color/text/tertiary"
+                      }
+                    ],
+                    "height": 36,
+                    "paddingX": 10,
+                    "fill": "color/surface/default",
+                    "stroke": "color/border/strong",
+                    "strokeWidth": 1,
+                    "radius": 6,
+                    "alignItems": "CENTER"
+                  }
+                ],
+                "gap": 6
+              },
+              {
+                "specId": "callback-register.field.content",
+                "type": "FRAME",
+                "name": "FormField",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "callback-register.field.content.label",
+                    "type": "TEXT",
+                    "name": "Label",
+                    "characters": "回访内容 *",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/secondary"
+                  },
+                  {
+                    "specId": "callback-register.root.content.0.children.2.children.0",
+                    "type": "FRAME",
+                    "name": "Input",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "callback-register.root.content.0.children.2.children.0.placeholder",
+                        "type": "TEXT",
+                        "name": "Placeholder",
+                        "characters": "请输入回访内容",
+                        "textStyle": "b-mobile/body.md",
+                        "color": "color/text/tertiary"
+                      }
+                    ],
+                    "height": 36,
+                    "paddingX": 10,
+                    "fill": "color/surface/default",
+                    "stroke": "color/border/strong",
+                    "strokeWidth": 1,
+                    "radius": 6,
+                    "alignItems": "CENTER"
+                  }
+                ],
+                "gap": 6
+              },
+              {
+                "specId": "callback-register.field.result",
+                "type": "FRAME",
+                "name": "FormField",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "callback-register.field.result.label",
+                    "type": "TEXT",
+                    "name": "Label",
+                    "characters": "回访结果 *",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/secondary"
+                  },
+                  {
+                    "specId": "callback-register.root.content.0.children.3.children.0",
+                    "type": "FRAME",
+                    "name": "Select",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "callback-register.root.content.0.children.3.children.0.value",
+                        "type": "TEXT",
+                        "name": "Value",
+                        "characters": "请选择回访结果",
+                        "textStyle": "b-mobile/body.md",
+                        "color": "color/text/primary"
+                      },
+                      {
+                        "specId": "callback-register.root.content.0.children.3.children.0.chevron",
+                        "type": "GLYPH",
+                        "name": "Chevron",
+                        "glyph": "expand_more",
+                        "size": 16,
+                        "color": "color/text/tertiary"
+                      }
+                    ],
+                    "height": 36,
+                    "paddingX": 10,
+                    "fill": "color/surface/default",
+                    "stroke": "color/border/strong",
+                    "strokeWidth": 1,
+                    "radius": 6,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN"
+                  }
+                ],
+                "gap": 6
+              }
+            ],
+            "padding": 0,
+            "gap": 0
+          }
+        ],
+        "layoutGrow": 1,
+        "fill": "color/surface/subtle",
+        "gap": 0,
+        "clip": true
+      },
+      {
+        "specId": "callback-register.page.root.actions",
+        "type": "FRAME",
+        "name": "Actions",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "callback-register.action.save",
+            "type": "INSTANCE",
+            "name": "Button:保存回访",
+            "component": "Button",
+            "variant": "primary",
+            "label": "保存回访",
+            "height": 44,
+            "layoutGrow": 1
+          }
+        ],
+        "padding": 12,
+        "paddingX": 16,
+        "gap": 8,
+        "fill": "color/surface/default",
+        "stroke": "color/border/subtle",
+        "strokeWidth": 1,
+        "alignItems": "CENTER"
+      }
+    ],
+    "width": 390,
+    "height": 844,
+    "fill": "color/surface/subtle",
+    "clip": true
+  },
+  "stats": {
+    "frames": 14,
+    "texts": 9,
+    "instances": 2,
+    "icons": 2,
+    "images": 0
+  }
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-22T13:57:10.128Z",
+  "generatedAt": "2026-10-23T06:11:29.991Z",
   "cases": [
     {
       "id": "today.default",
@@ -12,8 +12,8 @@
         "height": 844
       },
       "file": "screenshots/today.default.png",
-      "sha256": "sha256:6f6e17d64ce660f3e4d9056a055b654a73e2aabcbe827535d716ac0c6e182b8c",
-      "visualHash": "sha256:dff105d1ca36f60772a63d67d6898e96f005692f5096fc25f8cca713952805e6"
+      "sha256": "sha256:59bf398abf04047603d64ebf4be8a0bfec904f37aec7159dae2b7d2c9cd486dd",
+      "visualHash": "sha256:5aa5cf24bed16567434a3e1c65f06f0011fcab65c2875d89bc50beb1f0f2fc48"
     },
     {
       "id": "today.state.empty",
@@ -27,7 +27,7 @@
         "height": 844
       },
       "file": "screenshots/today.state.empty.png",
-      "sha256": "sha256:c185be33bdc5514edec2a885dc6c02ffb54df1652a2c34b8e082920a76603fde",
+      "sha256": "sha256:58ce713f8c7ed5a2b31f24e8980819d74fe105a3865f604487801c74387e3314",
       "visualHash": "sha256:559fdeebc11bdd91907b6dcf25baaf458a71bedac2283f9f20fc5656855ac3b8"
     },
     {
@@ -39,8 +39,8 @@
         "height": 844
       },
       "file": "screenshots/customer-search.default.png",
-      "sha256": "sha256:15ef99202e8d7f834ed00781440eb2242e198ccf564b06a286338f2a70fb21dd",
-      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+      "sha256": "sha256:5dbcb3a50d3f9be286ada3a1a0b52163bf5cdaff83892d8f688d2ebcd7841c30",
+      "visualHash": "sha256:56b0c90101aadc848c3f03e61e32065902ab9a6892aaa4522b82ae1ba9f89e29"
     },
     {
       "id": "customer-search.search.results",
@@ -51,7 +51,7 @@
         "height": 844
       },
       "file": "screenshots/customer-search.search.results.png",
-      "sha256": "sha256:9cb7b97ea7203d3f8fff7d1c749233d7dc9de99d9e931ab990a2eb14be88624f",
+      "sha256": "sha256:15f062e23cc4e037bf6e4d5b0b73dae761886dd15fef42ff81e36fb794431fd6",
       "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
     },
     {
@@ -63,8 +63,8 @@
         "height": 844
       },
       "file": "screenshots/customer-search.search.empty.png",
-      "sha256": "sha256:9265f99cee196910537193f51f7ef69964ded2470222266a6269e81750eeec62",
-      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+      "sha256": "sha256:a4909edf870f0eaa8264ae156564bfbcd0acb437bcd0b790c6c892104e27c68e",
+      "visualHash": "sha256:a66ab901256b40d490a1cee5cac932e84e12bd255839c6487335ad044b93ad20"
     },
     {
       "id": "customer-detail.default",
@@ -75,8 +75,8 @@
         "height": 844
       },
       "file": "screenshots/customer-detail.default.png",
-      "sha256": "sha256:48b7923b70998631575791a50fa48525748416ea7df77359303651acd62f3a53",
-      "visualHash": "sha256:dfe3501774f7f8e742b3dcc038850dbd5674a45bf1b965bf30027936abf6141f"
+      "sha256": "sha256:04c9f3ca6349ad636b20b5207008f093d08c207f8a4278fc9e317c482c5b9a0b",
+      "visualHash": "sha256:dd07273d2df54d3690a434b9aba6225f01a4e53f53347bd83b2b8a5881e9e2fb"
     },
     {
       "id": "appointment-detail.default",
@@ -87,8 +87,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.default.png",
-      "sha256": "sha256:77898a3a83eca12c8fa904ab7af296aa8040e301a0f276fda6a52b420b600d39",
-      "visualHash": "sha256:7bd0821d4a99086317f16040e1c82a4d3d906787fea9713762dffb437bf73d38"
+      "sha256": "sha256:e742fa14d5c3de3479a73604269f5ebfc62c80fb7a98a69beb1e29fdd47e09aa",
+      "visualHash": "sha256:1148215a822fa54d9ea978bc338563774cd614a5c268907cda26f9146edcfa40"
     },
     {
       "id": "appointment-detail.state.loading",
@@ -102,8 +102,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.state.loading.png",
-      "sha256": "sha256:e30de641030b76075682a1d15f52c0968e9967f983e99d74e7be8d74f23fdd58",
-      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+      "sha256": "sha256:eaf7f4d7179bbbd4bbad1db9141482cd7bf0bf1a407c613ae6f7ff42d5703b11",
+      "visualHash": "sha256:37499b58be68a6f8aff0c0ce6ed82d23ef2a0042991354cd484b623fda18807a"
     },
     {
       "id": "appointment-detail.state.error",
@@ -117,8 +117,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.state.error.png",
-      "sha256": "sha256:72553c8944f05ad06305e07aadd810ac1c28cc02a20d1566d07e4d816af69b5f",
-      "visualHash": "sha256:a3fe62ff96caa3117b3ca9ce4a1bb5466db65d7980308be835c1e1c09ca8df04"
+      "sha256": "sha256:b4bbc39831cc6ab76b8268b2e6be71106852126c79a370bf04eb4ea9123d58a1",
+      "visualHash": "sha256:c768cbea97566b2b86337a218aa6c9b863e82e6363f5617d61d11804f8765172"
     },
     {
       "id": "appointment-detail.business.已到店",
@@ -132,8 +132,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.business.已到店.png",
-      "sha256": "sha256:0603f28b3250e14af89716fa560c08f1c0159f8212101182c0a572c97d1a1db3",
-      "visualHash": "sha256:37499b58be68a6f8aff0c0ce6ed82d23ef2a0042991354cd484b623fda18807a"
+      "sha256": "sha256:ffd5ec701e500e724015d1a51d908d0bf2abb957e999be718fc936b4117cb404",
+      "visualHash": "sha256:43eb76460652c75fa8bb43738924b895a5b1051b5ff342f133d7440f4c1942d5"
     },
     {
       "id": "appointment-detail.business.爽约",
@@ -147,7 +147,7 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.business.爽约.png",
-      "sha256": "sha256:a750d2bb5e98731cd54705feb11d13072b118e13f346f4fb8e33a5f3190bce0f",
+      "sha256": "sha256:9d99dbb099736ca41184a8c0eb15ca55d11aefc221924f84b3199ac0831d110b",
       "visualHash": "sha256:37499b58be68a6f8aff0c0ce6ed82d23ef2a0042991354cd484b623fda18807a"
     },
     {
@@ -162,7 +162,7 @@
         "height": 844
       },
       "file": "screenshots/appointment-detail.business.已取消.png",
-      "sha256": "sha256:5daf520829d380eecbaf3f536ddf8a48389556950fc3adf6958b40ddc1cb91b1",
+      "sha256": "sha256:86bf41eca53d46eef8f5217629f16be531c16325cfe3dbac1561767ef0100572",
       "visualHash": "sha256:37499b58be68a6f8aff0c0ce6ed82d23ef2a0042991354cd484b623fda18807a"
     },
     {
@@ -174,8 +174,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-form.default.png",
-      "sha256": "sha256:dc0886caac657a3b9a4860eb53683e4af55e0b6115215dfb8244284e32c059bb",
-      "visualHash": "sha256:9517ca2922db5a751a48e8088680634a1ec8347f2221162bc91beb9bf1888544"
+      "sha256": "sha256:05fbd68c93914ef1602b9fc108d811e7b4e04fe4aa9da1afdf3492a77accd369",
+      "visualHash": "sha256:157162e253101d4343b554be495429ec03d24d3e43d6ec30bf5339289a5d77d1"
     },
     {
       "id": "appointment-form.state.disabled",
@@ -189,23 +189,24 @@
         "height": 844
       },
       "file": "screenshots/appointment-form.state.disabled.png",
-      "sha256": "sha256:873857b7ae1335dbd15e59e06a17d7180e41f78d54fe9a48b3838594f5c0a052",
-      "visualHash": "sha256:799c0f577f857c21f7fb85a1286fda1cfa6ea10f379d647da93c6f03f5a6bb84"
+      "sha256": "sha256:ff9aadb8b7b1d86edff2d2335ae502d580e53358e4d3b584d73f13039af3fdb5",
+      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
     },
     {
       "id": "appointment-form.mode.reschedule",
       "pageId": "appointment-form",
       "state": "mode:reschedule",
       "query": {
-        "mode": "reschedule"
+        "mode": "reschedule",
+        "recordId": "appointment-detail"
       },
       "viewport": {
         "width": 390,
         "height": 844
       },
       "file": "screenshots/appointment-form.mode.reschedule.png",
-      "sha256": "sha256:ac71f60c6c387e988ea65efa3c89590bf855e3c808ac1fb2d9432de77d605c38",
-      "visualHash": "sha256:3540d552c690532eb316998070d1cae6361fcc7de234f228411d70072534c98b"
+      "sha256": "sha256:8e6d475c1faea31ab61fdcddac13b8e8f927057aaef551813b454049a5dcfeb9",
+      "visualHash": "sha256:fe00e569c83ea279ed6ec9ffbaeb5552ab1d0dfa7c6da20e82fcad0c69f44ddd"
     },
     {
       "id": "treatment-notice.default",
@@ -216,8 +217,8 @@
         "height": 844
       },
       "file": "screenshots/treatment-notice.default.png",
-      "sha256": "sha256:dd31a154b14b38e0500fe7dabe049daf3e1812d9f5cd75929f7151bbcce56211",
-      "visualHash": "sha256:f14f23c5fba5663d930deb7701a065ef08eb594e0f9e5990f1812c0caea2dfa6"
+      "sha256": "sha256:da11d010ceb55e2f64a6b6f3d582085e480d33941046ea3b7579163fd5c4c0de",
+      "visualHash": "sha256:0ef88c2f6459046c9c4ae14066eaee45ef933ddec895176db135f104140ad57e"
     },
     {
       "id": "treatment-notice.business.已确认",
@@ -231,7 +232,7 @@
         "height": 844
       },
       "file": "screenshots/treatment-notice.business.已确认.png",
-      "sha256": "sha256:ab76a04020768cbb6bd7f2bf93abef3d1270b6115f511d513033f05cdf98a53d",
+      "sha256": "sha256:90222a16ddbacc4d16fa1aec241c675846c382f7057518a8a7ef240f91435c33",
       "visualHash": "sha256:37499b58be68a6f8aff0c0ce6ed82d23ef2a0042991354cd484b623fda18807a"
     },
     {
@@ -243,8 +244,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.default.png",
-      "sha256": "sha256:9347b52320ca78c5529967045f75f164f4cf5eabf345c0bfc79f1a2bdd9c8116",
-      "visualHash": "sha256:1a132c64f179581e9a183921a5a63a3840f2b6db0c66325599adf1044ee99fc1"
+      "sha256": "sha256:0d36b35d3653b8360e58705c2317975d2f4c04731a6a695d35ceec84dce568aa",
+      "visualHash": "sha256:63cca39c447201d150da3f74407dfeabdcd0cad7a17d6dba3248e9b1e8d06741"
     },
     {
       "id": "appointment-list.state.loading",
@@ -258,8 +259,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.state.loading.png",
-      "sha256": "sha256:7aff7884302538a1db7b0bb86efb4cafac05e17f6bb38f1f541d5c2d66033b5d",
-      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+      "sha256": "sha256:83ea3039aa860c02a2d920d75d47a96d70015eb614158009b8fd424c1abfdc09",
+      "visualHash": "sha256:ea0cd4d9858fbc2c2ee7703259bc6b0c634df19471014600b3a49cbd04b8abc1"
     },
     {
       "id": "appointment-list.state.error",
@@ -273,8 +274,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.state.error.png",
-      "sha256": "sha256:698a1ebc6b71d221a12bf298f1c00f803f6e9183135df943a105a411ef578a6d",
-      "visualHash": "sha256:a3fe62ff96caa3117b3ca9ce4a1bb5466db65d7980308be835c1e1c09ca8df04"
+      "sha256": "sha256:cd4e4ffde78301fbd5201c4fe07e906a1f6a549dbcc29b9a2b92b64bbeef09e8",
+      "visualHash": "sha256:9580d86dfc0870227e84f99d53d629837151772e22caa13cf7a116d4a773ad0f"
     },
     {
       "id": "appointment-list.state.empty",
@@ -288,8 +289,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.state.empty.png",
-      "sha256": "sha256:00058f549ea2140cd41f44933f8394cdcd7bb27068290251f009486a8f833e78",
-      "visualHash": "sha256:07199ed3da369f4a44a1e2e864f4c60bd44823ec3c1ac68d15140868f7595eb7"
+      "sha256": "sha256:d21ed83f01dc60b5ae21cc9a3d00a4496addd02b37d5a00fd89449398ed1b88a",
+      "visualHash": "sha256:136d2681585beb67e79b2903eb8d6688045dba6abd6316b3ecf4f5f85a9973c0"
     },
     {
       "id": "appointment-list.view.list",
@@ -303,8 +304,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.view.list.png",
-      "sha256": "sha256:a0859fa8466bb3e00c55485c910a1764f55f654b37b98a047df7d7de2b1635ff",
-      "visualHash": "sha256:238133e229287323672af40a5b670a1938f48a104ca7f0b3ac183aa19a462dee"
+      "sha256": "sha256:9f80bc69498b2dd1369c5bfeacf01080082aa843208867205b0f77fcf770ae5f",
+      "visualHash": "sha256:6ca98738f50e8c53b268fd224199e5cbb04b7cefbe53920ef4e91980e5a25986"
     },
     {
       "id": "appointment-list.drawer",
@@ -318,8 +319,8 @@
         "height": 844
       },
       "file": "screenshots/appointment-list.drawer.png",
-      "sha256": "sha256:b48476b3c6fc2cf4ec9249f3c8722b31766075763b3cd826b0de9ed4b11696cd",
-      "visualHash": "sha256:3b5ea5b6700dba5929f89d801d0a77d6e5b942b9b415ef48033ccd0d4ff204bd"
+      "sha256": "sha256:dfcf32ae60bed444d9f15a273cc0eb56fc5ce01d1c01345ec4847bf31be248a0",
+      "visualHash": "sha256:c527960550ffef0bed8cc95f9d5f7605fc0b30d65377d6e2394eb38963d793d5"
     },
     {
       "id": "callback-register.default",
@@ -330,8 +331,8 @@
         "height": 844
       },
       "file": "screenshots/callback-register.default.png",
-      "sha256": "sha256:62f1e7562cbcadfb1765188b13bd9be49d630b4f12f523304287b6be7950a586",
-      "visualHash": "sha256:9e58473aee7c18dee5eae431d0855068ccb88c76332d39ec7adb4093e98d842d"
+      "sha256": "sha256:38bbbcd1624194793fa25915c732df6449175074b7edba51ab7a26242b508c2b",
+      "visualHash": "sha256:eda97ce815431ca86dc403852a92ab0d8f0471d1c2249c84cdc778a43ad92571"
     }
   ]
 }

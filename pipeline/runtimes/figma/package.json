@@ -1,0 +1,15 @@
+{
+  "name": "@prd-ui/runtime-figma",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "node esbuild.config.mjs"
+  },
+  "dependencies": {
+    "@prd-ui/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

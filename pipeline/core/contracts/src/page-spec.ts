@@ -164,6 +164,8 @@ export interface PageSpec {
     customer?: string;
     notice?: string;
     form?: string;
+    /** List page route; today's card action consumes it. */
+    list?: string;
   };
   traceability: PageTraceability;
 }
@@ -269,6 +271,7 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
         customer: z.string().min(1).optional(),
         notice: z.string().min(1).optional(),
         form: z.string().min(1).optional(),
+        list: z.string().min(1).optional(),
       })
       .strict()
       .optional(),

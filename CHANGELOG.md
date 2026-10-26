@@ -3,12 +3,113 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-25 — Phase 3A implementation (v0.6, Figma gate pending)
+
+### Added
+
+- `core/contracts/src/figma.ts`: FigmaPlan/Readback/Diff schemas.
+- `core/figma`: 8-page default plan compiler, Button instances, glyph/vector/image,
+  CalendarGrid absolute blocks, readback diff; plan/diff tests.
+- `runtimes/figma`: Figma sandbox plugin, plan file picker, scratch/delivery build,
+  readback download, esbuild bundle and manifest; no Node imports.
+- `runtimes/standalone`: `figma:plan`, `figma:verify`, `asset:compile`,
+  `studio:prepare` CLIs.
+- `core/asset-compiler`: determinism, licenses, placeholders/missing file blocks;
+  M0 13 assets and phase2 4 frozen icons package.
+- `studio`: read-only Vite/React/Tailwind v4 + shadcn-style workbench; 8 pages,
+  iframe state/view preview, Spec/Catalog/Profile/Findings/Assets/Trace panels.
+
+### Verification
+
+- `pnpm test` **688 passed**；typecheck clean；`pnpm test:dsh` 4 passed。
+- Phase 1 `8 / 2 / 4 / 8` pages，全 0 blockers。
+- `figma:plan`: 8 plans；plugin bundle build；8-page Studio smoke 0 console.
+- Asset Compiler: M0 13/13 + phase2 4/4；LICENSES includes Lucide ISC.
+
+### Not done
+
+- Real Figma scratch/delivery/readback and `figma:verify` are pending (Brio MCP
+  disconnected); v0.6 is **not signed**.
+- v0.6.x: Figma state frames, full component library, Material Symbols vector set,
+  Studio Playwright test wiring.
+- Handoff: `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
+
 ## 2026-10-23 — Version roadmap confirmed
 
 - Confirmed the release path: v0.4.1 visual patch → v0.5 visual/a11y closure →
   v0.6 Figma/Studio → v0.7 sandbox/Handoff → v0.8 real-project pilot → v0.9 RC →
   v1.0. No code or behavior changes in this entry.
 - Roadmap: `docs/superpowers/plans/2026-10-23-version-roadmap.md`.
+
+## 2026-10-23 — v0.5 visual + a11y closure (signed)
+
+### Added
+
+- In-place loading skeletons for mobile-list/detail: calendar keeps its 7×12 grid,
+  day/time labels and chrome; list gets 12 skeleton rows; detail summary values
+  shimmer and loading hides status/action/footer.
+- Inline empty band in the calendar/list panels; grid, legend and clear-filter
+  remain visible; no fixed overlay.
+- a11y baseline: AA text/status tokens, `:focus-visible`, search pill focus ring,
+  keyboard row/block activation, drawer Escape/focus return, `required`/
+  `aria-required`.
+- Critic stop rule: signoff `acceptedMajors` + max 2 majors; `visual:sign`
+  rejects over-limit or unexplained majors.
+- Calendar half-hour positioning: 16:30 blocks render at 16:30 and show the real
+  time; shared field labels align detail summary values.
+- Visual debt: `取消` danger action right-aligned, 44px footer CTA, 16px page
+  gutter, search placeholder `搜索客户`.
+
+### Changed
+
+- `appointment-form` mode pills removed; title/entry/banner express
+  new vs reschedule; no-record reschedule disables save.
+- `VisualReview` baseline/signoff updated to v0.5 (24 cases).
+
+### Verification
+
+- `pnpm test` 672 passed；typecheck clean；`pnpm test:dsh` 4 passed。
+- Phase 1 `8 / 2 / 4 / 8` pages，全 0 blockers；`--strict-motion` 8 / 0 / 0；8 HTML + index。
+- 最终 Critic `run-2026-10-23T06-10-08-791Z`：24/24、diff 24/0/0、
+  **0 major / 4 minor / 0 blocker**、¥0.4105、`usageComplete=true`。
+- 签核：胡冀徽，2026-10-23，`acceptedMajors=[]`，`waivers=[]`；baseline manifest
+  `sha256:6c900b29…c79f`；findings `sha256:57c9a5b4…b623`。
+- 1 次 `VISUAL_CRITIC_UNAVAILABLE` infra 失败已记录，未伪造 pass。
+- Remaining minors: disabled datetime container, loading selected-column skeleton,
+  Sunday tint, treatment-notice timestamp format（v0.5.x）。
+- Handoff: `docs/handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md`。
+
+## 2026-10-23 — v0.4.1 visual patch (signed)
+
+### Added
+
+- today「我的预约」卡头「查看全部」：`PageSpec.linkedRoutes.list`、Card
+  `actionLabel/actionRoute`，并在 b-mobile / b-dense / c-expressive 的 Card 契约中声明。
+- 390px 紧凑 7 日周历：短日期、选中日表头/整列高亮、11px 时间/日期、12px 事件标题、
+  10px 项目与开始时间 cue；hint/fade 作为溢出兜底保留。
+- 列表 error 内联面板：mobile-list 保留筛选/日期/切换/日历标题与图例，隐藏数据区。
+- `datetime-local` 静止态中文显示层；禁用态统一 input surface 并隐藏原生 picker 图标。
+- `VisualCase.storage` + reschedule 上下文：截图前注入详情摘要，字段 prefill 和
+  「正在改期」条生效；移除旧 `.appointment-id`。
+- business state 下 footer 仅一个可见动作时提升为 primary（已到店「开单」）。
+
+### Changed
+
+- v0.4.1 原定“3 天 + 滚动提示/渐隐”被真实 Critic 拒绝，最终采用同屏 7 列紧凑周历；
+  偏差见 spec §13.2。
+- 列表视图移除游离「列表」标题；disabled 表单不再出现原生日期白块。
+
+### Verification
+
+- `pnpm test` 652 passed；typecheck clean；`pnpm test:dsh` 4 passed。
+- Phase 1 `8 / 2 / 4 / 8` pages，全 0 blockers；`--strict-motion` 8 / 0 / 0；8 HTML + index。
+- 最终 Critic run `run-2026-10-23T03-01-28-979Z`：24/24、diff 24/0/0、0 blocker、¥0.3970、
+  `usageComplete=true`；6 项 v0.4.1 finding 消失。
+- `visual:sign` signed：胡冀徽，2026-10-23，`waivers=[]`；baseline manifest
+  `sha256:341458e6…c4f4`；findings `sha256:0b7829da…c0b06`；`status=success`。
+- 剩余 major：empty overlay、loading skeleton、mode pills（v0.5）以及 appointment-detail
+  「取消」缺少危险语义（既有问题，本轮新暴露）。
+- Handoff: `docs/handoffs/2026-10-23-v041-implementation-handoff.md`。
 
 ## 2026-10-22 — Motion, Visual Review, picker, and fidelity (v0.4)
 

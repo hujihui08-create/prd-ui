@@ -1,0 +1,2857 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "appointment-list",
+  "pageName": "预约列表",
+  "width": 390,
+  "height": 844,
+  "background": "color/surface/subtle",
+  "tokens": {
+    "color/surface/default": "#FFFFFF",
+    "color/surface/subtle": "#F5F6F8",
+    "color/surface/raised": "#FFFFFF",
+    "color/text/primary": "#111827",
+    "color/text/secondary": "#4B5563",
+    "color/text/tertiary": "#5B6472",
+    "color/text/onAction": "#FFFFFF",
+    "color/action/primary": "#111827",
+    "color/action/secondary": "#F3F4F6",
+    "color/accent/customer": "#2563EB",
+    "color/accent/inventory": "#F97316",
+    "color/status/success": "#166534",
+    "color/status/warning": "#92400E",
+    "color/status/danger": "#991B1B",
+    "color/status/info": "#1D4ED8",
+    "color/border/subtle": "#E5E7EB",
+    "color/border/strong": "#D1D5DB",
+    "space/1": "4px",
+    "space/2": "8px",
+    "space/3": "12px",
+    "space/4": "16px",
+    "space/6": "24px",
+    "space/8": "32px",
+    "radius/sm": "4px",
+    "radius/md": "6px",
+    "radius/lg": "12px",
+    "radius/full": "9999px"
+  },
+  "textStyles": {
+    "b-mobile/heading.1": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 24,
+      "fontWeight": 600,
+      "lineHeight": 32
+    },
+    "b-mobile/heading.2": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "lineHeight": 24
+    },
+    "b-mobile/heading.3": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 22
+    },
+    "b-mobile/body.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 500,
+      "lineHeight": 18
+    },
+    "b-mobile/body.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16
+    },
+    "b-mobile/label.strong": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "lineHeight": 16
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "fill": "color/action/primary",
+          "text": "color/text/onAction",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "secondary": {
+          "fill": "color/surface/default",
+          "text": "color/text/primary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost": {
+          "fill": "color/surface/default",
+          "text": "color/text/secondary",
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "danger": {
+          "fill": "color/surface/default",
+          "text": "color/status/danger",
+          "labelTextStyle": "b-mobile/body.md"
+        }
+      }
+    }
+  },
+  "root": {
+    "specId": "appointment-list.page.root",
+    "type": "FRAME",
+    "name": "预约列表",
+    "layoutMode": "VERTICAL",
+    "children": [
+      {
+        "specId": "appointment-list.page.root.header",
+        "type": "FRAME",
+        "name": "PageHeader",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "appointment-list.page.root.header.back",
+            "type": "GLYPH",
+            "name": "Back",
+            "glyph": "arrow_back_ios_new",
+            "size": 20,
+            "color": "color/text/primary"
+          },
+          {
+            "specId": "appointment-list.page.root.header.title",
+            "type": "TEXT",
+            "name": "Title",
+            "characters": "预约列表",
+            "textStyle": "b-mobile/heading.2",
+            "color": "color/text/primary"
+          }
+        ],
+        "height": 48,
+        "paddingX": 16,
+        "gap": 8,
+        "fill": "color/surface/subtle",
+        "alignItems": "CENTER"
+      },
+      {
+        "specId": "appointment-list.page.root.content",
+        "type": "FRAME",
+        "name": "Content",
+        "layoutMode": "VERTICAL",
+        "children": [
+          {
+            "specId": "appointment-list.root.content.0",
+            "type": "FRAME",
+            "name": "Section",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "appointment-list.root.content.0.children.0",
+                "type": "FRAME",
+                "name": "Row",
+                "layoutMode": "HORIZONTAL",
+                "children": [
+                  {
+                    "specId": "appointment-list.root.content.0.children.0.children.0",
+                    "type": "FRAME",
+                    "name": "CollapsedFilter",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.0.label",
+                        "type": "TEXT",
+                        "name": "Label",
+                        "characters": "状态",
+                        "textStyle": "b-mobile/label.sm",
+                        "color": "color/text/tertiary"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.0.value",
+                        "type": "TEXT",
+                        "name": "Value",
+                        "characters": "全部",
+                        "textStyle": "b-mobile/body.md",
+                        "color": "color/text/primary"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.0.chevron",
+                        "type": "GLYPH",
+                        "name": "Chevron",
+                        "glyph": "expand_more",
+                        "size": 16,
+                        "color": "color/text/tertiary"
+                      }
+                    ],
+                    "height": 30,
+                    "paddingX": 8,
+                    "gap": 4,
+                    "fill": "color/surface/default",
+                    "stroke": "color/border/subtle",
+                    "strokeWidth": 1,
+                    "radius": 6,
+                    "alignItems": "CENTER"
+                  },
+                  {
+                    "specId": "appointment-list.root.content.0.children.0.children.1",
+                    "type": "FRAME",
+                    "name": "CollapsedFilter",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.1.label",
+                        "type": "TEXT",
+                        "name": "Label",
+                        "characters": "日期",
+                        "textStyle": "b-mobile/label.sm",
+                        "color": "color/text/tertiary"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.1.value",
+                        "type": "TEXT",
+                        "name": "Value",
+                        "characters": "11-05 周三",
+                        "textStyle": "b-mobile/body.md",
+                        "color": "color/text/primary"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.0.children.1.chevron",
+                        "type": "GLYPH",
+                        "name": "Chevron",
+                        "glyph": "expand_more",
+                        "size": 16,
+                        "color": "color/text/tertiary"
+                      }
+                    ],
+                    "height": 30,
+                    "paddingX": 8,
+                    "gap": 4,
+                    "fill": "color/surface/default",
+                    "stroke": "color/border/subtle",
+                    "strokeWidth": 1,
+                    "radius": 6,
+                    "alignItems": "CENTER"
+                  }
+                ],
+                "gap": 0,
+                "alignItems": "CENTER"
+              },
+              {
+                "specId": "appointment-list.root.content.0.children.1",
+                "type": "FRAME",
+                "name": "Row",
+                "layoutMode": "HORIZONTAL",
+                "children": [
+                  {
+                    "specId": "appointment-list.action.toggle-view",
+                    "type": "INSTANCE",
+                    "name": "Button:切换日历/列表",
+                    "component": "Button",
+                    "variant": "secondary",
+                    "label": "切换日历/列表",
+                    "height": 36
+                  }
+                ],
+                "gap": 0,
+                "alignItems": "CENTER"
+              },
+              {
+                "specId": "appointment-list.view.calendar",
+                "type": "FRAME",
+                "name": "Section",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "appointment-list.root.content.0.children.2.children.0",
+                    "type": "FRAME",
+                    "name": "Row",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.0.children.0",
+                        "type": "TEXT",
+                        "name": "Text",
+                        "characters": "日历",
+                        "textStyle": "b-mobile/heading.3",
+                        "color": "color/text/primary"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.0.children.1",
+                        "type": "TEXT",
+                        "name": "Text",
+                        "characters": "11-05 周三",
+                        "textStyle": "b-mobile/label.strong",
+                        "color": "color/text/primary"
+                      }
+                    ],
+                    "gap": 0,
+                    "alignItems": "CENTER"
+                  },
+                  {
+                    "specId": "appointment-list.root.content.0.children.2.children.1",
+                    "type": "FRAME",
+                    "name": "Row",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.1.children.0",
+                        "type": "FRAME",
+                        "name": "Badge",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-list.root.content.0.children.2.children.1.children.0.label",
+                            "type": "TEXT",
+                            "name": "Label",
+                            "characters": "已登记",
+                            "textStyle": "b-mobile/label.strong",
+                            "color": "color/status/warning"
+                          }
+                        ],
+                        "height": 20,
+                        "paddingX": 6,
+                        "radius": 4,
+                        "fill": "color/status/warning",
+                        "fillAlpha": 0.12,
+                        "alignItems": "CENTER",
+                        "justifyContent": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.1.children.1",
+                        "type": "FRAME",
+                        "name": "Badge",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-list.root.content.0.children.2.children.1.children.1.label",
+                            "type": "TEXT",
+                            "name": "Label",
+                            "characters": "已到店",
+                            "textStyle": "b-mobile/label.strong",
+                            "color": "color/status/success"
+                          }
+                        ],
+                        "height": 20,
+                        "paddingX": 6,
+                        "radius": 4,
+                        "fill": "color/status/success",
+                        "fillAlpha": 0.12,
+                        "alignItems": "CENTER",
+                        "justifyContent": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.1.children.2",
+                        "type": "FRAME",
+                        "name": "Badge",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-list.root.content.0.children.2.children.1.children.2.label",
+                            "type": "TEXT",
+                            "name": "Label",
+                            "characters": "爽约",
+                            "textStyle": "b-mobile/label.strong",
+                            "color": "color/status/danger"
+                          }
+                        ],
+                        "height": 20,
+                        "paddingX": 6,
+                        "radius": 4,
+                        "fill": "color/status/danger",
+                        "fillAlpha": 0.12,
+                        "alignItems": "CENTER",
+                        "justifyContent": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-list.root.content.0.children.2.children.1.children.3",
+                        "type": "FRAME",
+                        "name": "Badge",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-list.root.content.0.children.2.children.1.children.3.label",
+                            "type": "TEXT",
+                            "name": "Label",
+                            "characters": "已取消",
+                            "textStyle": "b-mobile/label.strong",
+                            "color": "color/status/danger"
+                          }
+                        ],
+                        "height": 20,
+                        "paddingX": 6,
+                        "radius": 4,
+                        "fill": "color/status/danger",
+                        "fillAlpha": 0.12,
+                        "alignItems": "CENTER",
+                        "justifyContent": "CENTER"
+                      }
+                    ],
+                    "gap": 0,
+                    "alignItems": "CENTER"
+                  },
+                  {
+                    "specId": "appointment-list.calendar.grid",
+                    "type": "FRAME",
+                    "name": "CalendarGrid",
+                    "layoutMode": "NONE",
+                    "children": [
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.0",
+                        "name": "Day:周一",
+                        "x": 36,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.0.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.0.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周一",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.0.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-03",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.1",
+                        "name": "Day:周二",
+                        "x": 82,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.1.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.1.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周二",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.1.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-04",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.2",
+                        "name": "Day:周三",
+                        "x": 128,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.2.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.2.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周三",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/status/info"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.2.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-05",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/status/info"
+                            }
+                          ],
+                          "fill": "color/status/info",
+                          "fillAlpha": 0.14,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.3",
+                        "name": "Day:周四",
+                        "x": 174,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.3.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.3.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周四",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.3.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-06",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.4",
+                        "name": "Day:周五",
+                        "x": 220,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.4.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.4.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周五",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.4.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-07",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.5",
+                        "name": "Day:周六",
+                        "x": 266,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.5.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.5.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周六",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.5.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-08",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.day.6",
+                        "name": "Day:周日",
+                        "x": 312,
+                        "y": 0,
+                        "width": 46,
+                        "height": 36,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.day.6.frame",
+                          "type": "FRAME",
+                          "name": "Day",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.day.6.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "周日",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.day.6.date",
+                              "type": "TEXT",
+                              "name": "Date",
+                              "characters": "11-09",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "fill": "color/surface/subtle",
+                          "fillAlpha": 1,
+                          "gap": 1,
+                          "alignItems": "CENTER",
+                          "justifyContent": "CENTER"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.0",
+                        "name": "Hour:09:00",
+                        "x": 0,
+                        "y": 36,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.0.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.0.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "09:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.0.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 36,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.0.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.1",
+                        "name": "Hour:10:00",
+                        "x": 0,
+                        "y": 80,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.1.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.1.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "10:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.1.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 80,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.1.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.2",
+                        "name": "Hour:11:00",
+                        "x": 0,
+                        "y": 124,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.2.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.2.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "11:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.2.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 124,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.2.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.3",
+                        "name": "Hour:12:00",
+                        "x": 0,
+                        "y": 168,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.3.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.3.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "12:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.3.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 168,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.3.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.4",
+                        "name": "Hour:13:00",
+                        "x": 0,
+                        "y": 212,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.4.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.4.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "13:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.4.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 212,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.4.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.5",
+                        "name": "Hour:14:00",
+                        "x": 0,
+                        "y": 256,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.5.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.5.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "14:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.5.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 256,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.5.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.6",
+                        "name": "Hour:15:00",
+                        "x": 0,
+                        "y": 300,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.6.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.6.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "15:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.6.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 300,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.6.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.7",
+                        "name": "Hour:16:00",
+                        "x": 0,
+                        "y": 344,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.7.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.7.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "16:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.7.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 344,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.7.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.8",
+                        "name": "Hour:17:00",
+                        "x": 0,
+                        "y": 388,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.8.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.8.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "17:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.8.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 388,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.8.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.9",
+                        "name": "Hour:18:00",
+                        "x": 0,
+                        "y": 432,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.9.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.9.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "18:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.9.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 432,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.9.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.10",
+                        "name": "Hour:19:00",
+                        "x": 0,
+                        "y": 476,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.10.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.10.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "19:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.10.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 476,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.10.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.hour.11",
+                        "name": "Hour:20:00",
+                        "x": 0,
+                        "y": 520,
+                        "width": 36,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.hour.11.frame",
+                          "type": "FRAME",
+                          "name": "Hour",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.hour.11.label",
+                              "type": "TEXT",
+                              "name": "Label",
+                              "characters": "20:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary",
+                              "align": "RIGHT"
+                            }
+                          ],
+                          "paddingX": 4,
+                          "alignItems": "END",
+                          "justifyContent": "START"
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.0",
+                        "name": "Cell",
+                        "x": 36,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.0.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.1",
+                        "name": "Cell",
+                        "x": 82,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.1.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.2",
+                        "name": "Cell",
+                        "x": 128,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.2.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.3",
+                        "name": "Cell",
+                        "x": 174,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.3.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.4",
+                        "name": "Cell",
+                        "x": 220,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.4.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.5",
+                        "name": "Cell",
+                        "x": 266,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.5.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.cell.11.6",
+                        "name": "Cell",
+                        "x": 312,
+                        "y": 520,
+                        "width": 46,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.cell.11.6.frame",
+                          "type": "FRAME",
+                          "name": "Cell",
+                          "layoutMode": "NONE",
+                          "children": [],
+                          "fill": "color/surface/default",
+                          "stroke": "color/border/subtle",
+                          "strokeWidth": 0.5
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.block.0",
+                        "name": "Block:张女士",
+                        "x": 129,
+                        "y": 80,
+                        "width": 44,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.block.0.frame",
+                          "type": "FRAME",
+                          "name": "Block",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.block.0.title",
+                              "type": "TEXT",
+                              "name": "Title",
+                              "characters": "张女士",
+                              "textStyle": "b-mobile/label.strong",
+                              "color": "color/text/primary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.0.subtitle",
+                              "type": "TEXT",
+                              "name": "Subtitle",
+                              "characters": "小气泡",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.0.time",
+                              "type": "TEXT",
+                              "name": "Time",
+                              "characters": "10:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "padding": 2,
+                          "gap": 0,
+                          "fill": "color/status/warning",
+                          "fillAlpha": 0.1,
+                          "radius": 4
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.block.1",
+                        "name": "Block:李女士",
+                        "x": 129,
+                        "y": 256,
+                        "width": 44,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.block.1.frame",
+                          "type": "FRAME",
+                          "name": "Block",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.block.1.title",
+                              "type": "TEXT",
+                              "name": "Title",
+                              "characters": "李女士",
+                              "textStyle": "b-mobile/label.strong",
+                              "color": "color/text/primary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.1.subtitle",
+                              "type": "TEXT",
+                              "name": "Subtitle",
+                              "characters": "补水",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.1.time",
+                              "type": "TEXT",
+                              "name": "Time",
+                              "characters": "14:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "padding": 2,
+                          "gap": 0,
+                          "fill": "color/status/success",
+                          "fillAlpha": 0.1,
+                          "radius": 4
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.block.2",
+                        "name": "Block:王女士",
+                        "x": 129,
+                        "y": 366,
+                        "width": 44,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.block.2.frame",
+                          "type": "FRAME",
+                          "name": "Block",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.block.2.title",
+                              "type": "TEXT",
+                              "name": "Title",
+                              "characters": "王女士",
+                              "textStyle": "b-mobile/label.strong",
+                              "color": "color/text/primary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.2.subtitle",
+                              "type": "TEXT",
+                              "name": "Subtitle",
+                              "characters": "肩颈",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.2.time",
+                              "type": "TEXT",
+                              "name": "Time",
+                              "characters": "16:30",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "padding": 2,
+                          "gap": 0,
+                          "fill": "color/status/warning",
+                          "fillAlpha": 0.1,
+                          "radius": 4
+                        }
+                      },
+                      {
+                        "type": "ABSOLUTE",
+                        "specId": "appointment-list.calendar.grid.block.3",
+                        "name": "Block:赵女士",
+                        "x": 129,
+                        "y": 432,
+                        "width": 44,
+                        "height": 44,
+                        "child": {
+                          "specId": "appointment-list.calendar.grid.block.3.frame",
+                          "type": "FRAME",
+                          "name": "Block",
+                          "layoutMode": "VERTICAL",
+                          "children": [
+                            {
+                              "specId": "appointment-list.calendar.grid.block.3.title",
+                              "type": "TEXT",
+                              "name": "Title",
+                              "characters": "赵女士",
+                              "textStyle": "b-mobile/label.strong",
+                              "color": "color/text/primary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.3.subtitle",
+                              "type": "TEXT",
+                              "name": "Subtitle",
+                              "characters": "补水",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/secondary"
+                            },
+                            {
+                              "specId": "appointment-list.calendar.grid.block.3.time",
+                              "type": "TEXT",
+                              "name": "Time",
+                              "characters": "18:00",
+                              "textStyle": "b-mobile/label.sm",
+                              "color": "color/text/tertiary"
+                            }
+                          ],
+                          "padding": 2,
+                          "gap": 0,
+                          "fill": "color/status/danger",
+                          "fillAlpha": 0.1,
+                          "radius": 4
+                        }
+                      }
+                    ],
+                    "width": 358,
+                    "height": 564,
+                    "fill": "color/surface/default",
+                    "radius": 12,
+                    "clip": true
+                  }
+                ],
+                "padding": 0,
+                "gap": 0
+              }
+            ],
+            "padding": 0,
+            "gap": 0
+          }
+        ],
+        "layoutGrow": 1,
+        "fill": "color/surface/subtle",
+        "gap": 0,
+        "clip": true
+      },
+      {
+        "specId": "appointment-list.page.root.actions",
+        "type": "FRAME",
+        "name": "Actions",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "appointment-list.action.new-appointment",
+            "type": "INSTANCE",
+            "name": "Button:新增预约",
+            "component": "Button",
+            "variant": "primary",
+            "label": "新增预约",
+            "height": 44,
+            "layoutGrow": 1
+          }
+        ],
+        "padding": 12,
+        "paddingX": 16,
+        "gap": 8,
+        "fill": "color/surface/default",
+        "stroke": "color/border/subtle",
+        "strokeWidth": 1,
+        "alignItems": "CENTER"
+      }
+    ],
+    "width": 390,
+    "height": 844,
+    "fill": "color/surface/subtle",
+    "clip": true
+  },
+  "stats": {
+    "frames": 124,
+    "texts": 49,
+    "instances": 2,
+    "icons": 3,
+    "images": 0
+  }
+}

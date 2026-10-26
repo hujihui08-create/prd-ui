@@ -2,6 +2,7 @@ packages:
   - "core/*"
   - "runtimes/*"
   - "dsh/home/profiles/*"
+  - "studio"
 allowBuilds:
   '@deepseek-ai/dsh-subprocess-local': true
   '@google/genai': true

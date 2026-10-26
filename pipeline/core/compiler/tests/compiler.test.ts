@@ -72,6 +72,68 @@ describe("compileProject", () => {
     expect(icons).toEqual(["icon-plus", "icon-plus", "icon-search"]);
   });
 
+  it("adds today's appointment-list entry and marks the selected calendar day", () => {
+    const phase2 = UiBriefSchema.parse(phase2BriefJson);
+    const compiled = compileProject(phase2, deps);
+    const today = compiled.find((spec) => spec.meta.pageId === "today")!;
+    const card = collectNodes(today.layout).find(
+      (node) => node.type === "Card" && node.props?.title === "我的预约"
+    )!;
+    expect(card.props).toMatchObject({
+      actionLabel: "查看全部",
+      actionRoute: "/appointments",
+    });
+    expect(today.linkedRoutes?.list).toBe("/appointments");
+
+    const list = compiled.find((spec) => spec.meta.pageId === "appointment-list")!;
+    const calendar = collectNodes(list.layout).find((node) => node.type === "CalendarGrid")!;
+    const days = calendar.props?.days as Array<{
+      date: string;
+      selected: boolean;
+      today: boolean;
+    }>;
+    expect(days.find((day) => day.date === "2025-11-05")?.selected).toBe(true);
+    expect(days.filter((day) => day.selected)).toHaveLength(1);
+    expect(days.every((day) => day.today === false)).toBe(true);
+
+    const form = compiled.find((spec) => spec.meta.pageId === "appointment-form")!;
+    const inputs = collectNodes(form.layout).filter((node) => node.type === "Input");
+    expect(inputs.find((node) => node.props?.name === "startTime")?.props?.placeholder).toBe(
+      "请选择开始时间"
+    );
+    expect(inputs.find((node) => node.props?.name === "endTime")?.props?.placeholder).toBe(
+      "请选择结束时间"
+    );
+  });
+
+  it("places inline empty states in both view panels and a list skeleton", () => {
+    const list = phase2Spec("appointment-list");
+    const panels = collectNodes(list.layout).filter(
+      (node) => node.type === "Section" && node.props?.viewPanel !== undefined
+    );
+    const calendar = panels.find((node) => node.props?.viewPanel === "calendar")!;
+    const listPanel = panels.find((node) => node.props?.viewPanel === "list")!;
+    const empties = (panel: SpecNode) =>
+      collectNodes(panel).filter(
+        (node) => node.type === "EmptyState" && node.props?.variant === "inline"
+      );
+    expect(empties(calendar)).toHaveLength(1);
+    expect(empties(listPanel)).toHaveLength(1);
+    expect(
+      collectNodes(listPanel).some(
+        (node) => node.type === "Skeleton" && node.props?.variant === "list"
+      )
+    ).toBe(true);
+  });
+
+  it("marks 取消 as a danger action", () => {
+    const detail = phase2Spec("appointment-detail");
+    const cancel = nodesOf(detail, "Button").find(
+      (node) => node.props?.label === "取消"
+    );
+    expect(cancel?.props?.emphasis).toBe("danger");
+  });
+
   it("adds a clear-keyword action to the customer-search empty state", () => {
     const phase2Brief = UiBriefSchema.parse(phase2BriefJson);
     const phase2Specs = compileProject(phase2Brief, deps);
@@ -357,6 +419,11 @@ describe("compileProject", () => {
   });
 });
 
+function phase2Spec(pageId: string): PageSpec {
+  const phase2 = UiBriefSchema.parse(phase2BriefJson);
+  return compileProject(phase2, deps).find((spec) => spec.meta.pageId === pageId)!;
+}
+
 function nodesOf(spec: PageSpec, type: string): SpecNode[] {
   return collectNodes(spec.layout).filter((node) => node.type === type);
 }
@@ -432,7 +499,7 @@ describe("brief-driven page content", () => {
       collectNodes(spec.layout)
         .filter((node) => node.type === "Text")
         .map((node) => node.props?.text)
-    ).toEqual(["日历", "列表"]);
+    ).toEqual(["日历"]);
     expect(nodesOf(spec, "CalendarGrid")[0]?.props).toMatchObject({
       days: expect.arrayContaining([
         expect.objectContaining({ label: "周一", date: "2026-10-19", today: true }),
@@ -586,7 +653,7 @@ describe("brief-driven page content", () => {
       archetype: getArchetype("mobile-list"),
     });
     expect(nodesOf(spec, "SearchBar")[0]?.props?.placeholder).toBe(
-      "输入姓名或脱敏手机号搜索客户"
+      "搜索客户"
     );
     expect(nodesOf(spec, "Text").map((node) => node.props?.text)).not.toContain(
       "关键词"
@@ -1056,13 +1123,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     const list = phase2Spec("appointment-list");
     const grid = nodesOf(list, "CalendarGrid")[0]!;
     expect(grid.props?.days).toEqual([
-      { label: "周一", date: "2025-11-03", today: false },
-      { label: "周二", date: "2025-11-04", today: false },
-      { label: "周三", date: "2025-11-05", today: false },
-      { label: "周四", date: "2025-11-06", today: false },
-      { label: "周五", date: "2025-11-07", today: false },
-      { label: "周六", date: "2025-11-08", today: false },
-      { label: "周日", date: "2025-11-09", today: false },
+      { label: "周一", date: "2025-11-03", today: false, selected: false },
+      { label: "周二", date: "2025-11-04", today: false, selected: false },
+      { label: "周三", date: "2025-11-05", today: false, selected: true },
+      { label: "周四", date: "2025-11-06", today: false, selected: false },
+      { label: "周五", date: "2025-11-07", today: false, selected: false },
+      { label: "周六", date: "2025-11-08", today: false, selected: false },
+      { label: "周日", date: "2025-11-09", today: false, selected: false },
     ]);
     expect(
       (grid.props?.blocks as Array<{ day: number }>).map((block) => block.day)

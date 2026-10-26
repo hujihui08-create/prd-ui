@@ -23,6 +23,16 @@ export const IaWaiverSchema = z
   .strict();
 export type IaWaiver = z.infer<typeof IaWaiverSchema>;
 
+export const AcceptedMajorSchema = z
+  .object({
+    findingId: z.string().min(1),
+    reason: z.string().min(1),
+    owner: z.string().min(1),
+    reviewBy: z.string().min(1).optional(),
+  })
+  .strict();
+export type AcceptedMajor = z.infer<typeof AcceptedMajorSchema>;
+
 export const SignoffAnswerSchema = z
   .object({
     questionId: z.string().min(1),
@@ -51,6 +61,7 @@ export const SignoffBlockSchema = z
     signer: z.string().min(1),
     date: z.string().min(1),
     waivers: z.array(IaWaiverSchema).default([]),
+    acceptedMajors: z.array(AcceptedMajorSchema).default([]),
     answers: z.array(SignoffAnswerSchema).default([]),
     approvals: z.array(SignoffApprovalSchema).default([]),
     briefHash: z.string().min(1).optional(),
@@ -68,6 +79,7 @@ export interface ParsedSignoff {
   signer?: string;
   date?: string;
   waivers: IaWaiver[];
+  acceptedMajors: AcceptedMajor[];
   answers: SignoffAnswer[];
   approvals: SignoffApproval[];
   briefHash?: string;
@@ -89,6 +101,7 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: false,
       valid: false,
       waivers: [],
+      acceptedMajors: [],
       answers: [],
       approvals: [],
       error: "SIGNOFF_BLOCK_MISSING",
@@ -103,6 +116,7 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: true,
       valid: false,
       waivers: [],
+      acceptedMajors: [],
       answers: [],
       approvals: [],
       error: "SIGNOFF_BLOCK_INVALID_JSON",
@@ -115,6 +129,7 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       present: true,
       valid: false,
       waivers: [],
+      acceptedMajors: [],
       answers: [],
       approvals: [],
       error: `SIGNOFF_BLOCK_INVALID: ${parsed.error.message}`,
@@ -127,6 +142,7 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
       signer: parsed.data.signer,
       date: parsed.data.date,
       waivers: parsed.data.waivers,
+      acceptedMajors: parsed.data.acceptedMajors,
       answers: parsed.data.answers,
       approvals: parsed.data.approvals,
       ...(parsed.data.briefHash === undefined
@@ -148,6 +164,7 @@ export function parseSignoffMarkdown(text: string): ParsedSignoff {
     signer: parsed.data.signer,
     date: parsed.data.date,
     waivers: parsed.data.waivers,
+    acceptedMajors: parsed.data.acceptedMajors,
     answers: parsed.data.answers,
     approvals: parsed.data.approvals,
     ...(parsed.data.briefHash === undefined

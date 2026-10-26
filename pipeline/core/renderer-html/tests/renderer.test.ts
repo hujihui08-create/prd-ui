@@ -386,6 +386,114 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(detail).not.toContain('form-readonly">已登记');
   });
 
+  it("renders the today action and calendar scroll/selection affordances", () => {
+    const today = renderDocument(phase2ById.get("today")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(today).toContain('class="card-action" href="appointment-list.html"');
+    expect(today).toContain("查看全部");
+
+    const list = renderDocument(phase2ById.get("appointment-list")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(list).toContain('class="calendar-hint"');
+    expect(list).toContain('class="calendar-viewport"');
+    expect(list).toContain('class="calendar-scroll" tabindex="0"');
+    expect(list).toContain('class="calendar-day selected"');
+    expect(list).toContain('class="calendar-cell selected"');
+    expect(list).toContain("applyCalendarScroll");
+  });
+
+  it("keeps list context above an inline error panel", () => {
+    const list = renderDocument(phase2ById.get("appointment-list")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    const inline = list.indexOf('class="state-panel error inline"');
+    expect(inline).toBeGreaterThan(-1);
+    expect(inline).toBeLessThan(list.indexOf("</main>"));
+
+    const detail = renderDocument(phase2ById.get("appointment-detail")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(detail).not.toContain("state-panel error inline");
+    expect(detail.indexOf('class="state-panel error"')).toBeGreaterThan(
+      detail.indexOf("</main>")
+    );
+  });
+
+  it("localizes datetime display and renders a reschedule context", () => {
+    const form = renderDocument(phase2ById.get("appointment-form")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+      pageArchetypes: phase2Archetypes,
+    });
+    expect(form).toContain('class="datetime-control"');
+    expect(form).toContain('class="datetime-display" aria-hidden="true">请选择开始时间');
+    expect(form).toContain("applyDateTimeDisplay");
+    expect(form).toContain('className = "reschedule-context"');
+    expect(form).toContain("正在改期");
+    expect(form).toContain("请从预约详情进入改期");
+    expect(form).not.toContain("appointment-id");
+  });
+
+  it("promotes a sole visible footer action in a business state", () => {
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile"),
+      { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
+    );
+    expect(detail).toContain("visibleBarActions.length === 1");
+    expect(detail).toContain('only.classList.add("primary")');
+  });
+
+  it("uses in-place loading skeletons for list and detail", () => {
+    const list = renderDocument(phase2ById.get("appointment-list")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(list).not.toContain('class="state-panel loading"');
+    expect((list.match(/class="skeleton-list-row"/g) ?? []).length).toBe(12);
+    expect(list).toContain('body[data-state="loading"] .calendar-cell');
+    expect(list).toContain("aria-busy");
+
+    const detail = renderDocument(phase2ById.get("appointment-detail")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(detail).not.toContain('class="state-panel loading"');
+    expect(detail).toContain('body[data-state="loading"] .app-scroll .list-text-value');
+  });
+
+  it("renders empty as an inline band without a fixed overlay", () => {
+    const list = renderDocument(phase2ById.get("appointment-list")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(list).toContain('class="empty-state empty-inline"');
+    expect(list).not.toContain("empty-calendar{position:fixed");
+    expect(list).toContain('body[data-state="empty"] .calendar-block');
+  });
+
+  it("adds focus, keyboard, and required semantics", () => {
+    const list = renderDocument(phase2ById.get("appointment-list")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(list).toContain(":focus-visible");
+    expect(list).toContain('role="button"');
+    expect(list).toContain('tabindex="0"');
+    const form = renderDocument(phase2ById.get("appointment-form")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+    });
+    expect(form).toContain("aria-required");
+  });
+
+  it("removes mode pills and expresses reschedule through title and banner", () => {
+    const form = renderDocument(phase2ById.get("appointment-form")!, getProfile("b-mobile"), {
+      pageRoutes: phase2Routes,
+      pageArchetypes: phase2Archetypes,
+    });
+    expect(form).not.toContain("mode-tabs");
+    expect(form).toContain("改期预约");
+    expect(form).toContain("请从预约详情进入改期");
+    expect(form).toContain("submit.disabled = true");
+  });
+
   it("stores and restores reschedule record context", () => {
     const detail = renderDocument(
       phase2ById.get("appointment-detail")!,
@@ -416,7 +524,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     );
     expect(search).not.toContain('class="app-actions"');
     expect(search).not.toContain('data-action="查看详情"');
-    expect(search).toContain('placeholder="输入姓名或脱敏手机号搜索客户"');
+    expect(search).toContain('placeholder="搜索客户"');
     expect(search).toContain("row.dataset.rowLink = \"true\"");
     expect(search).toContain("chevron.className = \"row-chevron\"");
   });
@@ -428,7 +536,8 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       { pageRoutes: phase2Routes, pageArchetypes: phase2Archetypes }
     );
     expect(form).toContain('"referenceId":null');
-    expect(form).toContain("current.name === \"reschedule\" && appointmentId");
+    expect(form).toContain('className = "reschedule-context"');
+    expect(form).toContain("请从预约详情进入改期");
     const detail = renderDocument(
       phase2ById.get("appointment-detail")!,
       getProfile("b-mobile"),
@@ -527,7 +636,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     );
     expect(form).toContain('dateParam + "T" + timeParam');
     expect(form).toContain('"formModeLabels":{"new":"新增预约","reschedule":"改期"}');
-    expect(form).toContain("config.formModeLabels?.[mode.name]");
+    expect(form).toContain('current.name === "reschedule" ? "改期预约" : "新增预约"');
     expect(form).toContain('sessionStorage.setItem(draftKey, JSON.stringify(draft))');
     expect(form).toContain('sessionStorage.setItem(returnKey, config.pageId)');
     expect(form).toContain('sessionStorage.getItem(returnKey) === config.pageId');
