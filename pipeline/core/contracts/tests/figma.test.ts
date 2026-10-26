@@ -98,4 +98,63 @@ describe("figma contracts", () => {
       FigmaReadbackSchema.safeParse({ ...readback, nodes: undefined }).success
     ).toBe(false);
   });
+
+  it("accepts coverage and mapping metadata", () => {
+    const withCoverage: FigmaPlan = {
+      ...plan,
+      coverage: {
+        nodes: [
+          {
+            specId: "today.page.root",
+            specType: "MobileShell",
+            path: "layout",
+            status: "mapped",
+          },
+          {
+            specId: "today.chart",
+            specType: "Chart",
+            path: "layout.children[0]",
+            status: "unmapped",
+            reason: "UNMAPPED_COMPONENT:Chart",
+          },
+        ],
+        summary: { spec: 2, derived: 0, mapped: 1, degraded: 0, unmapped: 1, skipped: 0 },
+      },
+      root: {
+        ...plan.root,
+        origin: "spec",
+        mapping: "unmapped",
+        reason: "UNMAPPED_COMPONENT:Chart",
+      },
+    };
+    expect(FigmaPlanSchema.safeParse(withCoverage).success).toBe(true);
+  });
+
+  it("accepts extended readback style fields", () => {
+    const extended: FigmaReadback = {
+      ...readback,
+      nodes: [
+        {
+          ...readback.nodes[0]!,
+          cornerRadius: 8,
+          borderTop: { width: 0, color: "#00000000" },
+          borderBottom: { width: 1, color: "#E2E8F0" },
+          borderLeft: { width: 2, color: "#2563EB" },
+          fillDetails: [{ color: "#FFFFFF", alpha: 1 }],
+          fontWeight: 600,
+          textColor: "#111827",
+          lineHeight: 24,
+        },
+      ],
+    };
+    expect(FigmaReadbackSchema.safeParse(extended).success).toBe(true);
+  });
+
+  it("rejects an unknown mapping status", () => {
+    const invalid = {
+      ...plan,
+      root: { ...plan.root, mapping: "maybe" },
+    };
+    expect(FigmaPlanSchema.safeParse(invalid).success).toBe(false);
+  });
 });
