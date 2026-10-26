@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-26T16:26:02.661Z",
+  "generatedAt": "2026-10-26T16:40:39.348Z",
   "executedGatesPassed": true,
   "complete": false,
   "conformance": {
@@ -21,7 +21,7 @@
   },
   "parity": {
     "status": "skipped",
-    "reason": "missing Figma PNGs in pipeline/artifacts/employee-app-phase2/figma/parity: appointment-detail, appointment-form, appointment-list, callback-register, customer-detail, customer-search, today, treatment-notice"
+    "reason": "missing --baseline"
   },
   "paritySkipped": true
 }
