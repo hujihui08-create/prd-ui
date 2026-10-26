@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "appointment-detail.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "预约详情",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-detail.page.root.content",
@@ -217,7 +229,9 @@
                     "name": "Title",
                     "characters": "预约详情摘要",
                     "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary"
+                    "color": "color/text/primary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-detail.card.summary.badge",
@@ -231,7 +245,9 @@
                         "name": "Label",
                         "characters": "已登记",
                         "textStyle": "b-mobile/label.strong",
-                        "color": "color/status/warning"
+                        "color": "color/status/warning",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 20,
@@ -240,12 +256,16 @@
                     "fill": "color/status/warning",
                     "fillAlpha": 0.12,
                     "alignItems": "CENTER",
-                    "justifyContent": "CENTER"
+                    "justifyContent": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN"
+                "justifyContent": "SPACE_BETWEEN",
+                "origin": "derived",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-detail.card.summary.body",
@@ -277,10 +297,14 @@
                                 "name": "Label",
                                 "characters": "客户",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.0.value",
@@ -289,14 +313,18 @@
                             "characters": "张女士",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.1",
@@ -316,10 +344,14 @@
                                 "name": "Label",
                                 "characters": "手机号",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.1.value",
@@ -328,14 +360,18 @@
                             "characters": "138****0000",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.2",
@@ -355,10 +391,14 @@
                                 "name": "Label",
                                 "characters": "项目",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.2.value",
@@ -367,14 +407,18 @@
                             "characters": "小气泡",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.3",
@@ -394,10 +438,14 @@
                                 "name": "Label",
                                 "characters": "时间段",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.3.value",
@@ -406,14 +454,18 @@
                             "characters": "11-05 周三 10:00-11:00",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.4",
@@ -433,10 +485,14 @@
                                 "name": "Label",
                                 "characters": "护理师",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.4.value",
@@ -445,14 +501,18 @@
                             "characters": "王美容",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.5",
@@ -472,10 +532,14 @@
                                 "name": "Label",
                                 "characters": "门店",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.5.value",
@@ -484,14 +548,18 @@
                             "characters": "星光店",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.6",
@@ -511,10 +579,14 @@
                                 "name": "Label",
                                 "characters": "来源",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.6.value",
@@ -523,14 +595,18 @@
                             "characters": "电话",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.7",
@@ -550,10 +626,14 @@
                                 "name": "Label",
                                 "characters": "创建人",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.7.value",
@@ -562,14 +642,18 @@
                             "characters": "王美容",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.8",
@@ -589,10 +673,14 @@
                                 "name": "Label",
                                 "characters": "创建时间",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.8.value",
@@ -601,14 +689,18 @@
                             "characters": "2026-11-01 15:20",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.9",
@@ -628,10 +720,14 @@
                                 "name": "Label",
                                 "characters": "委派留痕",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.9.value",
@@ -640,14 +736,18 @@
                             "characters": "—",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-detail.root.summary.0.children.0.row.10",
@@ -667,10 +767,14 @@
                                 "name": "Label",
                                 "characters": "服务完成",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "appointment-detail.root.summary.0.children.0.row.10.value",
@@ -679,27 +783,36 @@
                             "characters": "否",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
-                    "gap": 0
+                    "gap": 0,
+                    "paddingY": 4,
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 0
+                "gap": 0,
+                "origin": "derived",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8,
+            "gap": 0,
             "fill": "color/surface/default",
             "radius": 12,
-            "shadow": true
+            "shadow": true,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "appointment-detail.root.fields.0",
@@ -713,7 +826,9 @@
                 "name": "Button:改期",
                 "component": "Button",
                 "variant": "ghost-chip",
-                "label": "改期"
+                "label": "改期",
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-detail.action.customer",
@@ -721,7 +836,9 @@
                 "name": "Button:客户详情",
                 "component": "Button",
                 "variant": "ghost-chip",
-                "label": "客户详情"
+                "label": "客户详情",
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-detail.action.cancel",
@@ -729,17 +846,24 @@
                 "name": "Button:取消",
                 "component": "Button",
                 "variant": "danger",
-                "label": "取消"
+                "label": "取消",
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "gap": 8,
-            "alignItems": "CENTER"
+            "alignItems": "CENTER",
+            "paddingX": 16,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-detail.page.root.actions",
@@ -755,7 +879,9 @@
             "variant": "primary",
             "label": "已到店确认",
             "height": 44,
-            "layoutGrow": 1
+            "layoutGrow": 1,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "appointment-detail.action.open-order",
@@ -765,7 +891,9 @@
             "variant": "secondary",
             "label": "开单",
             "height": 44,
-            "layoutGrow": 1
+            "layoutGrow": 1,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "padding": 12,
@@ -774,13 +902,17 @@
         "fill": "color/surface/default",
         "stroke": "color/border/subtle",
         "strokeWidth": 1,
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
     "frames": 32,
@@ -788,5 +920,71 @@
     "instances": 5,
     "icons": 1,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "appointment-detail.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.card.summary",
+        "specType": "Card",
+        "path": "layout.slots.summary[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.root.summary.0.children.0",
+        "specType": "List",
+        "path": "layout.slots.summary[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.root.fields.0",
+        "specType": "Row",
+        "path": "layout.slots.fields[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.action.reschedule",
+        "specType": "Button",
+        "path": "layout.slots.fields[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.action.customer",
+        "specType": "Button",
+        "path": "layout.slots.fields[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.action.cancel",
+        "specType": "Button",
+        "path": "layout.slots.fields[0].children[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.action.checkin",
+        "specType": "Button",
+        "path": "layout.slots.actions[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-detail.action.open-order",
+        "specType": "Button",
+        "path": "layout.slots.actions[1]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 9,
+      "derived": 54,
+      "mapped": 63,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 0
+    }
   }
 }

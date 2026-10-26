@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "treatment-notice.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "术后告知",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "treatment-notice.page.root.content",
@@ -217,7 +229,9 @@
                     "name": "Title",
                     "characters": "术后告知摘要",
                     "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary"
+                    "color": "color/text/primary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "treatment-notice.card.summary.badge",
@@ -231,7 +245,9 @@
                         "name": "Label",
                         "characters": "未确认",
                         "textStyle": "b-mobile/label.strong",
-                        "color": "color/status/warning"
+                        "color": "color/status/warning",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 20,
@@ -240,12 +256,16 @@
                     "fill": "color/status/warning",
                     "fillAlpha": 0.12,
                     "alignItems": "CENTER",
-                    "justifyContent": "CENTER"
+                    "justifyContent": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN"
+                "justifyContent": "SPACE_BETWEEN",
+                "origin": "derived",
+                "mapping": "mapped"
               },
               {
                 "specId": "treatment-notice.card.summary.body",
@@ -277,10 +297,14 @@
                                 "name": "Label",
                                 "characters": "客户",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "treatment-notice.root.summary.0.children.0.row.0.value",
@@ -289,14 +313,18 @@
                             "characters": "张女士",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "treatment-notice.root.summary.0.children.0.row.1",
@@ -316,10 +344,14 @@
                                 "name": "Label",
                                 "characters": "单号",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "treatment-notice.root.summary.0.children.0.row.1.value",
@@ -328,14 +360,18 @@
                             "characters": "SO20261102001",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "treatment-notice.root.summary.0.children.0.row.2",
@@ -355,10 +391,14 @@
                                 "name": "Label",
                                 "characters": "确认人",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "treatment-notice.root.summary.0.children.0.row.2.value",
@@ -367,14 +407,18 @@
                             "characters": "—",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
                         "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "borderBottomWidth": 1,
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "treatment-notice.root.summary.0.children.0.row.3",
@@ -394,10 +438,14 @@
                                 "name": "Label",
                                 "characters": "确认时间",
                                 "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary"
+                                "color": "color/text/tertiary",
+                                "origin": "derived",
+                                "mapping": "mapped"
                               }
                             ],
-                            "width": 72
+                            "width": 72,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           },
                           {
                             "specId": "treatment-notice.root.summary.0.children.0.row.3.value",
@@ -406,27 +454,36 @@
                             "characters": "—",
                             "textStyle": "b-mobile/body.md",
                             "color": "color/text/primary",
-                            "layoutGrow": 1
+                            "layoutGrow": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "paddingY": 10,
                         "gap": 12,
                         "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
-                    "gap": 0
+                    "gap": 0,
+                    "paddingY": 4,
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 0
+                "gap": 0,
+                "origin": "derived",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8,
+            "gap": 0,
             "fill": "color/surface/default",
             "radius": 12,
-            "shadow": true
+            "shadow": true,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "treatment-notice.root.summary.1",
@@ -440,11 +497,16 @@
                 "name": "Text",
                 "characters": "告知内容",
                 "textStyle": "b-mobile/heading.3",
-                "color": "color/text/primary"
+                "color": "color/text/primary",
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "gap": 8,
-            "alignItems": "CENTER"
+            "alignItems": "CENTER",
+            "paddingX": 16,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "treatment-notice.root.summary.2",
@@ -464,12 +526,16 @@
                     "name": "Title",
                     "characters": "小气泡",
                     "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary"
+                    "color": "color/text/primary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN"
+                "justifyContent": "SPACE_BETWEEN",
+                "origin": "derived",
+                "mapping": "mapped"
               },
               {
                 "specId": "treatment-notice.root.summary.2.body",
@@ -488,29 +554,40 @@
                         "type": "TEXT",
                         "name": "Item",
                         "characters": "术后 6 小时内避免沾水与化妆",
-                        "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "textStyle": "b-mobile/body.regular",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "treatment-notice.root.summary.2.children.0.row.1",
                         "type": "TEXT",
                         "name": "Item",
                         "characters": "当日避免剧烈运动与高温环境",
-                        "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "textStyle": "b-mobile/body.regular",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
-                    "gap": 0
+                    "gap": 0,
+                    "paddingY": 4,
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 0
+                "gap": 0,
+                "origin": "derived",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8,
+            "gap": 0,
             "fill": "color/surface/default",
             "radius": 12,
-            "shadow": true
+            "shadow": true,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "treatment-notice.root.summary.3",
@@ -530,12 +607,16 @@
                     "name": "Title",
                     "characters": "补水",
                     "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary"
+                    "color": "color/text/primary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN"
+                "justifyContent": "SPACE_BETWEEN",
+                "origin": "derived",
+                "mapping": "mapped"
               },
               {
                 "specId": "treatment-notice.root.summary.3.body",
@@ -554,29 +635,40 @@
                         "type": "TEXT",
                         "name": "Item",
                         "characters": "术后加强保湿与防晒",
-                        "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "textStyle": "b-mobile/body.regular",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "treatment-notice.root.summary.3.children.0.row.1",
                         "type": "TEXT",
                         "name": "Item",
                         "characters": "24 小时内避免桑拿与高温环境",
-                        "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "textStyle": "b-mobile/body.regular",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
-                    "gap": 0
+                    "gap": 0,
+                    "paddingY": 4,
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 0
+                "gap": 0,
+                "origin": "derived",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8,
+            "gap": 0,
             "fill": "color/surface/default",
             "radius": 12,
-            "shadow": true
+            "shadow": true,
+            "origin": "spec",
+            "mapping": "mapped"
           },
           {
             "specId": "treatment-notice.root.fields.0",
@@ -585,13 +677,18 @@
             "layoutMode": "HORIZONTAL",
             "children": [],
             "gap": 4,
-            "alignItems": "CENTER"
+            "alignItems": "CENTER",
+            "paddingX": 16,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "treatment-notice.page.root.actions",
@@ -607,7 +704,9 @@
             "variant": "primary",
             "label": "确认已当面告知",
             "height": 44,
-            "layoutGrow": 1
+            "layoutGrow": 1,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "padding": 12,
@@ -616,13 +715,17 @@
         "fill": "color/surface/default",
         "stroke": "color/border/subtle",
         "strokeWidth": 1,
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
     "frames": 27,
@@ -630,5 +733,83 @@
     "instances": 1,
     "icons": 1,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "treatment-notice.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.card.summary",
+        "specType": "Card",
+        "path": "layout.slots.summary[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.0.children.0",
+        "specType": "List",
+        "path": "layout.slots.summary[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.1",
+        "specType": "Row",
+        "path": "layout.slots.summary[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.1.children.0",
+        "specType": "Text",
+        "path": "layout.slots.summary[1].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.2",
+        "specType": "Card",
+        "path": "layout.slots.summary[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.2.children.0",
+        "specType": "List",
+        "path": "layout.slots.summary[2].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.3",
+        "specType": "Card",
+        "path": "layout.slots.summary[3]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.summary.3.children.0",
+        "specType": "List",
+        "path": "layout.slots.summary[3].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.root.fields.0",
+        "specType": "Row",
+        "path": "layout.slots.fields[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "treatment-notice.action.confirm",
+        "specType": "Button",
+        "path": "layout.slots.actions[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 11,
+      "derived": 36,
+      "mapped": 47,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 0
+    }
   }
 }

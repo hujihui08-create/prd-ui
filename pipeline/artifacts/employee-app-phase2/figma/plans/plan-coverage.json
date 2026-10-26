@@ -1,0 +1,823 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "specRun": "/Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/spec-source",
+  "pages": [
+    {
+      "pageId": "appointment-detail",
+      "file": "figma-plan.appointment-detail.json",
+      "summary": {
+        "spec": 9,
+        "derived": 54,
+        "mapped": 63,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 0
+      },
+      "nodes": [
+        {
+          "specId": "appointment-detail.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.card.summary",
+          "specType": "Card",
+          "path": "layout.slots.summary[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.root.summary.0.children.0",
+          "specType": "List",
+          "path": "layout.slots.summary[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.root.fields.0",
+          "specType": "Row",
+          "path": "layout.slots.fields[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.action.reschedule",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.action.customer",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.action.cancel",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.action.checkin",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-detail.action.open-order",
+          "specType": "Button",
+          "path": "layout.slots.actions[1]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "appointment-form",
+      "file": "figma-plan.appointment-form.json",
+      "summary": {
+        "spec": 17,
+        "derived": 18,
+        "mapped": 35,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 0
+      },
+      "nodes": [
+        {
+          "specId": "appointment-form.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0",
+          "specType": "Section",
+          "path": "layout.slots.content[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.customer",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.0.children.0",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.0.children.0.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.action.pick-customer",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[0].children[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.project",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.1.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.start-time",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.2.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.end-time",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[3]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.3.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[3].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.therapist",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[4]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.4.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[4].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.field.source",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[5]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.root.content.0.children.5.children.0",
+          "specType": "Select",
+          "path": "layout.slots.content[0].children[5].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-form.action.save",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "appointment-list",
+      "file": "figma-plan.appointment-list.json",
+      "summary": {
+        "spec": 29,
+        "derived": 267,
+        "mapped": 288,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 8
+      },
+      "nodes": [
+        {
+          "specId": "appointment-list.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0",
+          "specType": "Section",
+          "path": "layout.slots.content[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.0",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.0.children.0",
+          "specType": "CollapsedFilter",
+          "path": "layout.slots.content[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.0.children.1",
+          "specType": "CollapsedFilter",
+          "path": "layout.slots.content[0].children[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.1",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.action.toggle-view",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.view.calendar",
+          "specType": "Section",
+          "path": "layout.slots.content[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.0",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.0.children.0",
+          "specType": "Text",
+          "path": "layout.slots.content[0].children[2].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.0.children.1",
+          "specType": "Text",
+          "path": "layout.slots.content[0].children[2].children[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.1",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[2].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.1.children.0",
+          "specType": "Badge",
+          "path": "layout.slots.content[0].children[2].children[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.1.children.1",
+          "specType": "Badge",
+          "path": "layout.slots.content[0].children[2].children[1].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.1.children.2",
+          "specType": "Badge",
+          "path": "layout.slots.content[0].children[2].children[1].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.1.children.3",
+          "specType": "Badge",
+          "path": "layout.slots.content[0].children[2].children[1].children[3]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.state.empty",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[2].children[2]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:EmptyState"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.2.children.2.children.0",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[2].children[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.calendar.grid",
+          "specType": "CalendarGrid",
+          "path": "layout.slots.content[0].children[2].children[3]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.view.list",
+          "specType": "Section",
+          "path": "layout.slots.content[0].children[3]",
+          "status": "skipped",
+          "reason": "SKIPPED_VIEW_PANEL"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.3.children.0",
+          "specType": "Text",
+          "path": "layout.slots.content[0].children[3].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.row.appointment.0",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[3].children[1]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "appointment-list.row.appointment.1",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[3].children[2]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "appointment-list.row.appointment.2",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[3].children[3]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "appointment-list.row.appointment.3",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[3].children[4]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "appointment-list.state.empty.2",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[3].children[5]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:EmptyState"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.3.children.5.children.0",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[3].children[5].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "appointment-list.root.content.0.children.3.children.6",
+          "specType": "Skeleton",
+          "path": "layout.slots.content[0].children[3].children[6]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:Skeleton"
+        },
+        {
+          "specId": "appointment-list.action.new-appointment",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "callback-register",
+      "file": "figma-plan.callback-register.json",
+      "summary": {
+        "spec": 13,
+        "derived": 14,
+        "mapped": 27,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 0
+      },
+      "nodes": [
+        {
+          "specId": "callback-register.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0",
+          "specType": "Section",
+          "path": "layout.slots.content[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.field.customer",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0.children.0.children.0",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0.children.0.children.0.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.action.pick-customer",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[0].children[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.field.service",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0.children.1.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.field.content",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0.children.2.children.0",
+          "specType": "Input",
+          "path": "layout.slots.content[0].children[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.field.result",
+          "specType": "FormField",
+          "path": "layout.slots.content[0].children[3]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.root.content.0.children.3.children.0",
+          "specType": "Select",
+          "path": "layout.slots.content[0].children[3].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "callback-register.action.save",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "customer-detail",
+      "file": "figma-plan.customer-detail.json",
+      "summary": {
+        "spec": 8,
+        "derived": 44,
+        "mapped": 52,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 0
+      },
+      "nodes": [
+        {
+          "specId": "customer-detail.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.root.summary.0",
+          "specType": "Card",
+          "path": "layout.slots.summary[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.root.summary.0.children.0",
+          "specType": "List",
+          "path": "layout.slots.summary[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.root.fields.0",
+          "specType": "Row",
+          "path": "layout.slots.fields[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.action.new-appointment",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.action.view-notice",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.action.callback",
+          "specType": "Button",
+          "path": "layout.slots.fields[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-detail.action.view-appointment",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "customer-search",
+      "file": "figma-plan.customer-search.json",
+      "summary": {
+        "spec": 9,
+        "derived": 8,
+        "mapped": 13,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 4
+      },
+      "nodes": [
+        {
+          "specId": "customer-search.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-search.root.content.0",
+          "specType": "Section",
+          "path": "layout.slots.content[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-search.root.content.0.children.0",
+          "specType": "SearchBar",
+          "path": "layout.slots.content[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-search.state.idle",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "customer-search.row.result.0",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[2]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "customer-search.row.result.1",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[3]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "customer-search.row.result.2",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[4]",
+          "status": "skipped",
+          "reason": "SKIPPED_SEARCH_RESULT"
+        },
+        {
+          "specId": "customer-search.state.empty",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[5]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:EmptyState"
+        },
+        {
+          "specId": "customer-search.action.clear",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[5].children[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "today",
+      "file": "figma-plan.today.json",
+      "summary": {
+        "spec": 19,
+        "derived": 67,
+        "mapped": 84,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 2
+      },
+      "nodes": [
+        {
+          "specId": "today.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.root.top-bar.0",
+          "specType": "TopBar",
+          "path": "layout.slots.top-bar[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.root.content.0",
+          "specType": "Section",
+          "path": "layout.slots.content[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.card.quick-actions",
+          "specType": "Card",
+          "path": "layout.slots.content[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.root.content.0.children.0.children.0",
+          "specType": "Row",
+          "path": "layout.slots.content[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.quick.create-order",
+          "specType": "QuickAction",
+          "path": "layout.slots.content[0].children[0].children[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.quick.new-appointment",
+          "specType": "QuickAction",
+          "path": "layout.slots.content[0].children[0].children[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.quick.customer-search",
+          "specType": "QuickAction",
+          "path": "layout.slots.content[0].children[0].children[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.card.appointments",
+          "specType": "Card",
+          "path": "layout.slots.content[0].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.row.appointment.0",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.row.appointment.1",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[1].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.row.appointment.2",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[1].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.state.empty",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[1].children[3]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:EmptyState"
+        },
+        {
+          "specId": "today.root.content.0.children.1.children.3.children.0",
+          "specType": "Button",
+          "path": "layout.slots.content[0].children[1].children[3].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.card.callbacks",
+          "specType": "Card",
+          "path": "layout.slots.content[0].children[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.row.callback.0",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.row.callback.1",
+          "specType": "ListRow",
+          "path": "layout.slots.content[0].children[2].children[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "today.state.empty.2",
+          "specType": "EmptyState",
+          "path": "layout.slots.content[0].children[2].children[2]",
+          "status": "skipped",
+          "reason": "SKIPPED_STATE:EmptyState"
+        },
+        {
+          "specId": "today.root.bottom-nav.0",
+          "specType": "TabBar",
+          "path": "layout.slots.bottom-nav[0]",
+          "status": "mapped"
+        }
+      ]
+    },
+    {
+      "pageId": "treatment-notice",
+      "file": "figma-plan.treatment-notice.json",
+      "summary": {
+        "spec": 11,
+        "derived": 36,
+        "mapped": 47,
+        "degraded": 0,
+        "unmapped": 0,
+        "skipped": 0
+      },
+      "nodes": [
+        {
+          "specId": "treatment-notice.page.root",
+          "specType": "MobileShell",
+          "path": "layout",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.card.summary",
+          "specType": "Card",
+          "path": "layout.slots.summary[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.0.children.0",
+          "specType": "List",
+          "path": "layout.slots.summary[0].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.1",
+          "specType": "Row",
+          "path": "layout.slots.summary[1]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.1.children.0",
+          "specType": "Text",
+          "path": "layout.slots.summary[1].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.2",
+          "specType": "Card",
+          "path": "layout.slots.summary[2]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.2.children.0",
+          "specType": "List",
+          "path": "layout.slots.summary[2].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.3",
+          "specType": "Card",
+          "path": "layout.slots.summary[3]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.summary.3.children.0",
+          "specType": "List",
+          "path": "layout.slots.summary[3].children[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.root.fields.0",
+          "specType": "Row",
+          "path": "layout.slots.fields[0]",
+          "status": "mapped"
+        },
+        {
+          "specId": "treatment-notice.action.confirm",
+          "specType": "Button",
+          "path": "layout.slots.actions[0]",
+          "status": "mapped"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "specRun": "/Users/jihui/Desktop/产品、ui/pipeline/artifacts/employee-app-phase2/figma/spec-source",
+  "specRun": "/Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/figma/spec-source",
   "plans": [
     {
       "pageId": "appointment-detail",
@@ -9,7 +9,7 @@
       "file": "figma-plan.appointment-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:adc586dc59f76edd3ca86d149e1cd4d0eaa52855d1cbd09f3aa745c822e11e1d"
+      "hash": "sha256:1f802bda50c23f503da8cd1bb610a383c75ac1c43e99ff10a06579c73ebaf202"
     },
     {
       "pageId": "appointment-form",
@@ -17,7 +17,7 @@
       "file": "figma-plan.appointment-form.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:a2ad8cc9affbac77afae8b7445e7c83e4210bb8b3e253e00b031aeef5f432163"
+      "hash": "sha256:8ad8325be57fed5b46bc65a39361561aef63f85afc9dfcb7872ac4d3d50e1d0e"
     },
     {
       "pageId": "appointment-list",
@@ -25,7 +25,7 @@
       "file": "figma-plan.appointment-list.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:6892a1b9e273997bc07c5a566b301ad4aff6816dd2e90878e10836ab67d536b4"
+      "hash": "sha256:9462f26385d3154e91ec16259b39e1b63887cd0b0bf21ed78d93dccd3a9e6746"
     },
     {
       "pageId": "callback-register",
@@ -33,7 +33,7 @@
       "file": "figma-plan.callback-register.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:65ebe0058e7787059ceb43a35f34b508ae9d95fcee741248e31fab2792a336e7"
+      "hash": "sha256:ed0160ba244c64e83b03a6c8e0f3880321a3e39b4a1a06f26b0a901424265fbe"
     },
     {
       "pageId": "customer-detail",
@@ -41,7 +41,7 @@
       "file": "figma-plan.customer-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:3dc070cacac525d013254efab90845c9db1adb6119eec159bfa5aeb848c4ba29"
+      "hash": "sha256:79176463cfd69c2779effe2ade296a4de84dd6ba5f686197b613251d48d10dbf"
     },
     {
       "pageId": "customer-search",
@@ -49,7 +49,7 @@
       "file": "figma-plan.customer-search.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:044cf6e507dd1cdce2f57ae97150e65e7d92e47857761ed5046a6c4beaf5e5cb"
+      "hash": "sha256:e390dc3b2fe63cb9d9ced7b04bcad232d467e91540f254d68195771ba263d8a3"
     },
     {
       "pageId": "today",
@@ -57,7 +57,7 @@
       "file": "figma-plan.today.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:4997056c12d224a6d044cd0f9c33b363df84df07678e3c238807b46f6f3e8829"
+      "hash": "sha256:a6a57e9721b548dceba46bf478111fa42f329b7e704a3a77cb003bd3d8d101d8"
     },
     {
       "pageId": "treatment-notice",
@@ -65,7 +65,7 @@
       "file": "figma-plan.treatment-notice.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:a14e38a54a692a395b3343532cc3019dc214b8d706032807fdf56cf4057a4bcd"
+      "hash": "sha256:08621288a2af509de5034651db2cb47e3fd8376824a3d8123a469750eb2d300e"
     }
   ]
 }

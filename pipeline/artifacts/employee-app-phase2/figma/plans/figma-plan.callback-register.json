@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "callback-register.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "回访登记",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "callback-register.page.root.content",
@@ -217,7 +229,9 @@
                     "name": "Label",
                     "characters": "客户*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "callback-register.root.content.0.children.0.children.0",
@@ -237,7 +251,9 @@
                             "name": "Placeholder",
                             "characters": "请输入客户",
                             "textStyle": "b-mobile/input.md",
-                            "color": "color/text/tertiary"
+                            "color": "color/text/tertiary",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 36,
@@ -246,7 +262,9 @@
                         "stroke": "color/border/control",
                         "strokeWidth": 1,
                         "radius": 8,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "callback-register.action.pick-customer",
@@ -254,14 +272,20 @@
                         "name": "Button:选择",
                         "component": "Button",
                         "variant": "ghost",
-                        "label": "选择"
+                        "label": "选择",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       }
                     ],
                     "gap": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "callback-register.field.service",
@@ -275,7 +299,9 @@
                     "name": "Label",
                     "characters": "服务项目*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "callback-register.root.content.0.children.1.children.0",
@@ -289,7 +315,9 @@
                         "name": "Placeholder",
                         "characters": "请输入服务项目",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -298,10 +326,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "callback-register.field.content",
@@ -315,7 +347,9 @@
                     "name": "Label",
                     "characters": "回访内容*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "callback-register.root.content.0.children.2.children.0",
@@ -329,7 +363,9 @@
                         "name": "Placeholder",
                         "characters": "请输入回访内容",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -338,10 +374,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "callback-register.field.result",
@@ -355,7 +395,9 @@
                     "name": "Label",
                     "characters": "回访结果*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "callback-register.root.content.0.children.3.children.0",
@@ -369,7 +411,9 @@
                         "name": "Value",
                         "characters": "已联系",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "callback-register.root.content.0.children.3.children.0.chevron",
@@ -377,7 +421,9 @@
                         "name": "Chevron",
                         "glyph": "expand_more",
                         "size": 16,
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -387,20 +433,28 @@
                     "strokeWidth": 1,
                     "radius": 8,
                     "alignItems": "CENTER",
-                    "justifyContent": "SPACE_BETWEEN"
+                    "justifyContent": "SPACE_BETWEEN",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 12
+            "gap": 12,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "callback-register.page.root.actions",
@@ -416,7 +470,9 @@
             "variant": "primary",
             "label": "保存回访",
             "height": 44,
-            "layoutGrow": 1
+            "layoutGrow": 1,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "padding": 12,
@@ -425,13 +481,17 @@
         "fill": "color/surface/default",
         "stroke": "color/border/subtle",
         "strokeWidth": 1,
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
     "frames": 14,
@@ -439,5 +499,95 @@
     "instances": 2,
     "icons": 2,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "callback-register.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0",
+        "specType": "Section",
+        "path": "layout.slots.content[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.field.customer",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0.children.0.children.0",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0.children.0.children.0.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[0].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.action.pick-customer",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[0].children[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.field.service",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0.children.1.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[1].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.field.content",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0.children.2.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[2].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.field.result",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[3]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.root.content.0.children.3.children.0",
+        "specType": "Select",
+        "path": "layout.slots.content[0].children[3].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "callback-register.action.save",
+        "specType": "Button",
+        "path": "layout.slots.actions[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 13,
+      "derived": 14,
+      "mapped": 27,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 0
+    }
   }
 }

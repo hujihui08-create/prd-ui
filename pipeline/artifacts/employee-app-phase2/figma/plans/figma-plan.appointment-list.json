@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "appointment-list.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "预约列表",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-list.page.root.content",
@@ -223,7 +235,9 @@
                         "name": "Label",
                         "characters": "状态",
                         "textStyle": "b-mobile/label.sm",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.0.children.0.value",
@@ -231,7 +245,9 @@
                         "name": "Value",
                         "characters": "全部",
                         "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.0.children.0.chevron",
@@ -239,7 +255,9 @@
                         "name": "Chevron",
                         "glyph": "expand_more",
                         "size": 16,
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 30,
@@ -249,7 +267,9 @@
                     "stroke": "color/border/subtle",
                     "strokeWidth": 1,
                     "radius": 6,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-list.root.content.0.children.0.children.1",
@@ -263,7 +283,9 @@
                         "name": "Label",
                         "characters": "日期",
                         "textStyle": "b-mobile/label.sm",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.0.children.1.value",
@@ -271,7 +293,9 @@
                         "name": "Value",
                         "characters": "11-05 周三",
                         "textStyle": "b-mobile/body.md",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.0.children.1.chevron",
@@ -279,7 +303,9 @@
                         "name": "Chevron",
                         "glyph": "expand_more",
                         "size": 16,
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 30,
@@ -289,11 +315,15 @@
                     "stroke": "color/border/subtle",
                     "strokeWidth": 1,
                     "radius": 6,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
-                "alignItems": "CENTER"
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-list.root.content.0.children.1",
@@ -307,11 +337,15 @@
                     "name": "Button:切换日历/列表",
                     "component": "Button",
                     "variant": "secondary",
-                    "label": "切换日历/列表"
+                    "label": "切换日历/列表",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
-                "alignItems": "CENTER"
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-list.view.calendar",
@@ -331,7 +365,9 @@
                         "name": "Text",
                         "characters": "日历",
                         "textStyle": "b-mobile/heading.3",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.2.children.0.children.1",
@@ -339,11 +375,15 @@
                         "name": "Text",
                         "characters": "11-05 周三",
                         "textStyle": "b-mobile/label.strong",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       }
                     ],
                     "gap": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-list.root.content.0.children.2.children.1",
@@ -363,7 +403,9 @@
                             "name": "Label",
                             "characters": "已登记",
                             "textStyle": "b-mobile/label.strong",
-                            "color": "color/status/warning"
+                            "color": "color/status/warning",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 20,
@@ -372,7 +414,9 @@
                         "fill": "color/status/warning",
                         "fillAlpha": 0.12,
                         "alignItems": "CENTER",
-                        "justifyContent": "CENTER"
+                        "justifyContent": "CENTER",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.2.children.1.children.1",
@@ -386,7 +430,9 @@
                             "name": "Label",
                             "characters": "已到店",
                             "textStyle": "b-mobile/label.strong",
-                            "color": "color/status/success"
+                            "color": "color/status/success",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 20,
@@ -395,7 +441,9 @@
                         "fill": "color/status/success",
                         "fillAlpha": 0.12,
                         "alignItems": "CENTER",
-                        "justifyContent": "CENTER"
+                        "justifyContent": "CENTER",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.2.children.1.children.2",
@@ -409,7 +457,9 @@
                             "name": "Label",
                             "characters": "爽约",
                             "textStyle": "b-mobile/label.strong",
-                            "color": "color/status/danger"
+                            "color": "color/status/danger",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 20,
@@ -418,7 +468,9 @@
                         "fill": "color/status/danger",
                         "fillAlpha": 0.12,
                         "alignItems": "CENTER",
-                        "justifyContent": "CENTER"
+                        "justifyContent": "CENTER",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-list.root.content.0.children.2.children.1.children.3",
@@ -432,7 +484,9 @@
                             "name": "Label",
                             "characters": "已取消",
                             "textStyle": "b-mobile/label.strong",
-                            "color": "color/status/danger"
+                            "color": "color/status/danger",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 20,
@@ -441,11 +495,15 @@
                         "fill": "color/status/danger",
                         "fillAlpha": 0.12,
                         "alignItems": "CENTER",
-                        "justifyContent": "CENTER"
+                        "justifyContent": "CENTER",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       }
                     ],
                     "gap": 4,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-list.calendar.grid",
@@ -473,7 +531,9 @@
                               "name": "Label",
                               "characters": "周一",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.0.date",
@@ -481,7 +541,9 @@
                               "name": "Date",
                               "characters": "11-03",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -490,8 +552,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -513,7 +583,9 @@
                               "name": "Label",
                               "characters": "周二",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.1.date",
@@ -521,7 +593,9 @@
                               "name": "Date",
                               "characters": "11-04",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -530,8 +604,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -553,7 +635,9 @@
                               "name": "Label",
                               "characters": "周三",
                               "textStyle": "b-mobile/label.bold",
-                              "color": "color/status/info"
+                              "color": "color/status/info",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.2.date",
@@ -561,7 +645,9 @@
                               "name": "Date",
                               "characters": "11-05",
                               "textStyle": "b-mobile/date",
-                              "color": "color/status/info"
+                              "color": "color/status/info",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -571,9 +657,15 @@
                           "gap": 1,
                           "alignItems": "CENTER",
                           "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
                           "borderBottom": "color/status/info",
-                          "borderBottomWidth": 2
-                        }
+                          "borderBottomWidth": 2,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -595,7 +687,9 @@
                               "name": "Label",
                               "characters": "周四",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.3.date",
@@ -603,7 +697,9 @@
                               "name": "Date",
                               "characters": "11-06",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -612,8 +708,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -635,7 +739,9 @@
                               "name": "Label",
                               "characters": "周五",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.4.date",
@@ -643,7 +749,9 @@
                               "name": "Date",
                               "characters": "11-07",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -652,8 +760,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -675,7 +791,9 @@
                               "name": "Label",
                               "characters": "周六",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.5.date",
@@ -683,7 +801,9 @@
                               "name": "Date",
                               "characters": "11-08",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -692,8 +812,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -715,7 +843,9 @@
                               "name": "Label",
                               "characters": "周日",
                               "textStyle": "b-mobile/label.sm",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.day.6.date",
@@ -723,7 +853,9 @@
                               "name": "Date",
                               "characters": "11-09",
                               "textStyle": "b-mobile/date",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 46,
@@ -732,8 +864,16 @@
                           "fillAlpha": 1,
                           "gap": 1,
                           "alignItems": "CENTER",
-                          "justifyContent": "CENTER"
-                        }
+                          "justifyContent": "CENTER",
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "borderBottom": "color/border/subtle",
+                          "borderBottomWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -756,15 +896,22 @@
                               "characters": "09:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -782,11 +929,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -804,11 +955,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -828,9 +983,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -848,11 +1009,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -870,11 +1035,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -892,11 +1061,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -914,11 +1087,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -941,15 +1118,22 @@
                               "characters": "10:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -967,11 +1151,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -989,11 +1177,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1013,9 +1205,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1033,11 +1231,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1055,11 +1257,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1077,11 +1283,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1099,11 +1309,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1126,15 +1340,22 @@
                               "characters": "11:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1152,11 +1373,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1174,11 +1399,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1198,9 +1427,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1218,11 +1453,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1240,11 +1479,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1262,11 +1505,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1284,11 +1531,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1311,15 +1562,22 @@
                               "characters": "12:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1337,11 +1595,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1359,11 +1621,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1383,9 +1649,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1403,11 +1675,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1425,11 +1701,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1447,11 +1727,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1469,11 +1753,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1496,15 +1784,22 @@
                               "characters": "13:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1522,11 +1817,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1544,11 +1843,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1568,9 +1871,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1588,11 +1897,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1610,11 +1923,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1632,11 +1949,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1654,11 +1975,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1681,15 +2006,22 @@
                               "characters": "14:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1707,11 +2039,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1729,11 +2065,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1753,9 +2093,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1773,11 +2119,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1795,11 +2145,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1817,11 +2171,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1839,11 +2197,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1866,15 +2228,22 @@
                               "characters": "15:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1892,11 +2261,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1914,11 +2287,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1938,9 +2315,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1958,11 +2341,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -1980,11 +2367,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2002,11 +2393,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2024,11 +2419,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2051,15 +2450,22 @@
                               "characters": "16:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2077,11 +2483,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2099,11 +2509,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2123,9 +2537,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2143,11 +2563,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2165,11 +2589,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2187,11 +2615,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2209,11 +2641,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2236,15 +2672,22 @@
                               "characters": "17:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2262,11 +2705,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2284,11 +2731,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2308,9 +2759,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2328,11 +2785,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2350,11 +2811,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2372,11 +2837,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2394,11 +2863,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2421,15 +2894,22 @@
                               "characters": "18:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2447,11 +2927,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2469,11 +2953,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2493,9 +2981,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2513,11 +3007,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2535,11 +3033,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2557,11 +3059,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2579,11 +3085,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2606,15 +3116,22 @@
                               "characters": "19:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2632,11 +3149,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2654,11 +3175,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2678,9 +3203,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2698,11 +3229,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2720,11 +3255,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2742,11 +3281,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2764,11 +3307,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2791,15 +3338,22 @@
                               "characters": "20:00",
                               "textStyle": "b-mobile/date",
                               "color": "color/text/tertiary",
-                              "align": "RIGHT"
+                              "align": "RIGHT",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
                           "width": 36,
                           "height": 44,
-                          "paddingX": 4,
+                          "paddingTop": 2,
+                          "paddingRight": 4,
                           "alignItems": "END",
-                          "justifyContent": "START"
-                        }
+                          "justifyContent": "START",
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2817,11 +3371,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2839,11 +3397,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2863,9 +3425,15 @@
                           "height": 44,
                           "fill": "color/status/info",
                           "fillAlpha": 0.04,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2883,11 +3451,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2905,11 +3477,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2927,11 +3503,15 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
@@ -2949,19 +3529,23 @@
                           "children": [],
                           "width": 46,
                           "height": 44,
-                          "fill": "color/surface/default",
-                          "fillAlpha": 1,
-                          "stroke": "color/border/subtle",
-                          "strokeWidth": 0.5
-                        }
+                          "borderTop": "color/border/subtle",
+                          "borderTopWidth": 1,
+                          "borderLeft": "color/border/subtle",
+                          "borderLeftWidth": 1,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
                         "specId": "appointment-list.calendar.grid.block.0",
                         "name": "Block:张女士",
-                        "x": 129,
+                        "x": 128,
                         "y": 80,
-                        "width": 44,
+                        "width": 46,
                         "height": 44,
                         "child": {
                           "specId": "appointment-list.calendar.grid.block.0.frame",
@@ -2975,7 +3559,9 @@
                               "name": "Title",
                               "characters": "张女士",
                               "textStyle": "b-mobile/label.bold",
-                              "color": "color/text/primary"
+                              "color": "color/text/primary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.0.subtitle",
@@ -2983,7 +3569,9 @@
                               "name": "Subtitle",
                               "characters": "小气泡",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.0.time",
@@ -2991,10 +3579,12 @@
                               "name": "Time",
                               "characters": "10:00",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
-                          "width": 44,
+                          "width": 46,
                           "height": 44,
                           "padding": 2,
                           "gap": 0,
@@ -3002,16 +3592,20 @@
                           "fillAlpha": 0.1,
                           "radius": 4,
                           "borderLeft": "color/status/warning",
-                          "borderLeftWidth": 2
-                        }
+                          "borderLeftWidth": 2,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
                         "specId": "appointment-list.calendar.grid.block.1",
                         "name": "Block:李女士",
-                        "x": 129,
+                        "x": 128,
                         "y": 256,
-                        "width": 44,
+                        "width": 46,
                         "height": 44,
                         "child": {
                           "specId": "appointment-list.calendar.grid.block.1.frame",
@@ -3025,7 +3619,9 @@
                               "name": "Title",
                               "characters": "李女士",
                               "textStyle": "b-mobile/label.bold",
-                              "color": "color/text/primary"
+                              "color": "color/text/primary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.1.subtitle",
@@ -3033,7 +3629,9 @@
                               "name": "Subtitle",
                               "characters": "补水",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.1.time",
@@ -3041,10 +3639,12 @@
                               "name": "Time",
                               "characters": "14:00",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
-                          "width": 44,
+                          "width": 46,
                           "height": 44,
                           "padding": 2,
                           "gap": 0,
@@ -3052,16 +3652,20 @@
                           "fillAlpha": 0.1,
                           "radius": 4,
                           "borderLeft": "color/status/success",
-                          "borderLeftWidth": 2
-                        }
+                          "borderLeftWidth": 2,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
                         "specId": "appointment-list.calendar.grid.block.2",
                         "name": "Block:王女士",
-                        "x": 129,
+                        "x": 128,
                         "y": 366,
-                        "width": 44,
+                        "width": 46,
                         "height": 44,
                         "child": {
                           "specId": "appointment-list.calendar.grid.block.2.frame",
@@ -3075,7 +3679,9 @@
                               "name": "Title",
                               "characters": "王女士",
                               "textStyle": "b-mobile/label.bold",
-                              "color": "color/text/primary"
+                              "color": "color/text/primary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.2.subtitle",
@@ -3083,7 +3689,9 @@
                               "name": "Subtitle",
                               "characters": "肩颈",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.2.time",
@@ -3091,10 +3699,12 @@
                               "name": "Time",
                               "characters": "16:30",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
-                          "width": 44,
+                          "width": 46,
                           "height": 44,
                           "padding": 2,
                           "gap": 0,
@@ -3102,16 +3712,20 @@
                           "fillAlpha": 0.1,
                           "radius": 4,
                           "borderLeft": "color/status/warning",
-                          "borderLeftWidth": 2
-                        }
+                          "borderLeftWidth": 2,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "type": "ABSOLUTE",
                         "specId": "appointment-list.calendar.grid.block.3",
                         "name": "Block:赵女士",
-                        "x": 129,
+                        "x": 128,
                         "y": 432,
-                        "width": 44,
+                        "width": 46,
                         "height": 44,
                         "child": {
                           "specId": "appointment-list.calendar.grid.block.3.frame",
@@ -3125,7 +3739,9 @@
                               "name": "Title",
                               "characters": "赵女士",
                               "textStyle": "b-mobile/label.bold",
-                              "color": "color/text/primary"
+                              "color": "color/text/primary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.3.subtitle",
@@ -3133,7 +3749,9 @@
                               "name": "Subtitle",
                               "characters": "补水",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/secondary"
+                              "color": "color/text/secondary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             },
                             {
                               "specId": "appointment-list.calendar.grid.block.3.time",
@@ -3141,10 +3759,12 @@
                               "name": "Time",
                               "characters": "18:00",
                               "textStyle": "b-mobile/caption",
-                              "color": "color/text/tertiary"
+                              "color": "color/text/tertiary",
+                              "origin": "derived",
+                              "mapping": "mapped"
                             }
                           ],
-                          "width": 44,
+                          "width": 46,
                           "height": 44,
                           "padding": 2,
                           "gap": 0,
@@ -3152,30 +3772,42 @@
                           "fillAlpha": 0.1,
                           "radius": 4,
                           "borderLeft": "color/status/danger",
-                          "borderLeftWidth": 2
-                        }
+                          "borderLeftWidth": 2,
+                          "origin": "derived",
+                          "mapping": "mapped"
+                        },
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "width": 358,
                     "height": 564,
                     "fill": "color/surface/default",
                     "radius": 12,
-                    "clip": true
+                    "clip": true,
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
                 "paddingX": 0,
                 "paddingY": 4,
-                "gap": 8
+                "gap": 8,
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8
+            "gap": 8,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-list.page.root.actions",
@@ -3191,7 +3823,9 @@
             "variant": "primary",
             "label": "新增预约",
             "height": 44,
-            "layoutGrow": 1
+            "layoutGrow": 1,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "padding": 12,
@@ -3200,13 +3834,17 @@
         "fill": "color/surface/default",
         "stroke": "color/border/subtle",
         "strokeWidth": 1,
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
     "frames": 124,
@@ -3214,5 +3852,199 @@
     "instances": 2,
     "icons": 3,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "appointment-list.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0",
+        "specType": "Section",
+        "path": "layout.slots.content[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.0",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.0.children.0",
+        "specType": "CollapsedFilter",
+        "path": "layout.slots.content[0].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.0.children.1",
+        "specType": "CollapsedFilter",
+        "path": "layout.slots.content[0].children[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.1",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.action.toggle-view",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[1].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.view.calendar",
+        "specType": "Section",
+        "path": "layout.slots.content[0].children[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.0",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[2].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.0.children.0",
+        "specType": "Text",
+        "path": "layout.slots.content[0].children[2].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.0.children.1",
+        "specType": "Text",
+        "path": "layout.slots.content[0].children[2].children[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.1",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[2].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.1.children.0",
+        "specType": "Badge",
+        "path": "layout.slots.content[0].children[2].children[1].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.1.children.1",
+        "specType": "Badge",
+        "path": "layout.slots.content[0].children[2].children[1].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.1.children.2",
+        "specType": "Badge",
+        "path": "layout.slots.content[0].children[2].children[1].children[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.1.children.3",
+        "specType": "Badge",
+        "path": "layout.slots.content[0].children[2].children[1].children[3]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.state.empty",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[2].children[2]",
+        "status": "skipped",
+        "reason": "SKIPPED_STATE:EmptyState"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.2.children.2.children.0",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[2].children[2].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.calendar.grid",
+        "specType": "CalendarGrid",
+        "path": "layout.slots.content[0].children[2].children[3]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.view.list",
+        "specType": "Section",
+        "path": "layout.slots.content[0].children[3]",
+        "status": "skipped",
+        "reason": "SKIPPED_VIEW_PANEL"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.3.children.0",
+        "specType": "Text",
+        "path": "layout.slots.content[0].children[3].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.row.appointment.0",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3].children[1]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "appointment-list.row.appointment.1",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3].children[2]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "appointment-list.row.appointment.2",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3].children[3]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "appointment-list.row.appointment.3",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3].children[4]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "appointment-list.state.empty.2",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[3].children[5]",
+        "status": "skipped",
+        "reason": "SKIPPED_STATE:EmptyState"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.3.children.5.children.0",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[3].children[5].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-list.root.content.0.children.3.children.6",
+        "specType": "Skeleton",
+        "path": "layout.slots.content[0].children[3].children[6]",
+        "status": "skipped",
+        "reason": "SKIPPED_STATE:Skeleton"
+      },
+      {
+        "specId": "appointment-list.action.new-appointment",
+        "specType": "Button",
+        "path": "layout.slots.actions[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 29,
+      "derived": 267,
+      "mapped": 288,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 8
+    }
   }
 }
