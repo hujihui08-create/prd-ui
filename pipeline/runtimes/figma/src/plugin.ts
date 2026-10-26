@@ -493,7 +493,10 @@ async function readbackNode(node: FigmaNode): Promise<FigmaReadbackNode> {
   return result;
 }
 
-async function build(plan: FigmaPlan, mode: "scratch" | "delivery"): Promise<FigmaReadback> {
+async function build(
+  plan: FigmaPlan,
+  mode: "scratch" | "delivery"
+): Promise<{ readback: FigmaReadback; root: FigmaNode }> {
   errors.length = 0;
   fonts.length = 0;
   await figma.loadAllPagesAsync();
@@ -530,7 +533,7 @@ async function build(plan: FigmaPlan, mode: "scratch" | "delivery"): Promise<Fig
     nodes: [await readbackNode(root)],
     errors: [...errors],
   };
-  return readback;
+  return { readback, root };
 }
 
 figma.showUI(__html__, { width: 440, height: 680, themeColors: true });
@@ -541,8 +544,15 @@ figma.ui.onmessage = async (message: any) => {
       post("status", { message: "building" });
       const plan = message.plan as FigmaPlan;
       const mode = message.mode === "delivery" ? "delivery" : "scratch";
-      const readback = await build(plan, mode);
-      post("readback", { readback });
+      const { readback, root } = await build(plan, mode);
+      post("readback", { readback, mode, pageId: plan.pageId });
+      // The plugin cannot write files; the UI auto-saves these bytes to
+      // `figma:serve` and keeps a download link as fallback.
+      const png = await root.exportAsync({
+        format: "PNG",
+        constraint: { type: "SCALE", value: 1 },
+      });
+      post("png", { bytes: Array.from(png), pageId: plan.pageId });
     } catch (error) {
       post("error", { message: error instanceof Error ? error.message : String(error) });
     }
