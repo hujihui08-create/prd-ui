@@ -100,6 +100,24 @@ describe("validateStructure", () => {
     expect(findings.some((finding) => finding.ruleId === "STRUCTURE-HEADING-SKIP")).toBe(true);
   });
 
+  it("reports heading level skips from the compiler textRole", () => {
+    const spec = baseSpec();
+    spec.layout.slots = {
+      content: [
+        {
+          id: "today.section",
+          type: "Section",
+          children: [
+            { id: "today.h1", type: "Text", textRole: "heading.1", props: { text: "一" } },
+            { id: "today.h3", type: "Text", textRole: "heading.3", props: { text: "三" } },
+          ],
+        },
+      ],
+    };
+    const findings = validateStructure(spec, context(spec));
+    expect(findings.some((finding) => finding.ruleId === "STRUCTURE-HEADING-SKIP")).toBe(true);
+  });
+
   it("reports an orphan action button", () => {
     const spec = baseSpec();
     spec.layout.slots = {
@@ -115,6 +133,26 @@ describe("validateStructure", () => {
     expect(findings.some((finding) => finding.ruleId === "STRUCTURE-ORPHAN-ACTION")).toBe(true);
   });
 
+  it("does not report buttons in action-bearing section slots", () => {
+    const spec = baseSpec();
+    spec.layout.slots = {
+      content: [
+        {
+          id: "today.section",
+          type: "Section",
+          slots: {
+            actions: [{ id: "today.action", type: "Button", props: { label: "确定" } }],
+            footer: [{ id: "today.footer", type: "Button", props: { label: "取消" } }],
+            "card-actions": [{ id: "today.card-action", type: "Button", props: { label: "更多" } }],
+            "filter-row": [{ id: "today.filter", type: "Button", props: { label: "筛选" } }],
+          },
+        },
+      ],
+    };
+    const findings = validateStructure(spec, context(spec));
+    expect(findings.some((finding) => finding.ruleId === "STRUCTURE-ORPHAN-ACTION")).toBe(false);
+  });
+
   it("reports repeated sibling rows not expressed as a List", () => {
     const spec = baseSpec();
     const row = (id: string): SpecNode => ({
@@ -123,6 +161,21 @@ describe("validateStructure", () => {
       props: { title: "行", subtitle: "说明" },
     });
     spec.layout.slots = { content: [row("today.r1"), row("today.r2"), row("today.r3")] };
+    const findings = validateStructure(spec, context(spec));
+    expect(findings.some((finding) => finding.ruleId === "STRUCTURE-REPEATED-ROWS")).toBe(true);
+  });
+
+  it("groups repeated rows from an id-less parent", () => {
+    const spec = baseSpec();
+    const row = (): SpecNode => ({ type: "ListRow", props: { title: "行", subtitle: "说明" } });
+    spec.layout.slots = {
+      content: [
+        {
+          type: "Section",
+          children: [row(), row(), row()],
+        },
+      ],
+    };
     const findings = validateStructure(spec, context(spec));
     expect(findings.some((finding) => finding.ruleId === "STRUCTURE-REPEATED-ROWS")).toBe(true);
   });
