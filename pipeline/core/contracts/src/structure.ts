@@ -63,6 +63,12 @@ export interface RenderMetrics {
 /** One node-level difference between two versions of the same page. */
 export interface StructureNodeChange {
   specId: string;
+  /**
+   * `slot` covers two shapes: a matched node changing container slot
+   * (before/after are the slot names, `"children"` for direct children), or a
+   * matched parent gaining/losing an empty slot (`property: "slots"`,
+   * before/after are the sorted slot-key lists).
+   */
   kind: "type" | "prop" | "slot" | "moved";
   property?: string;
   before?: string;

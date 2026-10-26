@@ -106,8 +106,39 @@ describe("diffPageStructure", () => {
           before: section.id,
           after: after.layout.id,
         },
+        { specId: card!.id, kind: "slot", before: "children", after: "content" },
       ])
     );
+  });
+
+  it("reports a slot change when a node moves under the same parent", () => {
+    const after = structuredClone(today);
+    const [section] = after.layout.slots!.content!.splice(0, 1);
+    after.layout.slots!.footer = [section!];
+    const diff = diffPageStructure(today, after);
+    expect(diff.changed).toEqual([
+      { specId: section!.id, kind: "slot", before: "content", after: "footer" },
+    ]);
+  });
+
+  it("reports an empty slot added on a matched parent", () => {
+    const after = structuredClone(today);
+    after.layout.slots!.footer = [];
+    const diff = diffPageStructure(today, after);
+    expect(diff.changed).toEqual([
+      {
+        specId: after.layout.id,
+        kind: "slot",
+        property: "slots",
+        before: "bottom-nav,content,top-bar",
+        after: "bottom-nav,content,footer,top-bar",
+      },
+    ]);
+  });
+
+  it("throws when the two specs are different pages", () => {
+    const other = specs.find((spec) => spec.meta.pageId === "appointment-list")!;
+    expect(() => diffPageStructure(today, other)).toThrow(/PAGE_ID_MISMATCH/);
   });
 
   it("ignores nodes without an id", () => {

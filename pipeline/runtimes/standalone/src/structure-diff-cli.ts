@@ -79,11 +79,28 @@ function emptyShell(spec: PageSpec): PageSpec {
   return { ...spec, layout: { type: "PageShell", children: [], slots: {} } };
 }
 
+function runProject(specs: PageSpec[], label: string): string | undefined {
+  const projects = new Set(specs.map((spec) => spec.meta.project));
+  if (projects.size > 1) {
+    throw new Error(`SPEC_RUN_PROJECT_MIXED: ${label} has ${[...projects].sort().join(", ")}`);
+  }
+  return [...projects][0];
+}
+
 export function diffRuns(
   before: PageSpec[],
   after: PageSpec[],
   page?: string
 ): StructurePageDiff[] {
+  const beforeProject = runProject(before, "before");
+  const afterProject = runProject(after, "after");
+  if (
+    beforeProject !== undefined &&
+    afterProject !== undefined &&
+    beforeProject !== afterProject
+  ) {
+    throw new Error(`PROJECT_MISMATCH: before ${beforeProject}, after ${afterProject}`);
+  }
   const beforeByPage = new Map(before.map((spec) => [spec.meta.pageId, spec]));
   const afterByPage = new Map(after.map((spec) => [spec.meta.pageId, spec]));
   const pageIds = [...new Set([...beforeByPage.keys(), ...afterByPage.keys()])].sort();
