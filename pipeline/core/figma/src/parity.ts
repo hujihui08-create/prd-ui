@@ -2,13 +2,15 @@ import type { ParityPage, ParityThresholds } from "@prd-ui/contracts";
 
 /**
  * Pure parity gate: compare a Figma export against the signed HTML baseline.
- * A page passes only when dimensions match and both the pixel-diff and SSIM
- * thresholds are met. Findings are ordered size, pixels, SSIM.
+ * A page passes only when dimensions match and the pixel-diff, mean-SSIM and
+ * localized-cluster thresholds are met. Findings are ordered size, pixels,
+ * SSIM, cluster, stale baseline.
  */
 export function evaluateParityPage(input: {
   pageId: string;
   pixelDiffRatio: number;
   ssim: number;
+  maxDiffCluster: number;
   width: number;
   height: number;
   expectedWidth?: number;
@@ -17,6 +19,8 @@ export function evaluateParityPage(input: {
   figmaFile: string;
   baselineHash: string;
   figmaHash: string;
+  /** Hash recorded in the signed baseline manifest, when known. */
+  baselineManifestHash?: string;
   diffFile?: string;
   thresholds: ParityThresholds;
 }): ParityPage {
@@ -44,11 +48,29 @@ export function evaluateParityPage(input: {
       message: `SSIM ${input.ssim.toFixed(4)} < ${input.thresholds.minSsim.toFixed(4)}.`,
     });
   }
+  if (input.maxDiffCluster > input.thresholds.maxClusterPixels) {
+    findings.push({
+      code: "PARITY_DIFF_CLUSTER",
+      severity: "blocker",
+      message: `Largest diff cluster ${input.maxDiffCluster}px > ${input.thresholds.maxClusterPixels}px.`,
+    });
+  }
+  if (
+    input.baselineManifestHash !== undefined &&
+    input.baselineManifestHash !== input.baselineHash
+  ) {
+    findings.push({
+      code: "BASELINE_STALE",
+      severity: "blocker",
+      message: `Baseline hash ${input.baselineHash} != manifest ${input.baselineManifestHash}; re-sign the baseline.`,
+    });
+  }
   return {
     pageId: input.pageId,
     passed: findings.length === 0,
     pixelDiffRatio: input.pixelDiffRatio,
     ssim: input.ssim,
+    maxDiffCluster: input.maxDiffCluster,
     baselineFile: input.baselineFile,
     figmaFile: input.figmaFile,
     baselineHash: input.baselineHash,

@@ -7,21 +7,24 @@ import pixelmatch from "pixelmatch";
 import { evaluateParityPage } from "@prd-ui/figma";
 import type { ParityPage, ParityReport, ParityThresholds } from "@prd-ui/contracts";
 import { computeSsim } from "./visual/ssim.js";
+import { maxDiffCluster as largestDiffCluster } from "./visual/clusters.js";
 
 export const USAGE = `Usage:
   pnpm figma:parity --figma <dir> --baseline <dir> --spec-run <dir> --out <dir> [--json]
 
 Options:
-  --figma <dir>           Directory containing figma.<pageId>.png (plugin save dir: <figmaDir>/parity)
-  --baseline <dir>        Signed visual baseline directory (manifest.json + PNGs)
-  --spec-run <dir>        Completed spec:engineer run directory
-  --out <dir>             Output directory (parity.json, parity.config.json, diff/)
-  --max-pixel-diff <n>    Maximum pixel-diff ratio (default 0.005)
-  --min-ssim <n>          Minimum mean SSIM (default 0.98)
-  --json                  Print the parity report as one JSON object
-  -h, --help              Print this help and exit
+  --figma <dir>             Directory containing figma.<pageId>.png (plugin save dir: <figmaDir>/parity)
+  --baseline <dir>          Signed visual baseline directory (manifest.json + PNGs)
+  --spec-run <dir>          Completed spec:engineer run directory
+  --out <dir>               Output directory (parity.json, parity.config.json, diff/)
+  --max-pixel-diff <n>      Maximum pixel-diff ratio (default 0.005)
+  --min-ssim <n>            Minimum mean SSIM (default 0.98)
+  --max-cluster-pixels <n>  Largest allowed connected diff cluster in pixels (default 24)
+  --json                    Print the parity report as one JSON object
+  -h, --help                Print this help and exit
 
 The baseline case for each page is the manifest entry with state "default".
+Report file paths are relative to --out so the report hash is location-stable.
 
 Exit codes: 0 parity passed, 1 parity failed, 2 usage or infrastructure error.`;
 
@@ -34,6 +37,7 @@ export interface ParityOptions {
   out?: string;
   maxPixelDiff: number;
   minSsim: number;
+  maxClusterPixels: number;
   json: boolean;
   help: boolean;
 }
@@ -55,8 +59,23 @@ function threshold(argv: string[], index: number, flag: string): number {
   return value;
 }
 
+function count(argv: string[], index: number, flag: string): number {
+  const raw = readValue(argv, index, flag);
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0) {
+    throw new ParityUsageError(`${flag} must be a non-negative integer, got ${raw}`);
+  }
+  return value;
+}
+
 export function parseArgs(argv: string[]): ParityOptions {
-  const options: ParityOptions = { maxPixelDiff: 0.005, minSsim: 0.98, json: false, help: false };
+  const options: ParityOptions = {
+    maxPixelDiff: 0.005,
+    minSsim: 0.98,
+    maxClusterPixels: 24,
+    json: false,
+    help: false,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index]!;
     switch (flag) {
@@ -78,6 +97,9 @@ export function parseArgs(argv: string[]): ParityOptions {
       case "--min-ssim":
         options.minSsim = threshold(argv, ++index, flag);
         break;
+      case "--max-cluster-pixels":
+        options.maxClusterPixels = count(argv, ++index, flag);
+        break;
       case "--json":
         options.json = true;
         break;
@@ -96,10 +118,16 @@ function hash(buffer: Buffer): string {
   return `sha256:${createHash("sha256").update(buffer).digest("hex")}`;
 }
 
+/** Stable, portable report path: relative to --out with forward slashes. */
+function relativeTo(root: string, file: string): string {
+  return path.relative(root, file).split(path.sep).join("/");
+}
+
 interface BaselineCase {
   pageId: string;
   state: string;
   file: string;
+  sha256: string;
   viewport?: { width: number; height: number };
 }
 
@@ -165,6 +193,7 @@ export async function main(
     const thresholds: ParityThresholds = {
       maxPixelDiff: options.maxPixelDiff,
       minSsim: options.minSsim,
+      maxClusterPixels: options.maxClusterPixels,
     };
     const baselineManifest = await loadBaselineManifest(options.baseline);
     const pages: ParityPage[] = [];
@@ -176,6 +205,9 @@ export async function main(
         (entry) => entry.pageId === pageId && entry.state === "default"
       );
       if (baselineCase === undefined) throw new Error(`BASELINE_CASE_MISSING: ${pageId}`);
+      if (typeof baselineCase.sha256 !== "string" || !baselineCase.sha256.startsWith("sha256:")) {
+        throw new Error(`BASELINE_MANIFEST_INVALID: ${pageId} default case has no sha256`);
+      }
       const baselineFile = path.join(options.baseline, baselineCase.file);
       const figmaBuffer = await readFile(figmaFile);
       const baselineBuffer = await readFile(baselineFile);
@@ -184,9 +216,11 @@ export async function main(
       const sameSize = figma.width === baseline.width && figma.height === baseline.height;
       let pixelDiffRatio = 1;
       let ssim = 0;
+      let clusterPixels = 0;
       let diffFile: string | undefined;
       if (sameSize) {
         const diff = new PNG({ width: figma.width, height: figma.height });
+        const mask = new PNG({ width: figma.width, height: figma.height });
         const diffPixels = pixelmatch(
           baseline.data,
           figma.data,
@@ -195,8 +229,14 @@ export async function main(
           figma.height,
           { threshold: 0.1, includeAA: false }
         );
+        pixelmatch(baseline.data, figma.data, mask.data, figma.width, figma.height, {
+          threshold: 0.1,
+          includeAA: false,
+          diffMask: true,
+        });
         pixelDiffRatio = diffPixels / (figma.width * figma.height);
         ssim = computeSsim(baseline.data, figma.data, figma.width, figma.height);
+        clusterPixels = largestDiffCluster(mask.data, figma.width, figma.height);
         diffFile = path.join(options.out, "diff", `${pageId}.png`);
         await writeFile(diffFile, PNG.sync.write(diff));
       }
@@ -205,16 +245,18 @@ export async function main(
           pageId,
           pixelDiffRatio,
           ssim,
+          maxDiffCluster: clusterPixels,
           width: figma.width,
           height: figma.height,
           expectedWidth: baselineCase.viewport?.width ?? baseline.width,
           expectedHeight: baselineCase.viewport?.height ?? baseline.height,
-          baselineFile,
-          figmaFile,
+          baselineFile: relativeTo(options.out, baselineFile),
+          figmaFile: relativeTo(options.out, figmaFile),
           baselineHash: hash(baselineBuffer),
           figmaHash: hash(figmaBuffer),
+          baselineManifestHash: baselineCase.sha256,
           thresholds,
-          ...(diffFile === undefined ? {} : { diffFile }),
+          ...(diffFile === undefined ? {} : { diffFile: relativeTo(options.out, diffFile) }),
         })
       );
     }
@@ -247,7 +289,8 @@ export async function main(
       for (const page of pages) {
         io.stdout(
           `Parity ${page.pageId}: ${page.passed ? "passed" : "failed"} ` +
-            `(pixel ${(page.pixelDiffRatio * 100).toFixed(3)}%, ssim ${page.ssim.toFixed(4)})`
+            `(pixel ${(page.pixelDiffRatio * 100).toFixed(3)}%, ssim ${page.ssim.toFixed(4)}, ` +
+            `cluster ${page.maxDiffCluster}px)`
         );
         for (const finding of page.findings) {
           io.stdout(`- [${finding.severity}] ${finding.code}: ${finding.message}`);
@@ -255,7 +298,8 @@ export async function main(
       }
       io.stdout(
         `Parity: ${pages.length} pages, ${report.summary.failed} failed, ` +
-          `thresholds pixel<=${(thresholds.maxPixelDiff * 100).toFixed(2)}% ssim>=${thresholds.minSsim}`
+          `thresholds pixel<=${(thresholds.maxPixelDiff * 100).toFixed(2)}% ` +
+          `ssim>=${thresholds.minSsim} cluster<=${thresholds.maxClusterPixels}px`
       );
     }
     return report.summary.passed ? 0 : 1;
