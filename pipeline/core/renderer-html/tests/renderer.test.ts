@@ -722,6 +722,44 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
   });
 });
 
+describe("derived node ids", () => {
+  it("marks List rows, tabs, and calendar cells with derived ids", () => {
+    const list = renderDocument(
+      phase2ById.get("treatment-notice")!,
+      getProfile("b-mobile")
+    );
+    const today = renderDocument(
+      phase2ById.get("today")!,
+      getProfile("b-mobile"),
+      { pageNames: { today: "今日", "appointment-list": "预约列表" } }
+    );
+    const calendar = renderDocument(
+      appointmentById.get("appointment-list")!,
+      getProfile("b-mobile")
+    );
+
+    expect(list).toMatch(/data-node-id="[^"]+\.row\.0"/);
+    expect(list).toContain(
+      'data-node-id="treatment-notice.root.summary.0.children.0.row.0"'
+    );
+    expect(list).toContain(
+      'data-node-id="treatment-notice.root.summary.2.children.0.row.0"'
+    );
+    expect(today).toMatch(/data-node-id="[^"]+\.tab\.0"/);
+    expect(today).toContain('data-node-id="today.root.bottom-nav.0.tab.0"');
+    expect(calendar).toMatch(/data-node-id="[^"]+\.day\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.hour\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.cell\.0\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.block\.0"/);
+    expect(calendar).toContain(
+      'data-node-id="appointment-list.calendar.grid.cell.0.0"'
+    );
+    expect(calendar).toContain(
+      'data-node-id="appointment-list.calendar.grid.block.0"'
+    );
+  });
+});
+
 describe("renderer motion", () => {
   it("renders node and group motion attributes plus reduced-motion fallback", () => {
     const html = renderDocument(

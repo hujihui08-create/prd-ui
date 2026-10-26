@@ -1,4 +1,5 @@
 export * from "./ids.js";
+export * from "./derived-ids.js";
 export * from "./iso-date.js";
 export * from "./page-id.js";
 export * from "./page-spec.js";

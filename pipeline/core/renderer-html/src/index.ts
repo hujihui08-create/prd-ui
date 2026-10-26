@@ -1,4 +1,9 @@
-import type { PageSpec, Profile, SpecNode } from "@prd-ui/contracts";
+import {
+  derivedNodeId,
+  type PageSpec,
+  type Profile,
+  type SpecNode,
+} from "@prd-ui/contracts";
 import {
   createMotionContext,
   motionAttrs,
@@ -417,24 +422,34 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "TabBar": {
       const items = stringArray(props.items);
       const active = str(props.active);
+      const tabBarId = node.id;
       return `<div class="tabbar-inner">${items
-        .map(
-          (item) => `<a class="tab ${item === active ? "active" : ""}" href="#">
+        .map((item, index) => {
+          const tabId =
+            tabBarId === undefined
+              ? ""
+              : ` data-node-id="${esc(derivedNodeId(tabBarId, "tab", index))}"`;
+          return `<a class="tab ${item === active ? "active" : ""}" href="#"${tabId}>
   <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
   <span class="tab-label">${esc(pageLabel(item))}</span>
-</a>`
-        )
+</a>`;
+        })
         .join("")}</div>`;
     }
     case "BottomNav": {
       const items = stringArray(props.items);
+      const bottomNavId = node.id;
       return `<div class="tabbar-inner">${items
-        .map(
-          (item) => `<a class="tab ${item === renderPageId ? "active" : ""}" href="#">
+        .map((item, index) => {
+          const tabId =
+            bottomNavId === undefined
+              ? ""
+              : ` data-node-id="${esc(derivedNodeId(bottomNavId, "tab", index))}"`;
+          return `<a class="tab ${item === renderPageId ? "active" : ""}" href="#"${tabId}>
   <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
   <span class="tab-label">${esc(pageLabel(item))}</span>
-</a>`
-        )
+</a>`;
+        })
         .join("")}</div>`;
     }
     case "Stat": {
@@ -445,15 +460,20 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     }
     case "List": {
       if (Array.isArray(props.items)) {
+        const parentId = node.id;
         return `<div class="list-text">${(props.items as unknown[])
-          .map((item) => {
+          .map((item, index) => {
+            const rowId =
+              parentId === undefined
+                ? ""
+                : ` data-node-id="${esc(derivedNodeId(parentId, "row", index))}"`;
             if (item !== null && typeof item === "object" && !Array.isArray(item)) {
               const record = item as Record<string, unknown>;
               const label = str(record.label);
               const value = str(record.value);
-              return `<div class="list-text-row summary-row"><span class="list-text-label">${esc(label)}</span><b class="list-text-value">${esc(value)}</b></div>`;
+              return `<div class="list-text-row summary-row"${rowId}><span class="list-text-label">${esc(label)}</span><b class="list-text-value">${esc(value)}</b></div>`;
             }
-            return `<div class="list-text-row">${esc(item)}</div>`;
+            return `<div class="list-text-row"${rowId}>${esc(item)}</div>`;
           })
           .join("")}</div>`;
       }
@@ -607,6 +627,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const days = Array.isArray(props.days) ? props.days : [];
       const hours = stringArray(props.hours);
       const blocks = Array.isArray(props.blocks) ? props.blocks : [];
+      const calendarId = node.id;
+      const nodeIdAttr = (
+        kind: string,
+        ...segments: Array<string | number>
+      ): string =>
+        calendarId === undefined
+          ? ""
+          : ` data-node-id="${esc(derivedNodeId(calendarId, kind, ...segments))}"`;
       const dayItems = days.map((entry) => {
         if (typeof entry === "string") {
           return { label: entry, date: "", today: false, selected: false };
@@ -621,12 +649,12 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       });
       const rowCount = Math.max(hours.length, 1);
       const header = `<div class="calendar-corner"></div>${dayItems
-        .map((day) => {
+        .map((day, dayIndex) => {
           const classes = ["calendar-day", day.selected ? "selected" : "", day.today ? "today" : ""]
             .filter(Boolean)
             .join(" ");
           const shortDate = day.date.length === 10 ? day.date.slice(5) : day.date;
-          return `<div class="${classes}"${day.selected ? ' data-selected="true"' : ""}><span>${esc(day.label)}</span><span class="calendar-date"><span class="calendar-date-full">${esc(day.date)}</span><span class="calendar-date-short">${esc(shortDate)}</span></span></div>`;
+          return `<div class="${classes}"${day.selected ? ' data-selected="true"' : ""}${nodeIdAttr("day", dayIndex)}><span>${esc(day.label)}</span><span class="calendar-date"><span class="calendar-date-full">${esc(day.date)}</span><span class="calendar-date-short">${esc(shortDate)}</span></span></div>`;
         })
         .join("")}`;
       const cells = hours
@@ -634,14 +662,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           const row = dayItems
             .map(
               (day, dayIndex) =>
-                `<div class="calendar-cell${day.selected ? " selected" : ""}" data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
+                `<div class="calendar-cell${day.selected ? " selected" : ""}"${nodeIdAttr("cell", hourIndex, dayIndex)} data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
             )
             .join("");
-          return `<div class="calendar-hour" style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
+          return `<div class="calendar-hour"${nodeIdAttr("hour", hourIndex)} style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
         })
         .join("");
       const blockHtml = blocks
-        .map((entry) => {
+        .map((entry, index) => {
           const record = entry as Record<string, unknown>;
           const day =
             typeof record.day === "number"
@@ -667,7 +695,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
             date: dayItems[day]?.date ?? "",
             time: `${String(startHour).padStart(2, "0")}:${String(startMinute).padStart(2, "0")}`,
           };
-          return `<div class="calendar-block tone-${esc(tone)}" data-block="${esc(JSON.stringify(payload))}" role="button" tabindex="0" aria-label="${esc(record.title)} ${esc(record.subtitle)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span};margin-top:${minuteOffset}px;height:${blockHeight}px;align-self:start;" title="${esc(record.title)} ${esc(record.subtitle)}">
+          return `<div class="calendar-block tone-${esc(tone)}"${nodeIdAttr("block", index)} data-block="${esc(JSON.stringify(payload))}" role="button" tabindex="0" aria-label="${esc(record.title)} ${esc(record.subtitle)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span};margin-top:${minuteOffset}px;height:${blockHeight}px;align-self:start;" title="${esc(record.title)} ${esc(record.subtitle)}">
   <span class="calendar-block-title">${esc(record.title)}</span>
   <span class="calendar-block-subtitle">${esc(record.subtitle)}</span>
   <span class="calendar-block-time">${esc(payload.time)}</span>
