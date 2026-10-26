@@ -57,7 +57,12 @@ function page(pageId: string): PageSpec {
         ],
       },
     },
-    states: { default: { name: "default" } },
+    states: {
+      default: { name: "default" },
+      empty: { name: "empty" },
+      loading: { name: "loading" },
+      error: { name: "error" },
+    },
     interactions: [],
     traceability: { reqMap: {}, designDefaults: [], unmapped: [] },
   } as PageSpec;

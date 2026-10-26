@@ -40,7 +40,7 @@ parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff
 
 | 命令 | 结果 |
 |---|---|
-| `pnpm test` | **86 files / 949 tests passed** |
+| `pnpm test` | **87 files / 983 tests passed** |
 | `pnpm test:dsh` | **3 files / 4 tests passed** |
 | `pnpm typecheck` | clean（所有 workspace 包） |
 | `pnpm --dir runtimes/figma typecheck` | clean |
@@ -49,10 +49,10 @@ parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff
 ### 3.1 `v07:smoke`（真实 8 页）
 
 ```bash
-pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final
+pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final2
 pnpm v07:smoke \
   --spec-run artifacts/employee-app-phase2/figma/spec-source \
-  --html /tmp/html-v07-final \
+  --html /tmp/html-v07-final2 \
   --project samples/projects/employee-app-phase2/project.yaml \
   --figma artifacts/employee-app-phase2/figma \
   --baseline baselines/employee-app-phase2 \
@@ -145,7 +145,7 @@ cp -R artifacts/employee-app-phase2/figma/plans /tmp/defect-plans-button
 # 仅改 /tmp 副本：appointment-detail 的 components.Button.variants["ghost-chip"].height = 36
 pnpm exec tsx runtimes/standalone/src/figma-conformance-cli.ts \
   --spec-run artifacts/employee-app-phase2/figma/spec-source \
-  --html /tmp/html-v07-final --plans /tmp/defect-plans-button \
+  --html /tmp/html-v07-final2 --plans /tmp/defect-plans-button \
   --out /tmp/defect-conformance-button
 ```
 
@@ -165,7 +165,7 @@ cp -R artifacts/employee-app-phase2/figma/plans /tmp/defect-plans-divider
 # 删除 borderBottom 与 borderBottomWidth
 pnpm exec tsx runtimes/standalone/src/figma-conformance-cli.ts \
   --spec-run artifacts/employee-app-phase2/figma/spec-source \
-  --html /tmp/html-v07-final --plans /tmp/defect-plans-divider \
+  --html /tmp/html-v07-final2 --plans /tmp/defect-plans-divider \
   --out /tmp/defect-conformance-divider
 ```
 
@@ -312,13 +312,13 @@ pnpm handoff:pack ... --assets artifacts/employee-app-phase2/asset-compiler/phas
 cd pipeline
 
 # 1. 自动门禁（fresh HTML + committed plans + smoke）
-rm -rf /tmp/html-v07-final
-pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final
+rm -rf /tmp/html-v07-final2
+pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final2
 # plans 是 Task 20a 的已提交输出；需要重新生成时：
 pnpm figma:plan --spec-run artifacts/employee-app-phase2/figma/spec-source --out artifacts/employee-app-phase2/figma/plans
 pnpm v07:smoke \
   --spec-run artifacts/employee-app-phase2/figma/spec-source \
-  --html /tmp/html-v07-final \
+  --html /tmp/html-v07-final2 \
   --project samples/projects/employee-app-phase2/project.yaml \
   --figma artifacts/employee-app-phase2/figma \
   --baseline baselines/employee-app-phase2 \
@@ -360,8 +360,9 @@ pnpm figma:sign --figma artifacts/employee-app-phase2/figma \
 - **baseline 过期**：v0.5.x CSS 变更后未重签；parity 与 handoff 的 baselineHash 都依赖它。
 - **`figma/spec-source` 不是完整 spec run**：没有 `findings/spec-engineer-gate.json`，
   `handoff:pack` 必然 fail-closed；正式打包应使用真实 spec run 目录。
-- **`handoff:pack` 不重跑 `figma:verify`**：它信任已提交 diff 的 `passed` 值；重建后必须
-  重新生成 diff，`figma:sign` 会拒绝失败的 diff。
+- **`handoff:pack` 不再信任已提交 diff**（终审修复）：它从当前 plan + readback
+  重算每页 diff，并要求 stored diff 与重算结果一致；重建后仍必须重新生成 diff，
+  否则它以 `figma verify failed` / `figma diff evidence is stale` fail-closed。
 - **新项目 sample 的 Switch/InventoryCard 未映射**：conformance 以 6 个
   `CONFORMANCE_NODE_MISSING` 失败；是 fail-closed 的正确行为，但需要 v0.8 决策。
 - **分块实验**：`requiredStates` 语义、保留 baseline id、新增节点的 conformance 成本仍是
@@ -394,3 +395,25 @@ pnpm figma:sign --figma artifacts/employee-app-phase2/figma \
 - `pipeline/artifacts/employee-app-phase2/blocks/`（包含 `conformance/` 与
   `artifacts/block-manifest/` 的自包含副本；本地绝对路径已仓库相对化）
 - `AGENTS.md`、`CHANGELOG.md`、`docs/superpowers/plans/2026-10-23-version-roadmap.md`、本文件
+
+## 13. 终审修复（2026-10-26，同一版本，未签核）
+
+分支终审发现 2 个 Critical + 6 个 Important；全部修复并加回归测试：
+
+| 项 | 修复 |
+|---|---|
+| Critical 1 | `figma:sign` / `handoff:pack` 不再信任 stored `figma-diff.*.json` 的 `passed`；从当前 plan + readback 重算，stored diff 必须与重算一致（`FIGMA_DIFF_STALE` / handoff blocker）。回归测试覆盖“stored passed + 按钮高度回归”。 |
+| Critical 2 | 块高门禁同时读 `contentHeight` 与 `documentHeight`。已提交试跑的 appointment-list 760→804 (+5.79%) 在修正后是 `heightDelta>5%`；`blocks/block-experiment.md` 记录更正与差异，机器 JSON 保持原始证据。 |
+| Important 3 | sign/pack 重算 `parity/figma.<page>.png` 与 baseline case PNG 的 sha256，必须匹配 `parity.json` 的 `figmaHash`/`baselineHash`；测试在写入 parity.json 后篡改 PNG。 |
+| Important 4 | handoff 的 `screenshots/figma/<page>.png` 改为 parity PNG（hash 绑定）；v0.6 手工裁剪只进 `screenshots/figma-manual/` 并写 known gap；`figma/README.md` checklist 同步。 |
+| Important 5 | `handoff:pack --metrics` + 搜索 `<html>/../render/metrics/render-metrics.json`；缺失是 blocker；测试使用 v0.7 输出布局。 |
+| Important 6 | `figma:conformance` 记录 `htmlSha256`/`specSha256`；`visual:review` state 记录 `htmlHashes`；handoff 校验供给的 HTML/spec 字节，并把 `inputHashes` 写入 manifest；测试覆盖 HTML/visual 不匹配。 |
+| Important 7 | `verifyBlockContracts` 强制 `allowedComponents`/`requiredStates`（block:experiment + block:verify）；推广要求 Phase 1 0 blockers、token drift ≤ baseline、parity；`--figma`/`--figma-baseline` 才评估 parity，否则只能 `insufficient_evidence`。 |
+| Important 8 | structure diff 比较 `title/text/label/subtitle/description/value/meta/...`，无 id 节点按位置路径回退（`idless: true`）。 |
+| Minors | parity.config.json 固定阈值；figma:serve 保留 scratch/delivery readback 目录；structure-diff/block-experiment 路径仓库相对化；figma:sign 校验项目/日期并硬化 `__proto__`；handoff baseline 回退 `pipeline/baselines/<project>`；B2/B3 文档补 fold 省略与 text/id-less 规则。 |
+
+验证：`pnpm test` 87 files / 983 passed；`pnpm test:dsh` 3 files / 4 passed；
+`pnpm typecheck` clean；`figma:conformance` 仍 0 blocker / 0 major（8 页，233
+checked，fresh HTML）；`v07:smoke` 仍 `complete: false` / `paritySkipped: true`；
+`handoff:pack` 对当前 stale evidence 仍 fail-closed 且不写部分包。v0.7 **未签核**，
+Figma verify/parity 仍未绿。

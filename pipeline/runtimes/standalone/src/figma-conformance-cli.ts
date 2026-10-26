@@ -16,6 +16,7 @@ import {
 import { comparePlanToStyleManifest } from "@prd-ui/figma";
 import { getProfile } from "@prd-ui/design-system";
 import { captureStyleManifests } from "./conformance/capture.js";
+import { hashFile, hashHtmlInputs } from "./visual/manifest.js";
 
 export const USAGE = `Usage:
   pnpm figma:conformance --spec-run <dir> --html <dir> --plans <dir> --out <dir> [--json]
@@ -215,7 +216,38 @@ export async function main(
             : { width: 390, height: 844 },
       })),
     });
-    const manifestByPage = new Map(manifests.map((manifest) => [manifest.pageId, manifest]));
+    // Bind every gate result to the exact input bytes. A handoff package can
+    // then refuse HTML/spec files that this gate never checked.
+    const htmlHashes = await hashHtmlInputs(
+      options.html,
+      specs.map((spec) => spec.meta.pageId)
+    );
+    const specHashes = new Map<string, string>();
+    for (const spec of specs) {
+      specHashes.set(
+        spec.meta.pageId,
+        await hashFile(
+          path.join(
+            options.specRun,
+            "artifacts",
+            "page-spec",
+            `${spec.meta.pageId}.json`
+          )
+        )
+      );
+    }
+    const boundManifests = manifests.map((manifest) => ({
+      ...manifest,
+      ...(htmlHashes[manifest.pageId] === undefined
+        ? {}
+        : { htmlSha256: htmlHashes[manifest.pageId] }),
+      ...(specHashes.get(manifest.pageId) === undefined
+        ? {}
+        : { specSha256: specHashes.get(manifest.pageId) }),
+    }));
+    const manifestByPage = new Map(
+      boundManifests.map((manifest) => [manifest.pageId, manifest])
+    );
     const specByPage = new Map(specs.map((spec) => [spec.meta.pageId, spec]));
     const pages = plans.map((plan) => {
       const manifest = manifestByPage.get(plan.pageId);
@@ -223,11 +255,15 @@ export async function main(
         throw new Error(`CONFORMANCE_MANIFEST_MISSING: ${plan.pageId}`);
       }
       assertManifestUsable(manifest, plan);
-      return comparePlanToStyleManifest({
-        plan,
-        manifest,
-        profile: getProfile(specByPage.get(plan.pageId)!.meta.profile),
-      });
+      return {
+        ...comparePlanToStyleManifest({
+          plan,
+          manifest,
+          profile: getProfile(specByPage.get(plan.pageId)!.meta.profile),
+        }),
+        ...(manifest.htmlSha256 === undefined ? {} : { htmlSha256: manifest.htmlSha256 }),
+        ...(manifest.specSha256 === undefined ? {} : { specSha256: manifest.specSha256 }),
+      };
     });
     const { blockers, majors } = countFindings(pages);
     const report: ConformanceReport = {
@@ -241,7 +277,7 @@ export async function main(
     await mkdir(options.out, { recursive: true });
     await writeFile(
       path.join(options.out, "style-manifest.json"),
-      pretty({ schemaVersion: "1.0", project: report.project, pages: manifests }),
+      pretty({ schemaVersion: "1.0", project: report.project, pages: boundManifests }),
       "utf8"
     );
     await writeFile(path.join(options.out, "conformance.json"), pretty(report), "utf8");

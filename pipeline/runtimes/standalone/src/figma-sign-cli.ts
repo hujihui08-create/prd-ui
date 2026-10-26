@@ -2,7 +2,16 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { FigmaSignoffBlockSchema } from "@prd-ui/contracts";
+import { FigmaSignoffBlockSchema, type FigmaDiff } from "@prd-ui/contracts";
+import { compareDiffEvidence } from "@prd-ui/figma";
+import {
+  loadDiffEvidence,
+  loadPlanEvidence,
+  loadReadbackEvidence,
+  recomputeFigmaDiff,
+  verifyParityEvidence,
+  type BaselineCaseFile,
+} from "./figma/evidence.js";
 
 export const USAGE = `Usage:
   pnpm figma:sign --figma <dir> --baseline <dir> --signoff-figma <file> [--json]
@@ -21,6 +30,13 @@ signoff, so the signer can fill in or refresh the block. Hashes are
 canonical JSON (keys sorted) with the time-only fields generatedAt/
 builtAt dropped, so regenerating semantically identical evidence does
 not stale a signature.
+
+Every stored diff is also re-derived from the current plan + readback
+(with figma:verify defaults) and must agree with the recomputed verdict.
+The parity PNG and the signed baseline PNG are re-hashed and must match
+the figmaHash/baselineHash recorded in parity.json. A stale stored diff
+or changed PNG refuses the signature (FIGMA_DIFF_STALE /
+PARITY_HASH_STALE).
 
 Exit codes: 0 signed, 1 refused (gate failure, missing page evidence,
 stale signoff), 2 usage or infrastructure error.`;
@@ -127,7 +143,9 @@ async function readJson(file: string): Promise<unknown> {
 function stripTimestamps(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => stripTimestamps(item));
   if (isRecord(value)) {
-    const out: Record<string, unknown> = {};
+    // A null-prototype object makes a `__proto__` key an ordinary own property
+    // instead of a prototype mutation (and keeps JSON.parse payloads inert).
+    const out: Record<string, unknown> = Object.create(null);
     for (const key of Object.keys(value)) {
       if (TIMESTAMP_FIELDS.has(key)) continue;
       out[key] = stripTimestamps(value[key]);
@@ -257,16 +275,6 @@ function comparePages(expected: string[], actual: string[], kind: string): void 
   }
 }
 
-function requirePageId(body: unknown, pageId: string, file: string): void {
-  if (!isRecord(body)) throw new Error(`EVIDENCE_INVALID: ${file} is not an object`);
-  if (body.schemaVersion !== "1.0") {
-    throw new Error(`EVIDENCE_INVALID: ${file} schemaVersion ${String(body.schemaVersion)}`);
-  }
-  if (body.pageId !== pageId) {
-    throw new Error(`EVIDENCE_PAGE_MISMATCH: ${file} declares ${String(body.pageId)}`);
-  }
-}
-
 interface LoadedConformance {
   project: string;
   pages: Array<{ pageId: string; passed: boolean }>;
@@ -307,7 +315,12 @@ async function loadConformance(file: string): Promise<LoadedConformance> {
 
 interface LoadedParity {
   project: string;
-  pages: Array<{ pageId: string; passed: boolean }>;
+  pages: Array<{
+    pageId: string;
+    passed: boolean;
+    figmaHash?: string;
+    baselineHash?: string;
+  }>;
   passed: boolean;
 }
 
@@ -333,7 +346,12 @@ async function loadParity(file: string): Promise<LoadedParity> {
     ) {
       throw new Error(`EVIDENCE_INVALID: ${file} page entry`);
     }
-    return { pageId: page.pageId, passed: page.passed };
+    return {
+      pageId: page.pageId,
+      passed: page.passed,
+      ...(typeof page.figmaHash === "string" ? { figmaHash: page.figmaHash } : {}),
+      ...(typeof page.baselineHash === "string" ? { baselineHash: page.baselineHash } : {}),
+    };
   });
   return { project: body.project, pages, passed: summary.passed };
 }
@@ -346,6 +364,10 @@ export interface FigmaEvidenceSummary {
 /**
  * Fail-closed gate checks. Throws `FigmaSignRefusal` when readable evidence
  * fails a gate, and a plain `Error` when evidence is missing or malformed.
+ *
+ * Every verdict is re-derived from the current plan + readback. A stored
+ * `figma-diff.*.json` is only evidence when it agrees with that recomputation,
+ * and every parity hash is re-checked against the current PNG bytes.
  */
 export async function checkEvidence(input: {
   figmaDir: string;
@@ -353,33 +375,62 @@ export async function checkEvidence(input: {
 }): Promise<FigmaEvidenceSummary> {
   const plans = await listPlanFiles(input.figmaDir);
   const pageIds = plans.map((entry) => entry.pageId);
+  const planByPage = new Map<string, Awaited<ReturnType<typeof loadPlanEvidence>>>();
   for (const plan of plans) {
-    requirePageId(await readJson(plan.file), plan.pageId, plan.file);
+    planByPage.set(plan.pageId, await loadPlanEvidence(plan.file));
   }
 
   const readbacks = await listReadbackFiles(input.figmaDir);
   comparePages(pageIds, readbacks.map((entry) => entry.pageId), "readback");
+  const readbackByPage = new Map<string, Awaited<ReturnType<typeof loadReadbackEvidence>>>();
   for (const readback of readbacks) {
-    const body = await readJson(readback.file);
-    requirePageId(body, readback.pageId, readback.file);
-    const errors = (body as Record<string, unknown>).errors;
-    if (!Array.isArray(errors)) {
-      throw new Error(`EVIDENCE_INVALID: ${readback.file} errors`);
+    const body = await loadReadbackEvidence(readback.file);
+    if (body.pageId !== readback.pageId) {
+      throw new Error(`EVIDENCE_PAGE_MISMATCH: ${readback.file} declares ${body.pageId}`);
     }
-    if (errors.length > 0) {
+    if (body.errors.length > 0) {
       throw new FigmaSignRefusal(
-        `READBACK_ERRORS: ${readback.pageId}: ${String(errors[0])}`
+        `READBACK_ERRORS: ${readback.pageId}: ${String(body.errors[0])}`
+      );
+    }
+    readbackByPage.set(readback.pageId, body);
+  }
+
+  const recomputed = new Map<string, FigmaDiff>();
+  for (const pageId of pageIds) {
+    const plan = planByPage.get(pageId);
+    const readback = readbackByPage.get(pageId);
+    if (plan === undefined || readback === undefined) {
+      throw new Error(`EVIDENCE_PAGE_MISSING: ${pageId}`);
+    }
+    const diff = recomputeFigmaDiff(plan, readback);
+    recomputed.set(pageId, diff);
+    if (!diff.passed) {
+      throw new FigmaSignRefusal(
+        `FIGMA_VERIFY_FAILED: ${pageId} (${diff.blockerCount} blocker / ${diff.majorCount} major)`
       );
     }
   }
 
   const diffs = await listDiffFiles(input.figmaDir);
   comparePages(pageIds, diffs.map((entry) => entry.pageId), "diff");
-  for (const diff of diffs) {
-    const body = await readJson(diff.file);
-    requirePageId(body, diff.pageId, diff.file);
-    if ((body as Record<string, unknown>).passed !== true) {
-      throw new FigmaSignRefusal(`FIGMA_VERIFY_FAILED: ${diff.pageId}`);
+  for (const diffFile of diffs) {
+    const stored = await loadDiffEvidence(diffFile.file);
+    if (stored.pageId !== diffFile.pageId) {
+      throw new Error(`EVIDENCE_PAGE_MISMATCH: ${diffFile.file} declares ${stored.pageId}`);
+    }
+    const actual = recomputed.get(diffFile.pageId);
+    if (actual === undefined) {
+      throw new Error(`EVIDENCE_PAGE_MISSING: ${diffFile.pageId}`);
+    }
+    if (!stored.passed) {
+      throw new FigmaSignRefusal(`FIGMA_VERIFY_FAILED: ${diffFile.pageId}`);
+    }
+    const mismatches = compareDiffEvidence(stored, actual);
+    if (mismatches.length > 0) {
+      throw new FigmaSignRefusal(
+        `FIGMA_DIFF_STALE: ${diffFile.pageId}: ${mismatches.join("; ")}`
+      );
     }
   }
 
@@ -423,15 +474,63 @@ export async function checkEvidence(input: {
       `PROJECT_MISMATCH: baseline ${baseline.project} != conformance ${conformance.project}`
     );
   }
+  const baselineCases = loadBaselineCases(baseline, baselineFile);
+  const parityIssues = await verifyParityEvidence({
+    figmaDir: input.figmaDir,
+    pages: parity.pages,
+    baselineCases,
+    resolveBaselineFile: async (entry) => {
+      const parts = entry.file.replace(/\\/g, "/").split("/");
+      if (path.isAbsolute(entry.file) || parts.includes("..")) return undefined;
+      const file = path.join(input.baselineDir, entry.file);
+      try {
+        await readFile(file);
+        return file;
+      } catch {
+        return undefined;
+      }
+    },
+  });
+  if (parityIssues.length > 0) {
+    throw new FigmaSignRefusal(`PARITY_HASH_STALE: ${parityIssues.join("; ")}`);
+  }
 
   return { project: conformance.project, pageIds };
 }
+
+/** Parse baseline cases from an already-validated manifest body. */
+function loadBaselineCases(body: Record<string, unknown>, source: string): BaselineCaseFile[] {
+  const cases = body.cases;
+  if (!Array.isArray(cases)) throw new Error(`BASELINE_MANIFEST_INVALID: ${source}`);
+  const parsed: BaselineCaseFile[] = [];
+  for (const entry of cases) {
+    if (
+      !isRecord(entry) ||
+      typeof entry.pageId !== "string" ||
+      typeof entry.state !== "string" ||
+      typeof entry.file !== "string" ||
+      typeof entry.sha256 !== "string"
+    ) {
+      throw new Error(`BASELINE_MANIFEST_INVALID: ${source}: case`);
+    }
+    parsed.push({
+      pageId: entry.pageId,
+      state: entry.state,
+      file: entry.file,
+      sha256: entry.sha256,
+    });
+  }
+  return parsed;
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function signEvidence(input: {
   figmaDir: string;
   signoffPath: string;
   hashes: FigmaHashes;
   project?: string;
+  now?: Date;
 }): Promise<{ ok: true; signoff: Record<string, unknown> } | { ok: false; error: string }> {
   let text: string;
   try {
@@ -453,6 +552,24 @@ export async function signEvidence(input: {
     return { ok: false, error: `SIGNOFF_BLOCK_INVALID: ${parsed.error.message}` };
   }
   const block = parsed.data;
+  if (!ISO_DATE.test(block.date) || Number.isNaN(Date.parse(`${block.date}T00:00:00Z`))) {
+    return { ok: false, error: `SIGNOFF_DATE_INVALID: ${block.date}` };
+  }
+  const now = input.now ?? new Date();
+  const today = now.toISOString().slice(0, 10);
+  if (block.date > today) {
+    return { ok: false, error: `SIGNOFF_DATE_IN_FUTURE: ${block.date} > ${today}` };
+  }
+  if (
+    block.project !== undefined &&
+    input.project !== undefined &&
+    block.project !== input.project
+  ) {
+    return {
+      ok: false,
+      error: `SIGNOFF_PROJECT_MISMATCH: ${block.project} != ${input.project}`,
+    };
+  }
   for (const key of HASH_KEYS) {
     if (block[key] !== input.hashes[key]) {
       return { ok: false, error: `SIGNOFF_HASH_MISMATCH: ${key}` };

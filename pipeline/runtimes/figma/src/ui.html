@@ -187,6 +187,7 @@
         if (message.type === "readback") {
           build.disabled = false;
           const readback = message.readback;
+          const delivery = message.mode === "delivery";
           lastReadback = readback;
           copyReadback.hidden = false;
           const text = JSON.stringify(readback, null, 2);
@@ -195,7 +196,7 @@
           status.className = "ok";
           status.innerHTML = "";
           const lines = [
-            `Built ${readback.pageId}`,
+            `Built ${readback.pageId}${delivery ? " (delivery)" : ""}`,
             `${readback.fonts.length} fonts, ${readback.variables.length} variables, ${readback.textStyles.length} text styles`,
             readback.errors.length > 0 ? `errors: ${readback.errors.join("; ")}` : "no plugin errors",
           ];
@@ -207,10 +208,14 @@
           const link = document.createElement("a");
           link.href = url;
           link.download = `figma-readback.${readback.pageId}.json`;
-          link.textContent = "下载 readback JSON";
+          link.textContent = delivery
+            ? "下载 readback JSON（delivery，保存到 readback/delivery/）"
+            : "下载 readback JSON";
           status.append(link);
           void postToServer(
-            `/save/figma-readback.${readback.pageId}.json`,
+            delivery
+              ? `/save/delivery/figma-readback.${readback.pageId}.json`
+              : `/save/figma-readback.${readback.pageId}.json`,
             text,
             { "content-type": "application/json" }
           );

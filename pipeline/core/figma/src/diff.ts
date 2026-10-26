@@ -594,3 +594,38 @@ export function diffFigmaPlans(
 ): FigmaDiff[] {
   return pairs.map(({ plan, readback }) => diffFigma(plan, readback, options));
 }
+
+function findingSignature(finding: FigmaDiffFinding): string {
+  return `${finding.code}|${finding.severity}|${finding.specId ?? ""}`;
+}
+
+/**
+ * Compare a stored `figma-diff.*.json` with the diff recomputed from the
+ * current plan + readback. The stored file is untrusted evidence: a `passed:
+ * true` flag is only usable when the current inputs still produce the same
+ * verdict and the same finding identities. Messages are not compared, so a
+ * wording-only change in the comparator does not stale a signature.
+ */
+export function compareDiffEvidence(stored: FigmaDiff, recomputed: FigmaDiff): string[] {
+  const mismatches: string[] = [];
+  if (stored.pageId !== recomputed.pageId) {
+    mismatches.push(`pageId ${stored.pageId} != ${recomputed.pageId}`);
+  }
+  if (stored.passed !== recomputed.passed) {
+    mismatches.push(`passed ${String(stored.passed)} != ${String(recomputed.passed)}`);
+  }
+  if (stored.blockerCount !== recomputed.blockerCount) {
+    mismatches.push(
+      `blockerCount ${stored.blockerCount} != ${recomputed.blockerCount}`
+    );
+  }
+  if (stored.majorCount !== recomputed.majorCount) {
+    mismatches.push(`majorCount ${stored.majorCount} != ${recomputed.majorCount}`);
+  }
+  const storedFindings = stored.findings.map(findingSignature).sort().join("\n");
+  const recomputedFindings = recomputed.findings.map(findingSignature).sort().join("\n");
+  if (storedFindings !== recomputedFindings) {
+    mismatches.push(`findings differ (${stored.findings.length} != ${recomputed.findings.length})`);
+  }
+  return mismatches;
+}

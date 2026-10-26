@@ -9,6 +9,24 @@
 - 预算：¥3；实际成本：¥0.3302（fixture 模式为 ¥0）
 - 原因：conformance failed；parity not evaluated
 
+## 更正：页高门禁必须读 `contentHeight`（2026-10-26 终审修复）
+
+原始运行（v0.7 实现提交时）只用页面级 `documentHeight` Δ 做高度门禁。
+`documentHeight = max(documentElement.scrollHeight, scrollContainer.scrollHeight)`
+且会被移动端视口 844px 抬升，因此短页面上的内容增长完全被掩盖：
+
+| 页面 | 基线 contentHeight | 实验 contentHeight | contentHeight Δ | 旧 doc Δ | 旧门禁 | 更正后门禁 |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| today | 732 | 732 | 0% | 0% | 通过 | 通过 |
+| appointment-list | 760 | 804 | **+5.79%** | 0% | 通过（漏报） | **未通过（rollback）** |
+
+本次运行的实际 `documentHeight` 在两页都是 844，`contentHeight` 才是原始滚动内容高度。
+修复后的 `evaluateBlockExperiment` 同时检查两个 Δ，任一 |Δ| > 5% 都会写入
+`heightDelta>5%` 并强制 `rollback`。该运行原本就因 conformance failed / parity
+not evaluated 回滚，因此更正不改变结论，只补上被漏掉的高度回归证据。
+本目录的 `block-experiment.json` / `measurements.json` 是原始运行的机器证据，
+未改写；更正后的指标以本节和当前代码/测试为准。
+
 ## 页面指标
 
 | 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ | 页高门禁 | conformance | parity |

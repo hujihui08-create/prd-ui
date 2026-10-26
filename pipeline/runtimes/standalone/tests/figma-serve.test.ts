@@ -39,6 +39,25 @@ describe("figma:serve", () => {
       });
       expect(readback.status).toBe(200);
       expect(await readFile(path.join(figma, "readback", "figma-readback.today.json"), "utf8")).toContain("today");
+
+      const delivery = await fetch(
+        `${server.url}/save/delivery/figma-readback.today.json`,
+        {
+          method: "POST",
+          body: '{"pageId":"today","delivery":true}',
+        }
+      );
+      expect(delivery.status).toBe(200);
+      expect(
+        await readFile(
+          path.join(figma, "readback", "delivery", "figma-readback.today.json"),
+          "utf8"
+        )
+      ).toContain('"delivery":true');
+      // The scratch readback is not overwritten by a delivery build.
+      expect(
+        await readFile(path.join(figma, "readback", "figma-readback.today.json"), "utf8")
+      ).not.toContain("delivery");
     } finally {
       await server.close();
     }

@@ -7,6 +7,7 @@ import type {
   SpecNode,
 } from "@prd-ui/contracts";
 import type { ArchetypeDef } from "@prd-ui/design-system";
+import { isLayoutPrimitive } from "@prd-ui/design-system";
 
 /** Slots owned by the page shell; they never become blocks. */
 const SHELL_SLOTS = new Set(["top-bar", "tab-bar", "bottom-nav", "actions", "footer", "header"]);
@@ -258,5 +259,74 @@ export function verifyBlockManifest(spec: PageSpec, manifest: BlockManifest): Fi
     );
   }
 
+  return findings;
+}
+
+/**
+ * Verify the block contract itself, independent of the assembly round-trip:
+ *
+ * - every non-primitive component in a block root is in that block's
+ *   `allowedComponents` list (`BLOCK_COMPONENT_NOT_ALLOWED`);
+ * - `allowedComponents` is not empty;
+ * - every `requiredStates` entry exists on the assembled page
+ *   (`BLOCK_REQUIRED_STATE_MISSING`), and the list itself is not empty.
+ *
+ * These checks run on the regenerated block, so a model that introduces an
+ * undeclared component fails the block gate instead of being masked by a
+ * successful round-trip.
+ */
+export function verifyBlockContracts(spec: PageSpec, manifest: BlockManifest): Finding[] {
+  const findings: Finding[] = [];
+  const push = (ruleId: string, location: string, evidence: string, issue: string): void => {
+    findings.push({
+      id: `${ruleId}-${findings.length + 1}`,
+      ruleId,
+      severity: "blocker",
+      category: "block",
+      location,
+      evidence,
+      issue,
+    });
+  };
+  for (const block of manifest.blocks) {
+    if (block.allowedComponents.length === 0) {
+      push(
+        "BLOCK_ALLOWED_COMPONENTS_EMPTY",
+        block.blockId,
+        block.root.type,
+        "A block must declare the components it may contain."
+      );
+    }
+    const allowed = new Set(block.allowedComponents);
+    walk(block.root, (node) => {
+      if (isLayoutPrimitive(node.type)) return;
+      if (!allowed.has(node.type)) {
+        push(
+          "BLOCK_COMPONENT_NOT_ALLOWED",
+          block.blockId,
+          node.type,
+          `Component "${node.type}" is not in the block's allowedComponents.`
+        );
+      }
+    });
+    if (block.requiredStates.length === 0) {
+      push(
+        "BLOCK_REQUIRED_STATES_EMPTY",
+        block.blockId,
+        block.blockId,
+        "A block must declare its required page states."
+      );
+    }
+    for (const state of block.requiredStates) {
+      if (!(state in spec.states)) {
+        push(
+          "BLOCK_REQUIRED_STATE_MISSING",
+          block.blockId,
+          state,
+          `Required state "${state}" is missing from the assembled page.`
+        );
+      }
+    }
+  }
   return findings;
 }

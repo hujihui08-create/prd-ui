@@ -9,6 +9,7 @@ export function buildHandoffManifest(input: HandoffInput): HandoffManifest {
     profile: input.profile,
     catalog: input.catalog,
     pages: input.pages,
+    ...(input.inputHashes === undefined ? {} : { inputHashes: input.inputHashes }),
     figma: input.figma,
     gates: input.gates,
     signoffs: input.signoffs,

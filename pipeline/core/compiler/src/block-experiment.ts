@@ -62,10 +62,15 @@ export function countSeams(blocks: BlockSpec[], profile: Profile): number {
 /**
  * Decide whether the block experiment can be promoted.
  *
- * Conformance is a required tri-state. `failed` is a hard failure (rollback);
- * `not_evaluated` means the gate did not run, so the result is insufficient
- * evidence unless another hard failure already forces a rollback. A missing
- * parity result is likewise insufficient evidence, never a pass.
+ * C4 conditions are all load-bearing:
+ * - conformance is a required tri-state (`failed` rolls back, `not_evaluated`
+ *   withholds promotion);
+ * - page height is gated on both `documentHeight` (viewport-floored) and
+ *   `contentHeight` (raw scroll content), because a page shorter than the
+ *   viewport can grow without changing `documentHeight`;
+ * - Phase 1 semantic-validator blockers are a hard failure;
+ * - experiment token drift may not exceed the measured baseline drift;
+ * - parity is required, and a missing parity result is insufficient evidence.
  */
 export function evaluateBlockExperiment(input: {
   project: string;
@@ -81,10 +86,14 @@ export function evaluateBlockExperiment(input: {
       retries: number;
       seams: number;
       tokenDrift: number;
+      baselineTokenDrift?: number;
       heightDeltaPct?: number;
     }>;
     conformance: BlockConformanceStatus;
     heightDeltaPct?: number;
+    contentHeightDeltaPct?: number;
+    baselineTokenDrift?: number;
+    phase1Blockers?: number;
     blockVerifyPassed?: boolean;
     parityPassed?: boolean;
     conformanceComparable?: boolean;
@@ -103,14 +112,17 @@ export function evaluateBlockExperiment(input: {
     .map((metric) => metric.heightDeltaPct)
     .filter((value): value is number => value !== undefined);
   const pageHeightDeltas = input.pages
-    .map((page) => page.heightDeltaPct)
+    .flatMap((page) => [page.heightDeltaPct, page.contentHeightDeltaPct])
     .filter((value): value is number => value !== undefined);
   const heightDeltaExceeded = [...blockHeightDeltas, ...pageHeightDeltas].some(
     (value) => Math.abs(value) > 5
   );
   const heightNotEvaluated =
     input.pages.length === 0 ||
-    input.pages.some((page) => page.heightDeltaPct === undefined);
+    input.pages.some(
+      (page) =>
+        page.heightDeltaPct === undefined || page.contentHeightDeltaPct === undefined
+    );
   const conformanceFailed = input.pages.some((page) => page.conformance === "failed");
   const blockVerifyFailed = input.pages.some((page) => page.blockVerifyPassed === false);
   const conformanceNotEvaluated =
@@ -126,6 +138,36 @@ export function evaluateBlockExperiment(input: {
     input.pages.length > 0 && input.pages.every((page) => page.parityPassed !== undefined);
   const parityFailed = input.pages.some((page) => page.parityPassed === false);
 
+  // Phase 1 semantic blockers are a hard failure; a page whose Phase 1 gate
+  // never ran withholds promotion rather than counting as clean.
+  const phase1Blockers = input.pages.reduce(
+    (sum, page) => sum + (page.phase1Blockers ?? 0),
+    0
+  );
+  const phase1Failed = phase1Blockers > 0;
+  const phase1NotEvaluated =
+    input.pages.length === 0 ||
+    input.pages.some((page) => page.phase1Blockers === undefined);
+
+  // Token drift is only a regression when measured against the baseline; an
+  // unmeasured baseline is insufficient evidence, not an implicit zero.
+  const baselineTokenDrift = input.pages.map((page) => {
+    const perBlock = page.metrics.map((metric) => metric.baselineTokenDrift);
+    if (page.metrics.length > 0 && perBlock.every((value) => value !== undefined)) {
+      return perBlock.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+    }
+    return page.baselineTokenDrift;
+  });
+  const tokenDriftNotEvaluated =
+    input.pages.length === 0 || baselineTokenDrift.some((value) => value === undefined);
+  const experimentTokenDrift = allMetrics.reduce((sum, metric) => sum + metric.tokenDrift, 0);
+  const baselineTokenDriftTotal = baselineTokenDrift.reduce<number>(
+    (sum, value) => sum + (value ?? 0),
+    0
+  );
+  const tokenDriftRegressed =
+    !tokenDriftNotEvaluated && experimentTokenDrift > baselineTokenDriftTotal;
+
   if (seams > 0) reasons.push(`seams=${seams}`);
   if (retries > 6) reasons.push(`retries=${retries}`);
   if (cost > budget) reasons.push(`cost=${cost}`);
@@ -137,6 +179,10 @@ export function evaluateBlockExperiment(input: {
   if (conformanceNotComparable) reasons.push("conformance not comparable");
   if (parityFailed) reasons.push("parity failed");
   else if (!parityEvaluated) reasons.push("parity not evaluated");
+  if (phase1Failed) reasons.push(`phase1Blockers=${phase1Blockers}`);
+  else if (phase1NotEvaluated) reasons.push("phase1 not evaluated");
+  if (tokenDriftRegressed) reasons.push("tokenDrift>baseline");
+  else if (tokenDriftNotEvaluated) reasons.push("token drift not evaluated");
 
   const hardFailure =
     seams > 0 ||
@@ -145,10 +191,17 @@ export function evaluateBlockExperiment(input: {
     heightDeltaExceeded ||
     blockVerifyFailed ||
     conformanceFailed ||
-    parityFailed;
+    parityFailed ||
+    phase1Failed ||
+    tokenDriftRegressed;
   const conclusion = hardFailure
     ? "rollback"
-    : conformancePassed && parityEvaluated && !heightNotEvaluated && !conformanceNotComparable
+    : conformancePassed &&
+        parityEvaluated &&
+        !heightNotEvaluated &&
+        !conformanceNotComparable &&
+        !phase1NotEvaluated &&
+        !tokenDriftNotEvaluated
       ? "promote"
       : "insufficient_evidence";
 

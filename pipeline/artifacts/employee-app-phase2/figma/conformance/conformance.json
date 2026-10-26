@@ -1,63 +1,79 @@
 {
   "schemaVersion": "1.0",
   "project": "employee-app-phase2",
-  "generatedAt": "2026-10-26T15:47:39.210Z",
+  "generatedAt": "2026-10-26T16:26:31.204Z",
   "pages": [
     {
       "pageId": "appointment-detail",
       "passed": true,
       "checked": 20,
       "skipped": 0,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:66f97f498a74d751962401ece8b1060689e755c06a47e88948399fee1a9abe31",
+      "specSha256": "sha256:148570bdadf8153c51c363651623cafbe76012957f6113047e3d83987c628e1a"
     },
     {
       "pageId": "appointment-form",
       "passed": true,
       "checked": 17,
       "skipped": 0,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:7ffe068cd87f08e6f7eff158d9e8acbd20a7915518b82f61faf99a0336179065",
+      "specSha256": "sha256:69fe481eb5ad6152baf4781564ae322fca2f8bc826d8238f6c989e43b56ab2c0"
     },
     {
       "pageId": "appointment-list",
       "passed": true,
       "checked": 125,
       "skipped": 8,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:407a8bf260383f14b05698235b6fafb56f5689063f4b34a364dc189a66796155",
+      "specSha256": "sha256:797953e59b6bdc600d85f32bff0b094bdf2c6bfa0a10e1c9c2f3906b0fff4cea"
     },
     {
       "pageId": "callback-register",
       "passed": true,
       "checked": 13,
       "skipped": 0,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:bbfd170bf1723dd111597584dc45ed1ee098a99c3e234180860f58baee0cca47",
+      "specSha256": "sha256:74dfdffd339cbfeef2046f2e7cfa60d690d651ab51a0fcf511992d75867866ad"
     },
     {
       "pageId": "customer-detail",
       "passed": true,
       "checked": 17,
       "skipped": 0,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:5b049eb7e91750ca3d7f67abbfe2c80ef456d5121aa784fb6742ddef31be51ec",
+      "specSha256": "sha256:00ab527f1662d416fd4d049829759e6d7ad2a7a40415e6e5d7bdcd4fabac7b2d"
     },
     {
       "pageId": "customer-search",
       "passed": true,
       "checked": 4,
       "skipped": 4,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:38ef8bf68b504e0324fa090aec3b58d7b90ec9e05ad23dfb0a79efe74766a2bf",
+      "specSha256": "sha256:6ac167554d2e997cd7ae124ad6df19ffb8951a22519e863fbf6abb99c48c3859"
     },
     {
       "pageId": "today",
       "passed": true,
       "checked": 18,
       "skipped": 2,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:2dcc7f110035eaa9d71aa7a579b0352177edf83dd6d59504c153ae684e99c304",
+      "specSha256": "sha256:3812d73e85314e26dd6d38697e65e448aab1ba08bfadd487246a119c9814eb24"
     },
     {
       "pageId": "treatment-notice",
       "passed": true,
       "checked": 19,
       "skipped": 0,
-      "findings": []
+      "findings": [],
+      "htmlSha256": "sha256:f3532b77ec1baff07a5cfaf527fa6fd870a0627fcc11d27817a50960df87129d",
+      "specSha256": "sha256:382e230f59fa29695e314c3674c8060fad166ff88f7fe28d0f481214dab7d499"
     }
   ],
   "summary": {

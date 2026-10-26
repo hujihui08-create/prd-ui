@@ -3,6 +3,57 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.7 final whole-branch review fixes (still not signed)
+
+### Fixed
+
+- **Stale Figma diff trust (critical)**: `figma:sign` and `handoff:pack` now
+  re-derive every page diff from the current plan + readback via `diffFigma`
+  (pure `@prd-ui/figma`) and require it to pass. A stored
+  `figma-diff.*.json` `passed: true` is only usable when it agrees with the
+  recomputed verdict (`FIGMA_DIFF_STALE` / handoff blocker otherwise).
+- **Block height gate (critical)**: the C4 height gate reads raw `contentHeight`
+  in addition to the viewport-floored `documentHeight`. The committed pilot's
+  appointment-list 760→804 content growth (+5.79%) is now a `heightDelta>5%`
+  rollback instead of a silent 0% pass; the committed evidence documents the
+  corrected metric and discrepancy.
+- **Parity input hashes**: sign/pack re-hash `figma/parity/figma.<page>.png`
+  and the signed baseline case PNG and require them to match the
+  `figmaHash`/`baselineHash` recorded in `parity.json`.
+- **Handoff screenshots**: `screenshots/figma/<page>.png` now comes from the
+  parity PNG and is hash-bound to it; legacy v0.6 manual crops go to
+  `screenshots/figma-manual/` with an explicit stale-provenance known gap.
+- **Render metrics**: `handoff:pack` accepts `--metrics <file>`, searches the
+  v0.7 `render/metrics/render-metrics.json` layout and treats missing metrics
+  as a blocker.
+- **Gate-input binding**: `figma:conformance` records per-page
+  `htmlSha256`/`specSha256`, `visual:review` records `htmlHashes`, and
+  `handoff:pack` verifies the supplied HTML/spec bytes match those gates
+  (`inputHashes` is also written to `handoff.manifest.json`).
+- **Block C4 conditions**: promotion now requires measured Phase 1 blockers,
+  token drift ≤ baseline drift, conformance, and parity; `allowedComponents`
+  and `requiredStates` are enforced by `verifyBlockContracts` in
+  `block:experiment` and `block:verify`. `block:experiment` accepts
+  `--figma`/`--figma-baseline` to run `figma:parity`; without both it can only
+  return `insufficient_evidence`.
+- **Structure diff**: compares a defined set of text-bearing props and adds a
+  positional path fallback for id-less nodes (`idless: true`).
+- **Minors**: `figma:parity` reads a pinned `parity.config.json`; `figma:serve`
+  preserves scratch vs delivery readback directories; structure-diff and
+  block-experiment artifacts use repo-relative paths; `figma:sign` rejects
+  future/mismatched-project signoffs and hardens `__proto__` hashing;
+  `--baseline` in `handoff:pack` falls back to `pipeline/baselines/<project>`.
+
+### Verified
+
+- `pnpm test` **983 passed** (87 files); `pnpm test:dsh` **4 passed** (3 files);
+  `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
+- `figma:conformance` remains **0 blocker / 0 major / 233 checked** on the 8
+  fresh phase2 pages; `v07:smoke` remains honest (`complete: false`,
+  `paritySkipped: true`).
+- `handoff:pack` still fails closed on the current stale evidence and writes no
+  partial package.
+
 ## 2026-10-26 — v0.7 implementation: visual gates, structure, blocks, handoff (not signed)
 
 ### Added
@@ -27,7 +78,7 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
 
 ### Verified
 
-- `pnpm test` **949 passed** (86 files); `pnpm test:dsh` **4 passed** (3 files);
+- `pnpm test` **983 passed** (87 files); `pnpm test:dsh` **4 passed** (3 files);
   `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
 - `figma:conformance`: **0 blocker / 0 major / 233 checked** on all 8 phase2
   pages with freshly rendered HTML; `render:measure` 8 pages (no overflow);
@@ -55,8 +106,10 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   `manifest.json`), exit 1 with 23 blockers (missing parity evidence/diff PNGs,
   readback `fileKey`, figma signoff, full spec-engineer gate). No partial package.
 - Block-generation pilot concluded **rollback at ¥0.3302** (7 generations, 0
-  retries, 0% height delta, 0 new seams, parity not evaluated); it ran before the
-  conformance remediation and needs a v0.8 re-evaluation.
+  retries, documentHeight delta 0%, 0 new seams, parity not evaluated). The
+  corrected gate also sees appointment-list contentHeight 760→804 (+5.79%), so
+  the rollback stands; it ran before the conformance remediation and needs a
+  v0.8 re-evaluation.
 
 ## 2026-10-26 — v0.7 design input: gates, structure, block generation
 

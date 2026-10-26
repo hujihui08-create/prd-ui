@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { BlockManifest, Finding, PageSpec } from "@prd-ui/contracts";
-import { verifyBlockManifest } from "@prd-ui/compiler";
+import { verifyBlockContracts, verifyBlockManifest } from "@prd-ui/compiler";
 import { loadSpecs } from "./structure-check-cli.js";
 
 export const USAGE = `Usage:
@@ -160,6 +160,7 @@ async function verifyPage(runDir: string, spec: PageSpec): Promise<BlockVerifyPa
   }
   try {
     findings.push(...verifyBlockManifest(spec, manifest));
+    findings.push(...verifyBlockContracts(spec, manifest));
   } catch (error) {
     findings.push(
       blocker(

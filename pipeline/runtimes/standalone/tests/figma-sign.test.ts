@@ -1,14 +1,25 @@
+import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   computeFigmaHashes,
+  hashJson,
   main,
   parseArgs,
   signEvidence,
   type FigmaHashes,
 } from "../src/figma-sign-cli.js";
+
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+  "base64"
+);
+
+function sha256(value: Buffer): string {
+  return `sha256:${createHash("sha256").update(value).digest("hex")}`;
+}
 
 const dirs: string[] = [];
 afterEach(async () => {
@@ -26,6 +37,11 @@ async function writeJson(file: string, value: unknown): Promise<void> {
   await writeFile(file, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
+async function writeBytes(file: string, value: Buffer): Promise<void> {
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, value);
+}
+
 interface Fixture {
   root: string;
   figmaDir: string;
@@ -40,6 +56,17 @@ interface Overrides {
   readbackErrors?: string[];
 }
 
+function planChild(specId: string, height = 36): Record<string, unknown> {
+  return {
+    specId,
+    type: "FRAME",
+    name: specId,
+    layoutMode: "NONE",
+    height,
+    children: [],
+  };
+}
+
 function basePlan(): Record<string, unknown> {
   return {
     schemaVersion: "1.0",
@@ -52,18 +79,39 @@ function basePlan(): Record<string, unknown> {
     tokens: { "color/surface/default": "#FFFFFF" },
     textStyles: {},
     components: { Button: { variants: {} } },
+    coverage: {
+      nodes: [],
+      summary: { spec: 0, derived: 0, mapped: 0, degraded: 0, unmapped: 0, skipped: 0 },
+    },
     root: {
       specId: "today.page.root",
       type: "FRAME",
       name: "今日",
       layoutMode: "VERTICAL",
-      children: [],
+      children: [
+        planChild("today.button.a"),
+        planChild("today.button.b"),
+        planChild("today.button.c"),
+      ],
     },
-    stats: { frames: 1, texts: 0, instances: 0, icons: 0, images: 0 },
+    stats: { frames: 4, texts: 0, instances: 0, icons: 0, images: 0 },
   };
 }
 
-function baseReadback(): Record<string, unknown> {
+function readbackButton(specId: string, height = 36): Record<string, unknown> {
+  return {
+    specId,
+    nodeId: `node-${specId}`,
+    type: "FRAME",
+    name: specId,
+    layoutMode: "NONE",
+    height,
+    children: [],
+  };
+}
+
+function baseReadback(overrides: { buttonHeight?: number } = {}): Record<string, unknown> {
+  const height = overrides.buttonHeight ?? 36;
   return {
     schemaVersion: "1.0",
     pageId: "today",
@@ -72,7 +120,20 @@ function baseReadback(): Record<string, unknown> {
     variables: [],
     textStyles: [],
     components: [],
-    nodes: [],
+    nodes: [
+      {
+        specId: "today.page.root",
+        nodeId: "node-root",
+        type: "FRAME",
+        name: "今日",
+        layoutMode: "VERTICAL",
+        children: [
+          readbackButton("today.button.a", height),
+          readbackButton("today.button.b", height),
+          readbackButton("today.button.c", height),
+        ],
+      },
+    ],
     errors: [],
   };
 }
@@ -121,8 +182,9 @@ function baseParity(passed: boolean): Record<string, unknown> {
         maxDiffCluster: 0,
         baselineFile: "../baseline/today.default.png",
         figmaFile: "../figma/figma.today.png",
-        baselineHash: "sha256:a",
-        figmaHash: "sha256:b",
+        baselineHash: sha256(PNG),
+        figmaHash: sha256(PNG),
+        baselineManifestHash: sha256(PNG),
         width: 390,
         height: 844,
         findings: passed
@@ -146,7 +208,7 @@ function baseBaselineManifest(): Record<string, unknown> {
         state: "default",
         viewport: { width: 390, height: 844 },
         file: "today.default.png",
-        sha256: "sha256:baseline",
+        sha256: sha256(PNG),
       },
     ],
   };
@@ -175,7 +237,9 @@ async function createFixture(overrides: Overrides = {}): Promise<Fixture> {
     baseConformance(blockers)
   );
   await writeJson(path.join(figmaDir, "parity", "parity.json"), baseParity(parityPassed));
+  await writeBytes(path.join(figmaDir, "parity", "figma.today.png"), PNG);
   await writeJson(path.join(baselineDir, "manifest.json"), baseBaselineManifest());
+  await writeBytes(path.join(baselineDir, "today.default.png"), PNG);
   return { root, figmaDir, baselineDir, signoffPath };
 }
 
@@ -404,6 +468,128 @@ describe("figma:sign", () => {
     const readbackResult = await runMain(readbackFailure);
     expect(readbackResult.code).toBe(1);
     expect(readbackResult.stderr.join("\n")).toContain("READBACK_ERRORS: today");
+  });
+
+  it("does not trust a stored passed diff when the current readback regressed", async () => {
+    const fixture = await createFixture();
+    const hashes = await computeFigmaHashes({
+      figmaDir: fixture.figmaDir,
+      baselineDir: fixture.baselineDir,
+    });
+    await writeSignoff(fixture, hashes);
+
+    // Three button heights now disagree with the plan: 3 majors > the
+    // default maxMajor of 2. The stored diff still claims passed: true.
+    await writeJson(path.join(fixture.figmaDir, "readback", "figma-readback.today.json"), {
+      ...baseReadback({ buttonHeight: 44 }),
+      errors: [],
+    });
+
+    const result = await runMain(fixture);
+    expect(result.code).toBe(1);
+    expect(result.stderr.join("\n")).toContain("FIGMA_VERIFY_FAILED: today");
+    await expect(signoffFile(fixture)).rejects.toThrow();
+  });
+
+  it("does not trust a stored passed diff after a different plan is supplied", async () => {
+    const fixture = await createFixture();
+    const hashes = await computeFigmaHashes({
+      figmaDir: fixture.figmaDir,
+      baselineDir: fixture.baselineDir,
+    });
+    await writeSignoff(fixture, hashes);
+
+    const plan = basePlan();
+    (plan.root as Record<string, unknown>).children = [planChild("today.button.a")];
+    await writeJson(path.join(fixture.figmaDir, "plans", "figma-plan.today.json"), plan);
+
+    const result = await runMain(fixture);
+    expect(result.code).toBe(1);
+    // The plan/readback hierarchy no longer matches: blocker.
+    expect(result.stderr.join("\n")).toContain("FIGMA_VERIFY_FAILED: today");
+  });
+
+  it("refuses when a parity PNG changes after parity.json was written", async () => {
+    const fixture = await createFixture();
+    const hashes = await computeFigmaHashes({
+      figmaDir: fixture.figmaDir,
+      baselineDir: fixture.baselineDir,
+    });
+    await writeSignoff(fixture, hashes);
+
+    await writeBytes(
+      path.join(fixture.figmaDir, "parity", "figma.today.png"),
+      Buffer.from("tampered")
+    );
+
+    const result = await runMain(fixture);
+    expect(result.code).toBe(1);
+    expect(result.stderr.join("\n")).toContain("PARITY_HASH_STALE");
+    expect(result.stderr.join("\n")).toContain("parity PNG hash does not match parity.json");
+  });
+
+  it("refuses when the signed baseline PNG changes after parity.json was written", async () => {
+    const fixture = await createFixture();
+    const hashes = await computeFigmaHashes({
+      figmaDir: fixture.figmaDir,
+      baselineDir: fixture.baselineDir,
+    });
+    await writeSignoff(fixture, hashes);
+
+    await writeBytes(path.join(fixture.baselineDir, "today.default.png"), Buffer.from("tampered"));
+
+    const result = await runMain(fixture);
+    expect(result.code).toBe(1);
+    expect(result.stderr.join("\n")).toContain("PARITY_HASH_STALE");
+    expect(result.stderr.join("\n")).toContain(
+      "baseline PNG hash does not match parity.json"
+    );
+  });
+
+  it("rejects a signoff date in the future and a mismatched project", async () => {
+    const fixture = await createFixture();
+    const hashes = await computeFigmaHashes({
+      figmaDir: fixture.figmaDir,
+      baselineDir: fixture.baselineDir,
+    });
+    await writeSignoff(fixture, hashes);
+
+    const future = await signEvidence({
+      figmaDir: fixture.figmaDir,
+      signoffPath: fixture.signoffPath,
+      hashes,
+      project: "fixture",
+      now: new Date("2026-10-25T00:00:00Z"),
+    });
+    expect(future.ok).toBe(false);
+    if (!future.ok) expect(future.error).toContain("SIGNOFF_DATE_IN_FUTURE");
+
+    await writeFile(
+      fixture.signoffPath,
+      `<!-- signoff\n${JSON.stringify({
+        signer: "tester",
+        date: "2026-10-26",
+        project: "other",
+        ...hashes,
+      })}\n-->\n`,
+      "utf8"
+    );
+    const mismatch = await signEvidence({
+      figmaDir: fixture.figmaDir,
+      signoffPath: fixture.signoffPath,
+      hashes,
+      project: "fixture",
+      now: new Date("2026-10-26T00:00:00Z"),
+    });
+    expect(mismatch.ok).toBe(false);
+    if (!mismatch.ok) expect(mismatch.error).toContain("SIGNOFF_PROJECT_MISMATCH");
+  });
+
+  it("treats a __proto__ key as inert data when hashing", async () => {
+    const left = JSON.parse('{"__proto__":{"polluted":true},"a":1}') as unknown;
+    const right = JSON.parse('{"a":1,"__proto__":{"polluted":true}}') as unknown;
+    expect(hashJson(left)).toBe(hashJson(right));
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 
   it("returns 2 when the evidence is missing", async () => {

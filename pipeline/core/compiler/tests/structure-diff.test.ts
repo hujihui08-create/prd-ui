@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { UiBriefSchema } from "@prd-ui/contracts";
+import { UiBriefSchema, type SpecNode } from "@prd-ui/contracts";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import { compileProject } from "../src/index.js";
 import { diffPageStructure } from "../src/structure-diff.js";
@@ -141,7 +141,7 @@ describe("diffPageStructure", () => {
     expect(() => diffPageStructure(today, other)).toThrow(/PAGE_ID_MISMATCH/);
   });
 
-  it("ignores nodes without an id", () => {
+  it("reports an added id-less node with a positional spec id", () => {
     const after = structuredClone(today);
     after.layout.slots!.content![0]!.children!.push({
       type: "Card",
@@ -149,9 +149,81 @@ describe("diffPageStructure", () => {
       children: [],
     });
     const diff = diffPageStructure(today, after);
-    expect(diff.added).toEqual([]);
     expect(diff.removed).toEqual([]);
     expect(diff.changed).toEqual([]);
+    expect(diff.added).toEqual([
+      {
+        specId: "layout.slots.content[0].children[3]",
+        idless: true,
+        path: "layout.slots.content[0].children[3]",
+        type: "Card",
+      },
+    ]);
+  });
+
+  it("reports a copy change on an id-less node by path", () => {
+    const before = structuredClone(today);
+    before.layout.slots!.content![0]!.children!.push({
+      type: "Text",
+      props: { text: "旧文案" },
+    });
+    const after = structuredClone(before);
+    const node = after.layout.slots!.content![0]!.children!.at(-1)!;
+    node.props = { ...node.props, text: "新文案" };
+    const diff = diffPageStructure(before, after);
+    expect(diff.changed).toEqual(
+      expect.arrayContaining([
+        {
+          specId: "layout.slots.content[0].children[3]",
+          idless: true,
+          kind: "prop",
+          property: "text",
+          before: "旧文案",
+          after: "新文案",
+        },
+      ])
+    );
+  });
+
+  it("reports a button label change", () => {
+    const after = structuredClone(today);
+    const findLabel = (node: SpecNode): SpecNode | undefined => {
+      if (typeof node.props?.label === "string") return node;
+      for (const child of node.children ?? []) {
+        const found = findLabel(child);
+        if (found !== undefined) return found;
+      }
+      for (const nodes of Object.values(node.slots ?? {})) {
+        for (const child of nodes) {
+          const found = findLabel(child);
+          if (found !== undefined) return found;
+        }
+      }
+      return undefined;
+    };
+    const button = findLabel(after.layout);
+    expect(button).toBeDefined();
+    button!.props = { ...button!.props, label: "改过的按钮" };
+    const diff = diffPageStructure(today, after);
+    expect(
+      diff.changed.some((change) => change.kind === "prop" && change.property === "label")
+    ).toBe(true);
+  });
+
+  it("reports a subtitle copy change on a list row", () => {
+    const after = structuredClone(today);
+    const row = after.layout.slots!.content![0]!.children![1]!.children![0]!;
+    expect(typeof row.props?.subtitle).toBe("string");
+    row.props = { ...row.props, subtitle: "新的副标题" };
+    const diff = diffPageStructure(today, after);
+    expect(
+      diff.changed.some(
+        (change) =>
+          change.kind === "prop" &&
+          change.property === "subtitle" &&
+          change.after === "新的副标题"
+      )
+    ).toBe(true);
   });
 
   it("produces empty arrays for an identical spec", () => {

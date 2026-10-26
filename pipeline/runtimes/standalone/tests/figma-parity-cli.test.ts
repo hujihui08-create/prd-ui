@@ -289,4 +289,51 @@ describe("figma:parity main", () => {
     expect(page.passed).toBe(false);
     expect(page.findings.map((finding) => finding.code)).toContain("BASELINE_STALE");
   });
+
+  it("uses a pinned parity.config.json when no threshold flags are passed", async () => {
+    const fixture = await createFixture({
+      baseline: solidPng(200, 200, 255),
+      figma: linePng(200, 200, { y: 100, x: 50, length: 40, value: 0 }),
+    });
+    await writeFile(
+      path.join(fixture.outDir, "parity.config.json"),
+      JSON.stringify({
+        schemaVersion: "1.0",
+        thresholds: { maxPixelDiff: 0.005, minSsim: 0.98, maxClusterPixels: 40 },
+      }),
+      "utf8"
+    );
+
+    const relaxed = await runMain(fixture);
+    expect(relaxed.code).toBe(0);
+    expect((await readReport(fixture)).thresholds.maxClusterPixels).toBe(40);
+
+    // A later run must not silently fall back to the built-in default 24.
+    await writeFile(
+      path.join(fixture.outDir, "parity.config.json"),
+      JSON.stringify({
+        schemaVersion: "1.0",
+        thresholds: { maxPixelDiff: 0.005, minSsim: 0.98, maxClusterPixels: 10 },
+      }),
+      "utf8"
+    );
+    const pinned = await runMain(fixture);
+    expect(pinned.code).toBe(1);
+    const page = (await readReport(fixture)).pages[0]!;
+    expect(page.findings.map((finding) => finding.code)).toEqual(["PARITY_DIFF_CLUSTER"]);
+    expect((await readReport(fixture)).thresholds.maxClusterPixels).toBe(10);
+  });
+
+  it("rejects a malformed pinned config", async () => {
+    const image = solidPng(32, 32, 128);
+    const fixture = await createFixture({ baseline: image, figma: Buffer.from(image) });
+    await writeFile(
+      path.join(fixture.outDir, "parity.config.json"),
+      JSON.stringify({ schemaVersion: "1.0", thresholds: { maxClusterPixels: -1 } }),
+      "utf8"
+    );
+    const result = await runMain(fixture);
+    expect(result.code).toBe(2);
+    expect(result.stderr.join("\n")).toContain("PARITY_CONFIG_INVALID");
+  });
 });

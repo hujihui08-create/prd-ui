@@ -25,6 +25,9 @@ Options:
 
 The baseline case for each page is the manifest entry with state "default".
 Report file paths are relative to --out so the report hash is location-stable.
+When <out>/parity.config.json exists, its thresholds are the pinned defaults;
+explicit threshold flags still override them, so a later run cannot silently
+revert to looser defaults.
 
 Exit codes: 0 parity passed, 1 parity failed, 2 usage or infrastructure error.`;
 
@@ -162,6 +165,69 @@ async function loadBaselineManifest(baselineDir: string): Promise<BaselineManife
   return { cases: raw.cases };
 }
 
+function validRatio(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+function validCount(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
+/**
+ * A committed `parity.config.json` pins the thresholds. An explicit CLI flag
+ * still wins for that run, but a later run with no flags must not silently
+ * revert to looser built-in defaults.
+ */
+async function loadPinnedThresholds(
+  outDir: string
+): Promise<Partial<ParityThresholds> | undefined> {
+  const file = path.join(outDir, "parity.config.json");
+  let text: string;
+  try {
+    text = await readFile(file, "utf8");
+  } catch {
+    return undefined;
+  }
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text) as unknown;
+  } catch (error) {
+    throw new Error(`PARITY_CONFIG_INVALID: ${file}: ${String(error)}`);
+  }
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    throw new Error(`PARITY_CONFIG_INVALID: ${file}: not an object`);
+  }
+  const record = raw as Record<string, unknown>;
+  if (record.schemaVersion !== "1.0") {
+    throw new Error(`PARITY_CONFIG_INVALID: ${file}: schemaVersion`);
+  }
+  const thresholds = record.thresholds;
+  if (typeof thresholds !== "object" || thresholds === null || Array.isArray(thresholds)) {
+    throw new Error(`PARITY_CONFIG_INVALID: ${file}: thresholds`);
+  }
+  const values = thresholds as Record<string, unknown>;
+  const pinned: Partial<ParityThresholds> = {};
+  if (values.maxPixelDiff !== undefined) {
+    if (!validRatio(values.maxPixelDiff)) {
+      throw new Error(`PARITY_CONFIG_INVALID: ${file}: maxPixelDiff`);
+    }
+    pinned.maxPixelDiff = values.maxPixelDiff;
+  }
+  if (values.minSsim !== undefined) {
+    if (!validRatio(values.minSsim)) {
+      throw new Error(`PARITY_CONFIG_INVALID: ${file}: minSsim`);
+    }
+    pinned.minSsim = values.minSsim;
+  }
+  if (values.maxClusterPixels !== undefined) {
+    if (!validCount(values.maxClusterPixels)) {
+      throw new Error(`PARITY_CONFIG_INVALID: ${file}: maxClusterPixels`);
+    }
+    pinned.maxClusterPixels = values.maxClusterPixels;
+  }
+  return pinned;
+}
+
 export async function main(
   argv: string[],
   io: { stdout: (line: string) => void; stderr: (line: string) => void } = {
@@ -190,10 +256,17 @@ export async function main(
   try {
     const pageIds = await loadPageIds(options.specRun);
     const project = await loadProject(options.specRun);
+    const pinned = await loadPinnedThresholds(options.out);
     const thresholds: ParityThresholds = {
-      maxPixelDiff: options.maxPixelDiff,
-      minSsim: options.minSsim,
-      maxClusterPixels: options.maxClusterPixels,
+      maxPixelDiff: argv.includes("--max-pixel-diff")
+        ? options.maxPixelDiff
+        : (pinned?.maxPixelDiff ?? options.maxPixelDiff),
+      minSsim: argv.includes("--min-ssim")
+        ? options.minSsim
+        : (pinned?.minSsim ?? options.minSsim),
+      maxClusterPixels: argv.includes("--max-cluster-pixels")
+        ? options.maxClusterPixels
+        : (pinned?.maxClusterPixels ?? options.maxClusterPixels),
     };
     const baselineManifest = await loadBaselineManifest(options.baseline);
     const pages: ParityPage[] = [];

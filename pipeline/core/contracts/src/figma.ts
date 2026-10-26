@@ -461,6 +461,7 @@ export const FigmaSignoffBlockSchema = z
   .object({
     signer: z.string().min(1),
     date: z.string().min(1),
+    project: z.string().min(1).optional(),
     planHash: z.string().min(1),
     readbackHash: z.string().min(1),
     conformanceHash: z.string().min(1),

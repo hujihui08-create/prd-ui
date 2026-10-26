@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import { UiBriefSchema } from "@prd-ui/contracts";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import { compileProject } from "../src/index.js";
-import { assembleBlocks, splitBlocks, verifyBlockManifest } from "../src/blocks.js";
+import {
+  assembleBlocks,
+  splitBlocks,
+  verifyBlockContracts,
+  verifyBlockManifest,
+} from "../src/blocks.js";
 
 const brief = UiBriefSchema.parse(
   JSON.parse(readFileSync("samples/projects/employee-app-phase2/ui-brief.json", "utf8"))
@@ -132,5 +137,61 @@ describe("blocks", () => {
     manifest.blocks[0]!.root = structuredClone(today.layout);
     const findings = verifyBlockManifest(today, manifest);
     expect(findings.some((finding) => finding.ruleId === "BLOCK_SHELL_TYPE")).toBe(true);
+  });
+
+  it("accepts the compiler's own block contracts", () => {
+    for (const spec of specs) {
+      const manifest = splitBlocks(spec, getArchetype(spec.meta.archetype));
+      expect(verifyBlockContracts(spec, manifest), spec.meta.pageId).toHaveLength(0);
+    }
+  });
+
+  it("rejects a component that is not in allowedComponents", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = splitBlocks(today, getArchetype(today.meta.archetype));
+    const block = manifest.blocks[0]!;
+    block.allowedComponents = block.allowedComponents.filter((type) => type !== block.root.type);
+    const findings = verifyBlockContracts(today, manifest);
+    expect(
+      findings.some(
+        (finding) =>
+          finding.ruleId === "BLOCK_COMPONENT_NOT_ALLOWED" &&
+          finding.location === block.blockId
+      )
+    ).toBe(true);
+  });
+
+  it("rejects an empty allowedComponents list", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = splitBlocks(today, getArchetype(today.meta.archetype));
+    manifest.blocks[0]!.allowedComponents = [];
+    const findings = verifyBlockContracts(today, manifest);
+    expect(
+      findings.some((finding) => finding.ruleId === "BLOCK_ALLOWED_COMPONENTS_EMPTY")
+    ).toBe(true);
+  });
+
+  it("rejects a required state that the page does not declare", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = splitBlocks(today, getArchetype(today.meta.archetype));
+    manifest.blocks[0]!.requiredStates = ["default", "not-a-state"];
+    const findings = verifyBlockContracts(today, manifest);
+    expect(
+      findings.some(
+        (finding) =>
+          finding.ruleId === "BLOCK_REQUIRED_STATE_MISSING" &&
+          finding.evidence === "not-a-state"
+      )
+    ).toBe(true);
+  });
+
+  it("rejects an empty requiredStates list", () => {
+    const today = specs.find((spec) => spec.meta.pageId === "today")!;
+    const manifest = splitBlocks(today, getArchetype(today.meta.archetype));
+    manifest.blocks[0]!.requiredStates = [];
+    const findings = verifyBlockContracts(today, manifest);
+    expect(
+      findings.some((finding) => finding.ruleId === "BLOCK_REQUIRED_STATES_EMPTY")
+    ).toBe(true);
   });
 });

@@ -21,6 +21,13 @@ export interface HandoffAsset {
   license: string;
 }
 
+export interface HandoffInputHashes {
+  /** sha256 of each supplied `html/<pageId>.html`. */
+  html: Record<string, string>;
+  /** sha256 of each supplied `spec/page-spec/<pageId>.json`. */
+  specs: Record<string, string>;
+}
+
 export interface HandoffInput {
   project: string;
   generatedAt: string;
@@ -29,6 +36,8 @@ export interface HandoffInput {
   catalog: string;
   pages: string[];
   files: HandoffFile[];
+  /** Gate-input binding: the HTML/spec bytes the signed gates were checked against. */
+  inputHashes?: HandoffInputHashes;
   gates: {
     verify: HandoffGate;
     conformance: HandoffGate;

@@ -134,6 +134,17 @@ describe("block:experiment CLI", () => {
     expect(options.pricingPath).toMatch(/pricing\.json$/);
   });
 
+  it("parses optional parity inputs", () => {
+    const options = parseArgs([
+      "--figma",
+      "artifacts/employee-app-phase2/figma",
+      "--figma-baseline",
+      "baselines/employee-app-phase2",
+    ]);
+    expect(options.figma).toMatch(/artifacts\/employee-app-phase2\/figma$/);
+    expect(options.figmaBaseline).toMatch(/baselines\/employee-app-phase2$/);
+  });
+
   it("rejects a missing option value", () => {
     expect(() => parseArgs(["--pages"])).toThrow(/missing value for --pages/);
   });

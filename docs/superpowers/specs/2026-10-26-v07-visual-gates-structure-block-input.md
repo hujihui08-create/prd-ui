@@ -133,13 +133,22 @@ v0.6 的真实 Figma 门禁暴露了三类系统性缺口：
 
 - `render:measure`（`runtimes/standalone`，Playwright）测量每页：总高、首屏内容、
   溢出、折叠位置、超宽元素。
+- `structure:check` 消费 `render-metrics.json`，且 `--project` 为必填：
+  页高预算/重复块阈值来自项目 YAML（`structure:` 覆盖默认值）。
 - 结果回写 `render-metrics.json`，供结构 lint 与人工评审使用。
 - 后续可做自动收敛（如合并/折叠），v0.7 先只测量、不自动改。
+- **v0.7 未实现 fold advisory 规则**：`foldSpecId` 只记录、不产生 finding。
+  原因是没有项目无关的「首屏应包含哪些节点」契约；等 brief/archetype 声明后再加规则，
+  避免把信息型页面误判为折叠错误。
 
 ### B3. 结构 diff
 
 - 对两次 spec/render 的页面树做结构 diff（节点增删、层级变化、槽位变化），输出
   `structure-diff.json`。
+- 同时比较一组 text-bearing props（`title`/`text`/`label`/`subtitle`/`description`/
+  `value`/`meta` 等），因此纯文案改动也会出现在 diff 中。
+- 无 id 节点按位置路径回退匹配（`path:<path>#<type>`，`idless: true`）；插入/删除
+  前置兄弟节点会移动这些位置键，这是文档化的限制。
 - 目的：结构变化可审阅，而不是靠人重新看图。
 
 ## 6. Part C — 分块生成

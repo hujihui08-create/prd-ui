@@ -32,6 +32,7 @@ import {
   countSeams,
   evaluateBlockExperiment,
   splitBlocks,
+  verifyBlockContracts,
   verifyBlockManifest,
 } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
@@ -50,6 +51,8 @@ import {
   percentDelta,
 } from "./block/metrics.js";
 import { captureStyleManifests } from "./conformance/capture.js";
+import { main as parityMain } from "./figma-parity-cli.js";
+import { portableSpecRun } from "./figma-cli.js";
 import { measurePages } from "./measure/measure.js";
 import { loadSpecs } from "./structure-check-cli.js";
 
@@ -61,7 +64,8 @@ const pipelineRoot = path.resolve(
 export const USAGE = `Usage:
   pnpm block:experiment --project <yaml> --baseline <spec-run> --runs <dir>
     (--fixtures <dir> | --runtime dsh [--profile <name>])
-    [--pages <id,id>] [--pricing <path>] [--max-cost-cny <n>] [--json]
+    [--pages <id,id>] [--figma <dir>] [--figma-baseline <dir>]
+    [--pricing <path>] [--max-cost-cny <n>] [--json]
 
 Options:
   --project <yaml>      Project config (assets + brief)
@@ -70,6 +74,11 @@ Options:
   --fixtures <dir>      Deterministic block fixtures (<dir>/<pageId>/<blockId>.json)
   --runtime dsh         Model-backed generation (requires exported provider env)
   --profile <name>      dsh profile for --runtime dsh (default: prd-ui-agents)
+  --figma <dir>         Figma evidence dir containing parity/figma.<page>.png.
+                        With --figma-baseline, figma:parity is evaluated on the
+                        experiment spec run; without both, parity stays
+                        not_evaluated and the conclusion can never be promote.
+  --figma-baseline <dir> Signed visual baseline manifest directory for parity
   --pricing <path>      Pricing file (default: pipeline/pricing.json)
   --max-cost-cny <n>    Whole-run budget in CNY (default: 3; fixture mode costs 0)
   --runs <dir>          Runs directory (the report is written to <dir>/<runId>/)
@@ -88,6 +97,8 @@ export interface BlockExperimentOptions {
   fixtures?: string;
   runtime?: "dsh";
   profile?: string;
+  figma?: string;
+  figmaBaseline?: string;
   pricingPath?: string;
   maxCostCny: number;
   runs?: string;
@@ -137,6 +148,12 @@ export function parseArgs(argv: string[]): BlockExperimentOptions {
       case "--profile":
         options.profile = readValue(argv, ++index, flag);
         break;
+      case "--figma":
+        options.figma = path.resolve(readValue(argv, ++index, flag));
+        break;
+      case "--figma-baseline":
+        options.figmaBaseline = path.resolve(readValue(argv, ++index, flag));
+        break;
       case "--pricing":
         options.pricingPath = path.resolve(readValue(argv, ++index, flag));
         break;
@@ -168,6 +185,18 @@ export function parseArgs(argv: string[]): BlockExperimentOptions {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/** Strip the pipeline root from messages so experiment evidence stays portable. */
+function sanitizeMessage(message: string): string {
+  const roots = [pipelineRoot, process.cwd()].sort(
+    (left, right) => right.length - left.length
+  );
+  let out = message;
+  for (const root of roots) {
+    out = out.split(`${root}${path.sep}`).join("");
+  }
+  return out;
 }
 
 function pretty(value: unknown): string {
@@ -510,6 +539,7 @@ interface PageMeasurement {
   baseline: Pick<RenderMetricsPage, "documentHeight" | "contentHeight" | "firstScreenNodes">;
   experiment: Pick<RenderMetricsPage, "documentHeight" | "contentHeight" | "firstScreenNodes">;
   heightDeltaPct?: number;
+  contentHeightDeltaPct?: number;
   blocks: Array<{
     blockId: string;
     baselineHeight?: number;
@@ -681,7 +711,10 @@ export async function runBlockExperiment(
         // against the baseline page would fail every regenerated block through
         // BLOCK_ROUNDTRIP_MISMATCH; the round-trip contract is about manifest
         // structure, not content equality with the baseline.
-        findings = verifyBlockManifest(candidateSpec, attempt);
+        findings = [
+          ...verifyBlockManifest(candidateSpec, attempt),
+          ...verifyBlockContracts(candidateSpec, attempt),
+        ];
       } catch (error) {
         // Assembly itself failing is not a content judgement; retry the page
         // once in dsh mode, then stop honestly instead of fabricating a report.
@@ -727,6 +760,7 @@ export async function runBlockExperiment(
       retries: retriesByBlock[index] ?? 0,
       seams: newSeams[index] ?? 0,
       tokenDrift: countRawStyleValues(experimentManifest!.blocks[index]!.root),
+      baselineTokenDrift: countRawStyleValues(block.root),
     }));
 
     // Renaming baseline ids re-keys conformance, so blocker diffs stop being
@@ -746,6 +780,11 @@ export async function runBlockExperiment(
       durationMs: Date.now() - started,
       conformance: "not_evaluated",
       conformanceComparable,
+      baselineTokenDrift: metrics.reduce(
+        (sum, metric) => sum + (metric.baselineTokenDrift ?? 0),
+        0
+      ),
+      ...(validation === undefined ? {} : { phase1Blockers: validation.blockers }),
     };
 
     outcomes.push({
@@ -929,6 +968,16 @@ export async function runBlockExperiment(
     if (pageHeightDelta !== undefined) {
       outcome.report.heightDeltaPct = pageHeightDelta;
     }
+    // documentHeight is floored at the viewport, so it hides content growth on
+    // short pages. Gate the raw scroll content height as well; both deltas are
+    // machine inputs.
+    const contentHeightDelta = percentDelta(
+      baselinePageMetrics.contentHeight,
+      experimentPageMetrics.contentHeight
+    );
+    if (contentHeightDelta !== undefined) {
+      outcome.report.contentHeightDeltaPct = contentHeightDelta;
+    }
     measurements.push({
       pageId,
       baseline: {
@@ -942,6 +991,7 @@ export async function runBlockExperiment(
         firstScreenNodes: experimentPageMetrics.firstScreenNodes,
       },
       heightDeltaPct: pageHeightDelta,
+      contentHeightDeltaPct: contentHeightDelta,
       blocks: blockHeights.map((height, index) => ({
         blockId: outcome.experimentManifest.blocks[index]!.blockId,
         ...height,
@@ -949,12 +999,62 @@ export async function runBlockExperiment(
     });
   }
 
+  // Parity is a required C4 input. When both Figma inputs are supplied, run
+  // figma:parity against the experiment spec run; otherwise leave every page
+  // `parityPassed` undefined so the evaluator can only return
+  // insufficient_evidence.
+  let parityNote: string | undefined;
+  const outcomeByPage = new Map(outcomes.map((outcome) => [outcome.report.pageId, outcome]));
+  if (options.figma !== undefined && options.figmaBaseline !== undefined) {
+    const parityOut = path.join(options.figma, "parity");
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+    const code = await parityMain(
+      [
+        "--figma",
+        parityOut,
+        "--baseline",
+        options.figmaBaseline,
+        "--spec-run",
+        runDir,
+        "--out",
+        parityOut,
+        "--json",
+      ],
+      {
+        stdout: (line) => stdout.push(line),
+        stderr: (line) => stderr.push(line),
+      }
+    );
+    if (code === 0 || code === 1) {
+      try {
+        const raw = JSON.parse(
+          await readFile(path.join(parityOut, "parity.json"), "utf8")
+        ) as { pages?: Array<{ pageId?: string; passed?: boolean }> };
+        for (const page of raw.pages ?? []) {
+          if (typeof page.pageId !== "string" || typeof page.passed !== "boolean") continue;
+          const outcome = outcomeByPage.get(page.pageId);
+          if (outcome !== undefined) outcome.report.parityPassed = page.passed;
+        }
+      } catch (error) {
+        parityNote = `PARITY_REPORT_UNREADABLE: ${sanitizeMessage(errorMessage(error))}`;
+      }
+    } else {
+      parityNote = `PARITY_INFRA_ERROR: ${sanitizeMessage(
+        stderr.join(" ") || "figma:parity exited 2"
+      )}`;
+    }
+  } else if (options.figma !== undefined || options.figmaBaseline !== undefined) {
+    parityNote = "PARITY_INPUTS_INCOMPLETE: pass both --figma and --figma-baseline";
+  }
+
   const report = evaluateBlockExperiment({
     project,
-    baseline: options.baseline,
+    baseline: portableSpecRun(options.baseline),
     maxCostCny: options.maxCostCny,
     pages: outcomes.map((outcome) => outcome.report),
   });
+  if (parityNote !== undefined) report.reasons.push(parityNote);
 
   await writeJson(path.join(runDir, "block-experiment.json"), report);
   await writeJson(path.join(runDir, "block-verify.json"), {
@@ -1056,37 +1156,48 @@ function renderMarkdown(input: {
   lines.push(`# 块级实验报告 — ${report.project}`, "");
   lines.push(`- 结论：${conclusionLabel(report.conclusion)}`);
   lines.push(`- 基线：\`${report.baseline}\``);
-  lines.push(`- 运行目录：\`${input.runDir}\``);
+  lines.push(`- 运行目录：\`${portableSpecRun(input.runDir)}\``);
   lines.push(
     `- 预算：¥${input.maxCostCny}；实际成本：¥${totalCost.toFixed(4)}（fixture 模式为 ¥0）`
   );
   lines.push(`- 原因：${report.reasons.length === 0 ? "无" : report.reasons.join("；")}`, "");
   lines.push("## 页面指标", "");
   lines.push(
-    "| 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ | 页高门禁 | conformance | parity |"
+    "| 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ (doc/content) | 页高门禁 | conformance | parity |"
   );
-  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |");
+  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- |");
   for (const page of report.pages) {
     const measurement = input.measurements.find((entry) => entry.pageId === page.pageId);
     const pageDelta = page.heightDeltaPct ?? measurement?.heightDeltaPct;
+    const contentDelta = page.contentHeightDeltaPct ?? measurement?.contentHeightDeltaPct;
     const tokenDrift = page.metrics.reduce((sum, metric) => sum + metric.tokenDrift, 0);
+    const baselineDrift = page.metrics.reduce(
+      (sum, metric) => sum + (metric.baselineTokenDrift ?? 0),
+      0
+    );
     const retries = page.metrics.reduce((sum, metric) => sum + metric.retries, 0);
-    const pageDeltaLabel = pageDelta === undefined ? "未测量" : `${pageDelta}%`;
+    const pageDeltaLabel = `${pageDelta === undefined ? "未测量" : `${pageDelta}%`} / ${
+      contentDelta === undefined ? "未测量" : `${contentDelta}%`
+    }`;
+    const gateValues = [pageDelta, contentDelta].filter(
+      (value): value is number => value !== undefined
+    );
     const heightGate =
-      pageDelta === undefined
+      gateValues.length < 2
         ? "未测量"
-        : Math.abs(pageDelta) > 5
+        : gateValues.some((value) => Math.abs(value) > 5)
           ? "未通过"
           : "通过";
     const conformance = recordedLabel(page.conformance);
     const parity = page.parityPassed === undefined ? "未评估" : page.parityPassed ? "通过" : "失败";
     lines.push(
-      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${page.pageRetries} | ${pageDeltaLabel} | ${heightGate} | ${conformance} | ${parity} |`
+      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} (基线 ${baselineDrift}) | ${retries} | ${page.pageRetries} | ${pageDeltaLabel} | ${heightGate} | ${conformance} | ${parity} |`
     );
   }
   lines.push(
     "",
-    "> 页高门禁以页面级 `documentHeight` Δ 为准：|Δ| > 5% 是硬性 rollback 原因（`heightDelta>5%`），",
+    "> 页高门禁同时检查页面级 `documentHeight` Δ 与 `contentHeight` Δ：任一 |Δ| > 5% 都是硬性 rollback 原因（`heightDelta>5%`）。",
+    "> `documentHeight` 会被视口高度（移动端 844）抬升，短页面的内容增长不会改变它；raw `contentHeight` 才是主 C4 指标。",
     "> 与块级 root id 是否保留无关；块级 Δ 只作为附加诊断。",
     "> `durationMs` 在 fixture 模式只覆盖块生成/组装/校验，不含浏览器测量与 conformance 捕获；",
     "> dsh 模式下还包含模型调用，但同样不含浏览器测量与 conformance 捕获。",
@@ -1143,32 +1254,47 @@ function renderMarkdown(input: {
     );
   }
   lines.push("", "## 页高实测", "");
-  lines.push("| 页面 | 基线高度 | 实验高度 | Δ | 5% 门禁 |");
-  lines.push("| --- | ---: | ---: | ---: | --- |");
+  lines.push(
+    "| 页面 | doc 基线 | doc 实验 | doc Δ | content 基线 | content 实验 | content Δ | 5% 门禁 |"
+  );
+  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |");
   for (const measurement of input.measurements) {
     const delta = measurement.heightDeltaPct;
+    const contentDelta = measurement.contentHeightDeltaPct;
+    const values = [delta, contentDelta].filter(
+      (value): value is number => value !== undefined
+    );
     const gate =
-      delta === undefined ? "未测量" : Math.abs(delta) > 5 ? "未通过（回滚）" : "通过";
+      values.length < 2
+        ? "未测量"
+        : values.some((value) => Math.abs(value) > 5)
+          ? "未通过（回滚）"
+          : "通过";
     lines.push(
       `| ${measurement.pageId} | ${measurement.baseline.documentHeight}px | ${measurement.experiment.documentHeight}px | ${
         delta === undefined ? "未测量" : `${delta}%`
+      } | ${measurement.baseline.contentHeight}px | ${measurement.experiment.contentHeight}px | ${
+        contentDelta === undefined ? "未测量" : `${contentDelta}%`
       } | ${gate} |`
     );
   }
   lines.push(
     "",
-    "> 上表 Δ 是机器门禁输入；`|Δ| > 5%` 会写入 `reasons` 并强制 `rollback`。",
+    "> 上表两列 Δ 都是机器门禁输入；任一 `|Δ| > 5%` 会写入 `reasons` 并强制 `rollback`。",
+    "> `documentHeight` 以视口高度为下限，`contentHeight` 是原始滚动内容高度，内容增长只能靠后者暴露。",
     ""
   );
   lines.push("", "## 证据路径", "");
-  lines.push(`- \`${path.join(input.runDir, "block-experiment.json")}\``);
-  lines.push(`- \`${path.join(input.runDir, "block-experiment.md")}\``);
-  lines.push(`- \`${path.join(input.runDir, "block-verify.json")}\``);
-  lines.push(`- \`${path.join(input.runDir, "validation.json")}\``);
-  lines.push(`- \`${path.join(input.runDir, "conformance", "conformance.json")}\``);
-  lines.push(`- \`${path.join(input.runDir, "measurements.json")}\``);
-  lines.push(`- \`${path.join(input.runDir, "artifacts", "block-manifest")}\``);
-  lines.push(`- \`${path.join(input.runDir, "html")}\``);
+  const runRef = portableSpecRun(input.runDir);
+  lines.push("以下路径为仓库相对路径；仓库外运行只显示目录名。", "");
+  lines.push(`- \`${runRef}/block-experiment.json\``);
+  lines.push(`- \`${runRef}/block-experiment.md\``);
+  lines.push(`- \`${runRef}/block-verify.json\``);
+  lines.push(`- \`${runRef}/validation.json\``);
+  lines.push(`- \`${runRef}/conformance/conformance.json\``);
+  lines.push(`- \`${runRef}/measurements.json\``);
+  lines.push(`- \`${runRef}/artifacts/block-manifest/\``);
+  lines.push(`- \`${runRef}/html\``);
   lines.push("");
   return lines.join("\n");
 }

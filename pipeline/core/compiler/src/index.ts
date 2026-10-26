@@ -1,6 +1,6 @@
 export { compilePageSpec } from "./compile-page-spec.js";
 export { compileProject, type CompileDeps } from "./compile-project.js";
-export { assembleBlocks, splitBlocks, verifyBlockManifest } from "./blocks.js";
+export { assembleBlocks, splitBlocks, verifyBlockContracts, verifyBlockManifest } from "./blocks.js";
 export {
   countRawStyleValues,
   countSeams,

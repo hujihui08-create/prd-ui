@@ -35,6 +35,10 @@ export interface StyleManifest {
   viewport: { width: number; height: number };
   capturedAt: string;
   nodes: StyleNode[];
+  /** Hash of the exact HTML file this manifest was captured from. */
+  htmlSha256?: string;
+  /** Hash of the Page Spec that produced the HTML. */
+  specSha256?: string;
 }
 
 export interface ConformanceFinding {
@@ -58,6 +62,13 @@ export interface ConformancePage {
   checked: number;
   skipped: number;
   findings: ConformanceFinding[];
+  /**
+   * Gate-input binding: the hash of the rendered HTML this page was checked
+   * against. A handoff package must supply byte-identical HTML.
+   */
+  htmlSha256?: string;
+  /** Hash of the Page Spec file consumed by this gate. */
+  specSha256?: string;
 }
 
 export interface ConformanceReport {

@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { PageSpec, StructureDiff, StructurePageDiff } from "@prd-ui/contracts";
 import { diffPageStructure } from "@prd-ui/compiler";
+import { portableSpecRun } from "./figma-cli.js";
 import { loadSpecs } from "./structure-check-cli.js";
 
 export const USAGE = `Usage:
@@ -71,12 +72,17 @@ export function parseArgs(argv: string[]): StructureDiffCliOptions {
 }
 
 /**
- * A page that exists in only one run is diffed against an id-less shell, so
- * every identified node of the page is reported as added or removed without
- * inventing page-level contract fields.
+ * A page that exists in only one run is diffed against an empty version of its
+ * own shell (same id/type/props, no children or slots), so every node of the
+ * page is reported as added or removed without inventing page-level contract
+ * fields. Keeping the shell identity also avoids reporting the synthetic shell
+ * itself as an id-less node.
  */
 function emptyShell(spec: PageSpec): PageSpec {
-  return { ...spec, layout: { type: "PageShell", children: [], slots: {} } };
+  return {
+    ...spec,
+    layout: { ...spec.layout, children: [], slots: {} },
+  };
 }
 
 function runProject(specs: PageSpec[], label: string): string | undefined {
@@ -166,8 +172,8 @@ export async function main(
     );
     const diff: StructureDiff = {
       schemaVersion: "1.0",
-      before: options.before,
-      after: options.after,
+      before: portableSpecRun(options.before),
+      after: portableSpecRun(options.after),
       pages,
     };
 

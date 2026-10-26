@@ -122,10 +122,12 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   measured-structure findings are warnings in v0.7; the CLI only exits 1 on a
   blocker finding.
 - `figma:parity` needs real `<figma>/parity/figma.<pageId>.png` files plus a
-  signed baseline (`manifest.json`); it never updates the baseline. `v07:smoke`
-  reports `parity: {status: "skipped", reason}` when those inputs are missing
-  and does not fail only for that skip. Skipped parity is not a pass;
-  `handoff:pack` is the fail-closed final check.
+  signed baseline (`manifest.json`); it never updates the baseline. A committed
+  `<out>/parity.config.json` pins the thresholds for later runs; explicit flags
+  still override them. `v07:smoke` reports
+  `parity: {status: "skipped", reason}` when those inputs are missing and does
+  not fail only for that skip. Skipped parity is not a pass; `handoff:pack` is
+  the fail-closed final check.
 - `v07:smoke` runs conformance → render:measure → structure:check →
   figma:parity (only with both `--figma` and `--baseline` and every Figma PNG
   present) and stops at the first failure; it writes `<out>/v07-smoke.json` and
@@ -134,44 +136,65 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   and the human label reads `executed gates passed (parity skipped)` — a skip is
   never a full pass. It does **not** run `figma:verify`, which needs manual Figma
   readbacks.
-- `figma:serve` serves plans and accepts readback/PNG saves from the plugin;
-  `figma:sign` binds the five evidence hashes and refuses any `passed:false`
-  diff. `figma:verify` is green only after a real Figma rebuild (the checked-in
-  v0.6 readbacks predate the corrected plans).
-- `block:verify` verifies `artifacts/block-manifest/<pageId>.json`;
-  `block:experiment` is the block-generation pilot (`--fixtures` is the
-  deterministic free path, `--runtime dsh` the real one). The 2026-10-26 real
-  pilot concluded `rollback` at ¥0.3302.
-- `handoff:pack` is fail-closed: it checks plans/readbacks/diffs, conformance,
-  parity, the figma + visual signoffs, the signed baseline, the spec-engineer
-  gate, assets/licenses, and placeholders before staging; a failure leaves no
-  output directory. `--baseline` defaults to the visual run's baseline files.
+- `figma:serve` serves plans and accepts readback/PNG saves from the plugin.
+  Scratch readbacks save to `readback/`, delivery builds save to
+  `readback/delivery/`, and the exported PNG saves to `parity/figma.<page>.png`.
+  `figma:sign` binds the five evidence hashes, **re-derives every stored diff
+  from the current plan + readback** (`FIGMA_DIFF_STALE` on disagreement), and
+  re-hashes the parity PNG + signed baseline PNG (`PARITY_HASH_STALE`). A
+  `passed: true` file is never trusted on its own. `figma:verify` is green only
+  after a real Figma rebuild (the checked-in v0.6 readbacks predate the
+  corrected plans).
+- `block:verify` verifies `artifacts/block-manifest/<pageId>.json` (round-trip +
+  allowedComponents/requiredStates contracts); `block:experiment` is the
+  block-generation pilot (`--fixtures` is the deterministic free path,
+  `--runtime dsh` the real one). Promotion requires measured `contentHeight` and
+  `documentHeight` deltas (both ≤5%), Phase 1 0 blockers, token drift ≤ baseline,
+  conformance, and parity. Pass `--figma <dir> --figma-baseline <dir>` to run
+  parity on the experiment spec run; without both, the conclusion can never be
+  `promote`. The 2026-10-26 real pilot concluded `rollback` at ¥0.3302.
+- `handoff:pack` is fail-closed: it re-derives Figma diffs, re-hashes parity
+  inputs, checks conformance + visual signoffs, the signed baseline, the
+  spec-engineer gate, assets/licenses, and placeholders before staging; a failure
+  leaves no output directory. It requires `render/metrics/render-metrics.json`
+  (or `--metrics`), binds the supplied HTML/Page Spec hashes to the
+  `figma:conformance` and `visual:review` inputs, and uses
+  `figma/parity/figma.<page>.png` for `screenshots/figma/` (legacy manual crops
+  go to `screenshots/figma-manual/` with a known-gap note). `--baseline`
+  defaults to the visual run's baseline files, then `pipeline/baselines/<project>`.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-## Current state (v0.7 automatable gates implemented, Figma rebuild + Gate 0 pending, 2026-10-26)
+## Current state (v0.7 automatable gates implemented, final review fixes landed, Figma rebuild + Gate 0 pending, 2026-10-26)
 
-Verified: `pnpm test` **949 passed** (86 files), `pnpm test:dsh` **4 passed**
+Verified: `pnpm test` **983 passed** (87 files), `pnpm test:dsh` **4 passed**
 (3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma typecheck` clean
 and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
 **v0.7 is implemented in the parts that do not need Figma desktop, and is not
 signed.** `figma:conformance` is **0 blocker / 0 major / 233 checked** on the 8
-phase2 pages using freshly rendered HTML (`/tmp/html-v07-final`) and the
+phase2 pages using freshly rendered HTML (`/tmp/html-v07-final2`) and the
 committed corrected plans; `render:measure` is 8 pages with no overflow and
 `structure:check --project` is 0 warnings / 0 blockers. `v07:smoke` exits 0 with
 `executedGatesPassed: true`, `complete: false`, `paritySkipped: true` because no
 `figma/parity/figma.<page>.png` exist (not a full pass).
 Evidence: `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,v07-smoke.json}`.
 
+The whole-branch review fixes are in: stored `figma-diff.*.json` `passed` flags
+are re-derived from plan + readback, parity PNG/baseline PNG hashes are
+re-checked, the block height gate reads `contentHeight` (appointment-list
+760→804, +5.79%, now `heightDelta>5%`), promotion requires Phase 1/token-drift/
+parity evidence, handoff requires render metrics and binds supplied HTML/spec
+bytes to conformance + visual inputs, and structure diff covers text props and
+id-less nodes. Details: `docs/handoffs/2026-10-26-v07-final-review-fixes.md`.
+
 `figma:verify` is **red against the checked-in v0.6 readbacks** (3/8 passed;
 4 blocker / 53 major, all stale value diffs, no coverage findings) because
 Task 20a corrected the plans. A real Figma rebuild (scratch + delivery) is
 required before verify/parity/`figma:sign` can be green. `handoff:pack` fails
-closed: exit 2 with the brief's `--assets asset-compiler` (no root
-manifest), exit 1 with 23 blockers (missing `figma/parity/`, parity diff PNGs,
-readback `fileKey`, figma signoff, and a full `spec-engineer-gate.json`); no
-partial package is written.
+closed on the current evidence (stale diffs, missing parity PNG/`parity.json`,
+missing readback `fileKey`, missing figma signoff, and no `htmlHashes` in the
+old visual state); no partial package is written.
 
 v0.5 remains the last signed milestone. **Gate 0 is still pending**: the v0.6
 human side-by-side visual signoff was never done, and the v0.5 visual baseline
@@ -192,7 +215,8 @@ Next: Gate 0 (v0.6 human check + regenerated baseline), then rebuild the 8 Figma
 pages from the corrected plans, re-run `figma:verify` + `figma:parity`, sign
 `figma:sign`, and re-run `handoff:pack` against a full spec run. Phase 4 pilot
 is v0.8; RC v0.9; final v1.0. Handoff (latest):
-`docs/handoffs/2026-10-26-v07-implementation-handoff.md`; then
+`docs/handoffs/2026-10-26-v07-final-review-fixes.md`; then
+`docs/handoffs/2026-10-26-v07-implementation-handoff.md`,
 `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (v0.6 evidence),
 `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (v0.5.x/v0.6.x debt),
 `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` (overall session
@@ -279,7 +303,8 @@ state).
 - `docs/superpowers/specs/2026-10-26-v07-visual-gates-structure-block-input.md` — v0.7 design input: fail-closed mapping, project-agnostic conformance/parity gates, structure lint, block generation experiment.
 - `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-26-v07-implementation-handoff.md` — latest: v0.7 gates/smoke/evidence, conformance 0/0, handoff:pack blockers, manual Figma/Gate 0 checklist.
+- `docs/handoffs/2026-10-26-v07-final-review-fixes.md` — latest: final review fixes (stale diff recompute, parity hashes, contentHeight gate, handoff input binding, block C4, structure diff), test counts.
+- `docs/handoffs/2026-10-26-v07-implementation-handoff.md` — v0.7 gates/smoke/evidence, conformance 0/0, handoff:pack blockers, manual Figma/Gate 0 checklist.
 - `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` — v0.6 Figma gate evidence and fidelity pass (historical; readbacks predate the v0.7 plans).
 - `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
 - `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).

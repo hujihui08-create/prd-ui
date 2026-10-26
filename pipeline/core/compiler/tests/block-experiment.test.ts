@@ -18,12 +18,15 @@ function page(overrides: {
   blockVerifyPassed?: boolean;
   parityPassed?: boolean;
   heightDeltaPct?: number;
+  contentHeightDeltaPct?: number;
+  phase1Blockers?: number;
   conformanceComparable?: boolean;
   metrics?: Array<{
     blockId: string;
     retries: number;
     seams: number;
     tokenDrift: number;
+    baselineTokenDrift?: number;
     heightDeltaPct?: number;
   }>;
   costCny?: number;
@@ -40,11 +43,16 @@ function page(overrides: {
         retries: 0,
         seams: 0,
         tokenDrift: 0,
+        baselineTokenDrift: 0,
       })),
     conformance: overrides.conformance ?? "passed",
     ...(overrides.heightDeltaPct === undefined
       ? { heightDeltaPct: 0 }
       : { heightDeltaPct: overrides.heightDeltaPct }),
+    ...(overrides.contentHeightDeltaPct === undefined
+      ? { contentHeightDeltaPct: 0 }
+      : { contentHeightDeltaPct: overrides.contentHeightDeltaPct }),
+    phase1Blockers: overrides.phase1Blockers ?? 0,
     ...(overrides.blockVerifyPassed === undefined
       ? {}
       : { blockVerifyPassed: overrides.blockVerifyPassed }),
@@ -300,5 +308,129 @@ describe("block experiment metrics", () => {
     });
     expect(report.conclusion).toBe("insufficient_evidence");
     expect(report.reasons).toContain("conformance not comparable");
+  });
+
+  it("fails the height gate on contentHeight growth under a viewport-floored documentHeight", () => {
+    // appointment-list evidence: 760 -> 804 contentHeight (+5.79%) while the
+    // documentHeight stays 844. The old gate only read documentHeight.
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          heightDeltaPct: 0,
+          contentHeightDeltaPct: 5.79,
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toContain("heightDelta>5%");
+  });
+
+  it("withholds promotion when contentHeight was not measured", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        {
+          ...page({ conformance: "passed", parityPassed: true }),
+          contentHeightDeltaPct: undefined,
+        },
+      ],
+    });
+    expect(report.conclusion).toBe("insufficient_evidence");
+    expect(report.reasons).toContain("height not evaluated");
+  });
+
+  it("rolls back on Phase 1 blockers", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [page({ conformance: "passed", parityPassed: true, phase1Blockers: 2 })],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toContain("phase1Blockers=2");
+  });
+
+  it("withholds promotion when Phase 1 did not run", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        {
+          ...page({ conformance: "passed", parityPassed: true }),
+          phase1Blockers: undefined,
+        },
+      ],
+    });
+    expect(report.conclusion).toBe("insufficient_evidence");
+    expect(report.reasons).toContain("phase1 not evaluated");
+  });
+
+  it("rolls back when token drift exceeds the baseline drift", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          metrics: manifest.blocks.map((block) => ({
+            blockId: block.blockId,
+            retries: 0,
+            seams: 0,
+            tokenDrift: 1,
+            baselineTokenDrift: 0,
+          })),
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("rollback");
+    expect(report.reasons).toContain("tokenDrift>baseline");
+  });
+
+  it("allows token drift equal to the baseline", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          metrics: manifest.blocks.map((block) => ({
+            blockId: block.blockId,
+            retries: 0,
+            seams: 0,
+            tokenDrift: 1,
+            baselineTokenDrift: 1,
+          })),
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("promote");
+    expect(report.reasons).not.toContain("tokenDrift>baseline");
+  });
+
+  it("withholds promotion when baseline token drift was not measured", () => {
+    const report = evaluateBlockExperiment({
+      project: today.meta.project,
+      baseline: "run-x",
+      pages: [
+        page({
+          conformance: "passed",
+          parityPassed: true,
+          metrics: manifest.blocks.map((block) => ({
+            blockId: block.blockId,
+            retries: 0,
+            seams: 0,
+            tokenDrift: 0,
+          })),
+        }),
+      ],
+    });
+    expect(report.conclusion).toBe("insufficient_evidence");
+    expect(report.reasons).toContain("token drift not evaluated");
   });
 });

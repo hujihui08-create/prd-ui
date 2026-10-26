@@ -15,9 +15,13 @@ export interface FigmaServer {
 
 export const USAGE = `Usage: pnpm figma:serve [options]
 
-Serves <figma>/plans/*.json to the Figma plugin and accepts two save routes:
-  POST /save/figma-readback.<pageId>.json  -> <figma>/readback/
-  POST /save/figma.<pageId>.png             -> <figma>/parity/
+Serves <figma>/plans/*.json to the Figma plugin and accepts save routes:
+  POST /save/figma-readback.<pageId>.json            -> <figma>/readback/
+  POST /save/delivery/figma-readback.<pageId>.json   -> <figma>/readback/delivery/
+  POST /save/figma.<pageId>.png                       -> <figma>/parity/
+
+The delivery route keeps the scratch and delivery readbacks separate; the
+plugin picks it when Build mode is "Delivery page".
 
 Options:
   --figma <dir>   Figma artifact directory (default: artifacts/employee-app-phase2/figma)
@@ -27,10 +31,18 @@ Options:
 const PLAN_NAME = /^figma-plan\.[a-z0-9-]+\.json$/i;
 const READBACK_NAME = /^figma-readback\.[a-z0-9-]+\.json$/i;
 const PNG_NAME = /^figma\.[a-z0-9-]+\.png$/i;
+const SAVE_ROUTE = /^\/save\/(?:(delivery)\/)?([^/]+)$/;
 
-function saveTarget(name: string): { dir: "readback" | "parity"; file: string } | undefined {
-  if (READBACK_NAME.test(name)) return { dir: "readback", file: name };
-  if (PNG_NAME.test(name)) return { dir: "parity", file: name };
+function saveTarget(
+  name: string,
+  delivery: boolean
+): { dir: "readback" | "parity"; subdir?: "delivery"; file: string } | undefined {
+  if (READBACK_NAME.test(name)) {
+    return { dir: "readback", ...(delivery ? { subdir: "delivery" as const } : {}), file: name };
+  }
+  // The delivery prefix only applies to readbacks; a delivery PNG still lands
+  // in parity/ as the current canvas export.
+  if (!delivery && PNG_NAME.test(name)) return { dir: "parity", file: name };
   return undefined;
 }
 
@@ -54,6 +66,7 @@ export async function createFigmaServer(options: FigmaServerOptions): Promise<Fi
   await Promise.all([
     mkdir(plansDir, { recursive: true }),
     mkdir(path.join(root, "readback"), { recursive: true }),
+    mkdir(path.join(root, "readback", "delivery"), { recursive: true }),
     mkdir(path.join(root, "parity"), { recursive: true }),
   ]);
 
@@ -95,23 +108,28 @@ export async function createFigmaServer(options: FigmaServerOptions): Promise<Fi
       }
       return;
     }
-    const saveMatch = /^\/save\/([^/]+)$/.exec(pathname);
-    if (request.method === "POST" && saveMatch?.[1] !== undefined) {
+    const saveMatch = SAVE_ROUTE.exec(pathname);
+    if (request.method === "POST" && saveMatch?.[2] !== undefined) {
       let name: string;
       try {
-        name = decodeURIComponent(saveMatch[1]);
+        name = decodeURIComponent(saveMatch[2]);
       } catch {
         send(response, 400, "bad name");
         return;
       }
-      const target = saveTarget(name);
+      const target = saveTarget(name, saveMatch[1] === "delivery");
       if (target === undefined) {
         send(response, 400, "bad name");
         return;
       }
       try {
         const body = await readBody(request);
-        await writeFile(path.join(root, target.dir, target.file), body);
+        const dir =
+          target.subdir === undefined
+            ? path.join(root, target.dir)
+            : path.join(root, target.dir, target.subdir);
+        await mkdir(dir, { recursive: true });
+        await writeFile(path.join(dir, target.file), body);
         send(response, 200, '{"ok":true}');
       } catch {
         send(response, 500, '{"ok":false}');
@@ -185,6 +203,7 @@ export async function main(
   io.stdout(`Figma plan server: ${server.url}`);
   io.stdout(`Plans: ${path.join(figmaDir, "plans")} -> ${server.url}/plans/<file>`);
   io.stdout(`Saving readbacks to: ${path.join(figmaDir, "readback")}`);
+  io.stdout(`Saving delivery readbacks to: ${path.join(figmaDir, "readback", "delivery")}`);
   io.stdout(`Saving PNGs to: ${path.join(figmaDir, "parity")}`);
   await new Promise<void>((resolve) => {
     const stop = (): void => resolve();

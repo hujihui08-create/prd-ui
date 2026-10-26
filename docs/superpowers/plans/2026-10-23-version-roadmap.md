@@ -116,7 +116,7 @@
 - `handoff:pack`（fail-closed；完整包未验证）；
 - `v07:smoke`（顺序执行可无头门禁；parity 缺失时 `complete: false`，不冒充完整通过）。
 
-已完成：`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；缺陷注入（按钮高度、行分隔线、未知组件）均能变红；测试 949 passed / typecheck clean / test:dsh 4 passed。
+已完成：`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；缺陷注入（按钮高度、行分隔线、未知组件）均能变红；测试 **983 passed / 87 files**，`test:dsh` 4 passed，typecheck clean。终审修复（2026-10-26）已落地：签名/打包重算 diff 与 parity 哈希、块高门禁改读 `contentHeight`、handoff 绑定 HTML/spec 哈希并强制 render metrics、block 推广要求 Phase 1/token drift/parity、structure diff 覆盖文案与无 id 节点。
 
 未完成（阻塞签核）：v0.6 人工签核 + baseline 重生成（Gate 0）；用修正后的 plan 重建 Figma 8 页并重跑 `figma:verify`（当前 3/8 对旧 readback 为红）；真实 `figma:parity`（文本注入未执行）；`figma:sign`；完整 `handoff:pack`（当前 23 blockers）。
 

@@ -54,6 +54,14 @@ describe("structure:diff runs", () => {
     const diff = diffRuns([page("today")], [page("today"), page("list")]);
     const list = diff.find((entry) => entry.pageId === "list")!;
     expect(list.removed).toEqual([]);
-    expect(list.added.map((node) => node.specId)).toEqual(["list.page.root", "list.card"]);
+    // The empty shell keeps the page's own id/type, so only its content is new.
+    expect(list.added.map((node) => node.specId)).toEqual(["list.card"]);
+  });
+
+  it("reports a page removed from the after run as all removed", () => {
+    const diff = diffRuns([page("today"), page("list")], [page("today")]);
+    const list = diff.find((entry) => entry.pageId === "list")!;
+    expect(list.added).toEqual([]);
+    expect(list.removed.map((node) => node.specId)).toEqual(["list.card"]);
   });
 });

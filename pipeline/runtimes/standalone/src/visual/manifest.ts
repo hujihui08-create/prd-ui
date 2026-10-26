@@ -50,6 +50,18 @@ export async function hashFile(file: string): Promise<string> {
   return `sha256:${createHash("sha256").update(buffer).digest("hex")}`;
 }
 
+/** Per-page hash of `<htmlDir>/<pageId>.html`; missing files are an error. */
+export async function hashHtmlInputs(
+  htmlDir: string,
+  pageIds: readonly string[]
+): Promise<Record<string, string>> {
+  const hashes: Record<string, string> = {};
+  for (const pageId of [...pageIds].sort()) {
+    hashes[pageId] = await hashFile(path.join(htmlDir, `${pageId}.html`));
+  }
+  return hashes;
+}
+
 /**
  * Re-hash every manifest file and return `<case>: <detail>` entries for
  * missing files or bytes that no longer match the manifest.
@@ -360,6 +372,8 @@ export interface VisualRunState {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
+  /** sha256 of each page's HTML input, so handoff can bind the supplied bytes. */
+  htmlHashes?: Record<string, string>;
   signoff: { visual: boolean };
   startedAt: string;
   updatedAt: string;
@@ -435,6 +449,19 @@ export function parseVisualRunState(
   if (!isRecord(signoff) || typeof signoff.visual !== "boolean") {
     throw new Error(`STATE_INVALID: ${source}: invalid signoff`);
   }
+  let htmlHashes: Record<string, string> | undefined;
+  if (value.htmlHashes !== undefined) {
+    if (!isRecord(value.htmlHashes)) {
+      throw new Error(`STATE_INVALID: ${source}: htmlHashes must be an object`);
+    }
+    htmlHashes = {};
+    for (const [pageId, entry] of Object.entries(value.htmlHashes)) {
+      if (typeof entry !== "string" || entry.length === 0) {
+        throw new Error(`STATE_INVALID: ${source}: htmlHashes.${pageId}`);
+      }
+      htmlHashes[pageId] = entry;
+    }
+  }
   return {
     schemaVersion: "1.0",
     runId: stringField(value, "runId", source),
@@ -453,6 +480,7 @@ export function parseVisualRunState(
     usageComplete: Boolean(value.usageComplete),
     manifestHash: stringField(value, "manifestHash", source),
     findingsHash: stringField(value, "findingsHash", source),
+    ...(htmlHashes === undefined ? {} : { htmlHashes }),
     signoff: { visual: signoff.visual },
     startedAt: stringField(value, "startedAt", source),
     updatedAt: stringField(value, "updatedAt", source),

@@ -63,6 +63,8 @@ export interface RenderMetrics {
 /** One node-level difference between two versions of the same page. */
 export interface StructureNodeChange {
   specId: string;
+  /** True when the node has no stable id and `specId` is its positional path. */
+  idless?: boolean;
   /**
    * `slot` covers two shapes: a matched node changing container slot
    * (before/after are the slot names, `"children"` for direct children), or a
@@ -77,8 +79,8 @@ export interface StructureNodeChange {
 
 export interface StructurePageDiff {
   pageId: string;
-  added: Array<{ specId: string; path: string; type: string }>;
-  removed: Array<{ specId: string; path: string; type: string }>;
+  added: Array<{ specId: string; path: string; type: string; idless?: boolean }>;
+  removed: Array<{ specId: string; path: string; type: string; idless?: boolean }>;
   changed: StructureNodeChange[];
 }
 

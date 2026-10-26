@@ -75,6 +75,89 @@ function spec(): Record<string, unknown> {
   };
 }
 
+function planChild(specId: string, height = 36): Record<string, unknown> {
+  return {
+    specId,
+    type: "FRAME",
+    name: specId,
+    layoutMode: "NONE",
+    height,
+    children: [],
+  };
+}
+
+function plan(): Record<string, unknown> {
+  return {
+    schemaVersion: "1.0",
+    project: PROJECT,
+    pageId: "today",
+    pageName: "今日",
+    width: 390,
+    height: 844,
+    background: "#FFFFFF",
+    tokens: { "color/surface/default": "#FFFFFF" },
+    textStyles: {},
+    components: { Button: { variants: {} } },
+    coverage: {
+      nodes: [],
+      summary: { spec: 0, derived: 0, mapped: 0, degraded: 0, unmapped: 0, skipped: 0 },
+    },
+    root: {
+      specId: "today.page.root",
+      type: "FRAME",
+      name: "今日",
+      layoutMode: "VERTICAL",
+      children: [
+        planChild("today.card.a"),
+        planChild("today.card.b"),
+        planChild("today.card.c"),
+      ],
+    },
+    stats: { frames: 4, texts: 0, instances: 0, icons: 0, images: 0 },
+  };
+}
+
+function readbackCard(specId: string, height = 36): Record<string, unknown> {
+  return {
+    specId,
+    nodeId: `node-${specId}`,
+    type: "FRAME",
+    name: specId,
+    layoutMode: "NONE",
+    height,
+    children: [],
+  };
+}
+
+function readback(overrides: { cardHeight?: number } = {}): Record<string, unknown> {
+  const height = overrides.cardHeight ?? 36;
+  return {
+    schemaVersion: "1.0",
+    pageId: "today",
+    fileKey: "fixture-file-key",
+    builtAt: GENERATED_AT,
+    fonts: [],
+    variables: [],
+    textStyles: [],
+    components: [],
+    nodes: [
+      {
+        specId: "today.page.root",
+        nodeId: "node-root",
+        type: "FRAME",
+        name: "今日",
+        layoutMode: "VERTICAL",
+        children: [
+          readbackCard("today.card.a", height),
+          readbackCard("today.card.b", height),
+          readbackCard("today.card.c", height),
+        ],
+      },
+    ],
+    errors: [],
+  };
+}
+
 interface Fixture {
   root: string;
   specDir: string;
@@ -102,30 +185,37 @@ async function createFixture(): Promise<Fixture> {
     gate: { passed: true, issues: [] },
   });
   await mkdir(htmlDir, { recursive: true });
-  await writeFile(
-    path.join(htmlDir, "today.html"),
-    "<!doctype html><html lang=\"zh\"><body><h1>今日</h1></body></html>\n",
-    "utf8"
-  );
-
-  await writeJson(path.join(figmaDir, "plans", "figma-plan.today.json"), {
+  const htmlBody =
+    "<!doctype html><html lang=\"zh\"><body><h1>今日</h1></body></html>\n";
+  await writeFile(path.join(htmlDir, "today.html"), htmlBody, "utf8");
+  // render:measure writes <out>/render/metrics/render-metrics.json; <out> is
+  // the HTML directory's parent in the v0.7 smoke layout.
+  await writeJson(path.join(root, "render", "metrics", "render-metrics.json"), {
     schemaVersion: "1.0",
     project: PROJECT,
-    pageId: "today",
-    pageName: "今日",
+    pages: [
+      {
+        pageId: "today",
+        target: "mobile",
+        viewport: { width: 390, height: 844 },
+        documentHeight: 844,
+        contentHeight: 700,
+        scrollContainer: {
+          selector: ".app-scroll",
+          clientHeight: 844,
+          scrollHeight: 700,
+          overflowY: "auto",
+        },
+        firstScreenNodes: 3,
+        widest: { width: 390, overflowX: false },
+        fixedFooter: { present: false, height: 0, overlapsContent: false },
+        contentBottomGap: 0,
+      },
+    ],
   });
-  await writeJson(path.join(figmaDir, "readback", "figma-readback.today.json"), {
-    schemaVersion: "1.0",
-    pageId: "today",
-    fileKey: "fixture-file-key",
-    builtAt: GENERATED_AT,
-    fonts: [],
-    variables: [],
-    textStyles: [],
-    components: [],
-    nodes: [],
-    errors: [],
-  });
+
+  await writeJson(path.join(figmaDir, "plans", "figma-plan.today.json"), plan());
+  await writeJson(path.join(figmaDir, "readback", "figma-readback.today.json"), readback());
   await writeJson(path.join(figmaDir, "diff", "figma-diff.today.json"), {
     schemaVersion: "1.0",
     pageId: "today",
@@ -138,7 +228,17 @@ async function createFixture(): Promise<Fixture> {
     schemaVersion: "1.0",
     project: PROJECT,
     generatedAt: GENERATED_AT,
-    pages: [{ pageId: "today", passed: true, checked: 1, skipped: 0, findings: [] }],
+    pages: [
+      {
+        pageId: "today",
+        passed: true,
+        checked: 1,
+        skipped: 0,
+        findings: [],
+        htmlSha256: sha256(Buffer.from(htmlBody)),
+        specSha256: sha256(Buffer.from(JSON.stringify(spec(), null, 2) + "\n")),
+      },
+    ],
     summary: { blockers: 0, majors: 0, pages: 1 },
   });
   await writeJson(path.join(figmaDir, "parity", "parity.json"), {
@@ -153,12 +253,15 @@ async function createFixture(): Promise<Fixture> {
         pixelDiffRatio: 0,
         ssim: 1,
         maxDiffCluster: 0,
+        figmaHash: sha256(PNG),
+        baselineHash: sha256(PNG),
         findings: [],
       },
     ],
     summary: { passed: true, failed: 0, pages: 1 },
   });
   await writeBytes(path.join(figmaDir, "screenshots", "delivery.today.png"), PNG);
+  await writeBytes(path.join(figmaDir, "parity", "figma.today.png"), PNG);
   await writeBytes(path.join(figmaDir, "parity", "diff", "today.png"), PNG);
 
   const baselineSha = sha256(PNG);
@@ -212,6 +315,7 @@ async function createFixture(): Promise<Fixture> {
     usageComplete: true,
     manifestHash,
     findingsHash,
+    htmlHashes: { today: sha256(Buffer.from(htmlBody)) },
     signoff: { visual: true },
     startedAt: GENERATED_AT,
     updatedAt: GENERATED_AT,
@@ -470,5 +574,94 @@ describe("handoff:pack", () => {
       spec()
     );
     await expectFailure(fixture, /SPEC_PAGE_DUPLICATE/, 2);
+  });
+
+  it("fails closed when a stored passed diff regressed on the current readback", async () => {
+    const fixture = await createFixture();
+    // Three card heights now differ from the plan: 3 majors exceed the
+    // figma:verify default maxMajor of 2, but the stored diff still says pass.
+    await writeJson(
+      path.join(fixture.figmaDir, "readback", "figma-readback.today.json"),
+      readback({ cardHeight: 44 })
+    );
+    await expectFailure(fixture, /figma verify failed: diff did not pass for today/);
+  });
+
+  it("fails closed when a parity PNG changed after parity.json was written", async () => {
+    const fixture = await createFixture();
+    await writeBytes(
+      path.join(fixture.figmaDir, "parity", "figma.today.png"),
+      Buffer.from("tampered")
+    );
+    await expectFailure(fixture, /parity evidence is stale: today: parity PNG hash/);
+  });
+
+  it("fails closed when the supplied HTML does not match the conformance input", async () => {
+    const fixture = await createFixture();
+    await writeFile(
+      path.join(fixture.htmlDir, "today.html"),
+      "<!doctype html><html lang=\"zh\"><body><h1>changed</h1></body></html>\n",
+      "utf8"
+    );
+    await expectFailure(fixture, /does not match the conformance input/);
+  });
+
+  it("fails closed when the visual review saw different HTML bytes", async () => {
+    const fixture = await createFixture();
+    const state = await readJson(path.join(fixture.visualDir, "state.json"));
+    await writeJson(path.join(fixture.visualDir, "state.json"), {
+      ...state,
+      htmlHashes: { today: "sha256:elsewhere" },
+    });
+    await expectFailure(fixture, /does not match the visual review input/);
+  });
+
+  it("fails closed when render metrics are missing", async () => {
+    const fixture = await createFixture();
+    await rm(path.join(fixture.root, "render"), { recursive: true, force: true });
+    await expectFailure(fixture, /render metrics evidence is missing/);
+  });
+
+  it("prefers the parity PNG and keeps the manual crop as stale provenance", async () => {
+    const fixture = await createFixture();
+    const manual = Buffer.from("manual-v06-crop");
+    await writeBytes(path.join(fixture.figmaDir, "screenshots", "delivery.today.png"), manual);
+
+    const result = await runMain(fixture);
+    expect(result.code).toBe(0);
+    const manifest = JSON.parse(
+      await readFile(path.join(fixture.outDir, "handoff.manifest.json"), "utf8")
+    ) as HandoffManifest;
+
+    expect(await readFile(path.join(fixture.outDir, "screenshots", "figma", "today.png"))).toEqual(
+      PNG
+    );
+    expect(
+      await readFile(path.join(fixture.outDir, "screenshots", "figma-manual", "today.png"))
+    ).toEqual(manual);
+    expect(manifest.knownGaps.join("\n")).toContain("not current Figma parity evidence");
+    expect(manifest.inputHashes?.html.today).toBeDefined();
+    expect(manifest.inputHashes?.specs.today).toBeDefined();
+  });
+
+  it("accepts an explicit --metrics file outside the default layout", async () => {
+    const fixture = await createFixture();
+    await rm(path.join(fixture.root, "render"), { recursive: true, force: true });
+    const metrics = path.join(fixture.root, "elsewhere", "metrics.json");
+    await writeJson(metrics, {
+      schemaVersion: "1.0",
+      project: PROJECT,
+      pages: [],
+    });
+    const result = await runMain(fixture, ["--metrics", metrics]);
+    // The fixture's metrics carry one page; an empty file is still enough to
+    // prove the explicit path is consumed (pack gates do not parse it).
+    expect(result.code).toBe(0);
+    const manifest = JSON.parse(
+      await readFile(path.join(fixture.outDir, "handoff.manifest.json"), "utf8")
+    ) as HandoffManifest;
+    expect(manifest.files.some((file) => file.path === "evidence/render-metrics.json")).toBe(
+      true
+    );
   });
 });

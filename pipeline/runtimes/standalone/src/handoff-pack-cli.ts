@@ -4,8 +4,11 @@ import { fileURLToPath } from "node:url";
 import { parseSignoffMarkdown } from "@prd-ui/agents";
 import { verifyBlockManifest } from "@prd-ui/compiler";
 import {
+  FigmaReadbackSchema,
   PageSpecSchema,
   type BlockManifest,
+  type FigmaDiff,
+  type FigmaReadback,
   type HandoffAsset,
   type HandoffInput,
   type HandoffIssue,
@@ -13,6 +16,14 @@ import {
   type PageSpec,
 } from "@prd-ui/contracts";
 import { buildHandoffManifest, validateHandoff } from "@prd-ui/handoff";
+import { compareDiffEvidence } from "@prd-ui/figma";
+import {
+  loadDiffEvidence,
+  loadPlanEvidence,
+  recomputeFigmaDiff,
+  verifyParityEvidence,
+  type BaselineCaseFile,
+} from "./figma/evidence.js";
 import {
   computeFigmaHashes,
   figmaSignHash,
@@ -46,7 +57,7 @@ import { validateVisualSignoff } from "./visual/signoff.js";
 
 export const USAGE = `Usage:
   pnpm handoff:pack --spec-run <dir> --html <dir> --figma <dir> --visual-run <dir> \\
-    --out <dir> [--assets <dir>] [--baseline <dir>] [--zip] [--json]
+    --out <dir> [--assets <dir>] [--baseline <dir>] [--metrics <file>] [--zip] [--json]
 
 Options:
   --spec-run <dir>   Completed spec:engineer run (artifacts/page-spec, findings/)
@@ -54,10 +65,14 @@ Options:
   --figma <dir>      Figma evidence directory (plans/, readback/, diff/,
                      conformance/, parity/, signoff/)
   --visual-run <dir> Signed visual review run (state.json, visual-sign.json,
-                     screenshots/, signoff/visual.md, baseline-manifest.json)
+                     screenshots/, signoff/visual.md, htmlHashes)
   --assets <dir>     Asset package directory with manifest.json license records
   --baseline <dir>   Signed visual baseline directory. Defaults to
-                     <visual-run>/baseline, then <visual-run>/baseline-manifest.json
+                     <visual-run>/baseline, <visual-run>/baseline-manifest.json,
+                     then pipeline/baselines/<project> when present
+  --metrics <file>   render:measure output. Defaults to <html>/../render/metrics/
+                     render-metrics.json, <html>/../render-metrics.json,
+                     <html>/render-metrics.json, or <spec-run>/render-metrics.json
   --out <dir>        Output handoff directory
   --zip              Also write handoff.zip and record its hash in the manifest
   --json             Print one JSON summary
@@ -65,7 +80,10 @@ Options:
 
 The pack is fail-closed: every gate and signoff is checked before the output
 directory is replaced, evidence is staged in a temporary directory that is
-removed on failure, and handoff.manifest.json never lists itself.
+removed on failure, and handoff.manifest.json never lists itself. Figma diffs
+are re-derived from the current plan + readback, parity PNG hashes are
+re-checked, and the supplied HTML/spec bytes must match the inputs recorded by
+figma:conformance and visual:review.
 
 Exit codes: 0 packed, 1 gate/signoff failure, 2 usage or infrastructure error.`;
 
@@ -85,6 +103,7 @@ export interface HandoffPackOptions {
   visualRun?: string;
   assets?: string;
   baseline?: string;
+  metrics?: string;
   out?: string;
   zip: boolean;
   json: boolean;
@@ -131,6 +150,9 @@ export function parseArgs(argv: string[]): HandoffPackOptions {
         break;
       case "--baseline":
         options.baseline = path.resolve(value());
+        break;
+      case "--metrics":
+        options.metrics = path.resolve(value());
         break;
       case "--out":
         options.out = path.resolve(value());
@@ -242,6 +264,7 @@ interface LoadedReadback {
   pageId: string;
   fileKey?: string;
   errors: string[];
+  readback: FigmaReadback;
 }
 
 async function loadReadback(
@@ -259,28 +282,25 @@ async function loadReadback(
   } catch {
     return undefined;
   }
-  if (!isRecord(raw)) throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: not an object`);
-  if (raw.schemaVersion !== "1.0") {
-    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: schemaVersion`);
+  const parsed = FigmaReadbackSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: ${parsed.error.message}`);
   }
-  if (raw.pageId !== pageId) {
-    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: pageId ${String(raw.pageId)}`);
-  }
-  if (!Array.isArray(raw.errors) || raw.errors.some((entry) => typeof entry !== "string")) {
-    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: errors`);
+  if (parsed.data.pageId !== pageId) {
+    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: pageId ${parsed.data.pageId}`);
   }
   return {
     pageId,
-    ...(typeof raw.fileKey === "string" && raw.fileKey.length > 0
-      ? { fileKey: raw.fileKey }
-      : {}),
-    errors: raw.errors as string[],
+    ...(parsed.data.fileKey === undefined ? {} : { fileKey: parsed.data.fileKey }),
+    errors: parsed.data.errors,
+    readback: parsed.data,
   };
 }
 
 interface LoadedDiff {
   pageId: string;
   passed: boolean;
+  diff: FigmaDiff;
 }
 
 async function loadDiff(figmaDir: string, pageId: string): Promise<LoadedDiff | undefined> {
@@ -292,13 +312,11 @@ async function loadDiff(figmaDir: string, pageId: string): Promise<LoadedDiff | 
     return undefined;
   }
   if (!isRecord(raw)) throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: not an object`);
-  if (raw.schemaVersion !== "1.0") {
-    throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: schemaVersion`);
-  }
   if (raw.pageId !== pageId) {
     throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: pageId ${String(raw.pageId)}`);
   }
-  return { pageId, passed: booleanField(raw, "passed", file) };
+  const diff = await loadDiffEvidence(file);
+  return { pageId, passed: diff.passed, diff };
 }
 
 interface ConformanceEvidence {
@@ -307,6 +325,7 @@ interface ConformanceEvidence {
   passed: boolean;
   pageIds: string[];
   failedPages: string[];
+  pages: Array<{ pageId: string; passed: boolean; htmlSha256?: string; specSha256?: string }>;
 }
 
 async function loadConformance(figmaDir: string): Promise<ConformanceEvidence> {
@@ -326,13 +345,21 @@ async function loadConformance(figmaDir: string): Promise<ConformanceEvidence> {
   }
   const pageIds: string[] = [];
   const failedPages: string[] = [];
+  const pages: ConformanceEvidence["pages"] = [];
   for (const page of raw.pages) {
     if (!isRecord(page)) throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: page entry`);
     const pageId = stringField(page, "pageId", file);
     pageIds.push(pageId);
-    if (!booleanField(page, "passed", `${file} ${pageId}`)) failedPages.push(pageId);
+    const passed = booleanField(page, "passed", `${file} ${pageId}`);
+    if (!passed) failedPages.push(pageId);
+    pages.push({
+      pageId,
+      passed,
+      ...(typeof page.htmlSha256 === "string" ? { htmlSha256: page.htmlSha256 } : {}),
+      ...(typeof page.specSha256 === "string" ? { specSha256: page.specSha256 } : {}),
+    });
   }
-  return { project, blockers, passed: blockers === 0, pageIds, failedPages };
+  return { project, blockers, passed: blockers === 0, pageIds, failedPages, pages };
 }
 
 interface ParityEvidence {
@@ -340,6 +367,7 @@ interface ParityEvidence {
   passed: boolean;
   pageIds: string[];
   failedPages: string[];
+  pages: Array<{ pageId: string; passed: boolean; figmaHash?: string; baselineHash?: string }>;
 }
 
 async function loadParity(figmaDir: string): Promise<ParityEvidence> {
@@ -358,17 +386,26 @@ async function loadParity(figmaDir: string): Promise<ParityEvidence> {
   }
   const pageIds: string[] = [];
   const failedPages: string[] = [];
+  const pages: ParityEvidence["pages"] = [];
   for (const page of raw.pages) {
     if (!isRecord(page)) throw new Error(`HANDOFF_EVIDENCE_INVALID: ${file}: page entry`);
     const pageId = stringField(page, "pageId", file);
     pageIds.push(pageId);
-    if (!booleanField(page, "passed", `${file} ${pageId}`)) failedPages.push(pageId);
+    const passed = booleanField(page, "passed", `${file} ${pageId}`);
+    if (!passed) failedPages.push(pageId);
+    pages.push({
+      pageId,
+      passed,
+      ...(typeof page.figmaHash === "string" ? { figmaHash: page.figmaHash } : {}),
+      ...(typeof page.baselineHash === "string" ? { baselineHash: page.baselineHash } : {}),
+    });
   }
   return {
     project,
     passed: booleanField(raw.summary, "passed", `${file} summary`),
     pageIds,
     failedPages,
+    pages,
   };
 }
 
@@ -445,6 +482,11 @@ async function loadVisualSign(visualRun: string): Promise<VisualSignFile | undef
   };
 }
 
+const PIPELINE_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../.."
+);
+
 interface BaselineResolution {
   manifestFile: string;
   /** Directory to copy verbatim; undefined when only the manifest is available. */
@@ -453,7 +495,8 @@ interface BaselineResolution {
 }
 
 async function resolveBaseline(
-  options: HandoffPackOptions
+  options: HandoffPackOptions,
+  project: string
 ): Promise<BaselineResolution | undefined> {
   if (options.baseline !== undefined) {
     const manifestFile = path.join(options.baseline, "manifest.json");
@@ -492,11 +535,49 @@ async function resolveBaseline(
     }
     return { manifestFile: copied };
   }
+  // The real visual-run layout does not copy the project baseline: a review
+  // reads `pipeline/baselines/<project>` and never mutates it.
+  const projectBaseline = path.join(PIPELINE_ROOT, "baselines", project);
+  if (await pathExists(path.join(projectBaseline, "manifest.json"))) {
+    return {
+      manifestFile: path.join(projectBaseline, "manifest.json"),
+      directory: projectBaseline,
+      ...((await pathExists(path.join(projectBaseline, "screenshots")))
+        ? { screenshotsDirectory: path.join(projectBaseline, "screenshots") }
+        : {}),
+    };
+  }
+  return undefined;
+}
+
+/** Resolve a signed baseline case file inside a resolved baseline. */
+async function resolveBaselineCaseFile(
+  baseline: BaselineResolution,
+  entry: Pick<BaselineCaseFile, "file">
+): Promise<string | undefined> {
+  if (!isSafeRelative(entry.file)) return undefined;
+  if (baseline.directory !== undefined) {
+    const file = path.join(baseline.directory, entry.file);
+    return (await pathExists(file)) ? file : undefined;
+  }
+  const fileName = path.posix.basename(entry.file);
+  for (const candidate of [
+    baseline.screenshotsDirectory,
+    path.join(path.dirname(baseline.manifestFile), "screenshots"),
+  ]) {
+    if (candidate === undefined) continue;
+    for (const tryRelative of [entry.file, fileName]) {
+      const file = path.join(candidate, tryRelative);
+      if (await pathExists(file)) return file;
+    }
+  }
   return undefined;
 }
 
 interface BaselineCase {
   id: string;
+  pageId: string;
+  state: string;
   file: string;
   sha256: string;
 }
@@ -519,6 +600,8 @@ async function loadBaselineManifest(manifestFile: string): Promise<LoadedBaselin
     }
     cases.push({
       id: stringField(entry, "id", manifestFile),
+      pageId: stringField(entry, "pageId", manifestFile),
+      state: stringField(entry, "state", manifestFile),
       file: stringField(entry, "file", manifestFile),
       sha256: stringField(entry, "sha256", manifestFile),
     });
@@ -622,6 +705,9 @@ interface BuildOptions {
   profile: string;
   figmaFiles: Array<{ pageId: string; fileKey: string }>;
   hashes: FigmaHashes | undefined;
+  baseline: BaselineResolution | undefined;
+  htmlHashes: Map<string, string>;
+  specHashes: Map<string, string>;
   gates: HandoffInput["gates"];
   signoffs: HandoffSignoff[];
   assets: HandoffAsset[];
@@ -685,23 +771,33 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
   const figmaDir = options.figma!;
   const readbacks: Array<{ pageId: string; fileKey?: string; errors: string[] }> = [];
   const diffs: Array<{ pageId: string; passed: boolean }> = [];
+  const recomputedDiffByPage = new Map<string, FigmaDiff>();
   let figmaFiles: Array<{ pageId: string; fileKey: string }> = [];
 
   const signFile = path.join(figmaDir, "signoff", "figma-sign.json");
   for (const pageId of pages) {
-    const plan = path.join(figmaDir, "plans", `figma-plan.${pageId}.json`);
-    if (await pathExists(plan)) {
-      copies.push({ source: plan, target: `figma/plans/figma-plan.${pageId}.json` });
-      const planRaw = await readJson(plan);
-      if (!isRecord(planRaw) || planRaw.schemaVersion !== "1.0" || planRaw.pageId !== pageId) {
+    const planFile = path.join(figmaDir, "plans", `figma-plan.${pageId}.json`);
+    let plan: Awaited<ReturnType<typeof loadPlanEvidence>> | undefined;
+    if (await pathExists(planFile)) {
+      copies.push({ source: planFile, target: `figma/plans/figma-plan.${pageId}.json` });
+      try {
+        plan = await loadPlanEvidence(planFile);
+      } catch (error) {
         issues.push(
           blocker(
             "HANDOFF_GATE_FAILED",
-            `figma plan identity mismatch: figma/plans/figma-plan.${pageId}.json declares ${String(
-              isRecord(planRaw) ? planRaw.pageId : "?"
-            )}`
+            `figma verify failed: plan is invalid for ${pageId}: ${errorMessage(error)}`
           )
         );
+      }
+      if (plan !== undefined && plan.pageId !== pageId) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `figma plan identity mismatch: figma/plans/figma-plan.${pageId}.json declares ${plan.pageId}`
+          )
+        );
+        plan = undefined;
       }
     } else {
       issues.push(blocker("HANDOFF_GATE_FAILED", `figma verify failed: plan is missing for ${pageId} (figma/plans/figma-plan.${pageId}.json)`));
@@ -724,6 +820,24 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
         );
       }
     }
+
+    // The stored diff is untrusted: re-derive it from the current plan and
+    // readback, require the recomputed verdict, then require the stored file
+    // to describe that same result. A stale `passed: true` cannot slip through.
+    let recomputed: FigmaDiff | undefined;
+    if (plan !== undefined && readback !== undefined) {
+      recomputed = recomputeFigmaDiff(plan, readback.readback);
+      recomputedDiffByPage.set(pageId, recomputed);
+      if (!recomputed.passed) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `figma verify failed: diff did not pass for ${pageId} ` +
+              `(${recomputed.blockerCount} blocker / ${recomputed.majorCount} major)`
+          )
+        );
+      }
+    }
     const diff = await loadDiff(figmaDir, pageId);
     if (diff === undefined) {
       issues.push(blocker("HANDOFF_GATE_FAILED", `figma verify failed: diff is missing for ${pageId} (figma/diff/figma-diff.${pageId}.json)`));
@@ -735,28 +849,54 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
       });
       if (!diff.passed) {
         issues.push(blocker("HANDOFF_GATE_FAILED", `figma verify failed: diff did not pass for ${pageId}`));
+      } else if (recomputed !== undefined) {
+        const mismatches = compareDiffEvidence(diff.diff, recomputed);
+        if (mismatches.length > 0) {
+          issues.push(
+            blocker(
+              "HANDOFF_GATE_FAILED",
+              `figma diff evidence is stale for ${pageId}: ${mismatches.join("; ")}`
+            )
+          );
+        }
       }
     }
 
-    const figmaScreenshot = path.join(figmaDir, "screenshots", `delivery.${pageId}.png`);
-    const scratchScreenshot = path.join(figmaDir, "screenshots", `figma.${pageId}.png`);
-    if (await pathExists(figmaScreenshot)) {
-      copies.push({
-        source: figmaScreenshot,
-        target: `screenshots/figma/${pageId}.png`,
-      });
-    } else if (await pathExists(scratchScreenshot)) {
-      copies.push({
-        source: scratchScreenshot,
-        target: `screenshots/figma/${pageId}.png`,
-      });
+    // The parity PNG is current Figma evidence and is hash-bound to
+    // parity.json. The v0.6 canvas crops are kept only as provenance.
+    const parityPng = path.join(figmaDir, "parity", `figma.${pageId}.png`);
+    if (await pathExists(parityPng)) {
+      copies.push({ source: parityPng, target: `screenshots/figma/${pageId}.png` });
     } else {
       issues.push(
         blocker(
           "HANDOFF_GATE_FAILED",
-          `figma screenshot is missing for ${pageId} (figma/screenshots/delivery.${pageId}.png or figma.${pageId}.png)`
+          `Figma screenshot is missing for ${pageId} (figma/parity/figma.${pageId}.png)`
         )
       );
+    }
+    const manualScreenshots = [
+      path.join(figmaDir, "screenshots", `delivery.${pageId}.png`),
+      path.join(figmaDir, "screenshots", `figma.${pageId}.png`),
+    ];
+    for (const manual of manualScreenshots) {
+      if (!(await pathExists(manual))) continue;
+      if (await pathExists(parityPng)) {
+        const [manualHash, parityHash] = await Promise.all([
+          hashFile(manual),
+          hashFile(parityPng),
+        ]);
+        if (manualHash === parityHash) break;
+      }
+      copies.push({
+        source: manual,
+        target: `screenshots/figma-manual/${pageId}.png`,
+      });
+      const gap =
+        `screenshots/figma-manual/${pageId}.png is a manual v0.6 canvas crop; ` +
+        "it is not current Figma parity evidence";
+      if (!build.knownGaps.includes(gap)) build.knownGaps.push(gap);
+      break;
     }
 
     const parityDiff = path.join(figmaDir, "parity", "diff", `${pageId}.png`);
@@ -866,6 +1006,48 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
         )
       );
     }
+    // Bind the supplied HTML/spec bytes to the bytes this gate actually saw.
+    for (const page of conformance.pages) {
+      const htmlHash = build.htmlHashes.get(page.pageId);
+      if (page.htmlSha256 === undefined) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `conformance evidence has no HTML hash for ${page.pageId}; re-run figma:conformance`
+          )
+        );
+      } else if (htmlHash === undefined) {
+        issues.push(
+          blocker(
+            "HANDOFF_PAGE_MISSING",
+            `cannot hash supplied HTML for ${page.pageId}`
+          )
+        );
+      } else if (htmlHash !== page.htmlSha256) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `supplied HTML for ${page.pageId} does not match the conformance input (${htmlHash} != ${page.htmlSha256})`
+          )
+        );
+      }
+      const specHash = build.specHashes.get(page.pageId);
+      if (page.specSha256 === undefined) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `conformance evidence has no Page Spec hash for ${page.pageId}; re-run figma:conformance`
+          )
+        );
+      } else if (specHash !== undefined && specHash !== page.specSha256) {
+        issues.push(
+          blocker(
+            "HANDOFF_GATE_FAILED",
+            `supplied Page Spec for ${page.pageId} does not match the conformance input`
+          )
+        );
+      }
+    }
   } catch (error) {
     issues.push(
       blocker("HANDOFF_GATE_FAILED", `conformance gate failed: ${errorMessage(error)}`)
@@ -903,6 +1085,21 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
         )
       );
     }
+    if (build.baseline !== undefined) {
+      const loaded = await loadBaselineManifest(build.baseline.manifestFile);
+      const stale = await verifyParityEvidence({
+        figmaDir,
+        pages: parity.pages,
+        baselineCases: loaded.cases,
+        resolveBaselineFile: (entry) =>
+          resolveBaselineCaseFile(build.baseline!, entry),
+      });
+      for (const message of stale) {
+        issues.push(
+          blocker("HANDOFF_GATE_FAILED", `parity evidence is stale: ${message}`)
+        );
+      }
+    }
   } catch (error) {
     issues.push(blocker("HANDOFF_GATE_FAILED", `parity gate failed: ${errorMessage(error)}`));
   }
@@ -931,11 +1128,21 @@ async function planFigmaEvidence(build: BuildOptions): Promise<void> {
 
   const verifyPassed =
     readbacks.length === pages.length &&
-    diffs.length === pages.length &&
+    recomputedDiffByPage.size === pages.length &&
     readbacks.every((readback) => readback.errors.length === 0) &&
-    diffs.every((diff) => diff.passed);
+    [...recomputedDiffByPage.values()].every((diff) => diff.passed);
   const verifyHash = hashJson(
-    [...diffs].sort((left, right) => compareStrings(left.pageId, right.pageId))
+    pages
+      .map((pageId) => {
+        const diff = recomputedDiffByPage.get(pageId);
+        return {
+          pageId,
+          passed: diff?.passed ?? false,
+          blockerCount: diff?.blockerCount ?? -1,
+          majorCount: diff?.majorCount ?? -1,
+        };
+      })
+      .sort((left, right) => compareStrings(left.pageId, right.pageId))
   );
 
   build.figmaFiles = figmaFiles;
@@ -1073,6 +1280,45 @@ async function planVisualEvidence(
           `visual project mismatch: ${state.project} != ${build.project}`
         )
       );
+    }
+    // The visual review must have seen the same HTML bytes we are shipping.
+    if (state.htmlHashes === undefined) {
+      issues.push(
+        blocker(
+          "HANDOFF_GATE_FAILED",
+          "visual state has no htmlHashes; re-run visual:review with this CLI version"
+        )
+      );
+    } else {
+      for (const pageId of pages) {
+        const recorded = state.htmlHashes[pageId];
+        const supplied = build.htmlHashes.get(pageId);
+        if (recorded === undefined) {
+          issues.push(
+            blocker(
+              "HANDOFF_GATE_FAILED",
+              `visual state has no HTML hash for ${pageId}; re-run visual:review`
+            )
+          );
+        } else if (supplied !== undefined && recorded !== supplied) {
+          issues.push(
+            blocker(
+              "HANDOFF_GATE_FAILED",
+              `supplied HTML for ${pageId} does not match the visual review input (${supplied} != ${recorded})`
+            )
+          );
+        }
+      }
+      for (const pageId of Object.keys(state.htmlHashes)) {
+        if (!pages.includes(pageId)) {
+          issues.push(
+            blocker(
+              "HANDOFF_GATE_FAILED",
+              `visual state has an HTML hash for an unexpected page: ${pageId}`
+            )
+          );
+        }
+      }
     }
   }
 
@@ -1411,9 +1657,11 @@ async function planSpecEvidence(build: BuildOptions): Promise<void> {
       source: file,
       target: `spec/page-spec/${pageId}.json`,
     });
+    build.specHashes.set(pageId, await hashFile(file));
     const htmlFile = path.join(htmlDir, `${pageId}.html`);
     if (await pathExists(htmlFile)) {
       copies.push({ source: htmlFile, target: `html/${pageId}.html` });
+      build.htmlHashes.set(pageId, await hashFile(htmlFile));
     } else {
       issues.push(
         blocker("HANDOFF_PAGE_MISSING", `${pageId} is missing html (${htmlFile})`)
@@ -1505,15 +1753,31 @@ async function planSpecEvidence(build: BuildOptions): Promise<void> {
     copies.push({ source: lintFile, target: "evidence/structure-lint.json" });
   }
 
-  for (const candidate of [
+  const metricsCandidates = options.metrics === undefined ? [] : [options.metrics];
+  const htmlParent = path.dirname(htmlDir);
+  metricsCandidates.push(
     path.join(specRun, "render-metrics.json"),
     path.join(htmlDir, "render-metrics.json"),
-    path.join(path.dirname(htmlDir), "render-metrics.json"),
-  ]) {
+    path.join(htmlParent, "render-metrics.json"),
+    path.join(htmlParent, "render", "metrics", "render-metrics.json"),
+    path.join(htmlDir, "render", "metrics", "render-metrics.json"),
+    path.join(path.dirname(specRun), "render", "metrics", "render-metrics.json")
+  );
+  let metricsCopied = false;
+  for (const candidate of metricsCandidates) {
     if (await pathExists(candidate)) {
       copies.push({ source: candidate, target: "evidence/render-metrics.json" });
+      metricsCopied = true;
       break;
     }
+  }
+  if (!metricsCopied) {
+    issues.push(
+      blocker(
+        "HANDOFF_GATE_FAILED",
+        "render metrics evidence is missing (pass --metrics or place render/metrics/render-metrics.json next to the HTML)"
+      )
+    );
   }
 }
 
@@ -1612,7 +1876,7 @@ async function buildPackInput(options: HandoffPackOptions): Promise<PackInput> {
   const copies: Array<{ source: string; target: string }> = [];
   const directoryCopies: Array<{ source: string; target: string }> = [];
 
-  const baseline = await resolveBaseline(options);
+  const baseline = await resolveBaseline(options, project);
   if (baseline === undefined) {
     issues.push(
       blocker(
@@ -1644,6 +1908,9 @@ async function buildPackInput(options: HandoffPackOptions): Promise<PackInput> {
     profile,
     figmaFiles: [],
     hashes,
+    baseline,
+    htmlHashes: new Map(),
+    specHashes: new Map(),
     gates: {
       verify: { passed: false, hash: "" },
       conformance: { passed: false, hash: "" },
@@ -1735,6 +2002,18 @@ async function buildPackInput(options: HandoffPackOptions): Promise<PackInput> {
     files: [...plannedFiles]
       .sort(compareStrings)
       .map((file) => ({ path: file, sha256: "", bytes: 0 })),
+    inputHashes: {
+      html: Object.fromEntries(
+        [...build.htmlHashes.entries()].sort(([left], [right]) =>
+          compareStrings(left, right)
+        )
+      ),
+      specs: Object.fromEntries(
+        [...build.specHashes.entries()].sort(([left], [right]) =>
+          compareStrings(left, right)
+        )
+      ),
+    },
     gates: build.gates,
     signoffs: build.signoffs,
     figma: { files: build.figmaFiles, pages },
