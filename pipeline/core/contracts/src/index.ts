@@ -3,6 +3,7 @@ export * from "./derived-ids.js";
 export * from "./iso-date.js";
 export * from "./page-id.js";
 export * from "./page-spec.js";
+export * from "./block.js";
 export * from "./profile.js";
 export * from "./catalog.js";
 export * from "./ui-brief.js";
