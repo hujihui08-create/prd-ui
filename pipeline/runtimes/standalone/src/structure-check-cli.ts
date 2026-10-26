@@ -87,7 +87,7 @@ export function parseArgs(argv: string[]): StructureCheckOptions {
   return options;
 }
 
-async function loadSpecs(specRun: string): Promise<PageSpec[]> {
+export async function loadSpecs(specRun: string): Promise<PageSpec[]> {
   const dir = path.join(specRun, "artifacts", "page-spec");
   const files = (await readdir(dir)).filter((file) => file.endsWith(".json")).sort();
   if (files.length === 0) throw new Error(`SPEC_RUN_EMPTY: ${dir}`);

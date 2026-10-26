@@ -14,6 +14,7 @@
     "agent:sign": "tsx runtimes/standalone/src/agent-sign-cli.ts",
     "spec:engineer": "tsx runtimes/standalone/src/spec-cli.ts",
     "structure:check": "tsx runtimes/standalone/src/structure-check-cli.ts",
+    "structure:diff": "tsx runtimes/standalone/src/structure-diff-cli.ts",
     "intake:run": "tsx runtimes/standalone/src/intake-cli.ts",
     "visual:review": "tsx runtimes/standalone/src/visual-review-cli.ts",
     "visual:baseline": "tsx runtimes/standalone/src/visual-baseline-cli.ts",

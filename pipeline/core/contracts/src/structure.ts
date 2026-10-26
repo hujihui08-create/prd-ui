@@ -59,3 +59,27 @@ export interface RenderMetrics {
   project: string;
   pages: RenderMetricsPage[];
 }
+
+/** One node-level difference between two versions of the same page. */
+export interface StructureNodeChange {
+  specId: string;
+  kind: "type" | "prop" | "slot" | "moved";
+  property?: string;
+  before?: string;
+  after?: string;
+}
+
+export interface StructurePageDiff {
+  pageId: string;
+  added: Array<{ specId: string; path: string; type: string }>;
+  removed: Array<{ specId: string; path: string; type: string }>;
+  changed: StructureNodeChange[];
+}
+
+/** `structure:diff` artifact: node-level changes between two spec runs. */
+export interface StructureDiff {
+  schemaVersion: "1.0";
+  before: string;
+  after: string;
+  pages: StructurePageDiff[];
+}
