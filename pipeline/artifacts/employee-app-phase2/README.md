@@ -1,4 +1,4 @@
-# 员工端 · Phase 2 8 页出口（v0.5 已签核；v0.6 Figma/Studio 待开始）
+# 员工端 · Phase 2 8 页出口（v0.5 已签核；v0.6 Figma 证据完成，待人工签核）
 
 从 `samples/projects/employee-app-phase2/prd.md` 的真实 PRD 走完整链路：
 
@@ -34,7 +34,26 @@ signoffs/                   PRD/IA、brief、visual-style 签核（历史）
 gates/                      ia / interaction / visual-style gate 结果
 m1-final-ia-blocked/        早前 blocked M1 IA 的证据（保留）
 asset-review/               2026-10-22 clean M1 资产 brief 的 M0 评审（4/4 passed）
+figma/                      v0.6 Figma 门禁证据（见 figma/README.md）
+  spec-source/              从已签核 brief 编译的 8 份 PageSpec（plan 输入）
+  plans/                    8 份 figma plan + index
+  readback/                 8 份 scratch readback（delivery/ 下为 8 份 delivery readback）
+  diff/                     16 份结构 diff（scratch + delivery，全部 0/0/0）
+  screenshots/              16 张画布截图（figma.* 为 scratch，delivery.* 为交付页）
 ```
+
+## v0.6 Figma 门禁（2026-10-26）
+
+| 项 | 结果 |
+|---|---|
+| Scratch | 8/8 页在 Figma 桌面版构建；`figma:verify` 8/8 `passed`（0 blocker / 0 major / 0 findings） |
+| Delivery | 新空白文件 8/8 页；diff 8/8 `passed`；readback 全部 `errors: []` |
+| Figma 文件 | scratch `iL99qSPGhmh08BB9LketgF`；delivery `ne1JYKpfjDivRr0nK5jm4S` |
+| 人工检查 | **待胡冀徽执行**；checklist 在 `figma/README.md` |
+
+门禁暴露的 6 个真实 bug（dynamic-page `mainComponent`、INSTANCE 子节点、变量 fill 的 opacity、
+`summary`/`fields` 槽位被丢弃、搜索行、view-panel padding）已在 `core/figma` 与
+`runtimes/figma` 修复，`pnpm test` 697 passed。
 
 ## v0.5 数字
 

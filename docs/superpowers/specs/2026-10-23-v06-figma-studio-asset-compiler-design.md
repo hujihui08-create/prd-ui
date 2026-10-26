@@ -508,37 +508,42 @@ pnpm asset:compile --project samples/projects/demo-crm/project.yaml \
 - v0.8：真实项目试点；v0.9 RC；v1.0 最终交付。
 - Figma 构建/回读是 v0.6 的人工门禁；v0.7 沙箱再把它纳入自动验证。
 
-## 15. 实施进度（2026-10-25）
+## 15. 实施进度（2026-10-26）
 
 ### 15.1 已完成（自动化部分）
 
 - `core/contracts/src/figma.ts`：FigmaPlan / FigmaReadback / FigmaDiff schema。
 - `core/figma`：8 页 plan compiler、Button 实例、glyph/vector/image、CalendarGrid 绝对定位、readback diff。
-- `runtimes/figma`：插件 sandbox + UI + esbuild bundle + manifest；bundle 15.8kb，无 Node import。
-- `runtimes/standalone`：`figma:plan`、`figma:verify`、`asset:compile`、`studio:prepare` CLI。
+- `runtimes/figma`：插件 sandbox + UI + esbuild bundle + manifest（`documentAccess: "dynamic-page"`）。
+- `runtimes/standalone`：`figma:plan`、`figma:verify`、`asset:compile`、`studio:prepare`、`studio:smoke` CLI。
 - `core/asset-compiler`：M0 13/13、phase2 4 frozen icons、LICENSES、hash/幂等。
-- `studio`：Vite/React/Tailwind v4 + 本地 shadcn 原语，8 页只读工作台；build 成功，手动 smoke 8 页 / 0 console。
-- 测试：**688 passed**；typecheck clean；`test:dsh` 4；Phase 1 `8/2/4/8` 全 0。
+- `studio`：Vite/React/Tailwind v4 + 本地 shadcn 原语，8 页只读工作台；`studio:smoke` 8 页 / 8 iframe / 0 error。
+- 测试：**697 passed**；typecheck clean；`test:dsh` 4；Phase 1 `8/2/4/8` 全 0。
 
-### 15.2 证据
+### 15.2 真实 Figma 门禁（2026-10-26）
 
-- Plans：`/tmp/figma-v06`（8 plans；appointment-list stats 124 frames / 2 instances）。
-- Plugin bundle：`runtimes/figma/dist/`（gitignored）。
-- Assets：`/tmp/assets-m0`（13/13）、`/tmp/assets-phase2`（4/4）。
-- Studio：`studio/public`（generated，gitignored）、`/tmp/studio-v06.png`。
-- 测试：`core/figma/tests/{plan,diff}.test.ts`、`core/asset-compiler/tests/package.test.ts`、`runtimes/figma/tests/build.test.ts`。
+- 8 页 scratch 在 Figma 桌面版构建完成；`figma:verify` **8/8 passed（0 blocker / 0 major / 0 findings）**。
+- 在新空白文件构建 8 页 delivery；delivery diff **8/8 passed**；16 份 readback 均 `errors: []`。
+- Figma 文件：scratch `iL99qSPGhmh08BB9LketgF`，delivery `ne1JYKpfjDivRr0nK5jm4S`（均为 Drafts `Untitled`）。
+- 证据：`pipeline/artifacts/employee-app-phase2/figma/{spec-source,plans,readback,diff,screenshots}/`，
+  索引与复现步骤见同目录 `README.md`。
+- 门禁暴露并修复的真实 bug：
+  1. `getMainComponent()` 在 dynamic-page 下被拒绝 → `getMainComponentAsync()`。
+  2. readback 递归进 INSTANCE 的内部 `Label`，每页 Button 报 `expected 0 children, got 1` → INSTANCE 作为叶子。
+  3. Figma 在变量绑定 paint 时会丢弃 `opacity` → tinted token 改用 `<token>/alpha-NN` RGBA 变量。
+  4. plan compiler 只读 `slots.content`，`detail`/`notice` 的 `summary`/`fields` 被丢弃（3 页空白）→ 按 renderer 顺序合并。
+  5. 搜索页结果行（`searchText`）在默认态应隐藏 → plan 跳过。
+  6. view-panel section 保留纵向 padding、去掉横向 padding，对齐 `[data-view-panel]`。
+- 计划来源：v0.5 spec run 已丢失；plans 由已签核 brief 经 `compileProject` 重建（`spec-source/` 留档），
+  旧的手改 spacing 被编译器修复取代。
 
-### 15.3 未完成（人工门禁）
+### 15.3 未完成（人工签字）
 
-- Brio MCP 当前未连接；未在 Figma 桌面版运行插件、未生成真实 readback、未跑真实 `figma:verify` / delivery pages / 8 页 side-by-side。
-- 因此 v0.6 **不能签 `passed`**；状态为 implemented，Figma gate pending。
-- Studio 的正式 Playwright 测试尚未接入 test runner；已完成手动 Chromium smoke。
-- 未 commit；不 push。
+- 8 页与 HTML baseline 的并排人工视觉检查、字体/变量/实例/glyph/16:30 日历核对尚未执行。
+- 因此 v0.6 仍为 implemented；**签核只能由胡冀徽执行**，结构 diff 不能代替签字。
 
 ### 15.4 下一步
 
-1. 在 Figma 桌面版打开空白文件，导入 `pipeline/runtimes/figma/manifest.json`；或连接 Brio MCP。
-2. 逐页选择 `/tmp/figma-v06/figma-plan.<page>.json`，scratch build + 下载 readback。
-3. `pnpm figma:verify --plan ... --readback ...`；0 blocker 后 build delivery pages。
-4. 按 §5.5 检查中文字体、变量、文本样式、Button 实例、glyph/vector、16:30 日历、关键页 side-by-side。
-5. 通过后更新 baseline/证据/CHANGELOG/roadmap/handoff，并签核 v0.6。
+1. 按 `pipeline/artifacts/employee-app-phase2/figma/README.md` 的「Manual Figma checklist」逐项检查。
+2. 通过后更新 roadmap/CHANGELOG/handoff 并签核 v0.6；签核后进入 v0.7。
+3. v0.6.x 债不变：状态帧、完整组件库、Material Symbols 矢量集、readback 编排。

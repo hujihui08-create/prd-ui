@@ -77,7 +77,7 @@
 
 ## 4. v0.6 Phase 3A：Figma + Studio + Asset Compiler
 
-**状态（2026-10-26）**：自动化部分已实现（Figma plan/plugin/readback diff、Asset Compiler、只读 Studio；692 tests）。真实 Figma scratch/delivery/readback 未执行，Brio MCP 未连接，**未签核**。Studio Playwright 已接入 `pnpm studio:smoke`（8 页 / 8 iframe / 0 error）；Figma state frames、完整组件库、Material Symbols 矢量集、readback 编排仍留 v0.6.x。见 [v0.6 进度交接](../../handoffs/2026-10-25-v06-phase3a-progress-handoff.md) 与 [小债清理交接](../../handoffs/2026-10-26-v05x-v06x-debt-cleanup.md)。
+**状态（2026-10-26）**：Figma 门禁结构证据已完成：8/8 scratch + 8/8 delivery 在 Figma 桌面版构建，`figma:verify` 全部 0 blocker / 0 major / 0 findings，16 份 readback `errors: []`；证据在 `pipeline/artifacts/employee-app-phase2/figma/`（含 `README.md` 与人工 checklist）。697 tests / typecheck clean；`pnpm studio:smoke` 为 Studio 的无头门禁。**仍差人工并排视觉检查与胡冀徽签核**，因此 v0.6 未签。Figma state frames、完整组件库、Material Symbols 矢量集、readback 编排仍留 v0.6.x。见 [v0.6 门禁证据交接](../../handoffs/2026-10-26-v06-figma-gate-evidence.md)。
 
 **目标**：把 Page Spec 变成可交付的 Figma 源文件和可用工作台。
 

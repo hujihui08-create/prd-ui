@@ -3,6 +3,49 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.6 Figma gate: 8/8 scratch + delivery evidence
+
+### Added
+
+- Durable Figma gate evidence under
+  `pipeline/artifacts/employee-app-phase2/figma/`: 8 PageSpecs compiled from the
+  signed brief (`spec-source/`), 8 regenerated plans, 8 scratch + 8 delivery
+  readbacks, 16 diffs, and 16 canvas screenshots. Index and checklist in that
+  directory's `README.md`.
+- Figma files: scratch `iL99qSPGhmh08BB9LketgF`, delivery `ne1JYKpfjDivRr0nK5jm4S`.
+
+### Fixed
+
+- Figma readback crashed on Button instances under `dynamic-page`
+  (`getMainComponent`) → `getMainComponentAsync()`.
+- Instances were read back with their internal label child, so every Button
+  failed `FIGMA_HIERARCHY` (`expected 0 children, got 1`); instances are leaves
+  and still expose `characters`.
+- Figma discards paint `opacity` on variable-bound fills, so badges/calendar
+  blocks rendered solid; tinted tokens now use generated `<token>/alpha-NN`
+  RGBA variables.
+- `core/figma` plan compiler read only `slots.content`, dropping `summary` /
+  `fields` for the detail and notice archetypes (3 empty pages). All content
+  slots are composed in renderer-html order.
+- Default plans skipped nothing for search result rows; `ListRow` nodes with
+  `searchText` are now omitted (they are hidden until a query matches).
+- View-panel sections keep vertical padding and drop horizontal padding,
+  matching `[data-view-panel]` in the renderer.
+- Plugin UI uses a radio pair for build mode; the native `<select>` popup
+  (NSMenu) cannot be driven by the computer-use bridge.
+
+### Verified
+
+- `figma:verify`: scratch **8/8 passed**, delivery **8/8 passed** — all
+  0 blocker / 0 major / 0 findings; 16 readbacks with `errors: []`.
+- `pnpm test` **697 passed**; `pnpm typecheck` clean.
+
+### Not done
+
+- Human side-by-side visual check and v0.6 signoff; v0.6 stays unsigned.
+- v0.6.x debt unchanged: state frames, full component library, Material Symbols
+  vector set, Figma readback orchestration.
+
 ## 2026-10-26 — v0.5.x/v0.6.x debt cleanup
 
 ### Fixed

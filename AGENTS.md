@@ -95,9 +95,9 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   missing; only `SKIP_DSH=1` skips it.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-## Current state (v0.6 implemented, Figma gate pending, 2026-10-26)
+## Current state (v0.6 gate evidence complete, human signoff pending, 2026-10-26)
 
-Verified: `pnpm test` 694 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
+Verified: `pnpm test` 697 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
 clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
@@ -105,33 +105,31 @@ v0.5 remains the last signed milestone. v0.6 Phase 3A is implemented in the
 automatable parts: `core/figma` plan compiler + readback diff, `runtimes/figma`
 plugin/UI/bundle, `core/asset-compiler` + `asset:compile`, and a read-only
 Studio (`studio/`, shadcn/Tailwind). `figma:plan` generates 8 plans; M0 assets
-package 13/13 and phase2 frozen icons 4/4. Real Figma scratch has run for
-customer-search after the dynamic-page fixes; the remaining pages, delivery
-pages, and durable readback/diff evidence are still open, so v0.6 is **not signed**
-and cannot be `passed` yet. Checked-in evidence:
-`pipeline/artifacts/employee-app-phase2/figma/plans/` (8 plans),
-`pipeline/artifacts/employee-app-phase2/asset-compiler/`, and
-`pipeline/artifacts/employee-app-phase2/studio-v06.png`; `studio/public` is
-generated and gitignored. The `/tmp` evidence from 2026-10-25 has expired.
+package 13/13 and phase2 frozen icons 4/4.
 
-v0.6 Figma gate is in progress (2026-10-26): the plugin now runs under
-`documentAccess: "dynamic-page"`, customer-search scratch built with a
-0 blocker / 0 major / 0 findings diff and visual check; see the latest handoff
-§11. Remaining: 6 pages, delivery pages, durable evidence, and human signoff.
+The real Figma gate ran on 2026-10-26: 8/8 scratch pages and 8/8 delivery pages
+built in Figma desktop, all `figma:verify` runs **passed (0 blocker / 0 major /
+0 findings)** with 16 `errors: []` readbacks. Durable evidence lives in
+`pipeline/artifacts/employee-app-phase2/figma/` (`spec-source/`, `plans/`,
+`readback/{,delivery}/`, `diff/{,delivery}/`, `screenshots/`, `README.md`);
+Figma files are scratch `iL99qSPGhmh08BB9LketgF` and delivery
+`ne1JYKpfjDivRr0nK5jm4S` (Drafts). The gate exposed and fixed six real bugs
+(dynamic-page mainComponent, instance children, variable-paint opacity, dropped
+summary/fields slots, search rows, view-panel padding); `pnpm studio:smoke` is
+the headless Studio gate. v0.6 still needs the **human** side-by-side visual check
+and signoff, so it is **not signed** and cannot be `passed`.
 
 v0.5.x debt cleanup landed on 2026-10-26: disabled datetime container, loading
 selected-column skeleton, and `YYYY-MM-DD HH:mm` confirmed time; the Sunday
-column tint was not reproducible and needed no code change. `pnpm studio:smoke`
-is now a headless Playwright gate for the Studio (8 pages / 8 iframes / 0
-errors). **The v0.5 visual baseline is stale after those CSS changes**; the next
-visual gate must regenerate and re-sign it.
+column tint was not reproducible and needed no code change. **The v0.5 visual
+baseline is stale after those CSS changes**; the next visual gate must regenerate
+and re-sign it.
 
-Next: open Figma desktop (or Brio MCP), import
-`pipeline/runtimes/figma/manifest.json`, build scratch pages + readback, run
-`figma:verify`, then delivery pages and the v0.6 checklist. After signing v0.6,
-start v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9;
-final v1.0.
-Handoff: `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (latest);
+Next: run the manual Figma checklist in
+`pipeline/artifacts/employee-app-phase2/figma/README.md`, sign v0.6, then start
+v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9; final v1.0.
+Handoff: `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (latest);
+`docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (v0.5.x/v0.6.x debt);
 `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` (overall session
 state); v0.6 details in
 `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
