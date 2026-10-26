@@ -18,6 +18,8 @@ export interface StyleNode {
   };
   radius: number;
   background: { color: string; alpha: number };
+  /** Raw computed `box-shadow`; the renderer paints selected-day accents as an inset underline. */
+  boxShadow?: string;
   font: {
     family: string;
     size: number;

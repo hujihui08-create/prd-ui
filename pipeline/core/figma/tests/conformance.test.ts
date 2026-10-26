@@ -364,6 +364,63 @@ describe("comparePlanToStyleManifest", () => {
     ).toBe(true);
   });
 
+  it("accepts an inset bottom shadow that paints a declared bottom border", () => {
+    const compiled = plan("appointment-list");
+    const manifest = manifestFor(compiled);
+    const day = manifest.nodes.find(
+      (node) => node.specId === "appointment-list.calendar.grid.day.2"
+    )!;
+    // The renderer paints the selected-day underline as a 1px base border plus
+    // `box-shadow: inset 0 -2px 0 status.info`; the plan declares a 2px
+    // status.info bottom border.
+    day.border.bottom = { width: 1, color: "#E5E7EB" };
+    day.boxShadow = "rgb(29, 78, 216) 0px -2px 0px 0px inset";
+    const page = comparePlanToStyleManifest({
+      plan: compiled,
+      manifest,
+      profile: getProfile("b-mobile"),
+    });
+    expect(
+      page.findings.filter(
+        (finding) =>
+          finding.severity === "blocker" &&
+          (finding.property === "borderBottom" || finding.property === "borderBottomWidth")
+      )
+    ).toHaveLength(0);
+    expect(page.passed).toBe(true);
+  });
+
+  it("rejects an inset bottom shadow with the wrong color or thickness", () => {
+    const cases = [
+      { shadow: "rgb(220, 38, 38) 0px -2px 0px 0px inset", property: "borderBottom" },
+      { shadow: "rgb(29, 78, 216) 0px -1px 0px 0px inset", property: "borderBottomWidth" },
+    ];
+    for (const entry of cases) {
+      const compiled = plan("appointment-list");
+      const manifest = manifestFor(compiled);
+      const day = manifest.nodes.find(
+        (node) => node.specId === "appointment-list.calendar.grid.day.2"
+      )!;
+      day.border.bottom = { width: 1, color: "#E5E7EB" };
+      day.boxShadow = entry.shadow;
+      const page = comparePlanToStyleManifest({
+        plan: compiled,
+        manifest,
+        profile: getProfile("b-mobile"),
+      });
+      expect(
+        page.findings.some(
+          (finding) =>
+            finding.code === "CONFORMANCE_STYLE_MISMATCH" &&
+            finding.specId === "appointment-list.calendar.grid.day.2" &&
+            finding.property === entry.property &&
+            finding.severity === "blocker"
+        ),
+        entry.shadow
+      ).toBe(true);
+    }
+  });
+
   it("normalizes token colors against rgb()", () => {
     const compiled = plan("today");
     const manifest = manifestFor(compiled);

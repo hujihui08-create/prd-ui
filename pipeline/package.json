@@ -18,6 +18,7 @@
     "visual:sign": "tsx runtimes/standalone/src/visual-sign-cli.ts",
     "figma:plan": "tsx runtimes/standalone/src/figma-cli.ts plan",
     "figma:verify": "tsx runtimes/standalone/src/figma-cli.ts verify",
+    "figma:conformance": "tsx runtimes/standalone/src/figma-conformance-cli.ts",
     "asset:compile": "tsx runtimes/standalone/src/asset-compile-cli.ts",
     "studio:prepare": "tsx runtimes/standalone/src/studio-prepare-cli.ts",
     "studio:dev": "pnpm --dir studio dev",

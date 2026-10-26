@@ -153,6 +153,79 @@ export function sameTint(expected: string, actual: string, alpha: number): boole
   return relativeLuminance(rendered) > tokenLuminance + 1e-6;
 }
 
+export interface BoxShadow {
+  inset: boolean;
+  offsetX: number;
+  offsetY: number;
+  blur: number;
+  spread: number;
+  color: string;
+}
+
+const SHADOW_LENGTH = /-?(?:\d+(?:\.\d+)?|\.\d+)px/gi;
+
+/**
+ * Parse a computed `box-shadow` value. Chrome serializes each shadow as
+ * `<color> <x>px <y>px <blur>px <spread>px [inset]`, with shadows separated by
+ * top-level commas (rgb() colors contain commas too).
+ */
+export function parseBoxShadows(value: string | undefined): BoxShadow[] {
+  if (value === undefined) return [];
+  const trimmed = value.trim();
+  if (trimmed === "" || trimmed === "none") return [];
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < trimmed.length; index += 1) {
+    const char = trimmed[index];
+    if (char === "(") depth += 1;
+    else if (char === ")") depth = Math.max(0, depth - 1);
+    else if (char === "," && depth === 0) {
+      parts.push(trimmed.slice(start, index));
+      start = index + 1;
+    }
+  }
+  parts.push(trimmed.slice(start));
+  const shadows: BoxShadow[] = [];
+  for (const part of parts) {
+    const lengths = (part.match(SHADOW_LENGTH) ?? []).map((length) => Number.parseFloat(length));
+    if (lengths.length < 2) continue;
+    const color = part
+      .replace(SHADOW_LENGTH, " ")
+      .replace(/\binset\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    shadows.push({
+      inset: /\binset\b/i.test(part),
+      offsetX: lengths[0]!,
+      offsetY: lengths[1]!,
+      blur: lengths[2] ?? 0,
+      spread: lengths[3] ?? 0,
+      color,
+    });
+  }
+  return shadows;
+}
+
+/**
+ * The renderer draws a selected calendar day's bottom accent as
+ * `box-shadow: inset 0 -Npx 0 <token>` instead of a wider bottom border. A
+ * negative y-offset with `inset` paints a band at the bottom edge; its solid
+ * thickness is the offset minus blur plus spread. Returns the first such
+ * bottom underline, if any.
+ */
+export function insetBottomUnderline(
+  value: string | undefined
+): { color: string; thickness: number } | undefined {
+  for (const shadow of parseBoxShadows(value)) {
+    if (!shadow.inset || shadow.offsetY >= 0) continue;
+    const thickness = Math.abs(shadow.offsetY) + shadow.spread - shadow.blur;
+    if (thickness <= 0) continue;
+    return { color: shadow.color, thickness };
+  }
+  return undefined;
+}
+
 function resolveToken(plan: FigmaPlan, value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
   return plan.tokens[value] ?? value;
@@ -371,9 +444,30 @@ function compareNode(
   ] as const;
   for (const [property, token, width, actual] of border) {
     const expectedWidth = width ?? (token === undefined ? 0 : 1);
+    const expectedColor = token === undefined ? undefined : resolveToken(plan, token)!;
+    // The renderer may paint a declared bottom accent with a base border plus an
+    // inset shadow (selected calendar day: 1px border/subtle + 2px status.info
+    // shadow). Accept the shadow only when it supplies both the declared color
+    // and the declared thickness, and only when the CSS border is thinner than
+    // the plan; a thicker CSS border still fails.
+    if (
+      property === "borderBottom" &&
+      expectedColor !== undefined &&
+      expectedWidth > 0 &&
+      actual.width < expectedWidth
+    ) {
+      const underline = insetBottomUnderline(style.boxShadow);
+      if (
+        underline !== undefined &&
+        sameColor(expectedColor, underline.color) &&
+        Math.abs(underline.thickness - expectedWidth) <= 0.5
+      ) {
+        continue;
+      }
+    }
     compareNumber(findings, node, `${property}Width`, expectedWidth, actual.width);
-    if (token !== undefined && expectedWidth > 0) {
-      compareColor(findings, node, property, resolveToken(plan, token)!, actual.color);
+    if (expectedColor !== undefined && expectedWidth > 0) {
+      compareColor(findings, node, property, expectedColor, actual.color);
     }
   }
 
