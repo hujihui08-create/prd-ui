@@ -99,15 +99,39 @@ export async function measurePages(input: MeasurePagesInput): Promise<RenderMetr
             ({ rect }) => rect.height > 0 && rect.top < viewportHeight && rect.bottom > 0
           ).length;
           const fold = rects.find(({ rect }) => rect.height > 0 && rect.top >= viewportHeight);
-          let widest = { specId: undefined, width: 0 };
-          for (const entry of rects) {
-            if (entry.rect.width > widest.width) {
-              widest = {
-                specId: entry.id === "" ? undefined : entry.id,
-                width: entry.rect.width,
-              };
+          // Overflow is a layout property, not a property of labeled nodes: an
+          // unlabeled child can be wider than the viewport. Scan every element
+          // and fall back to the scroll container's scrollWidth for overflow
+          // that no element rect exposes (e.g. pseudo-elements).
+          const labeledAncestor = (el) => el.closest("[data-node-id]");
+          let widestElement = null;
+          let widestWidth = 0;
+          for (const el of document.querySelectorAll("*")) {
+            const width = el.getBoundingClientRect().width;
+            if (width <= 0) continue;
+            if (width > widestWidth) {
+              widestWidth = width;
+              widestElement = el;
+            } else if (
+              width === widestWidth &&
+              widestElement !== null &&
+              labeledAncestor(widestElement) === null &&
+              labeledAncestor(el) !== null
+            ) {
+              widestElement = el;
             }
           }
+          const scrollWidth = scrollElement === null ? 0 : scrollElement.scrollWidth;
+          // Only fall back when no element rect exposes the overflow: an
+          // overflowing element is the better answer because it carries a
+          // specId, while scrollWidth also counts that element's offset.
+          if (widestWidth <= viewportWidth && scrollWidth > viewportWidth) {
+            widestWidth = scrollWidth;
+            widestElement = null;
+          }
+          const widestLabel = widestElement === null ? null : labeledAncestor(widestElement);
+          const widestSpecId =
+            widestLabel === null ? undefined : widestLabel.dataset.nodeId || undefined;
 
           // Content that the footer can cover lives inside the scroll
           // container (page shell nodes are not content). Hidden nodes report
@@ -146,14 +170,16 @@ export async function measurePages(input: MeasurePagesInput): Promise<RenderMetr
             }
           }
 
+          const contentHeight =
+            scrollElement === null
+              ? document.documentElement.scrollHeight
+              : scrollElement.scrollHeight;
           return {
             pageId,
             target,
             viewport,
-            documentHeight: Math.max(
-              document.documentElement.scrollHeight,
-              scrollElement === null ? 0 : scrollElement.scrollHeight
-            ),
+            documentHeight: Math.max(document.documentElement.scrollHeight, contentHeight),
+            contentHeight,
             scrollContainer: {
               selector: appScroll === null ? "document.scrollingElement" : ".app-scroll",
               clientHeight: scrollElement === null ? 0 : scrollElement.clientHeight,
@@ -164,9 +190,9 @@ export async function measurePages(input: MeasurePagesInput): Promise<RenderMetr
             firstScreenNodes,
             ...(fold === undefined ? {} : { foldSpecId: fold.id }),
             widest: {
-              ...(widest.specId === undefined ? {} : { specId: widest.specId }),
-              width: Math.round(widest.width),
-              overflowX: widest.width > viewportWidth,
+              ...(widestSpecId === undefined ? {} : { specId: widestSpecId }),
+              width: Math.round(widestWidth),
+              overflowX: widestWidth > viewportWidth,
             },
             fixedFooter: {
               present: footer !== null,

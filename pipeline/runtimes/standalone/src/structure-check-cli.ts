@@ -13,13 +13,13 @@ import { loadProjectConfig } from "@prd-ui/orchestrator";
 import { checkMeasuredStructure } from "@prd-ui/validators";
 
 export const USAGE = `Usage:
-  pnpm structure:check --spec-run <dir> --metrics <file> --out <dir> [--project <yaml>] [--json]
+  pnpm structure:check --spec-run <dir> --metrics <file> --project <yaml> --out <dir> [--json]
 
 Options:
   --spec-run <dir>  Completed spec:engineer run directory
   --metrics <file>  render:measure output (render-metrics.json)
+  --project <yaml>  Project config supplying structure overrides (required)
   --out <dir>       Output directory (structure-measured.json)
-  --project <yaml>  Optional project config supplying structure overrides
   --json            Print the measured-structure report as one JSON object
   -h, --help        Print this help and exit
 
@@ -81,6 +81,9 @@ export function parseArgs(argv: string[]): StructureCheckOptions {
         throw new StructureCheckUsageError(`unknown argument: ${flag}`);
     }
   }
+  if (!options.project && !options.help) {
+    throw new StructureCheckUsageError("missing required --project <yaml>");
+  }
   return options;
 }
 
@@ -117,6 +120,7 @@ export async function loadMetrics(file: string): Promise<RenderMetrics> {
       typeof page?.pageId !== "string" ||
       (page.target !== "mobile" && page.target !== "web") ||
       typeof page.documentHeight !== "number" ||
+      typeof page.contentHeight !== "number" ||
       typeof page.widest?.width !== "number" ||
       typeof page.widest?.overflowX !== "boolean" ||
       typeof page.fixedFooter?.present !== "boolean" ||
@@ -161,8 +165,8 @@ export function assertMetricsMatchSpecs(metrics: RenderMetrics, specs: PageSpec[
   }
 }
 
-export function resolveStructureConfig(projectPath?: string): StructureConfig {
-  const overrides = projectPath === undefined ? undefined : loadProjectConfig(projectPath).config.structure;
+export function resolveStructureConfig(projectPath: string): StructureConfig {
+  const overrides = loadProjectConfig(projectPath).config.structure;
   return {
     maxRepeatedSections:
       overrides?.maxRepeatedSections ?? DEFAULT_STRUCTURE_CONFIG.maxRepeatedSections,
@@ -197,8 +201,8 @@ export async function main(
     io.stdout(USAGE);
     return 0;
   }
-  if (!options.specRun || !options.metrics || !options.out) {
-    io.stderr("missing required --spec-run/--metrics/--out");
+  if (!options.specRun || !options.metrics || !options.out || !options.project) {
+    io.stderr("missing required --spec-run/--metrics/--project/--out");
     io.stderr(USAGE);
     return 2;
   }

@@ -29,15 +29,17 @@ export interface StructureLintReport {
 
 /**
  * Measurement of one rendered page in its default state. `documentHeight` is
- * the page's total scrollable height: the taller of the document's scroll
- * height and the app scroll container's `scrollHeight` (so it is never below
- * the viewport).
+ * the budgeted page height: the taller of the document's scroll height and the
+ * app scroll container's `scrollHeight` (so it is never below the viewport).
+ * `contentHeight` is the raw scrollable content height before that floor is
+ * applied.
  */
 export interface RenderMetricsPage {
   pageId: string;
   target: "mobile" | "web";
   viewport: { width: number; height: number };
   documentHeight: number;
+  contentHeight: number;
   scrollContainer: {
     selector: string;
     clientHeight: number;

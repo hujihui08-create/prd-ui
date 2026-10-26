@@ -133,7 +133,8 @@ export async function main(
           ? `${page.fixedFooter.height}px${page.fixedFooter.overlapsContent ? ", overlapping" : ""}`
           : "none";
         io.stdout(
-          `Measured ${page.pageId}: height ${page.documentHeight}px, ` +
+          `Measured ${page.pageId}: height ${page.documentHeight}px ` +
+            `(content ${page.contentHeight}px), ` +
             `${page.firstScreenNodes} first-screen nodes, ` +
             `widest ${page.widest.width}px${overflow}${fold}, footer ${footer}`
         );

@@ -11,6 +11,7 @@ const metrics: RenderMetrics = {
       target: "mobile",
       viewport: { width: 390, height: 844 },
       documentHeight: 2500,
+      contentHeight: 2500,
       scrollContainer: {
         selector: ".app-scroll",
         clientHeight: 716,
