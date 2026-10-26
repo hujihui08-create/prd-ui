@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type Severity = "blocker" | "major" | "minor" | "question";
+export type Severity = "blocker" | "major" | "minor" | "question" | "warning";
 
 export interface Finding {
   id: string;
@@ -19,7 +19,7 @@ export const FindingSchema = z
   .object({
     id: z.string().min(1),
     ruleId: z.string().min(1),
-    severity: z.enum(["blocker", "major", "minor", "question"]),
+    severity: z.enum(["blocker", "major", "minor", "question", "warning"]),
     category: z.string().min(1),
     location: z.string().min(1),
     evidence: z.string().min(1),

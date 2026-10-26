@@ -9,6 +9,7 @@ export * from "./ui-brief.js";
 export * from "./prd-review.js";
 export * from "./brief-draft.js";
 export * from "./project-config.js";
+export * from "./structure.js";
 export * from "./asset-manifest.js";
 export * from "./asset-brief.js";
 export * from "./usage.js";

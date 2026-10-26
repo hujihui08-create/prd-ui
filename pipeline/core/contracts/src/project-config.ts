@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export interface ProjectStructureConfig {
+  maxRepeatedSections?: number;
+  pageHeightBudget?: { mobile?: number; web?: number };
+}
+
 export interface ProjectConfig {
   project: string;
   brief: string;
@@ -10,6 +15,8 @@ export interface ProjectConfig {
   platforms?: Array<"web" | "mobile">;
   manifests: Record<string, string>;
   runsDir?: string;
+  /** Optional structure-lint overrides; omitted keys use defaults. */
+  structure?: ProjectStructureConfig;
 }
 
 /**
@@ -25,5 +32,18 @@ export const ProjectConfigSchema = z
     platforms: z.array(z.enum(["web", "mobile"])).min(1).optional(),
     manifests: z.record(z.string(), z.string().min(1)),
     runsDir: z.string().min(1).optional(),
+    structure: z
+      .object({
+        maxRepeatedSections: z.number().int().positive().optional(),
+        pageHeightBudget: z
+          .object({
+            mobile: z.number().int().positive().optional(),
+            web: z.number().int().positive().optional(),
+          })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   AssetBriefSchema,
+  DEFAULT_STRUCTURE_CONFIG,
   type AssetBrief,
 } from "@prd-ui/contracts";
 import {
@@ -197,6 +198,46 @@ async function makeM1Run(options: M1FixtureOptions = {}): Promise<string> {
   return dir;
 }
 
+async function writeProjectWithStructure(structureYaml: string): Promise<string> {
+  const dir = await tempDir("prd-ui-spec-project-");
+  await writeFile(
+    path.join(dir, "ui-brief.json"),
+    await readFile(
+      path.join(pipelineRoot, "samples", "projects", "employee-app", "ui-brief.json"),
+      "utf8"
+    ),
+    "utf8"
+  );
+  await writeFile(
+    path.join(dir, "project.yaml"),
+    [
+      "project: employee-app",
+      "brief: ui-brief.json",
+      "manifests: {}",
+      structureYaml,
+      "",
+    ].join("\n"),
+    "utf8"
+  );
+  return path.join(dir, "project.yaml");
+}
+
+interface StructureLintPayload {
+  schemaVersion: string;
+  project: string;
+  config: {
+    maxRepeatedSections: number;
+    pageHeightBudget: { mobile: number; web: number };
+  };
+  pages: Array<{
+    pageId: string;
+    estimatedHeight: number;
+    budget: number;
+    findings: Array<{ ruleId: string; severity: string }>;
+  }>;
+  summary: { warnings: number; blockers: number };
+}
+
 async function runCli(args: string[]): Promise<{
   code: number;
   stdout: string;
@@ -284,6 +325,119 @@ describe("spec:engineer CLI", () => {
     await expect(
       readFile(path.join(runDir, "findings", "spec-engineer-gate.json"), "utf8")
     ).resolves.toContain("SPEC_ASSET_UNUSED");
+  });
+
+  it("writes a warning-only structure lint report", async () => {
+    const agentRun = await makeM1Run();
+    const runs = await tempDir("prd-ui-spec-out-");
+
+    const result = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(0);
+
+    const runDir = await singleRunDir(runs);
+    const report = JSON.parse(
+      await readFile(path.join(runDir, "findings", "structure-lint.json"), "utf8")
+    ) as StructureLintPayload;
+
+    expect(report.schemaVersion).toBe("1.0");
+    expect(report.project).toBe("employee-app");
+    expect(report.config).toEqual(DEFAULT_STRUCTURE_CONFIG);
+    expect(report.pages.map((page) => page.pageId)).toEqual(["today", "inventory-query"]);
+    expect(
+      report.pages.every(
+        (page) => page.budget === DEFAULT_STRUCTURE_CONFIG.pageHeightBudget.mobile
+      )
+    ).toBe(true);
+    expect(report.pages.every((page) => page.estimatedHeight >= 844)).toBe(true);
+    expect(
+      report.pages.every((page) =>
+        page.findings.every((finding) => finding.severity === "warning")
+      )
+    ).toBe(true);
+    expect(report.summary).toEqual({
+      warnings: report.pages.reduce((sum, page) => sum + page.findings.length, 0),
+      blockers: 0,
+    });
+  });
+
+  it("deep-merges partial structure config without blocking the gate", async () => {
+    const structureProject = await writeProjectWithStructure(
+      [
+        "structure:",
+        "  maxRepeatedSections: 5",
+        "  pageHeightBudget:",
+        "    mobile: 400",
+      ].join("\n")
+    );
+    const agentRun = await makeM1Run();
+    const runs = await tempDir("prd-ui-spec-out-");
+
+    const result = await runCli([
+      "--project",
+      structureProject,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+      "--json",
+    ]);
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as { status: string };
+    expect(payload.status).toBe("passed");
+
+    const runDir = await singleRunDir(runs);
+    const report = JSON.parse(
+      await readFile(path.join(runDir, "findings", "structure-lint.json"), "utf8")
+    ) as StructureLintPayload;
+
+    expect(report.config).toEqual({
+      maxRepeatedSections: 5,
+      pageHeightBudget: { mobile: 400, web: 2400 },
+    });
+    expect(report.pages.every((page) => page.budget === 400)).toBe(true);
+    expect(report.summary.blockers).toBe(0);
+    expect(report.summary.warnings).toBeGreaterThan(0);
+    expect(
+      report.pages.some((page) =>
+        page.findings.some((finding) => finding.ruleId === "STRUCTURE-PAGE-HEIGHT")
+      )
+    ).toBe(true);
+  });
+
+  it("writes structure lint when the spec gate fails", async () => {
+    const agentRun = await makeM1Run({
+      motionBindings: [
+        { pageId: "today", nodeId: "today.unknown-node", preset: "page-enter" },
+      ],
+    });
+    const runs = await tempDir("prd-ui-spec-out-");
+
+    const strict = await runCli([
+      "--project",
+      projectPath,
+      "--agent-run",
+      agentRun,
+      "--runs",
+      runs,
+      "--strict-motion",
+      "--json",
+    ]);
+    expect(strict.code).toBe(1);
+
+    const runDir = await singleRunDir(runs);
+    const report = JSON.parse(
+      await readFile(path.join(runDir, "findings", "structure-lint.json"), "utf8")
+    ) as StructureLintPayload;
+    expect(report.pages.map((page) => page.pageId)).toEqual(["today", "inventory-query"]);
+    expect(report.summary.blockers).toBe(0);
   });
 
   it("resolves motion aliases and upgrades unresolved bindings with --strict-motion", async () => {
