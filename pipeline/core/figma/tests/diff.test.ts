@@ -154,4 +154,47 @@ describe("diffFigma", () => {
     expect(diff.passed).toBe(false);
     expect(diff.majorCount).toBeGreaterThan(0);
   });
+
+  it("fails when coverage is missing", () => {
+    const plan = structuredClone(plans[0]!);
+    delete plan.coverage;
+    const readback = readbackFromPlan(plan);
+    const diff = diffFigma(plan, readback);
+    expect(diff.passed).toBe(false);
+    expect(diff.findings.some((finding) => finding.code === "COVERAGE_MISSING")).toBe(true);
+  });
+
+  it("fails on an unmapped node and reports the spec id", () => {
+    const plan = structuredClone(plans[0]!);
+    plan.coverage!.summary.unmapped += 1;
+    plan.coverage!.nodes.push({
+      specId: "today.chart",
+      specType: "Chart",
+      path: "layout.children[0]",
+      status: "unmapped",
+      reason: "UNMAPPED_COMPONENT:Chart",
+    });
+    const diff = diffFigma(plan, readbackFromPlan(plan));
+    expect(diff.passed).toBe(false);
+    expect(
+      diff.findings.some(
+        (finding) => finding.code === "UNMAPPED_COMPONENT" && finding.specId === "today.chart"
+      )
+    ).toBe(true);
+  });
+
+  it("reports degraded nodes as major", () => {
+    const plan = structuredClone(plans[0]!);
+    plan.coverage!.summary.degraded += 1;
+    plan.coverage!.nodes.push({
+      specId: "today.card.appointments",
+      specType: "Card",
+      path: "layout.slots.content[0]",
+      status: "degraded",
+      reason: "UNMAPPED_PROP:mystery",
+    });
+    const diff = diffFigma(plan, readbackFromPlan(plan));
+    expect(diff.findings.some((finding) => finding.code === "UNMAPPED_PROP")).toBe(true);
+    expect(diff.majorCount).toBeGreaterThan(0);
+  });
 });

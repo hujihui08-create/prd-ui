@@ -81,6 +81,40 @@ export function diffFigma(
     );
   }
 
+  if (plan.coverage === undefined) {
+    findings.push(
+      finding(
+        "COVERAGE_MISSING",
+        "blocker",
+        "Plan has no coverage report; regenerate with figma:plan."
+      )
+    );
+  } else {
+    for (const node of plan.coverage.nodes) {
+      if (node.status === "unmapped") {
+        findings.push(
+          finding(
+            node.reason?.startsWith("SPEC_NODE_ID_MISSING")
+              ? "SPEC_NODE_ID_MISSING"
+              : "UNMAPPED_COMPONENT",
+            "blocker",
+            `${node.specType} at ${node.path}: ${node.reason ?? "unmapped"}`,
+            node.specId
+          )
+        );
+      } else if (node.status === "degraded") {
+        findings.push(
+          finding(
+            node.reason?.startsWith("UNMAPPED_PROP") ? "UNMAPPED_PROP" : "UNMAPPED_STYLE",
+            "major",
+            `${node.specType} at ${node.path}: ${node.reason ?? "degraded"}`,
+            node.specId
+          )
+        );
+      }
+    }
+  }
+
   const planEntries = flattenPlan(plan.root);
   const readbackEntries = flattenReadback({
     nodeId: "root",

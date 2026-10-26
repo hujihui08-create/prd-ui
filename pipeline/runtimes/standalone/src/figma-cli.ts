@@ -10,7 +10,7 @@ import {
   type FigmaReadback,
   type PageSpec,
 } from "@prd-ui/contracts";
-import { compileFigmaPlans, diffFigma } from "@prd-ui/figma";
+import { compileFigmaPlans, coverageIndex, diffFigma } from "@prd-ui/figma";
 import { getCatalog, getProfile } from "@prd-ui/design-system";
 
 export const USAGE = `Usage:
@@ -159,8 +159,19 @@ async function runPlan(options: PlanOptions): Promise<number> {
     plans: index,
   });
   await writeFile(path.join(options.out, "figma-plan.index.json"), indexBody, "utf8");
+  await writeFile(
+    path.join(options.out, "plan-coverage.json"),
+    pretty(coverageIndex(plans, options.specRun, specs[0]?.meta.project ?? "unknown")),
+    "utf8"
+  );
   if (options.json) {
-    console.log(JSON.stringify({ plans: plans.length, out: options.out }, null, 2));
+    const coverage = {
+      mapped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.mapped ?? 0), 0),
+      degraded: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.degraded ?? 0), 0),
+      unmapped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.unmapped ?? 0), 0),
+      skipped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.skipped ?? 0), 0),
+    };
+    console.log(JSON.stringify({ plans: plans.length, out: options.out, coverage }, null, 2));
   } else {
     console.log(`Figma plans: ${plans.length} -> ${options.out}`);
   }
