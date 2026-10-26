@@ -145,7 +145,525 @@
         "type": "FRAME",
         "name": "Content",
         "layoutMode": "VERTICAL",
-        "children": [],
+        "children": [
+          {
+            "specId": "appointment-detail.card.summary",
+            "type": "FRAME",
+            "name": "Card",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "appointment-detail.card.summary.head",
+                "type": "FRAME",
+                "name": "Head",
+                "layoutMode": "HORIZONTAL",
+                "children": [
+                  {
+                    "specId": "appointment-detail.card.summary.title",
+                    "type": "TEXT",
+                    "name": "Title",
+                    "characters": "预约详情摘要",
+                    "textStyle": "b-mobile/heading.2",
+                    "color": "color/text/primary"
+                  },
+                  {
+                    "specId": "appointment-detail.card.summary.badge",
+                    "type": "FRAME",
+                    "name": "Badge",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "appointment-detail.card.summary.badge.label",
+                        "type": "TEXT",
+                        "name": "Label",
+                        "characters": "已登记",
+                        "textStyle": "b-mobile/label.strong",
+                        "color": "color/status/warning"
+                      }
+                    ],
+                    "height": 20,
+                    "paddingX": 6,
+                    "radius": 4,
+                    "fill": "color/status/warning",
+                    "fillAlpha": 0.12,
+                    "alignItems": "CENTER",
+                    "justifyContent": "CENTER"
+                  }
+                ],
+                "gap": 8,
+                "alignItems": "CENTER",
+                "justifyContent": "SPACE_BETWEEN"
+              },
+              {
+                "specId": "appointment-detail.card.summary.body",
+                "type": "FRAME",
+                "name": "Body",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "appointment-detail.root.summary.0.children.0",
+                    "type": "FRAME",
+                    "name": "List",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.0",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.0.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.0.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "客户",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.0.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "张女士",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.1",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.1.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.1.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "手机号",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.1.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "138****0000",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.2",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.2.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.2.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "项目",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.2.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "小气泡",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.3",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.3.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.3.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "时间段",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.3.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "11-05 周三 10:00-11:00",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.4",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.4.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.4.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "护理师",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.4.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "王美容",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.5",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.5.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.5.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "门店",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.5.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "星光店",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.6",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.6.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.6.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "来源",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.6.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "电话",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.7",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.7.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.7.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "创建人",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.7.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "王美容",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.8",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.8.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.8.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "创建时间",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.8.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "2026-11-01 15:20",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.9",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.9.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.9.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "委派留痕",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.9.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "—",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      },
+                      {
+                        "specId": "appointment-detail.root.summary.0.children.0.row.10",
+                        "type": "FRAME",
+                        "name": "Row",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.10.label",
+                            "type": "FRAME",
+                            "name": "Label",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "appointment-detail.root.summary.0.children.0.row.10.labelText",
+                                "type": "TEXT",
+                                "name": "Label",
+                                "characters": "服务完成",
+                                "textStyle": "b-mobile/label.sm",
+                                "color": "color/text/tertiary"
+                              }
+                            ],
+                            "width": 72
+                          },
+                          {
+                            "specId": "appointment-detail.root.summary.0.children.0.row.10.value",
+                            "type": "TEXT",
+                            "name": "Value",
+                            "characters": "否",
+                            "textStyle": "b-mobile/body.md",
+                            "color": "color/text/primary",
+                            "layoutGrow": 1
+                          }
+                        ],
+                        "paddingY": 10,
+                        "gap": 12,
+                        "alignItems": "CENTER"
+                      }
+                    ],
+                    "gap": 0
+                  }
+                ],
+                "gap": 0
+              }
+            ],
+            "padding": 16,
+            "gap": 8,
+            "fill": "color/surface/default",
+            "radius": 12,
+            "shadow": true
+          },
+          {
+            "specId": "appointment-detail.root.fields.0",
+            "type": "FRAME",
+            "name": "Row",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "appointment-detail.action.reschedule",
+                "type": "INSTANCE",
+                "name": "Button:改期",
+                "component": "Button",
+                "variant": "ghost",
+                "label": "改期",
+                "height": 36
+              },
+              {
+                "specId": "appointment-detail.action.customer",
+                "type": "INSTANCE",
+                "name": "Button:客户详情",
+                "component": "Button",
+                "variant": "ghost",
+                "label": "客户详情",
+                "height": 36
+              },
+              {
+                "specId": "appointment-detail.action.cancel",
+                "type": "INSTANCE",
+                "name": "Button:取消",
+                "component": "Button",
+                "variant": "danger",
+                "label": "取消",
+                "height": 36
+              }
+            ],
+            "gap": 8,
+            "alignItems": "CENTER"
+          }
+        ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
@@ -193,9 +711,9 @@
     "clip": true
   },
   "stats": {
-    "frames": 4,
-    "texts": 1,
-    "instances": 2,
+    "frames": 32,
+    "texts": 25,
+    "instances": 5,
     "icons": 1,
     "images": 0
   }

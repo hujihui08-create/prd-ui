@@ -239,7 +239,7 @@
                     "alignItems": "CENTER"
                   }
                 ],
-                "gap": 0,
+                "gap": 8,
                 "alignItems": "CENTER"
               },
               {
@@ -258,7 +258,7 @@
                     "height": 36
                   }
                 ],
-                "gap": 0,
+                "gap": 8,
                 "alignItems": "CENTER"
               },
               {
@@ -290,7 +290,7 @@
                         "color": "color/text/primary"
                       }
                     ],
-                    "gap": 0,
+                    "gap": 8,
                     "alignItems": "CENTER"
                   },
                   {
@@ -392,7 +392,7 @@
                         "justifyContent": "CENTER"
                       }
                     ],
-                    "gap": 0,
+                    "gap": 4,
                     "alignItems": "CENTER"
                   },
                   {
@@ -2803,9 +2803,9 @@
                     "clip": true
                   }
                 ],
-                "gap": 8,
                 "paddingX": 0,
-                "paddingY": 4
+                "paddingY": 4,
+                "gap": 8
               }
             ],
             "padding": 16,

@@ -1,0 +1,796 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "appointment-form",
+  "builtAt": "2026-10-26T07:56:16.473Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "1:342",
+      "type": "FRAME",
+      "name": "新增/改期预约",
+      "specId": "appointment-form.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "1:343",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "appointment-form.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:344",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "appointment-form.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": []
+            },
+            {
+              "nodeId": "1:345",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "appointment-form.page.root.header.title",
+              "width": 103,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "新增/改期预约",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeId": "1:346",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "appointment-form.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "width": 390,
+          "height": 726,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:347",
+              "type": "FRAME",
+              "name": "Section",
+              "specId": "appointment-form.root.content.0",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 12,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 440,
+              "x": 0,
+              "y": 0,
+              "children": [
+                {
+                  "nodeId": "1:348",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.customer",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "1:349",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.customer.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "客户 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:350",
+                      "type": "FRAME",
+                      "name": "Row",
+                      "specId": "appointment-form.root.content.0.children.0.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 8,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "children": [
+                        {
+                          "nodeId": "1:351",
+                          "type": "FRAME",
+                          "name": "Input",
+                          "specId": "appointment-form.root.content.0.children.0.children.0.children.0",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 10,
+                            "bottom": 0,
+                            "left": 10
+                          },
+                          "width": 87,
+                          "height": 36,
+                          "x": 0,
+                          "y": 0,
+                          "fills": [
+                            "color/surface/default"
+                          ],
+                          "children": [
+                            {
+                              "nodeId": "1:352",
+                              "type": "TEXT",
+                              "name": "Placeholder",
+                              "specId": "appointment-form.root.content.0.children.0.children.0.children.0.placeholder",
+                              "width": 65,
+                              "height": 18,
+                              "x": 11,
+                              "y": 9,
+                              "fills": [
+                                "color/text/tertiary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "请输入客户",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:353",
+                          "type": "INSTANCE",
+                          "name": "Button:选择",
+                          "specId": "appointment-form.action.pick-customer",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 0,
+                          "padding": {
+                            "top": 8,
+                            "right": 16,
+                            "bottom": 8,
+                            "left": 16
+                          },
+                          "width": 58,
+                          "height": 36,
+                          "x": 95,
+                          "y": 0,
+                          "componentName": "Emphasis=ghost",
+                          "variantProperties": {
+                            "emphasis": "ghost"
+                          },
+                          "characters": "选择",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:355",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.project",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 86,
+                  "children": [
+                    {
+                      "nodeId": "1:356",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.project.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "项目 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:357",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "appointment-form.root.content.0.children.1.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:358",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "appointment-form.root.content.0.children.1.children.0.placeholder",
+                          "width": 65,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "请输入项目",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:359",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.start-time",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 156,
+                  "children": [
+                    {
+                      "nodeId": "1:360",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.start-time.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "开始时间 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:361",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "appointment-form.root.content.0.children.2.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:362",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "appointment-form.root.content.0.children.2.children.0.placeholder",
+                          "width": 91,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "请选择开始时间",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:363",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.end-time",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 226,
+                  "children": [
+                    {
+                      "nodeId": "1:364",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.end-time.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "结束时间 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:365",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "appointment-form.root.content.0.children.3.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:366",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "appointment-form.root.content.0.children.3.children.0.placeholder",
+                          "width": 91,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "请选择结束时间",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:367",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.therapist",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 296,
+                  "children": [
+                    {
+                      "nodeId": "1:368",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.therapist.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "护理师 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:369",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "appointment-form.root.content.0.children.4.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:370",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "appointment-form.root.content.0.children.4.children.0.placeholder",
+                          "width": 78,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "请输入护理师",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:371",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "appointment-form.field.source",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 58,
+                  "x": 16,
+                  "y": 366,
+                  "children": [
+                    {
+                      "nodeId": "1:372",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "appointment-form.field.source.label",
+                      "width": 358,
+                      "height": 16,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "来源 *",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "1:373",
+                      "type": "FRAME",
+                      "name": "Select",
+                      "specId": "appointment-form.root.content.0.children.5.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 22,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:374",
+                          "type": "TEXT",
+                          "name": "Value",
+                          "specId": "appointment-form.root.content.0.children.5.children.0.value",
+                          "width": 65,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "请选择来源",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        },
+                        {
+                          "nodeId": "1:375",
+                          "type": "GLYPH",
+                          "name": "Chevron",
+                          "specId": "appointment-form.root.content.0.children.5.children.0.chevron",
+                          "width": 16,
+                          "height": 16,
+                          "x": 331,
+                          "y": 10,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "characters": "expand_more",
+                          "fontName": {
+                            "family": "Material Symbols Rounded",
+                            "style": "Regular"
+                          },
+                          "fontSize": 16,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nodeId": "1:376",
+          "type": "FRAME",
+          "name": "Actions",
+          "specId": "appointment-form.page.root.actions",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "width": 390,
+          "height": 70,
+          "x": 0,
+          "y": 774,
+          "fills": [
+            "color/surface/default"
+          ],
+          "children": [
+            {
+              "nodeId": "1:377",
+              "type": "INSTANCE",
+              "name": "Button:保存",
+              "specId": "appointment-form.action.save",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 8,
+                "right": 16,
+                "bottom": 8,
+                "left": 16
+              },
+              "width": 364,
+              "height": 44,
+              "x": 13,
+              "y": 13,
+              "componentName": "Emphasis=primary",
+              "variantProperties": {
+                "emphasis": "primary"
+              },
+              "characters": "保存",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

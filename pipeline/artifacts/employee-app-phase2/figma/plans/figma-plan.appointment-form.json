@@ -205,7 +205,7 @@
                         "height": 36
                       }
                     ],
-                    "gap": 0,
+                    "gap": 8,
                     "alignItems": "CENTER"
                   }
                 ],

@@ -123,8 +123,7 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary",
-            "children": []
+            "color": "color/text/primary"
           },
           {
             "specId": "customer-search.page.root.header.title",
@@ -132,8 +131,7 @@
             "name": "Title",
             "characters": "客户搜索",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary",
-            "children": []
+            "color": "color/text/primary"
           }
         ],
         "height": 48,
@@ -166,8 +164,7 @@
                     "name": "Search",
                     "glyph": "search",
                     "size": 20,
-                    "color": "color/text/tertiary",
-                    "children": []
+                    "color": "color/text/tertiary"
                   },
                   {
                     "specId": "customer-search.root.content.0.children.0.placeholder",
@@ -175,8 +172,7 @@
                     "name": "Placeholder",
                     "characters": "搜索客户",
                     "textStyle": "b-mobile/label.sm",
-                    "color": "color/text/tertiary",
-                    "children": []
+                    "color": "color/text/tertiary"
                   }
                 ],
                 "height": 36,
@@ -198,8 +194,7 @@
                     "name": "Icon",
                     "glyph": "inbox",
                     "size": 40,
-                    "color": "color/text/tertiary",
-                    "children": []
+                    "color": "color/text/tertiary"
                   },
                   {
                     "specId": "customer-search.state.idle.title",
@@ -208,8 +203,7 @@
                     "characters": "输入姓名或脱敏手机号搜索客户",
                     "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary",
-                    "align": "CENTER",
-                    "children": []
+                    "align": "CENTER"
                   },
                   {
                     "specId": "customer-search.state.idle.desc",
@@ -218,8 +212,7 @@
                     "characters": "输入关键词后显示匹配结果",
                     "textStyle": "b-mobile/label.sm",
                     "color": "color/text/tertiary",
-                    "align": "CENTER",
-                    "children": []
+                    "align": "CENTER"
                   }
                 ],
                 "padding": 24,
@@ -243,8 +236,8 @@
     "clip": true
   },
   "stats": {
-    "frames": 15,
-    "texts": 10,
+    "frames": 6,
+    "texts": 4,
     "instances": 0,
     "icons": 3,
     "images": 0

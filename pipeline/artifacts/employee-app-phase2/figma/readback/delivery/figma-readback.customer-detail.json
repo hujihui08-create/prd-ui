@@ -1,0 +1,1136 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "customer-detail",
+  "builtAt": "2026-10-26T07:55:44.233Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "1:137",
+      "type": "FRAME",
+      "name": "客户详情",
+      "specId": "customer-detail.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "1:138",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "customer-detail.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:139",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "customer-detail.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": []
+            },
+            {
+              "nodeId": "1:140",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "customer-detail.page.root.header.title",
+              "width": 64,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "客户详情",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeId": "1:141",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "customer-detail.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "width": 390,
+          "height": 726,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:142",
+              "type": "FRAME",
+              "name": "Card",
+              "specId": "customer-detail.root.summary.0",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 406,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/surface/default"
+              ],
+              "children": [
+                {
+                  "nodeId": "1:143",
+                  "type": "FRAME",
+                  "name": "Head",
+                  "specId": "customer-detail.root.summary.0.head",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 24,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "1:144",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "customer-detail.root.summary.0.title",
+                      "width": 96,
+                      "height": 24,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/primary"
+                      ],
+                      "textStyleName": "b-mobile/heading.2",
+                      "characters": "客户详情摘要",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "SemiBold"
+                      },
+                      "fontSize": 16,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "1:145",
+                  "type": "FRAME",
+                  "name": "Body",
+                  "specId": "customer-detail.root.summary.0.body",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 342,
+                  "x": 16,
+                  "y": 48,
+                  "children": [
+                    {
+                      "nodeId": "1:146",
+                      "type": "FRAME",
+                      "name": "List",
+                      "specId": "customer-detail.root.summary.0.children.0",
+                      "layoutMode": "VERTICAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 342,
+                      "x": 0,
+                      "y": 0,
+                      "children": [
+                        {
+                          "nodeId": "1:147",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.0",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 0,
+                          "children": [
+                            {
+                              "nodeId": "1:148",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.0.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:149",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.0.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "姓名",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:150",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.0.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "张女士",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:151",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.1",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 38,
+                          "children": [
+                            {
+                              "nodeId": "1:152",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.1.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:153",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.1.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "手机号",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:154",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.1.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "138****0000",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:155",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.2",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 76,
+                          "children": [
+                            {
+                              "nodeId": "1:156",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.2.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:157",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.2.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "等级",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:158",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.2.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "金卡会员",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:159",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.3",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 114,
+                          "children": [
+                            {
+                              "nodeId": "1:160",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.3.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:161",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.3.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "余额",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:162",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.3.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "¥1,280.00",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:163",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.4",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 152,
+                          "children": [
+                            {
+                              "nodeId": "1:164",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.4.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:165",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.4.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "累计消费",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:166",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.4.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "¥8,600.00",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:167",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.5",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 190,
+                          "children": [
+                            {
+                              "nodeId": "1:168",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.5.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:169",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.5.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "卡张数",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:170",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.5.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "3",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:171",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.6",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 228,
+                          "children": [
+                            {
+                              "nodeId": "1:172",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.6.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:173",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.6.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "标签",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:174",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.6.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "敏感肌、老客",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:175",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.7",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 266,
+                          "children": [
+                            {
+                              "nodeId": "1:176",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.7.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:177",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.7.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "备注",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:178",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.7.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "—",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "1:179",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "customer-detail.root.summary.0.children.0.row.8",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 304,
+                          "children": [
+                            {
+                              "nodeId": "1:180",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "customer-detail.root.summary.0.children.0.row.8.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "1:181",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "customer-detail.root.summary.0.children.0.row.8.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "服务记录",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "1:182",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "customer-detail.root.summary.0.children.0.row.8.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "10-20 · 小气泡 · A1020",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeId": "1:183",
+              "type": "FRAME",
+              "name": "Row",
+              "specId": "customer-detail.root.fields.0",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 36,
+              "x": 0,
+              "y": 406,
+              "children": [
+                {
+                  "nodeId": "1:184",
+                  "type": "INSTANCE",
+                  "name": "Button:新增预约",
+                  "specId": "customer-detail.action.new-appointment",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 84,
+                  "height": 36,
+                  "x": 0,
+                  "y": 0,
+                  "componentName": "Emphasis=ghost",
+                  "variantProperties": {
+                    "emphasis": "ghost"
+                  },
+                  "characters": "新增预约",
+                  "children": []
+                },
+                {
+                  "nodeId": "1:186",
+                  "type": "INSTANCE",
+                  "name": "Button:查看告知",
+                  "specId": "customer-detail.action.view-notice",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 84,
+                  "height": 36,
+                  "x": 92,
+                  "y": 0,
+                  "componentName": "Emphasis=ghost",
+                  "variantProperties": {
+                    "emphasis": "ghost"
+                  },
+                  "characters": "查看告知",
+                  "children": []
+                },
+                {
+                  "nodeId": "1:188",
+                  "type": "INSTANCE",
+                  "name": "Button:回访登记",
+                  "specId": "customer-detail.action.callback",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 84,
+                  "height": 36,
+                  "x": 184,
+                  "y": 0,
+                  "componentName": "Emphasis=ghost",
+                  "variantProperties": {
+                    "emphasis": "ghost"
+                  },
+                  "characters": "回访登记",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nodeId": "1:190",
+          "type": "FRAME",
+          "name": "Actions",
+          "specId": "customer-detail.page.root.actions",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "width": 390,
+          "height": 70,
+          "x": 0,
+          "y": 774,
+          "fills": [
+            "color/surface/default"
+          ],
+          "children": [
+            {
+              "nodeId": "1:191",
+              "type": "INSTANCE",
+              "name": "Button:查看预约",
+              "specId": "customer-detail.action.view-appointment",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 8,
+                "right": 16,
+                "bottom": 8,
+                "left": 16
+              },
+              "width": 364,
+              "height": 44,
+              "x": 13,
+              "y": 13,
+              "componentName": "Emphasis=primary",
+              "variantProperties": {
+                "emphasis": "primary"
+              },
+              "characters": "查看预约",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,1368 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "appointment-detail",
+  "builtAt": "2026-10-26T07:51:38.766Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "2:1784",
+      "type": "FRAME",
+      "name": "预约详情",
+      "specId": "appointment-detail.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "2:1785",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "appointment-detail.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1786",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "appointment-detail.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": []
+            },
+            {
+              "nodeId": "2:1787",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "appointment-detail.page.root.header.title",
+              "width": 64,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "预约详情",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeId": "2:1788",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "appointment-detail.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "width": 390,
+          "height": 726,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1789",
+              "type": "FRAME",
+              "name": "Card",
+              "specId": "appointment-detail.card.summary",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 482,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/surface/default"
+              ],
+              "children": [
+                {
+                  "nodeId": "2:1790",
+                  "type": "FRAME",
+                  "name": "Head",
+                  "specId": "appointment-detail.card.summary.head",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 24,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "2:1791",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "appointment-detail.card.summary.title",
+                      "width": 96,
+                      "height": 24,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/primary"
+                      ],
+                      "textStyleName": "b-mobile/heading.2",
+                      "characters": "预约详情摘要",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "SemiBold"
+                      },
+                      "fontSize": 16,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "2:1792",
+                      "type": "FRAME",
+                      "name": "Badge",
+                      "specId": "appointment-detail.card.summary.badge",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 6,
+                        "bottom": 0,
+                        "left": 6
+                      },
+                      "width": 48,
+                      "height": 20,
+                      "x": 310,
+                      "y": 2,
+                      "fills": [
+                        "color/status/warning"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "2:1793",
+                          "type": "TEXT",
+                          "name": "Label",
+                          "specId": "appointment-detail.card.summary.badge.label",
+                          "width": 36,
+                          "height": 16,
+                          "x": 6,
+                          "y": 2,
+                          "fills": [
+                            "color/status/warning"
+                          ],
+                          "textStyleName": "b-mobile/label.strong",
+                          "characters": "已登记",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 12,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "2:1794",
+                  "type": "FRAME",
+                  "name": "Body",
+                  "specId": "appointment-detail.card.summary.body",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 418,
+                  "x": 16,
+                  "y": 48,
+                  "children": [
+                    {
+                      "nodeId": "2:1795",
+                      "type": "FRAME",
+                      "name": "List",
+                      "specId": "appointment-detail.root.summary.0.children.0",
+                      "layoutMode": "VERTICAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 418,
+                      "x": 0,
+                      "y": 0,
+                      "children": [
+                        {
+                          "nodeId": "2:1796",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.0",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 0,
+                          "children": [
+                            {
+                              "nodeId": "2:1797",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.0.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1798",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.0.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "客户",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1799",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.0.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "张女士",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1800",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.1",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 38,
+                          "children": [
+                            {
+                              "nodeId": "2:1801",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.1.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1802",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.1.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "手机号",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1803",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.1.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "138****0000",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1804",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.2",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 76,
+                          "children": [
+                            {
+                              "nodeId": "2:1805",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.2.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1806",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.2.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "项目",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1807",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.2.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "小气泡",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1808",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.3",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 114,
+                          "children": [
+                            {
+                              "nodeId": "2:1809",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.3.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1810",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.3.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "时间段",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1811",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.3.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "11-05 周三 10:00-11:00",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1812",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.4",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 152,
+                          "children": [
+                            {
+                              "nodeId": "2:1813",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.4.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1814",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.4.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "护理师",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1815",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.4.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "王美容",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1816",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.5",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 190,
+                          "children": [
+                            {
+                              "nodeId": "2:1817",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.5.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1818",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.5.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "门店",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1819",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.5.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "星光店",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1820",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.6",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 228,
+                          "children": [
+                            {
+                              "nodeId": "2:1821",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.6.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1822",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.6.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "来源",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1823",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.6.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "电话",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1824",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.7",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 266,
+                          "children": [
+                            {
+                              "nodeId": "2:1825",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.7.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1826",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.7.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "创建人",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1827",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.7.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "王美容",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1828",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.8",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 304,
+                          "children": [
+                            {
+                              "nodeId": "2:1829",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.8.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1830",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.8.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "创建时间",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1831",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.8.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "2026-11-01 15:20",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1832",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.9",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 342,
+                          "children": [
+                            {
+                              "nodeId": "2:1833",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.9.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1834",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.9.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "委派留痕",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1835",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.9.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "—",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1836",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "appointment-detail.root.summary.0.children.0.row.10",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 380,
+                          "children": [
+                            {
+                              "nodeId": "2:1837",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.10.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1838",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "appointment-detail.root.summary.0.children.0.row.10.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "服务完成",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1839",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "appointment-detail.root.summary.0.children.0.row.10.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "否",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeId": "2:1840",
+              "type": "FRAME",
+              "name": "Row",
+              "specId": "appointment-detail.root.fields.0",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 36,
+              "x": 0,
+              "y": 482,
+              "children": [
+                {
+                  "nodeId": "2:1841",
+                  "type": "INSTANCE",
+                  "name": "Button:改期",
+                  "specId": "appointment-detail.action.reschedule",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 58,
+                  "height": 36,
+                  "x": 0,
+                  "y": 0,
+                  "componentName": "Emphasis=ghost",
+                  "variantProperties": {
+                    "emphasis": "ghost"
+                  },
+                  "characters": "改期",
+                  "children": []
+                },
+                {
+                  "nodeId": "2:1843",
+                  "type": "INSTANCE",
+                  "name": "Button:客户详情",
+                  "specId": "appointment-detail.action.customer",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 84,
+                  "height": 36,
+                  "x": 66,
+                  "y": 0,
+                  "componentName": "Emphasis=ghost",
+                  "variantProperties": {
+                    "emphasis": "ghost"
+                  },
+                  "characters": "客户详情",
+                  "children": []
+                },
+                {
+                  "nodeId": "2:1845",
+                  "type": "INSTANCE",
+                  "name": "Button:取消",
+                  "specId": "appointment-detail.action.cancel",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 8,
+                    "right": 16,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "width": 58,
+                  "height": 36,
+                  "x": 158,
+                  "y": 0,
+                  "componentName": "Emphasis=danger",
+                  "variantProperties": {
+                    "emphasis": "danger"
+                  },
+                  "characters": "取消",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nodeId": "2:1847",
+          "type": "FRAME",
+          "name": "Actions",
+          "specId": "appointment-detail.page.root.actions",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "width": 390,
+          "height": 70,
+          "x": 0,
+          "y": 774,
+          "fills": [
+            "color/surface/default"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1848",
+              "type": "INSTANCE",
+              "name": "Button:已到店确认",
+              "specId": "appointment-detail.action.checkin",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 8,
+                "right": 16,
+                "bottom": 8,
+                "left": 16
+              },
+              "width": 178,
+              "height": 44,
+              "x": 13,
+              "y": 13,
+              "componentName": "Emphasis=primary",
+              "variantProperties": {
+                "emphasis": "primary"
+              },
+              "characters": "已到店确认",
+              "children": []
+            },
+            {
+              "nodeId": "2:1850",
+              "type": "INSTANCE",
+              "name": "Button:开单",
+              "specId": "appointment-detail.action.open-order",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 8,
+                "right": 16,
+                "bottom": 8,
+                "left": 16
+              },
+              "width": 178,
+              "height": 44,
+              "x": 199,
+              "y": 13,
+              "componentName": "Emphasis=secondary",
+              "variantProperties": {
+                "emphasis": "secondary"
+              },
+              "characters": "开单",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

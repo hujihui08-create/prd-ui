@@ -297,7 +297,7 @@
                             "justifyContent": "CENTER"
                           }
                         ],
-                        "gap": 0,
+                        "gap": 8,
                         "alignItems": "CENTER"
                       }
                     ],

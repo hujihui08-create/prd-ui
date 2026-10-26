@@ -1,0 +1,1030 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "treatment-notice",
+  "builtAt": "2026-10-26T07:51:43.998Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "2:1853",
+      "type": "FRAME",
+      "name": "术后告知",
+      "specId": "treatment-notice.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "2:1854",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "treatment-notice.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1855",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "treatment-notice.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": []
+            },
+            {
+              "nodeId": "2:1856",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "treatment-notice.page.root.header.title",
+              "width": 64,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "术后告知",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeId": "2:1857",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "treatment-notice.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "width": 390,
+          "height": 726,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1858",
+              "type": "FRAME",
+              "name": "Card",
+              "specId": "treatment-notice.card.summary",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 216,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/surface/default"
+              ],
+              "children": [
+                {
+                  "nodeId": "2:1859",
+                  "type": "FRAME",
+                  "name": "Head",
+                  "specId": "treatment-notice.card.summary.head",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 24,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "2:1860",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "treatment-notice.card.summary.title",
+                      "width": 96,
+                      "height": 24,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/primary"
+                      ],
+                      "textStyleName": "b-mobile/heading.2",
+                      "characters": "术后告知摘要",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "SemiBold"
+                      },
+                      "fontSize": 16,
+                      "children": []
+                    },
+                    {
+                      "nodeId": "2:1861",
+                      "type": "FRAME",
+                      "name": "Badge",
+                      "specId": "treatment-notice.card.summary.badge",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 6,
+                        "bottom": 0,
+                        "left": 6
+                      },
+                      "width": 48,
+                      "height": 20,
+                      "x": 310,
+                      "y": 2,
+                      "fills": [
+                        "color/status/warning"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "2:1862",
+                          "type": "TEXT",
+                          "name": "Label",
+                          "specId": "treatment-notice.card.summary.badge.label",
+                          "width": 36,
+                          "height": 16,
+                          "x": 6,
+                          "y": 2,
+                          "fills": [
+                            "color/status/warning"
+                          ],
+                          "textStyleName": "b-mobile/label.strong",
+                          "characters": "未确认",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 12,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "2:1863",
+                  "type": "FRAME",
+                  "name": "Body",
+                  "specId": "treatment-notice.card.summary.body",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 152,
+                  "x": 16,
+                  "y": 48,
+                  "children": [
+                    {
+                      "nodeId": "2:1864",
+                      "type": "FRAME",
+                      "name": "List",
+                      "specId": "treatment-notice.root.summary.0.children.0",
+                      "layoutMode": "VERTICAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 152,
+                      "x": 0,
+                      "y": 0,
+                      "children": [
+                        {
+                          "nodeId": "2:1865",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "treatment-notice.root.summary.0.children.0.row.0",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 0,
+                          "children": [
+                            {
+                              "nodeId": "2:1866",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.0.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1867",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "treatment-notice.root.summary.0.children.0.row.0.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "客户",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1868",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.0.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "张女士",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1869",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "treatment-notice.root.summary.0.children.0.row.1",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 38,
+                          "children": [
+                            {
+                              "nodeId": "2:1870",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.1.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1871",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "treatment-notice.root.summary.0.children.0.row.1.labelText",
+                                  "width": 24,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "单号",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1872",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.1.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "SO20261102001",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1873",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "treatment-notice.root.summary.0.children.0.row.2",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 76,
+                          "children": [
+                            {
+                              "nodeId": "2:1874",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.2.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1875",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "treatment-notice.root.summary.0.children.0.row.2.labelText",
+                                  "width": 36,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "确认人",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1876",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.2.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "—",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "nodeId": "2:1877",
+                          "type": "FRAME",
+                          "name": "Row",
+                          "specId": "treatment-notice.root.summary.0.children.0.row.3",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 12,
+                          "padding": {
+                            "top": 10,
+                            "right": 0,
+                            "bottom": 10,
+                            "left": 0
+                          },
+                          "width": 358,
+                          "height": 38,
+                          "x": 0,
+                          "y": 114,
+                          "children": [
+                            {
+                              "nodeId": "2:1878",
+                              "type": "FRAME",
+                              "name": "Label",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.3.label",
+                              "layoutMode": "HORIZONTAL",
+                              "itemSpacing": 0,
+                              "padding": {
+                                "top": 0,
+                                "right": 0,
+                                "bottom": 0,
+                                "left": 0
+                              },
+                              "width": 72,
+                              "height": 16,
+                              "x": 0,
+                              "y": 11,
+                              "children": [
+                                {
+                                  "nodeId": "2:1879",
+                                  "type": "TEXT",
+                                  "name": "Label",
+                                  "specId": "treatment-notice.root.summary.0.children.0.row.3.labelText",
+                                  "width": 48,
+                                  "height": 16,
+                                  "x": 0,
+                                  "y": 0,
+                                  "fills": [
+                                    "color/text/tertiary"
+                                  ],
+                                  "textStyleName": "b-mobile/label.sm",
+                                  "characters": "确认时间",
+                                  "fontName": {
+                                    "family": "Noto Sans SC",
+                                    "style": "Regular"
+                                  },
+                                  "fontSize": 12,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "nodeId": "2:1880",
+                              "type": "TEXT",
+                              "name": "Value",
+                              "specId": "treatment-notice.root.summary.0.children.0.row.3.value",
+                              "width": 274,
+                              "height": 18,
+                              "x": 84,
+                              "y": 10,
+                              "fills": [
+                                "color/text/primary"
+                              ],
+                              "textStyleName": "b-mobile/body.md",
+                              "characters": "—",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Medium"
+                              },
+                              "fontSize": 13,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeId": "2:1881",
+              "type": "FRAME",
+              "name": "Row",
+              "specId": "treatment-notice.root.summary.1",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 22,
+              "x": 0,
+              "y": 216,
+              "children": [
+                {
+                  "nodeId": "2:1882",
+                  "type": "TEXT",
+                  "name": "Text",
+                  "specId": "treatment-notice.root.summary.1.children.0",
+                  "width": 60,
+                  "height": 22,
+                  "x": 0,
+                  "y": 0,
+                  "fills": [
+                    "color/text/primary"
+                  ],
+                  "textStyleName": "b-mobile/heading.3",
+                  "characters": "告知内容",
+                  "fontName": {
+                    "family": "Noto Sans SC",
+                    "style": "SemiBold"
+                  },
+                  "fontSize": 15,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "nodeId": "2:1883",
+              "type": "FRAME",
+              "name": "Card",
+              "specId": "treatment-notice.root.summary.2",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 100,
+              "x": 0,
+              "y": 238,
+              "fills": [
+                "color/surface/default"
+              ],
+              "children": [
+                {
+                  "nodeId": "2:1884",
+                  "type": "FRAME",
+                  "name": "Head",
+                  "specId": "treatment-notice.root.summary.2.head",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 24,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "2:1885",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "treatment-notice.root.summary.2.title",
+                      "width": 48,
+                      "height": 24,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/primary"
+                      ],
+                      "textStyleName": "b-mobile/heading.2",
+                      "characters": "小气泡",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "SemiBold"
+                      },
+                      "fontSize": 16,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "2:1886",
+                  "type": "FRAME",
+                  "name": "Body",
+                  "specId": "treatment-notice.root.summary.2.body",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 36,
+                  "x": 16,
+                  "y": 48,
+                  "children": [
+                    {
+                      "nodeId": "2:1887",
+                      "type": "FRAME",
+                      "name": "List",
+                      "specId": "treatment-notice.root.summary.2.children.0",
+                      "layoutMode": "VERTICAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 0,
+                      "children": [
+                        {
+                          "nodeId": "2:1888",
+                          "type": "TEXT",
+                          "name": "Item",
+                          "specId": "treatment-notice.root.summary.2.children.0.row.0",
+                          "width": 358,
+                          "height": 18,
+                          "x": 0,
+                          "y": 0,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "术后 6 小时内避免沾水与化妆",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        },
+                        {
+                          "nodeId": "2:1889",
+                          "type": "TEXT",
+                          "name": "Item",
+                          "specId": "treatment-notice.root.summary.2.children.0.row.1",
+                          "width": 358,
+                          "height": 18,
+                          "x": 0,
+                          "y": 18,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "当日避免剧烈运动与高温环境",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeId": "2:1890",
+              "type": "FRAME",
+              "name": "Card",
+              "specId": "treatment-notice.root.summary.3",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 100,
+              "x": 0,
+              "y": 338,
+              "fills": [
+                "color/surface/default"
+              ],
+              "children": [
+                {
+                  "nodeId": "2:1891",
+                  "type": "FRAME",
+                  "name": "Head",
+                  "specId": "treatment-notice.root.summary.3.head",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 24,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "2:1892",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "treatment-notice.root.summary.3.title",
+                      "width": 32,
+                      "height": 24,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/primary"
+                      ],
+                      "textStyleName": "b-mobile/heading.2",
+                      "characters": "补水",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "SemiBold"
+                      },
+                      "fontSize": 16,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "nodeId": "2:1893",
+                  "type": "FRAME",
+                  "name": "Body",
+                  "specId": "treatment-notice.root.summary.3.body",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 36,
+                  "x": 16,
+                  "y": 48,
+                  "children": [
+                    {
+                      "nodeId": "2:1894",
+                      "type": "FRAME",
+                      "name": "List",
+                      "specId": "treatment-notice.root.summary.3.children.0",
+                      "layoutMode": "VERTICAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 0,
+                      "children": [
+                        {
+                          "nodeId": "2:1895",
+                          "type": "TEXT",
+                          "name": "Item",
+                          "specId": "treatment-notice.root.summary.3.children.0.row.0",
+                          "width": 358,
+                          "height": 18,
+                          "x": 0,
+                          "y": 0,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "术后加强保湿与防晒",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        },
+                        {
+                          "nodeId": "2:1896",
+                          "type": "TEXT",
+                          "name": "Item",
+                          "specId": "treatment-notice.root.summary.3.children.0.row.1",
+                          "width": 358,
+                          "height": 18,
+                          "x": 0,
+                          "y": 18,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/body.md",
+                          "characters": "24 小时内避免桑拿与高温环境",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Medium"
+                          },
+                          "fontSize": 13,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeId": "2:1897",
+              "type": "FRAME",
+              "name": "Row",
+              "specId": "treatment-notice.root.fields.0",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 4,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 100,
+              "x": 0,
+              "y": 438,
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeId": "2:1898",
+          "type": "FRAME",
+          "name": "Actions",
+          "specId": "treatment-notice.page.root.actions",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "width": 390,
+          "height": 70,
+          "x": 0,
+          "y": 774,
+          "fills": [
+            "color/surface/default"
+          ],
+          "children": [
+            {
+              "nodeId": "2:1899",
+              "type": "INSTANCE",
+              "name": "Button:确认已当面告知",
+              "specId": "treatment-notice.action.confirm",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 8,
+                "right": 16,
+                "bottom": 8,
+                "left": 16
+              },
+              "width": 364,
+              "height": 44,
+              "x": 13,
+              "y": 13,
+              "componentName": "Emphasis=primary",
+              "variantProperties": {
+                "emphasis": "primary"
+              },
+              "characters": "确认已当面告知",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}
