@@ -443,3 +443,20 @@ export const FigmaDiffSchema: z.ZodType<FigmaDiff> = z
     blockerCount: z.number().int().nonnegative(),
   })
   .strict();
+
+/**
+ * Human Figma signoff block (`<!-- signoff { ... } -->`). It binds the five
+ * evidence hashes; any evidence change makes the previous block stale.
+ */
+export const FigmaSignoffBlockSchema = z
+  .object({
+    signer: z.string().min(1),
+    date: z.string().min(1),
+    planHash: z.string().min(1),
+    readbackHash: z.string().min(1),
+    conformanceHash: z.string().min(1),
+    parityHash: z.string().min(1),
+    baselineHash: z.string().min(1),
+  })
+  .strict();
+export type FigmaSignoffBlock = z.infer<typeof FigmaSignoffBlockSchema>;

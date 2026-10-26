@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FigmaPlanSchema,
   FigmaReadbackSchema,
+  FigmaSignoffBlockSchema,
   type FigmaPlan,
   type FigmaReadback,
 } from "../src/index.js";
@@ -156,5 +157,37 @@ describe("figma contracts", () => {
       root: { ...plan.root, mapping: "maybe" },
     };
     expect(FigmaPlanSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  it("accepts a figma signoff block", () => {
+    expect(
+      FigmaSignoffBlockSchema.safeParse({
+        signer: "tester",
+        date: "2026-10-26",
+        planHash: "sha256:a",
+        readbackHash: "sha256:b",
+        conformanceHash: "sha256:c",
+        parityHash: "sha256:d",
+        baselineHash: "sha256:e",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rejects a partial or extended figma signoff block", () => {
+    const block = {
+      signer: "tester",
+      date: "2026-10-26",
+      planHash: "sha256:a",
+      readbackHash: "sha256:b",
+      conformanceHash: "sha256:c",
+      parityHash: "sha256:d",
+      baselineHash: "sha256:e",
+    };
+    expect(
+      FigmaSignoffBlockSchema.safeParse({ ...block, parityHash: undefined }).success
+    ).toBe(false);
+    expect(
+      FigmaSignoffBlockSchema.safeParse({ ...block, extra: "not allowed" }).success
+    ).toBe(false);
   });
 });
