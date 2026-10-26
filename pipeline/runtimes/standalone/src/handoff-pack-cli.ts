@@ -217,6 +217,7 @@ async function loadSpecs(specRun: string): Promise<LoadedSpec[]> {
   }
   if (files.length === 0) throw new Error(`SPEC_RUN_EMPTY: ${dir}`);
   const specs: LoadedSpec[] = [];
+  const seen = new Map<string, string>();
   for (const file of files) {
     const absolute = path.join(dir, file);
     const raw = await readJson(absolute);
@@ -224,6 +225,12 @@ async function loadSpecs(specRun: string): Promise<LoadedSpec[]> {
     if (!parsed.success) {
       throw new Error(`PAGE_SPEC_INVALID: ${file}: ${parsed.error.message}`);
     }
+    const pageId = parsed.data.meta.pageId;
+    const existing = seen.get(pageId);
+    if (existing !== undefined) {
+      throw new Error(`SPEC_PAGE_DUPLICATE: ${pageId} (${existing}, ${file})`);
+    }
+    seen.set(pageId, file);
     specs.push({ spec: parsed.data, file: absolute });
   }
   return specs.sort((left, right) =>
@@ -494,11 +501,17 @@ interface BaselineCase {
   sha256: string;
 }
 
-async function loadBaselineCases(manifestFile: string): Promise<BaselineCase[]> {
+interface LoadedBaseline {
+  project: string;
+  cases: BaselineCase[];
+}
+
+async function loadBaselineManifest(manifestFile: string): Promise<LoadedBaseline> {
   const raw = await readJson(manifestFile);
   if (!isRecord(raw) || !Array.isArray(raw.cases)) {
     throw new Error(`BASELINE_MANIFEST_INVALID: ${manifestFile}`);
   }
+  const project = stringField(raw, "project", manifestFile);
   const cases: BaselineCase[] = [];
   for (const entry of raw.cases) {
     if (!isRecord(entry)) {
@@ -510,7 +523,7 @@ async function loadBaselineCases(manifestFile: string): Promise<BaselineCase[]> 
       sha256: stringField(entry, "sha256", manifestFile),
     });
   }
-  return cases;
+  return { project, cases };
 }
 
 interface AssetManifest {
@@ -1012,6 +1025,15 @@ async function planVisualEvidence(
         const chosen =
           cases.find((entry) => entry.state === "default") ??
           [...cases].sort((left, right) => compareStrings(left.id, right.id))[0]!;
+        if (!isSafeRelative(chosen.file)) {
+          issues.push(
+            blocker(
+              "HANDOFF_GATE_FAILED",
+              `visual manifest has an unsafe screenshot path (${chosen.file})`
+            )
+          );
+          continue;
+        }
         // Manifest paths are relative to the run directory (e.g.
         // "screenshots/<caseId>.png").
         const source = path.join(visualRun, chosen.file);
@@ -1183,7 +1205,24 @@ async function planVisualEvidence(
   }
 
   if (baseline !== undefined) {
-    const cases = await loadBaselineCases(baseline.manifestFile);
+    const loaded = await loadBaselineManifest(baseline.manifestFile);
+    if (loaded.cases.length === 0) {
+      issues.push(
+        blocker(
+          "HANDOFF_GATE_FAILED",
+          `baseline manifest has no cases (${baseline.manifestFile})`
+        )
+      );
+    }
+    if (loaded.project !== build.project) {
+      issues.push(
+        blocker(
+          "HANDOFF_GATE_FAILED",
+          `baseline project mismatch: ${loaded.project} != ${build.project}`
+        )
+      );
+    }
+    const cases = loaded.cases;
     if (baseline.directory !== undefined) {
       for (const entry of cases) {
         if (!isSafeRelative(entry.file)) {

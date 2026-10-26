@@ -69,9 +69,10 @@ export async function collectFiles(
 }
 
 /**
- * Zip the whole directory. A fixed 1980-01-01 timestamp avoids per-run drift
- * (fflate otherwise stamps the current time) so repeated packs on one host
- * produce the same archive bytes.
+ * Zip the whole directory. fflate otherwise stamps every entry with the
+ * current time; a fixed 1980-01-01 timestamp removes that per-run drift.
+ * Archive bytes still differ between packs because the embedded manifest's
+ * generatedAt changes, so this is not a byte-identical reproducibility claim.
  */
 export async function writeHandoffZip(root: string, outFile: string): Promise<HandoffFile> {
   const target = path.resolve(outFile);
