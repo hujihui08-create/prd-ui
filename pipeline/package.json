@@ -19,6 +19,7 @@
     "figma:plan": "tsx runtimes/standalone/src/figma-cli.ts plan",
     "figma:verify": "tsx runtimes/standalone/src/figma-cli.ts verify",
     "figma:conformance": "tsx runtimes/standalone/src/figma-conformance-cli.ts",
+    "figma:parity": "tsx runtimes/standalone/src/figma-parity-cli.ts",
     "figma:serve": "tsx runtimes/standalone/src/figma-serve-cli.ts",
     "asset:compile": "tsx runtimes/standalone/src/asset-compile-cli.ts",
     "studio:prepare": "tsx runtimes/standalone/src/studio-prepare-cli.ts",

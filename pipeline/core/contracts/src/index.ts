@@ -19,3 +19,4 @@ export * from "./findings.js";
 export * from "./run.js";
 export * from "./figma.js";
 export * from "./conformance.js";
+export * from "./parity.js";
