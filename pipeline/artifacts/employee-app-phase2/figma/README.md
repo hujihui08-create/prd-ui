@@ -125,6 +125,7 @@ The local plan server used for this run is a throwaway script (`node:http` servi
 
 ## Caveats
 
+- **The v0.7 regenerated plans invalidate this v0.6 evidence**: the card/quick-action/calendar/list style corrections mean the checked-in `readback/` and `diff/` are stale, and `figma:verify` is not green again until the 8 Figma pages are rebuilt and fresh readbacks are captured.
 - Figma scratch pages are volatile: closing the tab before copying readbacks loses them.
 - The registered development plugin points at `~/Downloads/prd-ui-figma/`; after
   `pnpm --dir runtimes/figma build`, copy `dist/{code.js,ui.html}` there or Figma runs the

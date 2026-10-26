@@ -251,6 +251,20 @@ describe("compileFigmaPlans", () => {
     }
   });
 
+  it("keeps the 8px head→body rhythm on the derived card body frame", () => {
+    const today = plans.find((plan) => plan.pageId === "today")!;
+    let body: FigmaPlanNode | undefined;
+    walk(today.root, (node) => {
+      if (node.specId === "today.card.quick-actions.body") body = node;
+    });
+    // `.card-body` supplies the rhythm with margin-top:8px; the card itself has
+    // no flex gap. The body frame is derived and non-material, so conformance
+    // does not compare it, but Figma must still render the 8px offset.
+    expect(body?.origin).toBe("derived");
+    expect(body?.paddingTop).toBe(8);
+    expect(body?.paddingLeft).toBeUndefined();
+  });
+
   it("pads quick actions with the UA button padding from the CSS", () => {
     const today = plans.find((plan) => plan.pageId === "today")!;
     const quick: FigmaPlanNode[] = [];

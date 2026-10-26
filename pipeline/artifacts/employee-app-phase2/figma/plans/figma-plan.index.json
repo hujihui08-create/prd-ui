@@ -9,7 +9,7 @@
       "file": "figma-plan.appointment-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:1f802bda50c23f503da8cd1bb610a383c75ac1c43e99ff10a06579c73ebaf202"
+      "hash": "sha256:d213660a7d99fab0116e6a9db90361f4cc93198732857114e17eed43a5ab5606"
     },
     {
       "pageId": "appointment-form",
@@ -41,7 +41,7 @@
       "file": "figma-plan.customer-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:79176463cfd69c2779effe2ade296a4de84dd6ba5f686197b613251d48d10dbf"
+      "hash": "sha256:73deb76e45a7a44b94ce923e94e7b8be01f276621e3855e498dd50b0b9e76929"
     },
     {
       "pageId": "customer-search",
@@ -57,7 +57,7 @@
       "file": "figma-plan.today.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:a6a57e9721b548dceba46bf478111fa42f329b7e704a3a77cb003bd3d8d101d8"
+      "hash": "sha256:6ae924a4919cbee85b24f60134aba23f02353e4f1e189b4db4c6197b6dede9fa"
     },
     {
       "pageId": "treatment-notice",
@@ -65,7 +65,7 @@
       "file": "figma-plan.treatment-notice.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:08621288a2af509de5034651db2cb47e3fd8376824a3d8123a469750eb2d300e"
+      "hash": "sha256:0ae6c741d1ce9396a90b0da49a00ac1f637a904a1fe7e05aea983c261d8ad90b"
     }
   ]
 }

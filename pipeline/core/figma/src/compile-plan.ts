@@ -419,7 +419,9 @@ function renderCard(node: SpecNode, ctx: Ctx, specId: string, path: string): Fig
     "Body",
     "VERTICAL",
     renderChildren(childrenOf(node), ctx, `${path}.children`),
-    { gap: 0 }
+    // `.card-body { margin-top: 8px }` is the head→body rhythm. The card itself
+    // has no gap, so the derived body frame carries the offset for Figma.
+    { gap: 0, paddingTop: spacePx(ctx.profile, "2") }
   );
   return frame(specId, "Card", "VERTICAL", [
     frame(`${specId}.head`, "Head", "HORIZONTAL", head, {

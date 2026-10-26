@@ -802,6 +802,7 @@
                   }
                 ],
                 "gap": 0,
+                "paddingTop": 8,
                 "origin": "derived",
                 "mapping": "mapped"
               }

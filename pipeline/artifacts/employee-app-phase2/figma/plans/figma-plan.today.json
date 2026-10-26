@@ -399,6 +399,7 @@
                       }
                     ],
                     "gap": 0,
+                    "paddingTop": 8,
                     "origin": "derived",
                     "mapping": "mapped"
                   }
@@ -812,6 +813,7 @@
                       }
                     ],
                     "gap": 0,
+                    "paddingTop": 8,
                     "origin": "derived",
                     "mapping": "mapped"
                   }
@@ -1043,6 +1045,7 @@
                       }
                     ],
                     "gap": 0,
+                    "paddingTop": 8,
                     "origin": "derived",
                     "mapping": "mapped"
                   }
