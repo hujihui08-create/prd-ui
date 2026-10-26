@@ -151,6 +151,23 @@ describe("figma contracts", () => {
     expect(FigmaReadbackSchema.safeParse(extended).success).toBe(true);
   });
 
+  it("accepts per-side frame padding", () => {
+    const padded = {
+      ...plan,
+      root: { ...plan.root, paddingTop: 2, paddingRight: 4 },
+    };
+    const parsed = FigmaPlanSchema.safeParse(padded);
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.root.paddingTop).toBe(2);
+    expect(parsed.success && parsed.data.root.paddingRight).toBe(4);
+    expect(
+      FigmaPlanSchema.safeParse({
+        ...plan,
+        root: { ...plan.root, paddingTop: -1 },
+      }).success
+    ).toBe(false);
+  });
+
   it("rejects an unknown mapping status", () => {
     const invalid = {
       ...plan,

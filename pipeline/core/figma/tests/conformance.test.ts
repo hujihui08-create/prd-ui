@@ -131,10 +131,10 @@ function expectedStyle(plan: FigmaPlan, node: FigmaPlanNode, specId = node.specI
     return style;
   }
   style.padding = {
-    top: node.padding ?? node.paddingY ?? 0,
-    right: node.padding ?? node.paddingX ?? 0,
-    bottom: node.padding ?? node.paddingY ?? 0,
-    left: node.padding ?? node.paddingX ?? 0,
+    top: node.paddingTop ?? node.padding ?? node.paddingY ?? 0,
+    right: node.paddingRight ?? node.padding ?? node.paddingX ?? 0,
+    bottom: node.paddingBottom ?? node.padding ?? node.paddingY ?? 0,
+    left: node.paddingLeft ?? node.padding ?? node.paddingX ?? 0,
   };
   const gap = node.layoutMode === "NONE" ? 0 : (node.gap ?? 0);
   style.gap = { row: gap, column: gap };

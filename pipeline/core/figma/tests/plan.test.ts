@@ -168,7 +168,14 @@ describe("compileFigmaPlans", () => {
       if (node.name === "Row" && node.specId.includes(".row.")) detailRows.push(node);
     });
     expect(detailRows).toHaveLength(9);
-    expect(detailRows.every((node) => node.borderBottom !== undefined)).toBe(true);
+    expect(
+      detailRows.every(
+        (node, index) =>
+          index === detailRows.length - 1
+            ? node.borderBottom === undefined
+            : node.borderBottom !== undefined
+      )
+    ).toBe(true);
     expect(detailRows[0]?.children?.[0]?.children?.[0]?.textStyle).toBe("b-mobile/body.sm");
   });
 
@@ -230,5 +237,143 @@ describe("compileFigmaPlans", () => {
     expect(blocks[0]?.child?.children?.some((child) => child.characters === "16:30")).toBe(
       true
     );
+  });
+
+  it("models card rhythm with gap 0 because the CSS uses a body margin", () => {
+    for (const pageId of ["today", "customer-detail", "appointment-detail", "treatment-notice"]) {
+      const page = plans.find((entry) => entry.pageId === pageId)!;
+      const cards: FigmaPlanNode[] = [];
+      walk(page.root, (node) => {
+        if (node.name === "Card") cards.push(node);
+      });
+      expect(cards.length, pageId).toBeGreaterThan(0);
+      expect(cards.every((card) => card.gap === 0), pageId).toBe(true);
+    }
+  });
+
+  it("pads quick actions with the UA button padding from the CSS", () => {
+    const today = plans.find((plan) => plan.pageId === "today")!;
+    const quick: FigmaPlanNode[] = [];
+    walk(today.root, (node) => {
+      if (node.name === "QuickAction") quick.push(node);
+    });
+    expect(quick).toHaveLength(3);
+    for (const node of quick) {
+      expect(node.paddingX).toBe(6);
+      expect(node.paddingY).toBe(1);
+    }
+  });
+
+  it("pads a visible empty state like the inline 24/16 CSS box", () => {
+    const search = plans.find((plan) => plan.pageId === "customer-search")!;
+    let empty: FigmaPlanNode | undefined;
+    walk(search.root, (node) => {
+      if (node.specId === "customer-search.state.idle") empty = node;
+    });
+    expect(empty?.paddingY).toBe(24);
+    expect(empty?.paddingX).toBe(16);
+  });
+
+  it("models the calendar day and cell borders from the CSS grid", () => {
+    const list = plans.find((plan) => plan.pageId === "appointment-list")!;
+    const nodes: FigmaPlanNode[] = [];
+    walk(list.root, (node) => nodes.push(node));
+    const byId = (id: string): FigmaPlanNode | undefined =>
+      nodes.find((node) => node.specId === id);
+
+    const plainDay = byId("appointment-list.calendar.grid.day.0.frame")!;
+    expect(plainDay.borderLeft).toBe("color/border/subtle");
+    expect(plainDay.borderLeftWidth).toBe(1);
+    expect(plainDay.borderBottom).toBe("color/border/subtle");
+    expect(plainDay.borderBottomWidth).toBe(1);
+
+    const selectedDay = byId("appointment-list.calendar.grid.day.2.frame")!;
+    expect(selectedDay.borderLeft).toBe("color/border/subtle");
+    expect(selectedDay.borderBottom).toBe("color/status/info");
+    expect(selectedDay.borderBottomWidth).toBe(2);
+
+    const plainCell = byId("appointment-list.calendar.grid.cell.0.0.frame")!;
+    expect(plainCell.fill).toBeUndefined();
+    expect(plainCell.borderTop).toBe("color/border/subtle");
+    expect(plainCell.borderTopWidth).toBe(1);
+    expect(plainCell.borderLeft).toBe("color/border/subtle");
+    expect(plainCell.borderLeftWidth).toBe(1);
+    expect(plainCell.borderBottom).toBeUndefined();
+    expect(plainCell.stroke).toBeUndefined();
+
+    const selectedCell = byId("appointment-list.calendar.grid.cell.0.2.frame")!;
+    expect(selectedCell.fill).toBe("color/status/info");
+    expect(selectedCell.fillAlpha).toBe(0.04);
+  });
+
+  it("uses the exact hour padding and block column geometry from the CSS", () => {
+    const list = plans.find((plan) => plan.pageId === "appointment-list")!;
+    const nodes: FigmaPlanNode[] = [];
+    walk(list.root, (node) => nodes.push(node));
+    const hour = nodes.find(
+      (node) => node.specId === "appointment-list.calendar.grid.hour.0.frame"
+    )!;
+    expect(hour.paddingTop).toBe(2);
+    expect(hour.paddingRight).toBe(4);
+    expect(hour.paddingBottom).toBeUndefined();
+    expect(hour.paddingLeft).toBeUndefined();
+
+    const block = nodes.find(
+      (node) => node.specId === "appointment-list.calendar.grid.block.0"
+    )!;
+    expect(block.x).toBe(36 + 2 * 46);
+    expect(block.width).toBe(46);
+    expect(block.child?.width).toBe(46);
+  });
+
+  it("omits the bottom divider on the last list row and pads the list box", () => {
+    const detail = plans.find((plan) => plan.pageId === "appointment-detail")!;
+    const nodes: FigmaPlanNode[] = [];
+    walk(detail.root, (node) => nodes.push(node));
+    const list = nodes.find(
+      (node) => node.specId === "appointment-detail.root.summary.0.children.0"
+    )!;
+    expect(list.paddingY).toBe(4);
+    expect(list.gap).toBe(0);
+    const row = (index: number): FigmaPlanNode | undefined =>
+      nodes.find(
+        (node) =>
+          node.specId === `appointment-detail.root.summary.0.children.0.row.${index}`
+      );
+    expect(row(0)?.borderBottom).toBe("color/border/subtle");
+    expect(row(10)?.borderBottom).toBeUndefined();
+    expect(row(10)?.borderBottomWidth).toBeUndefined();
+  });
+
+  it("renders string list rows at the CSS row weight (400)", () => {
+    const notice = plans.find((plan) => plan.pageId === "treatment-notice")!;
+    let list: FigmaPlanNode | undefined;
+    walk(notice.root, (node) => {
+      if (node.specId === "treatment-notice.root.summary.2.children.0") list = node;
+    });
+    expect(list?.paddingY).toBe(4);
+    expect(list?.children?.every((child) => child.type === "TEXT")).toBe(true);
+    for (const child of list?.children ?? []) {
+      expect(child.textStyle).toBe("b-mobile/body.regular");
+      expect(notice.textStyles[child.textStyle!]?.fontWeight).toBe(400);
+    }
+  });
+
+  it("pads direct app-scroll rows but not rows nested in a section or field", () => {
+    const notice = plans.find((plan) => plan.pageId === "treatment-notice")!;
+    const detail = plans.find((plan) => plan.pageId === "appointment-detail")!;
+    const form = plans.find((plan) => plan.pageId === "appointment-form")!;
+    const find = (page: typeof notice, id: string): FigmaPlanNode | undefined => {
+      let found: FigmaPlanNode | undefined;
+      walk(page.root, (node) => {
+        if (node.specId === id) found = node;
+      });
+      return found;
+    };
+    expect(find(notice, "treatment-notice.root.summary.1")?.paddingX).toBe(16);
+    expect(find(detail, "appointment-detail.root.fields.0")?.paddingX).toBe(16);
+    expect(
+      find(form, "appointment-form.root.content.0.children.0.children.0")?.paddingX
+    ).toBeUndefined();
   });
 });

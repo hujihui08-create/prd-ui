@@ -1,6 +1,10 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { FigmaPlan, FigmaPlanNode, StyleManifest } from "@prd-ui/contracts";
 import { assertManifestUsable, parseArgs } from "../src/figma-conformance-cli.js";
+import { captureStyleManifests } from "../src/conformance/capture.js";
 
 const fixtureRoot: FigmaPlanNode = {
   specId: "fixture.root",
@@ -79,4 +83,40 @@ describe("figma:conformance manifest guard", () => {
   it("allows a zero-node manifest when every plan node is skipped", () => {
     expect(() => assertManifestUsable(emptyManifest(), fixturePlan("skipped"))).not.toThrow();
   });
+});
+
+describe("conformance style capture", () => {
+  it("skips non-rendered nodes and keeps offscreen or empty-boxed ones", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "prd-ui-capture-"));
+    try {
+      await writeFile(
+        path.join(dir, "fixture.html"),
+        `<!doctype html><html><head><style>
+          body{margin:0}
+          .offscreen{position:absolute;top:2000px;left:0;width:10px;height:10px}
+        </style></head><body>
+          <div data-node-id="visible">visible</div>
+          <div data-node-id="display-none" style="display:none">x</div>
+          <div data-node-id="visibility-hidden" style="visibility:hidden">x</div>
+          <div data-node-id="hidden-attr" hidden>x</div>
+          <div data-node-id="display-contents" style="display:contents">x</div>
+          <div class="offscreen" data-node-id="offscreen">x</div>
+          <div data-node-id="empty-visible"></div>
+        </body></html>`,
+        "utf8"
+      );
+      const [manifest] = await captureStyleManifests({
+        htmlDir: dir,
+        pages: [{ pageId: "fixture", viewport: { width: 390, height: 844 } }],
+      });
+      expect(manifest).toBeDefined();
+      expect(manifest!.nodes.map((node) => node.specId).sort()).toEqual([
+        "empty-visible",
+        "offscreen",
+        "visible",
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 120_000);
 });

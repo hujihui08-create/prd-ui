@@ -22,7 +22,11 @@ function errorMessage(error: unknown): string {
 }
 
 /**
- * Capture computed styles for every `[data-node-id]` element on each page.
+ * Capture computed styles for every rendered `[data-node-id]` element on each
+ * page. Elements that generate no box (`display:none`, `visibility:hidden`,
+ * the `hidden` attribute, `display:contents`) are skipped: plan coverage marks
+ * state-only/branch-only nodes as skipped, and hidden branches (view panels,
+ * search results, state empties) must not appear as extra HTML nodes.
  *
  * Pure observation: no color un-compositing. `backgroundColor` and border
  * colors are kept exactly as Chrome serializes them (`rgb(...)`,
@@ -80,7 +84,15 @@ export async function captureStyleManifests(
         // into the serialized function body (the browser has no such helper).
         const raw = (await tab.evaluate(`(() => {
           const px = (value) => Number.parseFloat(value) || 0;
-          return [...document.querySelectorAll("[data-node-id]")].map((el) => {
+          const rendered = (el) => {
+            if (el.hidden) return false;
+            const cs = getComputedStyle(el);
+            if (cs.display === "none" || cs.visibility === "hidden") return false;
+            // display:contents and closed <details> generate no box. Offscreen
+            // elements still have a box and must stay in the manifest.
+            return el.getClientRects().length > 0;
+          };
+          return [...document.querySelectorAll("[data-node-id]")].filter(rendered).map((el) => {
             const cs = getComputedStyle(el);
             const rect = el.getBoundingClientRect();
             return {

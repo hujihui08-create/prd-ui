@@ -422,10 +422,10 @@ function compareNode(
   }
 
   const padding = {
-    top: node.padding ?? node.paddingY ?? 0,
-    right: node.padding ?? node.paddingX ?? 0,
-    bottom: node.padding ?? node.paddingY ?? 0,
-    left: node.padding ?? node.paddingX ?? 0,
+    top: node.paddingTop ?? node.padding ?? node.paddingY ?? 0,
+    right: node.paddingRight ?? node.padding ?? node.paddingX ?? 0,
+    bottom: node.paddingBottom ?? node.padding ?? node.paddingY ?? 0,
+    left: node.paddingLeft ?? node.padding ?? node.paddingX ?? 0,
   };
   compareNumber(findings, node, "paddingTop", padding.top, style.padding.top);
   compareNumber(findings, node, "paddingRight", padding.right, style.padding.right);

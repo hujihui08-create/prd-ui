@@ -103,6 +103,7 @@ export function planTextStyles(profile: Profile): FigmaPlan["textStyles"] {
   );
   const fallback = { fontFamily: "Noto Sans SC", fontSize: 13, fontWeight: 400, lineHeight: 18 };
   const body = profile.typography["body.sm"] ?? profile.typography["body.md"] ?? fallback;
+  const bodyMd = profile.typography["body.md"] ?? body;
   const label = profile.typography["label.sm"] ?? body;
   return {
     ...base,
@@ -112,6 +113,14 @@ export function planTextStyles(profile: Profile): FigmaPlan["textStyles"] {
       fontSize: 14,
       fontWeight: 400,
       lineHeight: 18,
+    },
+    // `.list-text-row` uses the body.md size but inherits the body weight (400),
+    // unlike `.typo-body-md`, which also applies the profile weight.
+    [textStyleName(profile, "body.regular")]: {
+      fontFamily: bodyMd.fontFamily,
+      fontSize: bodyMd.fontSize,
+      fontWeight: 400,
+      lineHeight: bodyMd.lineHeight,
     },
     [textStyleName(profile, "label.bold")]: {
       fontFamily: label.fontFamily,

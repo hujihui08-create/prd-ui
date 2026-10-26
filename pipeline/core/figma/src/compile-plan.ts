@@ -67,7 +67,11 @@ function renderChildren(
   nodes: SpecNode[],
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
+  options: {
+    inFooter?: boolean;
+    inFilterRow?: boolean;
+    directAppScroll?: boolean;
+  } = {}
 ): FigmaPlanNode[] {
   return nodes.flatMap((node, index) => {
     const result = renderNode(node, ctx, `${path}.${index}`, options);
@@ -79,13 +83,24 @@ function renderNode(
   node: SpecNode,
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
+  options: {
+    inFooter?: boolean;
+    inFilterRow?: boolean;
+    directAppScroll?: boolean;
+  } = {}
 ): FigmaPlanNode | null {
   if (skipReason(node, ctx.defaultView)) return null;
   const props = node.props ?? {};
   const specId = node.id ?? `${ctx.page.meta.pageId}.${path}`;
   const inFooter = options.inFooter === true;
   const inFilterRow = options.inFilterRow === true;
+  const directAppScroll = options.directAppScroll === true;
+  // `.app-scroll > .row` gets horizontal padding from the renderer CSS. Only a
+  // row that is a direct MobileShell slot child is in that position; nested
+  // rows keep their own (zero) padding.
+  const directRowPadding = directAppScroll
+    ? { paddingX: spacePx(ctx.profile, "4") }
+    : {};
 
   switch (node.type) {
     case "MobileShell":
@@ -114,11 +129,12 @@ function renderNode(
     case "Row": {
       const isFilterRow = str(props.variant) === "filter";
       return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`, {
-        ...options,
+        inFooter,
         inFilterRow: isFilterRow,
       }), {
         gap: spacePx(ctx.profile, str(props.gap)),
         alignItems: "CENTER",
+        ...directRowPadding,
       });
     }
     case "Stack":
@@ -203,7 +219,9 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
   // Mirror renderer-html's MobileShell slot order; detail/notice archetypes put
   // their body in summary/fields, not content.
   const contentSlots = ["title", "illustration", "body", "summary", "feed", "fields", "content"] as const;
-  const content = contentSlots.flatMap((name) => renderChildren(node.slots?.[name] ?? [], ctx, name));
+  const content = contentSlots.flatMap((name) =>
+    renderChildren(node.slots?.[name] ?? [], ctx, name, { directAppScroll: true })
+  );
   const actions = node.slots?.actions ?? [];
   const nav = node.slots?.["bottom-nav"] ?? [];
   const hasTop = top.length > 0;
@@ -412,7 +430,9 @@ function renderCard(node: SpecNode, ctx: Ctx, specId: string, path: string): Fig
     body,
   ], {
     padding: spacePx(ctx.profile, "4"),
-    gap: spacePx(ctx.profile, "2"),
+    // `.card` has no gap; `.card-body` supplies the 8px head→body rhythm with a
+    // margin, which is not a flex gap on the card itself.
+    gap: 0,
     fill: colorToken("surface.default"),
     radius: radiusPx(ctx.profile, "lg"),
     shadow: true,
@@ -439,6 +459,10 @@ function renderQuickAction(props: Record<string, unknown>, ctx: Ctx, specId: str
   ], {
     height: 56,
     layoutGrow: 1,
+    // `<button class="quick-action">` sets no padding, so the UA button padding
+    // (1px block / 6px inline in Chrome) is the computed value.
+    paddingY: 1,
+    paddingX: 6,
     fill,
     fillAlpha: tone === "customer" || tone === "inventory" ? 0.1 : 1,
     radius: radiusPx(ctx.profile, "md"),
@@ -610,7 +634,7 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
           color: colorToken("text.tertiary"),
         })
       ),
-      { gap: 0 }
+      { gap: 10, paddingY: 4 }
     );
   }
   const children = items.map((item, index) => {
@@ -629,14 +653,16 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
         paddingY: 10,
         gap: spacePx(ctx.profile, "3"),
         alignItems: "CENTER",
-        borderBottom: colorToken("border.subtle"),
-        borderBottomWidth: 1,
+        // `.list-text-row:last-child` suppresses the divider on the final row.
+        ...(index === items.length - 1
+          ? {}
+          : { borderBottom: colorToken("border.subtle"), borderBottomWidth: 1 }),
       });
     }
-    return text(`${specId}.row.${index}`, "Item", String(item), ctx.profile, "body.md");
+    return text(`${specId}.row.${index}`, "Item", String(item), ctx.profile, "body.regular");
   });
   void path;
-  return frame(specId, "List", "VERTICAL", children, { gap: 0 });
+  return frame(specId, "List", "VERTICAL", children, { gap: 0, paddingY: 4 });
 }
 
 const DAY_WIDTH = 46;
@@ -684,6 +710,14 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
         gap: 1,
         alignItems: "CENTER",
         justifyContent: "CENTER",
+        // `.calendar-day` has a 1px border on its left and bottom edges; the
+        // selected underline replaces the bottom border with a 2px accent (the
+        // renderer paints it as an inset box-shadow, which the comparator's
+        // underline fallback accepts).
+        borderLeft: colorToken("border.subtle"),
+        borderLeftWidth: 1,
+        borderBottom: colorToken("border.subtle"),
+        borderBottomWidth: 1,
         ...(selected
           ? { borderBottom: colorToken("status.info"), borderBottomWidth: 2 }
           : {}),
@@ -708,7 +742,9 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       ], {
         width: TIME_WIDTH,
         height: ROW_HEIGHT,
-        paddingX: 4,
+        // `.calendar-hour` is `padding:2px 4px 0 0`.
+        paddingTop: 2,
+        paddingRight: 4,
         alignItems: "END",
         justifyContent: "START",
       }),
@@ -728,10 +764,13 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
         child: frame(`${specId}.cell.${rowIndex}.${dayIndex}.frame`, "Cell", "NONE", [], {
           width: DAY_WIDTH,
           height: ROW_HEIGHT,
-          fill: selected ? colorToken("status.info") : colorToken("surface.default"),
-          fillAlpha: selected ? 0.04 : 1,
-          stroke: colorToken("border.subtle"),
-          strokeWidth: 0.5,
+          // `.calendar-cell` is transparent with top/left 1px rules; a selected
+          // column only adds a 4% info tint.
+          ...(selected ? { fill: colorToken("status.info"), fillAlpha: 0.04 } : {}),
+          borderTop: colorToken("border.subtle"),
+          borderTopWidth: 1,
+          borderLeft: colorToken("border.subtle"),
+          borderLeftWidth: 1,
         }),
       });
     }
@@ -752,9 +791,11 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       type: "ABSOLUTE",
       specId: `${specId}.block.${index}`,
       name: `Block:${title}`,
-      x: TIME_WIDTH + day * DAY_WIDTH + 1,
+      // The block fills the whole day column; its grid cell starts at the
+      // column edge and the CSS left border is inside the box.
+      x: TIME_WIDTH + day * DAY_WIDTH,
       y: HEADER_HEIGHT + Math.max(0, startHour - 9) * ROW_HEIGHT + minuteOffset,
-      width: DAY_WIDTH - 2,
+      width: DAY_WIDTH,
       height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
       child: frame(`${specId}.block.${index}.frame`, "Block", "VERTICAL", [
         text(`${specId}.block.${index}.title`, "Title", title, ctx.profile, "label.bold"),
@@ -767,7 +808,7 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
           color: colorToken("text.tertiary"),
         }),
       ], {
-        width: DAY_WIDTH - 2,
+        width: DAY_WIDTH,
         height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
         padding: 2,
         gap: 0,
@@ -809,7 +850,9 @@ function renderEmptyState(node: SpecNode, ctx: Ctx, specId: string, path: string
         ]),
     ...renderChildren(childrenOf(node), ctx, `${path}.children`),
   ], {
-    padding: spacePx(ctx.profile, "6"),
+    // `.empty-state` is `padding: space-6 space-4` (24px block / 16px inline).
+    paddingY: spacePx(ctx.profile, "6"),
+    paddingX: spacePx(ctx.profile, "4"),
     gap: 4,
     alignItems: "CENTER",
   });

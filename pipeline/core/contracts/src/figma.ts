@@ -48,6 +48,11 @@ export interface FigmaPlanNode {
   padding?: number;
   paddingX?: number;
   paddingY?: number;
+  /** Per-side padding; overrides paddingX/paddingY/padding when present. */
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
   gap?: number;
   fill?: string;
   fillAlpha?: number;
@@ -211,6 +216,10 @@ const FigmaPlanNodeSchema: z.ZodType<FigmaPlanNode> = z.lazy(() =>
       padding: z.number().nonnegative().optional(),
       paddingX: z.number().nonnegative().optional(),
       paddingY: z.number().nonnegative().optional(),
+      paddingTop: z.number().nonnegative().optional(),
+      paddingRight: z.number().nonnegative().optional(),
+      paddingBottom: z.number().nonnegative().optional(),
+      paddingLeft: z.number().nonnegative().optional(),
       gap: z.number().nonnegative().optional(),
       fill: z.string().min(1).optional(),
       fillAlpha: z.number().min(0).max(1).optional(),

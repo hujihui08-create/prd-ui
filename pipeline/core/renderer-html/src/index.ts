@@ -395,6 +395,11 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const listArchetype = renderSpec?.meta.archetype === "mobile-list";
       const inlineLoading =
         listArchetype || renderSpec?.meta.archetype === "detail";
+      // The plan's TabBar frame corresponds to the styled `<nav class="tabbar">`
+      // wrapper, not the inner flex row.
+      const navAttrs = navNodes[0]
+        ? motionAttrs(navNodes[0], renderMotionContext)
+        : { attrs: "", style: "" };
       const header =
         top ||
         (back
@@ -406,7 +411,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   ${header}
   <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}${listArchetype ? errorPanel("inline") : ""}</main>
   ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
-  ${showTabs ? `<nav class="tabbar">${nav}</nav>` : ""}
+  ${showTabs ? `<nav class="tabbar"${navAttrs.attrs}${inlineStyle("", navAttrs.style)}>${nav}</nav>` : ""}
   ${inlineLoading ? "" : loadingPanel()}
   ${listArchetype ? "" : errorPanel("overlay")}
 </div>`;
@@ -414,7 +419,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "TopBar": {
       const storeName = str(props.storeName);
       const hasMessage = bool(props.hasMessage);
-      return `<header class="topbar">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<header class="topbar"${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="topbar-store">${esc(storeName)}<span class="material-symbols-rounded topbar-chevron">expand_more</span></div>
   ${hasMessage ? `<span class="material-symbols-rounded topbar-bell">notifications</span>` : ""}
 </header>`;
@@ -459,9 +465,10 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
 </div>`;
     }
     case "List": {
+      const listMotion = motionAttrs(node, renderMotionContext);
       if (Array.isArray(props.items)) {
         const parentId = node.id;
-        return `<div class="list-text">${(props.items as unknown[])
+        return `<div class="list-text"${listMotion.attrs}${inlineStyle("", listMotion.style)}>${(props.items as unknown[])
           .map((item, index) => {
             const rowId =
               parentId === undefined
@@ -478,7 +485,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           .join("")}</div>`;
       }
       const count = Math.min(Math.max(Number(props.items) || 3, 1), 6);
-      return `<div class="list-placeholder">${Array.from(
+      return `<div class="list-placeholder"${listMotion.attrs}${inlineStyle("", listMotion.style)}>${Array.from(
         { length: count },
         () =>
           `<div class="list-placeholder-row"><span class="skeleton-line wide"></span><span class="skeleton-line"></span><span class="skeleton-line short"></span></div>`
@@ -552,7 +559,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const inputType = str(props.inputType) || "text";
       const value = str(props.value);
       const required = bool(props.required);
-      const control = `<input class="input" name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${required ? ' required aria-required="true"' : ""}${value ? ` value="${esc(value)}"` : ""} />`;
+      const motion = motionAttrs(node, renderMotionContext);
+      const control = `<input class="input"${motion.attrs}${inlineStyle("", motion.style)} name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${required ? ' required aria-required="true"' : ""}${value ? ` value="${esc(value)}"` : ""} />`;
       if (inputType === "datetime-local") {
         return `<span class="datetime-control">${control}<span class="datetime-display" aria-hidden="true">${esc(placeholder)}</span></span>`;
       }
@@ -560,7 +568,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     }
     case "Select": {
       const options = stringArray(props.options);
-      return `<select class="select">${options
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<select class="select"${motion.attrs}${inlineStyle("", motion.style)}>${options
         .map((option) => `<option>${esc(option)}</option>`)
         .join("")}</select>`;
     }
@@ -603,14 +612,21 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const gap = str(props.gap);
       const variant = str(props.variant);
       const variantClass = variant === "filter" ? " filter-row" : "";
-      return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="row${variantClass}"${motion.attrs}${inlineStyle(`gap:${cssVar(gap)}`, motion.style)}>${children}</div>`;
     }
-    case "Stack":
-      return `<div class="stack">${children}</div>`;
-    case "Grid":
-      return `<div class="grid">${children}</div>`;
-    case "Text":
-      return `<span class="${typoClass(node.textRole)}">${esc(props.text)}</span>`;
+    case "Stack": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="stack"${motion.attrs}${inlineStyle("", motion.style)}>${children}</div>`;
+    }
+    case "Grid": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="grid"${motion.attrs}${inlineStyle("", motion.style)}>${children}</div>`;
+    }
+    case "Text": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<span class="${typoClass(node.textRole)}"${motion.attrs}${inlineStyle("", motion.style)}>${esc(props.text)}</span>`;
+    }
     case "Icon":
       return `<span class="material-symbols-rounded icon" aria-hidden="true">${iconName(str(props.name))}</span>`;
     case "QuickAction": {
@@ -736,11 +752,13 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Badge": {
       const label = str(props.label);
       const tone = str(props.tone) || "neutral";
-      return `<span class="badge tone-${esc(tone)}">${esc(label)}</span>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<span class="badge tone-${esc(tone)}"${motion.attrs}${inlineStyle("", motion.style)}>${esc(label)}</span>`;
     }
     case "SearchBar": {
       const placeholder = str(props.placeholder);
-      return `<div class="searchbar">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="searchbar"${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="material-symbols-rounded search-icon">search</span>
   <input class="search-input" data-search-input placeholder="${esc(placeholder)}" />
 </div>`;
@@ -748,7 +766,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "CollapsedFilter": {
       const label = str(props.label);
       const value = str(props.value);
-      return `<button class="filter" type="button">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<button class="filter" type="button"${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="filter-label">${esc(label)}</span>
   <span class="filter-value">${esc(value)}</span>
   <span class="material-symbols-rounded filter-chevron">expand_more</span>
@@ -764,8 +783,10 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   <span class="switch-value">${esc(value)}</span>
 </div>`;
     }
-    case "SummaryRow":
-      return `<div class="summary">${esc(props.text)}</div>`;
+    case "SummaryRow": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="summary"${motion.attrs}${inlineStyle("", motion.style)}>${esc(props.text)}</div>`;
+    }
     case "InventoryCard": {
       const attributes = Array.isArray(props.attributes)
         ? (props.attributes as Array<{ label?: unknown; value?: unknown }>)
@@ -805,7 +826,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const icon = str(props.icon);
       const emptyKind = str(props.emptyKind);
       const variant = str(props.variant);
-      return `<div class="empty-state${variant ? ` empty-${esc(variant)}` : ""}"${emptyKind ? ` data-empty-kind="${esc(emptyKind)}"` : ""}>
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="empty-state${variant ? ` empty-${esc(variant)}` : ""}"${emptyKind ? ` data-empty-kind="${esc(emptyKind)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
   ${icon ? `<span class="material-symbols-rounded empty-icon">${iconName(icon)}</span>` : ""}
   <div class="empty-title">${esc(title)}</div>
   ${description ? `<div class="empty-desc">${esc(description)}</div>` : ""}

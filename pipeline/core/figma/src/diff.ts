@@ -94,15 +94,22 @@ function flattenReadback(node: FigmaReadbackNode, parent?: FigmaReadbackNode): A
 
 function expectedPadding(node: FigmaPlanNode): { top: number; right: number; bottom: number; left: number } | undefined {
   if (node.type !== "FRAME") return undefined;
-  if (node.padding !== undefined) {
-    return { top: node.padding, right: node.padding, bottom: node.padding, left: node.padding };
+  if (
+    node.padding === undefined &&
+    node.paddingX === undefined &&
+    node.paddingY === undefined &&
+    node.paddingTop === undefined &&
+    node.paddingRight === undefined &&
+    node.paddingBottom === undefined &&
+    node.paddingLeft === undefined
+  ) {
+    return undefined;
   }
-  if (node.paddingX === undefined && node.paddingY === undefined) return undefined;
   return {
-    top: node.paddingY ?? 0,
-    right: node.paddingX ?? 0,
-    bottom: node.paddingY ?? 0,
-    left: node.paddingX ?? 0,
+    top: node.paddingTop ?? node.padding ?? node.paddingY ?? 0,
+    right: node.paddingRight ?? node.padding ?? node.paddingX ?? 0,
+    bottom: node.paddingBottom ?? node.padding ?? node.paddingY ?? 0,
+    left: node.paddingLeft ?? node.padding ?? node.paddingX ?? 0,
   };
 }
 

@@ -284,10 +284,10 @@ function applyFrameStyle(node: FigmaNode, planNode: FigmaPlanNode, plan: FigmaPl
     const padding = planNode.padding;
     const paddingX = planNode.paddingX;
     const paddingY = planNode.paddingY;
-    node.paddingLeft = padding ?? paddingX ?? 0;
-    node.paddingRight = padding ?? paddingX ?? 0;
-    node.paddingTop = padding ?? paddingY ?? 0;
-    node.paddingBottom = padding ?? paddingY ?? 0;
+    node.paddingLeft = planNode.paddingLeft ?? padding ?? paddingX ?? 0;
+    node.paddingRight = planNode.paddingRight ?? padding ?? paddingX ?? 0;
+    node.paddingTop = planNode.paddingTop ?? padding ?? paddingY ?? 0;
+    node.paddingBottom = planNode.paddingBottom ?? padding ?? paddingY ?? 0;
     const alignMap: Record<string, string> = { START: "MIN", CENTER: "CENTER", END: "MAX" };
     if (planNode.alignItems !== undefined) {
       node.counterAxisAlignItems = alignMap[planNode.alignItems] ?? "MIN";
