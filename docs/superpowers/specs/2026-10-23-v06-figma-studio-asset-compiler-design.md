@@ -537,6 +537,21 @@ pnpm asset:compile --project samples/projects/demo-crm/project.yaml \
 - 计划来源：v0.5 spec run 已丢失；plans 由已签核 brief 经 `compileProject` 重建（`spec-source/` 留档），
   旧的手改 spacing 被编译器修复取代。
 
+### 15.2.1 保真修复（同日第二轮）
+
+首轮只保证结构；与 HTML baseline 并排比对（Playwright 实测几何/计算样式）后修正：
+
+- 按钮：`ghost` 改为透明文字按钮；`.filter-row` 内的 ghost 用 `ghost-chip`
+  （白底 + `border.strong`、32h、radius 8、paddingX 12）；`secondary`/`danger` 补边框
+  （`border.control` / `status.danger` 40%）。
+- 列表行与详情行补 1px `border/subtle` 底边；详情 label 改 13px `body.sm`。
+- TabBar 用页面中文名 + Material Symbols 图标（home / calendar_month），边框只保留顶部。
+- 输入/下拉：14px/400、radius 8、`border.control`；下拉显示首个选项（与原生 `<select>` 一致）。
+- EmptyState 仅在 spec 提供 icon 时绘制图标。
+- 日历：选中日 600 字重 + 2px info 下划线、选中列 4% info 底、色块 2px 左侧色条、
+  标题 600 / 副标题与时间 10px；ABSOLUTE 子 frame 显式尺寸，表头/单元格/色块铺满列宽。
+- 8 份 plan 重新生成、16 页全部重建；16 份 diff 仍为 0 blocker / 0 major / 0 findings。
+
 ### 15.3 未完成（人工签字）
 
 - 8 页与 HTML baseline 的并排人工视觉检查、字体/变量/实例/glyph/16:30 日历核对尚未执行。

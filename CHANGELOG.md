@@ -3,6 +3,32 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.6 Figma fidelity pass
+
+### Fixed
+
+- Button variants now mirror the renderer: transparent `ghost` text buttons,
+  bordered `secondary`/`danger`, and a new `ghost-chip` (32h, radius 8,
+  paddingX 12, `border.strong`) for `.filter-row` actions.
+- List rows and detail rows draw their 1px bottom divider; detail labels use
+  13px `body.sm`.
+- Tab bar uses page names with Material Symbols glyphs (`home`,
+  `calendar_month`) and a top-only border.
+- Inputs/selects are 14px/400 with radius 8 and `border.control`; selects show
+  their first option instead of the placeholder.
+- Empty states no longer add a default icon.
+- Calendar selected day uses a 600-weight label with a 2px info underline,
+  selected cells carry the 4% info tint, blocks get a 2px tone left border and
+  10px subtitle/time, and ABSOLUTE children have explicit sizes so columns fill.
+- `core/figma` accepts per-side plan borders and richer button variant styles;
+  `b-mobile` gains `border.control`.
+
+### Verified
+
+- All 8 plans regenerated, all 16 pages rebuilt: `figma:verify` still
+  **16/16 passed** (0 blocker / 0 major / 0 findings).
+- `pnpm test` **704 passed**; `pnpm typecheck` clean.
+
 ## 2026-10-26 — v0.6 Figma gate: 8/8 scratch + delivery evidence
 
 ### Added

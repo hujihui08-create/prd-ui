@@ -100,3 +100,33 @@ pnpm figma:verify --plan artifacts/employee-app-phase2/figma/plans/figma-plan.<p
    重建，避免实例指向被删除的 master。
 6. **Brio 与我们的插件不能同时运行。** 运行另一个会替换当前插件；Brio 的 `getPluginData`
    读不到别的插件写的 pluginData（按插件 ID 隔离），不能用它按 specId 检查我们的节点。
+
+## 8. 保真修复（同日第二轮）
+
+用户指出「布局、button、排版、颜色不对」后，用 Playwright 实测 HTML 的几何与计算样式，
+和 Figma readback 逐项对比，修正了 8 类问题：
+
+1. **按钮变体**：ghost 改为透明文字按钮；`.filter-row` 内 ghost 用 `ghost-chip`
+   （白底 + `border.strong`、32h、radius 8、px12）；secondary/danger 补边框
+   （`border.control`、`status.danger` 40% α）；每个变体自带高度/圆角/padding。
+2. **分隔线**：列表行与详情行补 1px `border/subtle` 底边；详情 label 13px `body.sm`。
+3. **TabBar**：页面中文名 + `home`/`calendar_month` 图标，只保留顶部边框。
+4. **输入/下拉**：14px/400、radius 8、`border.control`；下拉显示首个选项（到店）。
+5. **EmptyState**：spec 没有 icon 时不再画默认图标。
+6. **日历**：选中日 600 字重 + 2px info 下划线、选中列 4% info 底、色块 2px 左侧色条、
+   标题 600 / 副标题与时间 10px；ABSOLUTE 子 frame 显式尺寸，列宽铺满。
+7. **契约/插件**：plan 节点新增 per-side border；Button 变体新增 fill/stroke/radius/
+   padding/height/strokeAlpha；插件按边设置 stroke weight，按变体建组件。
+8. **profile**：新增 `border.control`（#CBD5E1）；plan 追加 `input.md`、`label.bold`、
+   `caption`、`date` 文本样式。
+
+结果：8 份 plan 重新生成、16 页全部重建，16 份 diff 仍为 0/0/0；`pnpm test` 704 passed。
+插件 bundle 为 `sha256:4f6aedcd6456…`。人工并排检查时请重点看：按钮边框/高度、列表分隔线、
+TabBar 图标与文案、输入框字号与圆角、日历选中列与色块左侧色条。
+
+### 截图注意
+
+- 截图时不要运行插件：Figma 会保留「Running <plugin>」toast；用 `Cancel` 关掉。
+- 截图前按两次 Escape 取消选中；不要在画布内点坐标（会选中 frame）。
+- 窗口可能部分移出屏幕，坐标点击会报 `frame no longer maps to a live display`；
+  一律用 AX 元素索引操作。

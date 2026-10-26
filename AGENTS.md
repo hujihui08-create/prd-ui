@@ -97,7 +97,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 
 ## Current state (v0.6 gate evidence complete, human signoff pending, 2026-10-26)
 
-Verified: `pnpm test` 697 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
+Verified: `pnpm test` 704 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
 clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
@@ -109,7 +109,10 @@ package 13/13 and phase2 frozen icons 4/4.
 
 The real Figma gate ran on 2026-10-26: 8/8 scratch pages and 8/8 delivery pages
 built in Figma desktop, all `figma:verify` runs **passed (0 blocker / 0 major /
-0 findings)** with 16 `errors: []` readbacks. Durable evidence lives in
+0 findings)** with 16 `errors: []` readbacks. A second fidelity pass aligned
+buttons (incl. a `ghost-chip` variant), row dividers, tab labels/icons, input
+styles, select values, empty states and the calendar against the HTML
+baselines. Durable evidence lives in
 `pipeline/artifacts/employee-app-phase2/figma/` (`spec-source/`, `plans/`,
 `readback/{,delivery}/`, `diff/{,delivery}/`, `screenshots/`, `README.md`);
 Figma files are scratch `iL99qSPGhmh08BB9LketgF` and delivery
