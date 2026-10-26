@@ -3,6 +3,16 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-26 — v0.7 design input: gates, structure, block generation
+
+### Added
+
+- `docs/superpowers/specs/2026-10-26-v07-visual-gates-structure-block-input.md`:
+  fail-closed plan mapping, project-agnostic `figma:conformance` and `figma:parity`
+  gates, structure lint / render-measure / structure diff, and a block-generation
+  experiment with an assembler-owned page frame. Assets stay per-project; only the
+  verification loop is frozen.
+
 ## 2026-10-26 — v0.6 Figma fidelity pass
 
 ### Fixed

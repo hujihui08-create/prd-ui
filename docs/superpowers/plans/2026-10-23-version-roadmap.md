@@ -98,6 +98,8 @@
 
 ## 5. v0.7 Phase 3B：沙箱 + Test Subagent + Handoff
 
+**状态（2026-10-26）**：设计输入已准备：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)。核心是 fail-closed 映射、项目无关的 conformance/parity 门禁、结构 lint 与分块生成实验；资产（组件/内容）按项目生成，不固化。
+
 **目标**：把验证和交付自动化，形成可独立实现的 Handoff。
 
 范围：

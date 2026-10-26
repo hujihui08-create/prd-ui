@@ -215,6 +215,7 @@ state); v0.6 details in
 - `docs/superpowers/specs/2026-10-23-v041-visual-patch-design.md` — v0.4.1 signed patch: today CTA, 7-column week, inline error, datetime display, reschedule storage.
 - `docs/superpowers/specs/2026-10-23-v05-visual-a11y-closure-design.md` — v0.5 signed: loading/empty/mode/a11y/critic stop rule.
 - `docs/superpowers/specs/2026-10-23-v06-figma-studio-asset-compiler-design.md` — v0.6 implemented (automatable parts): Figma plan/plugin/readback diff, Asset Compiler, read-only Studio; Figma gate pending.
+- `docs/superpowers/specs/2026-10-26-v07-visual-gates-structure-block-input.md` — v0.7 design input: fail-closed mapping, project-agnostic conformance/parity gates, structure lint, block generation experiment.
 - `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
 - `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — latest: v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
