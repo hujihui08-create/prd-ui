@@ -43,6 +43,7 @@ export class ScriptedAgentRunner implements AgentRunnerPort {
     "prd-review": 0,
     "ui-briefer": 0,
     "visual-critic": 0,
+    "block-content": 0,
   };
 
   constructor(

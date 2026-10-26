@@ -1,11 +1,17 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AgentRunnerError } from "@prd-ui/agents";
 import {
   AssetManifestSchema,
   UiBriefSchema,
+  parsePricingConfig,
+  resolvePricing,
+  reviewCost,
+  type AgentUsage,
   type AssetManifest,
   type BlockConformanceStatus,
+  type BlockContentDraft,
   type BlockExperimentPage,
   type BlockExperimentReport,
   type BlockManifest,
@@ -15,6 +21,7 @@ import {
   type PageSpec,
   type RenderMetrics,
   type RenderMetricsPage,
+  type ReviewPricing,
   type StyleManifest,
   type UiBrief,
 } from "@prd-ui/contracts";
@@ -33,6 +40,7 @@ import { renderDocument } from "@prd-ui/renderer-html";
 import { validatePageSpec, type ValidationContext, type ValidationReport } from "@prd-ui/validators";
 import {
   FixtureBlockGenerator,
+  type BlockGeneratorFactory,
   type BlockGeneratorPort,
 } from "./block/generator.js";
 import {
@@ -44,17 +52,25 @@ import { captureStyleManifests } from "./conformance/capture.js";
 import { measurePages } from "./measure/measure.js";
 import { loadSpecs } from "./structure-check-cli.js";
 
+const pipelineRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../.."
+);
+
 export const USAGE = `Usage:
-  pnpm block:experiment --project <yaml> --baseline <spec-run> --pages <id,id> --fixtures <dir> --runs <dir> [--max-cost-cny <n>] [--json]
+  pnpm block:experiment --project <yaml> --baseline <spec-run> --runs <dir>
+    (--fixtures <dir> | --runtime dsh [--profile <name>])
+    [--pages <id,id>] [--pricing <path>] [--max-cost-cny <n>] [--json]
 
 Options:
   --project <yaml>      Project config (assets + brief)
   --baseline <spec-run> Completed spec run containing artifacts/page-spec
   --pages <id,id>       Pages to experiment on (default: every baseline page)
   --fixtures <dir>      Deterministic block fixtures (<dir>/<pageId>/<blockId>.json)
-  --runtime dsh         Reserved for Task 17; not implemented in this task
-  --profile <name>      dsh profile (reserved for Task 17)
-  --max-cost-cny <n>    Budget in CNY (default: 3; fixture mode always costs 0)
+  --runtime dsh         Model-backed generation (requires exported provider env)
+  --profile <name>      dsh profile for --runtime dsh (default: prd-ui-agents)
+  --pricing <path>      Pricing file (default: pipeline/pricing.json)
+  --max-cost-cny <n>    Whole-run budget in CNY (default: 3; fixture mode costs 0)
   --runs <dir>          Runs directory (the report is written to <dir>/<runId>/)
   --json                Print the BlockExperimentReport as one JSON object
   -h, --help            Print this help and exit
@@ -71,6 +87,7 @@ export interface BlockExperimentOptions {
   fixtures?: string;
   runtime?: "dsh";
   profile?: string;
+  pricingPath?: string;
   maxCostCny: number;
   runs?: string;
   json: boolean;
@@ -119,6 +136,9 @@ export function parseArgs(argv: string[]): BlockExperimentOptions {
       case "--profile":
         options.profile = readValue(argv, ++index, flag);
         break;
+      case "--pricing":
+        options.pricingPath = path.resolve(readValue(argv, ++index, flag));
+        break;
       case "--max-cost-cny": {
         const raw = readValue(argv, ++index, flag);
         const parsed = Number.parseFloat(raw);
@@ -156,6 +176,122 @@ function pretty(value: unknown): string {
 async function writeJson(file: string, value: unknown): Promise<void> {
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, pretty(value), "utf8");
+}
+
+async function loadPricing(explicitPath?: string): Promise<ReviewPricing> {
+  const file = explicitPath ?? path.join(pipelineRoot, "pricing.json");
+  let raw: unknown;
+  try {
+    raw = JSON.parse(await readFile(file, "utf8")) as unknown;
+  } catch (error) {
+    throw new Error(`INVALID_PRICING: ${file}: ${errorMessage(error)}`);
+  }
+  const config = parsePricingConfig(raw, file);
+  return resolvePricing(config, process.env.PRD_UI_VISION_MODEL);
+}
+
+/** Block failures get two retries; a failed page assembly gets one page retry. */
+export const MAX_BLOCK_RETRIES = 2;
+export const MAX_PAGE_RETRIES = 1;
+
+export class BlockBudgetExceededError extends Error {
+  constructor(
+    readonly spentCny: number,
+    readonly maxCostCny: number
+  ) {
+    super(`BUDGET_EXCEEDED: spent ¥${spentCny.toFixed(4)} > cap ¥${maxCostCny}`);
+    this.name = "BlockBudgetExceededError";
+  }
+}
+
+/**
+ * Whole-run cost accounting for the dsh experiment. Every model call is
+ * charged, including calls that later failed; crossing the cap aborts the run
+ * instead of producing a report that looks affordable.
+ */
+export class BlockCostBudget {
+  private spent = 0;
+
+  constructor(
+    readonly maxCostCny: number,
+    readonly pricing: ReviewPricing
+  ) {}
+
+  get spentCny(): number {
+    return this.spent;
+  }
+
+  costOf(usage: AgentUsage | undefined): number {
+    return usage === undefined ? 0 : reviewCost(usage, this.pricing).cny;
+  }
+
+  canAfford(usage: AgentUsage | undefined): boolean {
+    return this.spent + this.costOf(usage) <= this.maxCostCny;
+  }
+
+  /** Charge one call and fail closed once the cap is crossed. */
+  charge(usage: AgentUsage | undefined): number {
+    const cost = this.costOf(usage);
+    this.spent += cost;
+    if (this.spent > this.maxCostCny) {
+      throw new BlockBudgetExceededError(this.spent, this.maxCostCny);
+    }
+    return cost;
+  }
+}
+
+/**
+ * Infrastructure failures must never be retried as block failures: a missing
+ * key, missing dsh binary, or an exhausted budget will not heal by asking the
+ * model again, and treating it as content failure would fabricate evidence.
+ */
+export function isBlockInfraError(error: unknown): boolean {
+  if (error instanceof BlockBudgetExceededError) return true;
+  if (error instanceof AgentRunnerError) {
+    return error.code === "AGENT_UNAVAILABLE";
+  }
+  return /CONFIGURATION_ERROR|DSH_UNAVAILABLE|BUDGET_EXCEEDED/.test(errorMessage(error));
+}
+
+/** Assembly/verification failure is the only failure that retries the page. */
+export class BlockAssemblyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BlockAssemblyError";
+  }
+}
+
+export async function generateBlockWithRetries(input: {
+  pageId: string;
+  block: BlockSpec;
+  generator: BlockGeneratorPort;
+  onCost: (cny: number) => void;
+  /** Fixture mode passes 0 so a bad fixture still fails immediately. */
+  maxRetries?: number;
+  budget?: BlockCostBudget;
+}): Promise<{ draft: BlockContentDraft; retries: number }> {
+  const maxRetries = input.maxRetries ?? MAX_BLOCK_RETRIES;
+  let retries = 0;
+  for (;;) {
+    try {
+      const draft = await input.generator.generate({
+        pageId: input.pageId,
+        blockId: input.block.blockId,
+        prompt: `Regenerate block ${input.block.blockId} (${input.block.role}).`,
+      });
+      input.onCost(input.budget?.charge(input.generator.takeUsage?.()) ?? 0);
+      return { draft, retries };
+    } catch (error) {
+      // Charge the failed call before deciding anything, so a budget stop
+      // still reflects every token spent.
+      const usage = input.generator.takeUsage?.();
+      const cost = input.budget?.charge(usage);
+      if (cost !== undefined) input.onCost(cost);
+      if (isBlockInfraError(error)) throw error;
+      if (retries >= maxRetries) throw error;
+      retries += 1;
+    }
+  }
 }
 
 function selectPages(specs: PageSpec[], requested: string[] | undefined): PageSpec[] {
@@ -362,13 +498,18 @@ export interface BlockExperimentResult {
 }
 
 /**
- * Run the fixture (or, later, dsh) block experiment. Everything that can be
- * measured is measured; checks that cannot be evaluated are left out of the
- * report rather than assumed green.
+ * Run the fixture or model block experiment. Everything that can be measured
+ * is measured; checks that cannot be evaluated are left out of the report
+ * rather than assumed green.
+ *
+ * `generatorSource` is either one shared fixture generator or a per-block
+ * factory (the model generator needs each block's role, components, states,
+ * and baseline root). `budget` is present only in dsh mode.
  */
 export async function runBlockExperiment(
   options: BlockExperimentOptions,
-  generator: BlockGeneratorPort
+  generatorSource: BlockGeneratorPort | BlockGeneratorFactory,
+  budget?: BlockCostBudget
 ): Promise<BlockExperimentResult> {
   if (options.project === undefined) throw new BlockExperimentUsageError("--project is required");
   if (options.baseline === undefined) throw new BlockExperimentUsageError("--baseline is required");
@@ -396,39 +537,99 @@ export async function runBlockExperiment(
   const outcomes: PageOutcome[] = [];
   const experimentSpecs: PageSpec[] = [];
 
+  const generatorFor = (block: BlockSpec): BlockGeneratorPort =>
+    typeof generatorSource === "function"
+      ? generatorSource(block, {
+          runDir: path.join(runDir, "dsh", block.pageId, block.blockId),
+        })
+      : generatorSource;
+  // Retries belong to the model path; fixture mode stays deterministic and
+  // reports structural findings instead of re-reading identical files.
+  const maxBlockRetries = options.runtime === "dsh" ? MAX_BLOCK_RETRIES : 0;
+  const maxPageRetries = options.runtime === "dsh" ? MAX_PAGE_RETRIES : 0;
+
   for (const spec of baselineSpecs) {
     const started = Date.now();
     const pageId = spec.meta.pageId;
     const profile = getProfile(spec.meta.profile);
     const archetype = getArchetype(spec.meta.archetype);
     const manifest = splitBlocks(spec, archetype);
-    const experimentManifest: BlockManifest = structuredClone(manifest);
+    const retriesByBlock: number[] = manifest.blocks.map(() => 0);
+    let pageRetries = 0;
+    let pageCostCny = 0;
+    let experimentManifest: BlockManifest | undefined;
+    let experimentSpec: PageSpec | undefined;
+    let verifyFindings: Finding[] | undefined;
 
-    for (let index = 0; index < manifest.blocks.length; index += 1) {
-      const block = manifest.blocks[index]!;
-      const draft = await generator.generate({
-        pageId,
-        blockId: block.blockId,
-        prompt: `Regenerate block ${block.blockId} (${block.role}).`,
-      });
-      if (draft.blockId !== block.blockId) {
-        throw new Error(
-          `BLOCK_DRAFT_ID_MISMATCH: ${pageId} expected ${block.blockId}, got ${draft.blockId}`
-        );
+    for (;;) {
+      const attempt: BlockManifest = structuredClone(manifest);
+      for (let index = 0; index < manifest.blocks.length; index += 1) {
+        const block = manifest.blocks[index]!;
+        const { draft, retries } = await generateBlockWithRetries({
+          pageId,
+          block,
+          generator: generatorFor(block),
+          onCost: (cny) => {
+            pageCostCny += cny;
+          },
+          maxRetries: maxBlockRetries,
+          ...(budget === undefined ? {} : { budget }),
+        });
+        retriesByBlock[index] = (retriesByBlock[index] ?? 0) + retries;
+        if (draft.blockId !== block.blockId) {
+          throw new Error(
+            `BLOCK_DRAFT_ID_MISMATCH: ${pageId} expected ${block.blockId}, got ${draft.blockId}`
+          );
+        }
+        attempt.blocks[index] = {
+          ...block,
+          root: structuredClone(draft.root),
+          hash: blockRootHash(draft.root),
+        };
       }
-      experimentManifest.blocks[index] = {
-        ...block,
-        root: structuredClone(draft.root),
-        hash: blockRootHash(draft.root),
-      };
+
+      let candidateSpec: PageSpec;
+      let findings: Finding[];
+      try {
+        candidateSpec = assembleBlocks(spec, attempt);
+        // Verify the manifest against the page it assembles to. Verifying it
+        // against the baseline page would fail every regenerated block through
+        // BLOCK_ROUNDTRIP_MISMATCH; the round-trip contract is about manifest
+        // structure, not content equality with the baseline.
+        findings = verifyBlockManifest(candidateSpec, attempt);
+      } catch (error) {
+        // Assembly itself failing is not a content judgement; retry the page
+        // once in dsh mode, then stop honestly instead of fabricating a report.
+        if (pageRetries >= maxPageRetries) {
+          throw new BlockAssemblyError(
+            `BLOCK_ASSEMBLY_FAILED: ${pageId}: ${errorMessage(error)}`
+          );
+        }
+        pageRetries += 1;
+        continue;
+      }
+
+      const blockers = findings.filter((finding) => finding.severity === "blocker");
+      if (blockers.length > 0 && pageRetries < maxPageRetries) {
+        pageRetries += 1;
+        continue;
+      }
+      // After the retry budget is spent, keep the findings and let the report
+      // conclude rollback (blockVerifyPassed=false) rather than exiting green.
+      experimentManifest = attempt;
+      experimentSpec = candidateSpec;
+      verifyFindings = findings;
+      break;
     }
 
-    const experimentSpec = assembleBlocks(spec, experimentManifest);
-    // Verify the manifest against the page it assembles to. Verifying it
-    // against the baseline page would fail every regenerated block through
-    // BLOCK_ROUNDTRIP_MISMATCH; the round-trip contract is about manifest
-    // structure, not content equality with the baseline.
-    const verifyFindings = verifyBlockManifest(experimentSpec, experimentManifest);
+    if (
+      experimentManifest === undefined ||
+      experimentSpec === undefined ||
+      verifyFindings === undefined
+    ) {
+      throw new Error(`BLOCK_PAGE_GENERATION_MISSING: ${pageId}`);
+    }
+
     const context = contextLoad.contexts.get(pageId);
     const validation = context === undefined ? undefined : validatePageSpec(experimentSpec, context);
 
@@ -438,16 +639,16 @@ export async function runBlockExperiment(
 
     const metrics = manifest.blocks.map((block, index) => ({
       blockId: block.blockId,
-      retries: 0,
+      retries: retriesByBlock[index] ?? 0,
       seams: newSeams[index] ?? 0,
-      tokenDrift: countRawStyleValues(experimentManifest.blocks[index]!.root),
+      tokenDrift: countRawStyleValues(experimentManifest!.blocks[index]!.root),
     }));
 
     const reportPage: BlockExperimentPage = {
       pageId,
       metrics,
-      pageRetries: 0,
-      costCny: 0,
+      pageRetries,
+      costCny: pageCostCny,
       durationMs: Date.now() - started,
       conformance: "not_evaluated",
     };
@@ -748,15 +949,20 @@ function renderMarkdown(input: {
 }): string {
   const { report } = input;
   const lines: string[] = [];
+  const totalCost = report.pages.reduce((sum, page) => sum + page.costCny, 0);
   lines.push(`# 块级实验报告 — ${report.project}`, "");
   lines.push(`- 结论：${conclusionLabel(report.conclusion)}`);
   lines.push(`- 基线：\`${report.baseline}\``);
   lines.push(`- 运行目录：\`${input.runDir}\``);
-  lines.push(`- 预算：¥${input.maxCostCny}（已传入 evaluateBlockExperiment；fixture 模式实际成本 ¥0）`);
+  lines.push(
+    `- 预算：¥${input.maxCostCny}；实际成本：¥${totalCost.toFixed(4)}（fixture 模式为 ¥0）`
+  );
   lines.push(`- 原因：${report.reasons.length === 0 ? "无" : report.reasons.join("；")}`, "");
   lines.push("## 页面指标", "");
-  lines.push("| 页面 | 块数 | 新接缝 | token 漂移 | 重试 | 页高 Δ | conformance | parity |");
-  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |");
+  lines.push(
+    "| 页面 | 块数 | 新接缝 | token 漂移 | 块重试 | 页重试 | 页高 Δ | conformance | parity |"
+  );
+  lines.push("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |");
   for (const page of report.pages) {
     const measurement = input.measurements.find((entry) => entry.pageId === page.pageId);
     const tokenDrift = page.metrics.reduce((sum, metric) => sum + metric.tokenDrift, 0);
@@ -766,12 +972,13 @@ function renderMarkdown(input: {
     const conformance = recordedLabel(page.conformance);
     const parity = page.parityPassed === undefined ? "未评估" : page.parityPassed ? "通过" : "失败";
     lines.push(
-      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${pageDelta} | ${conformance} | ${parity} |`
+      `| ${page.pageId} | ${page.metrics.length} | ${page.metrics.reduce((sum, metric) => sum + metric.seams, 0)} | ${tokenDrift} | ${retries} | ${page.pageRetries} | ${pageDelta} | ${conformance} | ${parity} |`
     );
   }
   lines.push(
     "",
-    "> `durationMs` 在 fixture 模式只覆盖块生成/组装/校验，不含浏览器测量与 conformance 捕获。",
+    "> `durationMs` 在 fixture 模式只覆盖块生成/组装/校验，不含浏览器测量与 conformance 捕获；",
+    "> dsh 模式下还包含模型调用，但同样不含浏览器测量与 conformance 捕获。",
     ""
   );
   lines.push("## 接缝", "");
@@ -802,7 +1009,7 @@ function renderMarkdown(input: {
     lines.push(
       "",
       `> ${gateUnusable} 页的基线 conformance 本身未通过（已知 plan/HTML 建模差异，见 v0.7 SDD ledger 的 Task 6 记录）。`,
-      "> 这些页面按 fail-closed 记录为 `failed`，结论回滚；新增 blocker = 0 只说明实验没有引入新的 conformance 回归，不能抵消基线红灯。"
+      "> 这些页面按 fail-closed 记录为 `failed`，结论回滚；新增 blocker 只是回归诊断，不能抵消基线红灯。"
     );
   }
   lines.push(
@@ -862,20 +1069,46 @@ export async function main(
     io.stdout(USAGE);
     return 0;
   }
-  if (options.runtime === "dsh") {
-    io.stderr("BLOCK_RUNTIME_NOT_IMPLEMENTED: Task 17 adds the dsh block generator");
+  if (options.runtime !== "dsh" && options.fixtures === undefined) {
+    io.stderr("missing required --fixtures <dir> (or use --runtime dsh)");
+    io.stderr(USAGE);
     return 2;
   }
-  if (options.fixtures === undefined) {
-    io.stderr("missing required --fixtures <dir> (or --runtime dsh after Task 17)");
+  if (options.runtime === "dsh" && options.fixtures !== undefined) {
+    io.stderr("--fixtures selects fixture mode; omit it with --runtime dsh");
     io.stderr(USAGE);
     return 2;
   }
 
   try {
+    let generatorSource: BlockGeneratorPort | BlockGeneratorFactory;
+    let budget: BlockCostBudget | undefined;
+    if (options.runtime === "dsh") {
+      const { DshBlockGenerator } = await import("./block/dsh-generator.js");
+      const pricing = await loadPricing(options.pricingPath);
+      const activeBudget = new BlockCostBudget(options.maxCostCny, pricing);
+      const dshHome = process.env.DSH_HOME ?? path.join(pipelineRoot, "dsh", "home");
+      const profile = options.profile ?? "prd-ui-agents";
+      budget = activeBudget;
+      generatorSource = (block, context) =>
+        new DshBlockGenerator({
+          runDir: context.runDir,
+          dshHome,
+          profile,
+          baseline: block.root,
+          allowedComponents: block.allowedComponents,
+          requiredStates: block.requiredStates,
+          role: block.role,
+          canRepair: (usage) => activeBudget.canAfford(usage),
+        });
+    } else {
+      generatorSource = new FixtureBlockGenerator(options.fixtures!);
+    }
+
     const { report, runDir } = await runBlockExperiment(
       options,
-      new FixtureBlockGenerator(options.fixtures)
+      generatorSource,
+      budget
     );
     if (options.json) {
       io.stdout(JSON.stringify(report));

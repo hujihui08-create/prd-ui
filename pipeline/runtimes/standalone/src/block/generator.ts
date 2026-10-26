@@ -1,6 +1,11 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { BlockContentDraftSchema, type BlockContentDraft } from "@prd-ui/contracts";
+import {
+  BlockContentDraftSchema,
+  type AgentUsage,
+  type BlockContentDraft,
+  type BlockSpec,
+} from "@prd-ui/contracts";
 
 export interface BlockGenerateInput {
   pageId: string;
@@ -10,7 +15,27 @@ export interface BlockGenerateInput {
 
 export interface BlockGeneratorPort {
   generate(input: BlockGenerateInput): Promise<BlockContentDraft>;
+  /**
+   * Drain the model usage accumulated since the last call. Fixture mode does
+   * not implement this (it makes no model calls), so cost stays 0.
+   */
+  takeUsage?(): AgentUsage | undefined;
 }
+
+export interface BlockGeneratorContext {
+  /** Run directory handed to the model transport (`<runId>/dsh/<pageId>/<blockId>`). */
+  runDir: string;
+}
+
+/**
+ * A model generator is configured per block (role, allowed components,
+ * required states, baseline root), so the experiment asks for a generator
+ * instance per block instead of sharing one mutable instance.
+ */
+export type BlockGeneratorFactory = (
+  block: BlockSpec,
+  context: BlockGeneratorContext
+) => BlockGeneratorPort;
 
 /**
  * Deterministic block generator backed by committed JSON fixtures.
