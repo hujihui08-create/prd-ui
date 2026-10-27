@@ -1203,10 +1203,15 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(items.map((item) => item.label)).not.toContain("状态");
     expect(detail.layout.props?.back).toBe(true);
     const actionRow = collectNodes(detail.layout).find(
-      (node) => node.type === "Row" && node.props?.variant === "filter"
+      (node) => node.type === "Row" && node.props?.variant === "card-actions"
     );
     expect(actionRow?.children?.length).toBeGreaterThan(1);
     expect(actionRow?.children?.every((child) => child.type === "Button")).toBe(true);
+    expect(
+      collectNodes(detail.layout).some(
+        (node) => node.type === "Row" && node.props?.variant === "filter"
+      )
+    ).toBe(false);
   });
 
   it("drops debug references, duplicate check-in, and premature notice actions", () => {
@@ -1315,5 +1320,40 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       roles: contactsPage.roles,
     });
     expectNoOrderCopy(contactsSpec);
+  });
+});
+
+describe("detail action placement", () => {
+  it("moves secondary actions into card-actions and overflow", () => {
+    const detail = phase2Spec("appointment-detail");
+    const cardRow = nodesOf(detail, "Row").find(
+      (node) => node.props?.variant === "card-actions"
+    );
+    expect(
+      (cardRow?.children ?? []).map((node) => node.props?.action)
+    ).toEqual(["order.create", "appointment.reschedule", "appointment.cancel"]);
+    const menu = nodesOf(detail, "ActionMenu")[0];
+    expect(menu).toBeDefined();
+    expect(
+      (menu?.children ?? []).map((node) => node.props?.action)
+    ).toEqual(["customer.view"]);
+    expect(nodesOf(detail, "Button").map((node) => node.props?.action)).toContain(
+      "appointment.check-in"
+    );
+  });
+
+  it("does not create a menu when everything fits in card-actions", () => {
+    const detail = phase2Spec("customer-detail");
+    expect(nodesOf(detail, "ActionMenu")).toEqual([]);
+    const cardRow = nodesOf(detail, "Row").find(
+      (node) => node.props?.variant === "card-actions"
+    );
+    expect(
+      (cardRow?.children ?? []).map((node) => node.props?.action)
+    ).toEqual([
+      "appointment.create",
+      "treatment.notice.view",
+      "customer.callback.create",
+    ]);
   });
 });

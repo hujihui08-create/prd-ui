@@ -44,7 +44,7 @@ export const bDenseCatalog: Catalog = {
         },
         summary: { allowed: ["Card", "List", "ListItem", "Badge", "Stack", "Row", "Text"] },
         fields: { allowed: ["Section", "FormField", "Input", "Select", "Grid", "EmptyState", "Stack", "Row", "Text"] },
-        actions: { allowed: ["Section", "Button", "Row", "Stack", "Text"] },
+        actions: { allowed: ["Section", "Button", "ActionMenu", "Row", "Stack", "Text"] },
         groups: {
           allowed: [
             "Section",
@@ -171,6 +171,21 @@ export const bDenseCatalog: Catalog = {
       },
       variants: ["primary", "secondary", "ghost", "danger"],
       states: ["default", "hover", "active", "focus", "disabled", "loading"],
+      version: "0.1.0",
+    },
+    {
+      id: "ActionMenu",
+      library: "b-dense",
+      source: "baseline",
+      availability: "available",
+      category: "action",
+      props: {
+        label: { type: "string", required: true },
+      },
+      variants: ["default"],
+      states: ["closed"],
+      slots: { children: { allowed: ["Button"] } },
+      mapping: { code: "ActionMenu", figma: "ActionMenu" },
       version: "0.1.0",
     },
     {
@@ -350,7 +365,7 @@ export const bDenseCatalog: Catalog = {
       states: ["default", "open", "closed"],
       slots: {
         content: { allowed: ["FormField", "Input", "Select", "List", "Stack", "Row", "Text"] },
-        actions: { allowed: ["Button", "Row", "Stack", "Text"] },
+        actions: { allowed: ["Button", "ActionMenu", "Row", "Stack", "Text"] },
       },
       version: "0.1.0",
     },

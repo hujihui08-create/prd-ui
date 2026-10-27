@@ -59,6 +59,7 @@ export const CONSUMED_PROPS: Record<string, readonly string[]> = {
     "inTransit",
   ],
   Switch: ["label", "value", "state"],
+  ActionMenu: ["label"],
   Image: ["alt"],
   Skeleton: [],
   ErrorState: [],
@@ -100,15 +101,17 @@ export function skipReason(
 function walkSpec(
   node: SpecNode,
   path: string,
-  visit: (node: SpecNode, path: string) => void
+  visit: (node: SpecNode, path: string, inMenu: boolean) => void,
+  inMenu = false
 ): void {
-  visit(node, path);
+  visit(node, path, inMenu);
+  const childInMenu = inMenu || node.type === "ActionMenu";
   (node.children ?? []).forEach((child, index) =>
-    walkSpec(child, `${path}.children[${index}]`, visit)
+    walkSpec(child, `${path}.children[${index}]`, visit, childInMenu)
   );
   for (const [slot, nodes] of Object.entries(node.slots ?? {})) {
     nodes.forEach((child, index) =>
-      walkSpec(child, `${path}.slots.${slot}[${index}]`, visit)
+      walkSpec(child, `${path}.slots.${slot}[${index}]`, visit, childInMenu)
     );
   }
 }
@@ -141,8 +144,18 @@ export function buildCoverage(spec: PageSpec, plan: FigmaPlan): FigmaCoverage {
   const nodes: FigmaCoverageNode[] = [];
   const specIds = new Set<string>();
 
-  walkSpec(spec.layout, "layout", (node, path) => {
+  walkSpec(spec.layout, "layout", (node, path, inMenu) => {
     if (node.id) specIds.add(node.id);
+    if (inMenu) {
+      nodes.push({
+        specId: node.id ?? `${spec.meta.pageId}.${path}`,
+        specType: node.type,
+        path,
+        status: "skipped",
+        reason: "SKIPPED_MENU_HIDDEN",
+      });
+      return;
+    }
     const skipped = skipReason(node, spec.defaultView);
     if (skipped) {
       nodes.push({

@@ -613,9 +613,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Row": {
       const gap = str(props.gap);
       const variant = str(props.variant);
-      const variantClass = variant === "filter" ? " filter-row" : "";
+      const variantClass =
+        variant === "filter"
+          ? " filter-row"
+          : variant === "card-actions"
+            ? " card-actions-row"
+            : "";
       const motion = motionAttrs(node, renderMotionContext);
-      return `<div class="row${variantClass}"${motion.attrs}${inlineStyle(`gap:${cssVar(gap)}`, motion.style)}>${children}</div>`;
+      return `<div class="row${variantClass}"${variant ? ` data-variant="${esc(variant)}"` : ""}${motion.attrs}${inlineStyle(`gap:${cssVar(gap)}`, motion.style)}>${children}</div>`;
     }
     case "Stack": {
       const motion = motionAttrs(node, renderMotionContext);
@@ -870,6 +875,16 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const motion = motionAttrs(node, renderMotionContext);
       return `<button class="btn ${esc(emphasis)}" type="button"${action ? ` data-action="${esc(action)}"` : ""}${viewToggle ? " data-view-toggle" : ""}${motion.attrs}${inlineStyle("", motion.style)}>${esc(label)}</button>`;
     }
+    case "ActionMenu": {
+      const label = str(props.label) || "更多";
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="action-menu"${motion.attrs}${inlineStyle("", motion.style)}>
+  <button class="btn ghost" type="button" data-action-menu aria-haspopup="dialog" aria-expanded="false">${esc(label)}</button>
+  <div class="action-sheet" role="dialog" aria-modal="true" aria-label="${esc(label)}" hidden>
+    <div class="action-sheet-panel">${children}</div>
+  </div>
+</div>`;
+    }
     default:
       return children;
   }
@@ -995,6 +1010,15 @@ ${typeClasses(profile)}
 .filter-row .btn{flex:0 0 auto;white-space:nowrap;}
 .filter-row .btn.danger{margin-left:auto;}
 .filter-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
+.card-actions-row{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
+.card-actions-row .btn{flex:0 0 auto;white-space:nowrap;}
+.card-actions-row .btn.ghost{border:1px solid var(--color-border-strong);background:#fff;color:var(--color-text-primary);height:32px;padding:0 12px;border-radius:8px;font-size:13px;}
+.card-actions-row .btn.danger{margin-left:auto;}
+.action-menu{display:flex;}
+.action-sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;background:rgba(17,24,39,.4);}
+.action-sheet[hidden]{display:none;}
+.action-sheet-panel{width:100%;background:var(--color-surface-default);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);}
+.action-sheet-panel .btn{width:100%;height:44px;justify-content:center;}
 .filter{height:30px;border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);background:var(--color-surface-default);display:inline-flex;align-items:center;gap:4px;padding:0 8px;}
 .filter-label{font-size:var(--type-label-sm-size);line-height:var(--type-label-sm-line);color:var(--color-text-tertiary);}
 .filter-value{font-size:var(--type-body-md-size);line-height:var(--type-body-md-line);font-weight:var(--type-body-md-weight);}
@@ -1932,6 +1956,47 @@ function renderInteractionScript(): string {
   applyPicker();
   applyReadonlyState();
   applyFilterActions();
+  for (const trigger of qsa("[data-action-menu]")) {
+    const root = trigger.closest(".action-menu");
+    const sheet = root ? root.querySelector(".action-sheet") : null;
+    if (!sheet) continue;
+    const panel = sheet.querySelector(".action-sheet-panel");
+    const buttons = panel ? Array.from(panel.querySelectorAll("button")) : [];
+    const open = () => {
+      sheet.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+      if (buttons.length > 0) buttons[0].focus();
+    };
+    const close = () => {
+      sheet.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.focus();
+    };
+    trigger.addEventListener("click", () => (sheet.hidden ? open() : close()));
+    sheet.addEventListener("click", (event) => {
+      if (event.target === sheet) close();
+    });
+    sheet.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== "Tab" || buttons.length === 0) return;
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+    for (const button of buttons) {
+      button.addEventListener("click", close);
+    }
+  }
 })();
 </script>`;
 }

@@ -15,6 +15,7 @@ import {
   semanticNodeId,
   type ArchetypeDef,
 } from "@prd-ui/design-system";
+import { resolveActionPlacements } from "./action-placement.js";
 
 /** Root shell the compiler emits per page target. */
 const ROOT_SHELL = {
@@ -1310,40 +1311,54 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
   const actionRefs = page.actions?.length
     ? page.actions
     : [{ id: "form.submit", label: "编辑" }];
-  const primary = primaryAction(actionRefs, actionRefs[0]!);
-  const openOrder = actionRefs.find(
-    (action) => action.id === "order.create" && action.id !== primary.id
-  );
-  const footerRefs = [primary, ...(openOrder === undefined ? [] : [openOrder])];
   const values = page.mockData?.values;
   const serviceCompletedValue = values?.serviceCompleted;
   const serviceCompleted =
     serviceCompletedValue === undefined ||
     !/^(否|false|no|未完成)$/i.test(String(serviceCompletedValue).trim());
+  // The notice action is only valid after the service is completed.
+  const candidates = actionRefs.filter(
+    (action) => action.id !== "treatment.notice.view" || serviceCompleted
+  );
+  const provisional = resolveActionPlacements(candidates);
+  const primary = primaryAction(provisional.footer, candidates[0]!);
   const checkinPrimary =
     primary.id === "appointment.check-in" || primary.id === "appointment.accept";
-  const secondaryRefs = actionRefs
-    .filter((action) => !footerRefs.some((footer) => footer.id === action.id))
-    // The footer already owns the check-in CTA; a second ghost CTA is ambiguous.
-    .filter(
-      (action) =>
-        !(
-          checkinPrimary &&
-          (action.id === "appointment.check-in" || action.id === "appointment.accept")
-        )
-    )
-    // The notice action is only valid after the service is completed.
-    .filter((action) => action.id !== "treatment.notice.view" || serviceCompleted);
-  const actions = footerRefs.map((action, index) =>
+  // The footer already owns the check-in CTA; a second ghost CTA is ambiguous.
+  const filtered = candidates.filter(
+    (action) =>
+      action.id === primary.id ||
+      !(
+        checkinPrimary &&
+        (action.id === "appointment.check-in" || action.id === "appointment.accept")
+      )
+  );
+  const groups = resolveActionPlacements(filtered);
+  const cancelLast = (refs: ActionRef[]) => [
+    ...refs.filter((action) => action.id !== "appointment.cancel"),
+    ...refs.filter((action) => action.id === "appointment.cancel"),
+  ];
+  const actions = groups.footer.map((action, index) =>
     btn(action, index === 0 ? "primary" : "secondary")
   );
-  const orderedSecondaryRefs = [
-    ...secondaryRefs.filter((action) => action.id !== "appointment.cancel"),
-    ...secondaryRefs.filter((action) => action.id === "appointment.cancel"),
-  ];
-  const secondaryActions = orderedSecondaryRefs.map((action) =>
+  const cardActionNodes = cancelLast(groups.cardActions).map((action) =>
     btn(action, action.id === "appointment.cancel" ? "danger" : "ghost")
   );
+  const overflowNodes = cancelLast(groups.overflow).map((action) =>
+    btn(action, action.id === "appointment.cancel" ? "danger" : "ghost")
+  );
+  const inlineNodes = cancelLast(groups.inline).map((action) =>
+    btn(action, action.id === "appointment.cancel" ? "danger" : "ghost")
+  );
+  const actionMenu: SpecNode | undefined =
+    overflowNodes.length === 0
+      ? undefined
+      : {
+          type: "ActionMenu",
+          id: `${page.id}.action-menu`,
+          props: { label: page.overflowLabel ?? "更多" },
+          children: overflowNodes,
+        };
   const noticeBlocks = page.noticeBlocks ?? [];
   const hasNoticeBlocks = noticeBlocks.length > 0;
   const visibleFields = fields.filter(
@@ -1423,13 +1438,13 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       ...missingFields.map((field) =>
         fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
       ),
-      ...(secondaryActions.length === 0
+      ...(inlineNodes.length === 0
         ? []
         : [
             {
               type: "Row" as const,
               props: { gap: "space.2", variant: "filter" },
-              children: secondaryActions,
+              children: inlineNodes,
             },
           ]),
       ...(page.emptyTitle === undefined
@@ -1447,9 +1462,22 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
       props: { title: page.name, tabs, back: true },
       reqRef: page.reqRefs[0] as ReqId | undefined,
       slots: {
-        summary: [summaryCard, ...noticeSection],
+        summary: [
+          summaryCard,
+          ...(cardActionNodes.length === 0
+            ? []
+            : [
+                {
+                  type: "Row" as const,
+                  id: `${page.id}.card-actions`,
+                  props: { gap: "space.2", variant: "card-actions" },
+                  children: cardActionNodes,
+                },
+              ]),
+          ...noticeSection,
+        ],
         fields: fieldNodes,
-        actions,
+        actions: [...actions, ...(actionMenu === undefined ? [] : [actionMenu])],
       },
     };
   }
@@ -1459,7 +1487,20 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
     props: { title: page.name, nav },
     reqRef: page.reqRefs[0] as ReqId | undefined,
     slots: {
-      summary: [summaryCard, ...noticeSection],
+      summary: [
+        summaryCard,
+        ...(cardActionNodes.length === 0
+          ? []
+          : [
+              {
+                type: "Row" as const,
+                id: `${page.id}.card-actions`,
+                props: { gap: "space.2", variant: "card-actions" },
+                children: cardActionNodes,
+              },
+            ]),
+        ...noticeSection,
+      ],
       fields: [
         {
           type: "Section",
@@ -1468,13 +1509,13 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
             ...missingFields.map((field) =>
               fieldFormNode(field, true, values?.[field], page.fieldLabels?.[field])
             ),
-            ...(secondaryActions.length === 0
+            ...(inlineNodes.length === 0
               ? []
               : [
                   {
                     type: "Row" as const,
                     props: { gap: "space.2" },
-                    children: secondaryActions,
+                    children: inlineNodes,
                   },
                 ]),
             ...(page.emptyTitle === undefined
@@ -1483,7 +1524,7 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
           ],
         },
       ],
-      actions,
+      actions: [...actions, ...(actionMenu === undefined ? [] : [actionMenu])],
     },
   };
 }

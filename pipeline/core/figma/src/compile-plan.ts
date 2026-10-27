@@ -157,10 +157,12 @@ function renderNode(
     case "Card":
       return renderCard(node, ctx, specId, path);
     case "Row": {
-      const isFilterRow = str(props.variant) === "filter";
+      const variant = str(props.variant);
+      const isFilterRow = variant === "filter";
+      const isCardActions = variant === "card-actions";
       return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`, {
         inFooter,
-        inFilterRow: isFilterRow,
+        inFilterRow: isFilterRow || isCardActions,
         inHorizontalRow: true,
       }), {
         gap: spacePx(ctx.profile, str(props.gap)),
@@ -330,6 +332,33 @@ function renderNode(
         24,
         colorToken("text.secondary")
       );
+    case "ActionMenu": {
+      const label = str(props.label) || "更多";
+      const sheet = frame(
+        `${specId}.sheet`,
+        "ActionSheet",
+        "VERTICAL",
+        renderChildren(childrenOf(node), ctx, `${path}.children`),
+        {
+          visible: false,
+          gap: spacePx(ctx.profile, "2"),
+          padding: spacePx(ctx.profile, "3"),
+          fill: colorToken("surface.default"),
+          radius: radiusPx(ctx.profile, "lg"),
+          origin: "derived",
+        }
+      );
+      return frame(
+        specId,
+        "ActionMenu",
+        "VERTICAL",
+        [
+          instance(`${specId}.trigger`, label, "ghost", { origin: "derived" }),
+          sheet,
+        ],
+        { gap: 0 }
+      );
+    }
     default: {
       // Fail closed: a type the compiler does not know is never silently a plain
       // frame. Known-but-unmapped types keep their generic frame but degrade.

@@ -517,7 +517,9 @@ export function comparePlanToStyleManifest(input: {
   );
 
   const walk = (node: FigmaPlanNode): void => {
-    const visible = node.origin !== "derived" || isMaterialDerivedId(node.specId);
+    const hidden = node.visible === false;
+    const visible =
+      !hidden && (node.origin !== "derived" || isMaterialDerivedId(node.specId));
     if (node.type === "ABSOLUTE") {
       const style = styles.get(node.specId);
       if (style && node.child) {

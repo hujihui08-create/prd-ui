@@ -48,7 +48,7 @@ export const archetypes: ArchetypeDef[] = [
     id: "detail",
     target: "any",
     requiredSlots: ["summary", "fields", "actions"],
-    allowedComponents: ["Section", "Card", "List", "ListItem", "Badge", "Button", "FormField", "EmptyState", "Skeleton", "ErrorState"],
+    allowedComponents: ["Section", "Card", "List", "ListItem", "Badge", "Button", "ActionMenu", "FormField", "EmptyState", "Skeleton", "ErrorState"],
     requiredStates: ["default", "loading", "error"],
   },
   {

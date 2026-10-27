@@ -68,6 +68,8 @@ export interface FigmaPlanNode {
   shadow?: boolean;
   radius?: number;
   clip?: boolean;
+  /** Hidden in the Figma frame (ActionMenu sheet); parity only sees the closed state. */
+  visible?: boolean;
   layoutGrow?: number;
   layoutAlign?: "STRETCH";
   characters?: string;
@@ -143,6 +145,7 @@ export interface FigmaReadbackNode {
   nodeId: string;
   type: string;
   name: string;
+  visible?: boolean;
   layoutMode?: string;
   itemSpacing?: number;
   padding?: { top: number; right: number; bottom: number; left: number };
@@ -234,6 +237,7 @@ const FigmaPlanNodeSchema: z.ZodType<FigmaPlanNode> = z.lazy(() =>
       shadow: z.boolean().optional(),
       radius: z.number().nonnegative().optional(),
       clip: z.boolean().optional(),
+      visible: z.boolean().optional(),
       layoutGrow: z.number().nonnegative().optional(),
       layoutAlign: z.literal("STRETCH").optional(),
       characters: z.string().optional(),
@@ -375,6 +379,7 @@ const FigmaReadbackNodeSchema: z.ZodType<FigmaReadbackNode> = z.lazy(() =>
       nodeId: z.string().min(1),
       type: z.string().min(1),
       name: z.string().min(1),
+      visible: z.boolean().optional(),
       layoutMode: z.string().optional(),
       itemSpacing: z.number().optional(),
       padding: z

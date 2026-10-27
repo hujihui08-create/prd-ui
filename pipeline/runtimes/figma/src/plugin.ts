@@ -375,6 +375,7 @@ async function buildNode(planNode: FigmaPlanNode, plan: FigmaPlan): Promise<Figm
     node.setPluginData("specId", planNode.specId);
     node.setPluginData("kind", "FRAME");
     applyFrameStyle(node, planNode, plan);
+    if (planNode.visible === false) node.visible = false;
     for (const childPlan of planNode.children ?? []) {
       const child = await buildNode(childPlan, plan);
       node.appendChild(child);
@@ -499,6 +500,7 @@ async function readbackNode(node: FigmaNode): Promise<FigmaReadbackNode> {
     type: kind,
     name: node.name,
     ...(node.getPluginData("specId") ? { specId: node.getPluginData("specId") } : {}),
+    ...(node.visible === false ? { visible: false } : {}),
     ...(node.layoutMode ? { layoutMode: node.layoutMode } : {}),
     ...(node.itemSpacing !== undefined ? { itemSpacing: node.itemSpacing } : {}),
     ...(node.paddingLeft !== undefined

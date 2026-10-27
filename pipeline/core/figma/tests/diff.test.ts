@@ -32,6 +32,7 @@ function readbackFromPlan(plan: FigmaPlan): FigmaReadback {
       nodeId: node.specId,
       type: node.type === "ABSOLUTE" ? "FRAME" : node.type,
       name: node.name,
+      ...(node.visible === false ? { visible: false } : {}),
       children,
     };
     const variant =

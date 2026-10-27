@@ -244,6 +244,19 @@ export function diffFigma(
     }
 
     if (expected.type === "FRAME" || expected.type === "ABSOLUTE") {
+      if (
+        expected.visible !== undefined &&
+        (node.visible ?? true) !== expected.visible
+      ) {
+        findings.push(
+          finding(
+            "FIGMA_VISIBILITY",
+            expected.visible ? "major" : "blocker",
+            `${expected.specId}: expected ${expected.visible ? "visible" : "hidden"}`,
+            expected.specId
+          )
+        );
+      }
       if (expected.layoutMode !== undefined && expected.layoutMode !== "NONE") {
         if (node.layoutMode !== expected.layoutMode) {
           findings.push(

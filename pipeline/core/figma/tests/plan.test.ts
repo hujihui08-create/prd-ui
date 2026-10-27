@@ -454,7 +454,7 @@ describe("compileFigmaPlans", () => {
     expect(card.parent?.paddingTop).toBe(16);
     expect(card.parent?.paddingX).toBe(16);
 
-    const detailRow = detailLookup("customer-detail.root.fields.0");
+    const detailRow = detailLookup("customer-detail.card-actions");
     // Direct `.app-scroll > .row` keeps its own 16px horizontal padding; the
     // preceding card's bottom margin becomes a 16px top gap.
     expect(detailRow.node.paddingX).toBe(16);
@@ -582,10 +582,14 @@ describe("compileFigmaPlans", () => {
       expect(row?.paddingY, pageId).toBe(12);
       expect(row?.paddingX, pageId).toBe(16);
       expect(row?.gap, pageId).toBe(8);
-      for (const button of row?.children ?? []) {
-        expect(button.type).toBe("INSTANCE");
-        expect(button.height).toBe(44);
-        expect(button.layoutGrow).toBe(1);
+      for (const child of row?.children ?? []) {
+        if (child.name === "ActionMenu") {
+          expect(child.type, pageId).toBe("FRAME");
+          continue;
+        }
+        expect(child.type, pageId).toBe("INSTANCE");
+        expect(child.height, pageId).toBe(44);
+        expect(child.layoutGrow, pageId).toBe(1);
       }
     }
   });
@@ -629,5 +633,24 @@ describe("inventory component mapping", () => {
     expect(card?.padding).toBe(16);
     expect(card?.gap).toBe(8);
     expect(card?.children?.length).toBeGreaterThan(0);
+  });
+});
+
+describe("action menu plan", () => {
+  it("builds a closed trigger with a hidden sheet", () => {
+    const spec = specs.find((entry) => entry.meta.pageId === "appointment-detail")!;
+    const plan = compileFigmaPlan(
+      spec,
+      getProfile("b-mobile"),
+      getCatalog("b-mobile")
+    );
+    let menu: FigmaPlanNode | undefined;
+    let sheet: FigmaPlanNode | undefined;
+    walk(plan.root, (node) => {
+      if (node.name === "ActionMenu") menu = node;
+      if (node.name === "ActionSheet") sheet = node;
+    });
+    expect(menu?.type).toBe("FRAME");
+    expect(sheet?.visible).toBe(false);
   });
 });

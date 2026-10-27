@@ -1038,3 +1038,16 @@ describe("node id emission", () => {
     );
   });
 });
+
+describe("action menu", () => {
+  it("renders an action menu with a hidden modal sheet", () => {
+    const spec = phase2ById.get("appointment-detail")!;
+    const html = renderDocument(spec, getProfile("b-mobile"));
+    expect(html).toContain('data-node-id="appointment-detail.action-menu"');
+    expect(html).toContain("data-action-menu");
+    expect(html).toContain('role="dialog"');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('data-node-id="appointment-detail.action.customer"');
+    expect(html).toContain("action-sheet");
+  });
+});
