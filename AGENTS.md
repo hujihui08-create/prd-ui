@@ -161,10 +161,11 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 tag `v0.7.0`). `.worktrees/v0.7` is kept for history only; v0.8 work happens on
 `main`. The v0.7 handoffs and evidence are now in `main`'s tree.
 
-Verified on `main` after the merge: `pnpm test` **987 passed** (87 files),
+Verified on `main`: `pnpm test` **994 passed** (88 files, after v0.8 Batch 1),
 `pnpm test:dsh` **4 passed** (3 files), `pnpm typecheck` clean, `pnpm --dir
 runtimes/figma typecheck` clean and build OK. `phase1:verify` is 8 / 2 / 4 / 8
 pages with 0 blockers across demo-orders, employee-app, 03-slice, and phase2.
+8-page phase2 conformance remains **0 blocker / 0 major / 233 checked**.
 
 v0.7 exit (signed by 胡冀徽 on 2026-10-27): `figma:conformance` **0 blocker / 0
 major / 233 checked** on fresh HTML; `render:measure` 8 pages with no overflow;
@@ -178,10 +179,10 @@ cluster 99–235); `figma:sign` (five hashes) and `visual:sign` recorded;
 `pipeline/artifacts/employee-app-phase2/handoff/` (114 files, `handoff.zip`
 sha256 `61b216bd…96eda1`, five gates passed, both signoffs inside).
 
-Next: v0.8 batches 1–8 + v0.8.1 on `main` (see the debt spec and
-`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md`). RC v0.9;
-final v1.0. Latest handoffs:
-`docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
+Next: v0.8 Batch 2 (end-to-end `actionId`), then batches 3–8 + v0.8.1. See
+`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md` and
+`docs/handoffs/2026-10-27-v08-batch1.md`. RC v0.9; final v1.0. Latest v0.7
+handoffs: `docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
 `docs/handoffs/2026-10-26-v07-implementation-handoff.md` (the latter's §10 is
 the debt list).
 
@@ -208,12 +209,13 @@ the debt list).
   Re-run `block:experiment` before treating that as final. Open issues:
   `requiredStates` semantics, preserving baseline node ids, conformance cost of
   new nodes.
-- **Unmapped component types:** the `employee-app` sample's `inventory-query`
-  uses `Switch` + `InventoryCard`; they exist in the compiler and validators but
-  the renderer branches omit `data-node-id` and the plan renders empty frames,
-  so conformance reports 6 `CONFORMANCE_NODE_MISSING`. Decision: complete both
-  mappings (renderer id + Figma styles) in v0.8; genuinely unknown types are
-  rejected in Phase 1.
+- **Unmapped component types:** closed in v0.8 Batch 1. `Switch`,
+  `InventoryCard`, `Image`, and `Icon` are mapped in both the renderer
+  (`data-node-id`) and the plan compiler; `employee-app` `inventory-query`
+  conformance is 0 blocker (was 6 `CONFORMANCE_NODE_MISSING`). Known-partial
+  types (Stat/DataTable/FilterBar/Pagination/FeedCard) are now
+  `skipped: PARTIAL_MAPPING` instead of degraded-and-compared; genuinely
+  unknown types still fail closed in Phase 1.
 - **Renderer/compiler pairing rule:** `checked` counts depend on renderer
   `data-node-id`. Adding a component type requires updating all five touchpoints
   (contract, catalogs, renderer, plan compiler/coverage, plugin/tests).
