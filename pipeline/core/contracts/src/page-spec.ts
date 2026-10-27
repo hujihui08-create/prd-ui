@@ -52,7 +52,7 @@ const PageMotionSchema = z
   })
   .strict();
 
-const SpecNodeSchema: z.ZodType<SpecNode> = z.lazy(() =>
+export const SpecNodeSchema: z.ZodType<SpecNode> = z.lazy(() =>
   z
     .object({
       id: z.string().min(1).optional(),

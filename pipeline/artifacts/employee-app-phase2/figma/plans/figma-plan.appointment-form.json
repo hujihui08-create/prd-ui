@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "appointment-form.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "新增/改期预约",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-form.page.root.content",
@@ -217,7 +229,9 @@
                     "name": "Label",
                     "characters": "客户*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.0.children.0",
@@ -237,7 +251,9 @@
                             "name": "Placeholder",
                             "characters": "请输入客户",
                             "textStyle": "b-mobile/input.md",
-                            "color": "color/text/tertiary"
+                            "color": "color/text/tertiary",
+                            "origin": "derived",
+                            "mapping": "mapped"
                           }
                         ],
                         "height": 36,
@@ -246,7 +262,10 @@
                         "stroke": "color/border/control",
                         "strokeWidth": 1,
                         "radius": 8,
-                        "alignItems": "CENTER"
+                        "alignItems": "CENTER",
+                        "layoutGrow": 1,
+                        "origin": "spec",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-form.action.pick-customer",
@@ -254,14 +273,20 @@
                         "name": "Button:选择",
                         "component": "Button",
                         "variant": "ghost",
-                        "label": "选择"
+                        "label": "选择",
+                        "origin": "spec",
+                        "mapping": "mapped"
                       }
                     ],
                     "gap": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-form.field.project",
@@ -275,7 +300,9 @@
                     "name": "Label",
                     "characters": "项目*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.1.children.0",
@@ -289,7 +316,9 @@
                         "name": "Placeholder",
                         "characters": "请输入项目",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -298,10 +327,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-form.field.start-time",
@@ -315,7 +348,9 @@
                     "name": "Label",
                     "characters": "开始时间*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.2.children.0",
@@ -329,7 +364,9 @@
                         "name": "Placeholder",
                         "characters": "请选择开始时间",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -338,10 +375,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-form.field.end-time",
@@ -355,7 +396,9 @@
                     "name": "Label",
                     "characters": "结束时间*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.3.children.0",
@@ -369,7 +412,9 @@
                         "name": "Placeholder",
                         "characters": "请选择结束时间",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -378,10 +423,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-form.field.therapist",
@@ -395,7 +444,9 @@
                     "name": "Label",
                     "characters": "护理师*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.4.children.0",
@@ -409,7 +460,9 @@
                         "name": "Placeholder",
                         "characters": "请输入护理师",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -418,10 +471,14 @@
                     "stroke": "color/border/control",
                     "strokeWidth": 1,
                     "radius": 8,
-                    "alignItems": "CENTER"
+                    "alignItems": "CENTER",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "appointment-form.field.source",
@@ -435,7 +492,9 @@
                     "name": "Label",
                     "characters": "来源*",
                     "textStyle": "b-mobile/body.md",
-                    "color": "color/text/secondary"
+                    "color": "color/text/secondary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "appointment-form.root.content.0.children.5.children.0",
@@ -449,7 +508,9 @@
                         "name": "Value",
                         "characters": "到店",
                         "textStyle": "b-mobile/input.md",
-                        "color": "color/text/primary"
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       },
                       {
                         "specId": "appointment-form.root.content.0.children.5.children.0.chevron",
@@ -457,7 +518,9 @@
                         "name": "Chevron",
                         "glyph": "expand_more",
                         "size": 16,
-                        "color": "color/text/tertiary"
+                        "color": "color/text/tertiary",
+                        "origin": "derived",
+                        "mapping": "mapped"
                       }
                     ],
                     "height": 36,
@@ -467,57 +530,205 @@
                     "strokeWidth": 1,
                     "radius": 8,
                     "alignItems": "CENTER",
-                    "justifyContent": "SPACE_BETWEEN"
+                    "justifyContent": "SPACE_BETWEEN",
+                    "origin": "spec",
+                    "mapping": "mapped"
                   }
                 ],
-                "gap": 6
+                "gap": 6,
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 12
+            "gap": 12,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "paddingBottom": 16,
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "appointment-form.page.root.actions",
         "type": "FRAME",
         "name": "Actions",
-        "layoutMode": "HORIZONTAL",
+        "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "appointment-form.action.save",
-            "type": "INSTANCE",
-            "name": "Button:保存",
-            "component": "Button",
-            "variant": "primary",
-            "label": "保存",
-            "height": 44,
-            "layoutGrow": 1
+            "specId": "appointment-form.page.root.actions.divider",
+            "type": "FRAME",
+            "name": "ActionsDivider",
+            "layoutMode": "HORIZONTAL",
+            "children": [],
+            "height": 1,
+            "fill": "color/border/subtle",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "appointment-form.page.root.actions.row",
+            "type": "FRAME",
+            "name": "ActionsRow",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "appointment-form.action.save",
+                "type": "INSTANCE",
+                "name": "Button:保存",
+                "component": "Button",
+                "variant": "primary",
+                "label": "保存",
+                "height": 44,
+                "layoutGrow": 1,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingY": 12,
+            "paddingX": 16,
+            "gap": 8,
+            "alignItems": "CENTER",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
-        "padding": 12,
-        "paddingX": 16,
-        "gap": 8,
         "fill": "color/surface/default",
-        "stroke": "color/border/subtle",
-        "strokeWidth": 1,
-        "alignItems": "CENTER"
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
-    "frames": 18,
+    "frames": 20,
     "texts": 13,
     "instances": 2,
     "icons": 2,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "appointment-form.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0",
+        "specType": "Section",
+        "path": "layout.slots.content[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.customer",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.0.children.0",
+        "specType": "Row",
+        "path": "layout.slots.content[0].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.0.children.0.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[0].children[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.action.pick-customer",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[0].children[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.project",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.1.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[1].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.start-time",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[2]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.2.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[2].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.end-time",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[3]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.3.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[3].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.therapist",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[4]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.4.children.0",
+        "specType": "Input",
+        "path": "layout.slots.content[0].children[4].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.field.source",
+        "specType": "FormField",
+        "path": "layout.slots.content[0].children[5]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.root.content.0.children.5.children.0",
+        "specType": "Select",
+        "path": "layout.slots.content[0].children[5].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "appointment-form.action.save",
+        "specType": "Button",
+        "path": "layout.slots.actions[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 17,
+      "derived": 20,
+      "mapped": 37,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 0
+    }
   }
 }

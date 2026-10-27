@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "appointment-list.content.2",
+  "root": {
+    "id": "appointment-list.view.calendar",
+    "type": "Section",
+    "props": {
+      "padding": "space.1",
+      "gap": "space.2",
+      "viewPanel": "calendar"
+    },
+    "children": [
+      {
+        "id": "appointment-list.root.content.0.children.2.children.0",
+        "type": "Row",
+        "props": {
+          "gap": "space.2"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.2.children.0.children.0",
+            "type": "Text",
+            "props": {
+              "text": "日历"
+            },
+            "textRole": "heading.3"
+          },
+          {
+            "id": "appointment-list.root.content.0.children.2.children.0.children.1",
+            "type": "Text",
+            "props": {
+              "text": "11-05 周三"
+            },
+            "textRole": "label.strong"
+          }
+        ]
+      },
+      {
+        "id": "appointment-list.root.content.0.children.2.children.1",
+        "type": "Row",
+        "props": {
+          "gap": "space.1",
+          "variant": "legend"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.2.children.1.children.0",
+            "type": "Badge",
+            "props": {
+              "label": "已登记",
+              "tone": "warning"
+            }
+          },
+          {
+            "id": "appointment-list.root.content.0.children.2.children.1.children.1",
+            "type": "Badge",
+            "props": {
+              "label": "已到店",
+              "tone": "success"
+            }
+          },
+          {
+            "id": "appointment-list.root.content.0.children.2.children.1.children.2",
+            "type": "Badge",
+            "props": {
+              "label": "爽约",
+              "tone": "danger"
+            }
+          },
+          {
+            "id": "appointment-list.root.content.0.children.2.children.1.children.3",
+            "type": "Badge",
+            "props": {
+              "label": "已取消",
+              "tone": "danger"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appointment-list.state.empty",
+        "type": "EmptyState",
+        "props": {
+          "title": "当前条件没有预约",
+          "description": "11-05 周三 · 调整筛选条件后重试",
+          "variant": "inline"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.2.children.2.children.0",
+            "type": "Button",
+            "props": {
+              "label": "清空筛选",
+              "emphasis": "secondary",
+              "action": "清空筛选"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appointment-list.calendar.grid",
+        "type": "CalendarGrid",
+        "props": {
+          "days": [
+            {
+              "label": "周一",
+              "date": "2025-11-03",
+              "today": false,
+              "selected": false
+            },
+            {
+              "label": "周二",
+              "date": "2025-11-04",
+              "today": false,
+              "selected": false
+            },
+            {
+              "label": "周三",
+              "date": "2025-11-05",
+              "today": false,
+              "selected": true
+            },
+            {
+              "label": "周四",
+              "date": "2025-11-06",
+              "today": false,
+              "selected": false
+            },
+            {
+              "label": "周五",
+              "date": "2025-11-07",
+              "today": false,
+              "selected": false
+            },
+            {
+              "label": "周六",
+              "date": "2025-11-08",
+              "today": false,
+              "selected": false
+            },
+            {
+              "label": "周日",
+              "date": "2025-11-09",
+              "today": false,
+              "selected": false
+            }
+          ],
+          "hours": [
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+            "18:00",
+            "19:00",
+            "20:00"
+          ],
+          "blocks": [
+            {
+              "day": 2,
+              "start": 10,
+              "duration": 1,
+              "title": "张女士",
+              "subtitle": "小气泡",
+              "status": "已登记",
+              "tone": "warning"
+            },
+            {
+              "day": 2,
+              "start": 14,
+              "duration": 1,
+              "title": "李女士",
+              "subtitle": "补水",
+              "status": "已到店",
+              "tone": "success"
+            },
+            {
+              "day": 2,
+              "start": 16.5,
+              "duration": 1,
+              "title": "王女士",
+              "subtitle": "肩颈",
+              "status": "已登记",
+              "tone": "warning"
+            },
+            {
+              "day": 2,
+              "start": 18,
+              "duration": 1,
+              "title": "赵女士",
+              "subtitle": "补水",
+              "status": "爽约",
+              "tone": "danger"
+            }
+          ],
+          "viewPanel": "calendar"
+        }
+      }
+    ]
+  }
+}

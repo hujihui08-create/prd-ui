@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FigmaPlanSchema,
   FigmaReadbackSchema,
+  FigmaSignoffBlockSchema,
   type FigmaPlan,
   type FigmaReadback,
 } from "../src/index.js";
@@ -96,6 +97,114 @@ describe("figma contracts", () => {
   it("rejects an incomplete readback", () => {
     expect(
       FigmaReadbackSchema.safeParse({ ...readback, nodes: undefined }).success
+    ).toBe(false);
+  });
+
+  it("accepts coverage and mapping metadata", () => {
+    const withCoverage: FigmaPlan = {
+      ...plan,
+      coverage: {
+        nodes: [
+          {
+            specId: "today.page.root",
+            specType: "MobileShell",
+            path: "layout",
+            status: "mapped",
+          },
+          {
+            specId: "today.chart",
+            specType: "Chart",
+            path: "layout.children[0]",
+            status: "unmapped",
+            reason: "UNMAPPED_COMPONENT:Chart",
+          },
+        ],
+        summary: { spec: 2, derived: 0, mapped: 1, degraded: 0, unmapped: 1, skipped: 0 },
+      },
+      root: {
+        ...plan.root,
+        origin: "spec",
+        mapping: "unmapped",
+        reason: "UNMAPPED_COMPONENT:Chart",
+      },
+    };
+    expect(FigmaPlanSchema.safeParse(withCoverage).success).toBe(true);
+  });
+
+  it("accepts extended readback style fields", () => {
+    const extended: FigmaReadback = {
+      ...readback,
+      nodes: [
+        {
+          ...readback.nodes[0]!,
+          cornerRadius: 8,
+          borderTop: { width: 0, color: "#00000000" },
+          borderBottom: { width: 1, color: "#E2E8F0" },
+          borderLeft: { width: 2, color: "#2563EB" },
+          fillDetails: [{ color: "#FFFFFF", alpha: 1 }],
+          fontWeight: 600,
+          textColor: "#111827",
+          lineHeight: 24,
+        },
+      ],
+    };
+    expect(FigmaReadbackSchema.safeParse(extended).success).toBe(true);
+  });
+
+  it("accepts per-side frame padding", () => {
+    const padded = {
+      ...plan,
+      root: { ...plan.root, paddingTop: 2, paddingRight: 4 },
+    };
+    const parsed = FigmaPlanSchema.safeParse(padded);
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.root.paddingTop).toBe(2);
+    expect(parsed.success && parsed.data.root.paddingRight).toBe(4);
+    expect(
+      FigmaPlanSchema.safeParse({
+        ...plan,
+        root: { ...plan.root, paddingTop: -1 },
+      }).success
+    ).toBe(false);
+  });
+
+  it("rejects an unknown mapping status", () => {
+    const invalid = {
+      ...plan,
+      root: { ...plan.root, mapping: "maybe" },
+    };
+    expect(FigmaPlanSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  it("accepts a figma signoff block", () => {
+    expect(
+      FigmaSignoffBlockSchema.safeParse({
+        signer: "tester",
+        date: "2026-10-26",
+        planHash: "sha256:a",
+        readbackHash: "sha256:b",
+        conformanceHash: "sha256:c",
+        parityHash: "sha256:d",
+        baselineHash: "sha256:e",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rejects a partial or extended figma signoff block", () => {
+    const block = {
+      signer: "tester",
+      date: "2026-10-26",
+      planHash: "sha256:a",
+      readbackHash: "sha256:b",
+      conformanceHash: "sha256:c",
+      parityHash: "sha256:d",
+      baselineHash: "sha256:e",
+    };
+    expect(
+      FigmaSignoffBlockSchema.safeParse({ ...block, parityHash: undefined }).success
+    ).toBe(false);
+    expect(
+      FigmaSignoffBlockSchema.safeParse({ ...block, extra: "not allowed" }).success
     ).toBe(false);
   });
 });

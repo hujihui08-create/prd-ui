@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "baseline": "pipeline/artifacts/employee-app-phase2/figma/spec-source",
+  "pages": [
+    {
+      "pageId": "today",
+      "metrics": [
+        {
+          "blockId": "today.content.0",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "today.content.1",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "today.content.2",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0,
+          "heightDeltaPct": 0
+        }
+      ],
+      "pageRetries": 0,
+      "costCny": 0.1467791712,
+      "durationMs": 46203,
+      "conformance": "failed",
+      "conformanceComparable": true,
+      "blockVerifyPassed": true,
+      "heightDeltaPct": 0
+    },
+    {
+      "pageId": "appointment-list",
+      "metrics": [
+        {
+          "blockId": "appointment-list.content.0",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0
+        },
+        {
+          "blockId": "appointment-list.content.1",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0
+        },
+        {
+          "blockId": "appointment-list.content.2",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "appointment-list.content.3",
+          "retries": 0,
+          "seams": 0,
+          "tokenDrift": 0
+        }
+      ],
+      "pageRetries": 0,
+      "costCny": 0.18339333119999998,
+      "durationMs": 69184,
+      "conformance": "failed",
+      "conformanceComparable": true,
+      "blockVerifyPassed": true,
+      "heightDeltaPct": 0
+    }
+  ],
+  "conclusion": "rollback",
+  "reasons": [
+    "conformance failed",
+    "parity not evaluated"
+  ]
+}

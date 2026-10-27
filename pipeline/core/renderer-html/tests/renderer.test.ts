@@ -722,6 +722,122 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
   });
 });
 
+describe("derived node ids", () => {
+  it("marks List rows, tabs, and calendar cells with derived ids", () => {
+    const list = renderDocument(
+      phase2ById.get("treatment-notice")!,
+      getProfile("b-mobile")
+    );
+    const today = renderDocument(
+      phase2ById.get("today")!,
+      getProfile("b-mobile"),
+      { pageNames: { today: "今日", "appointment-list": "预约列表" } }
+    );
+    const calendar = renderDocument(
+      appointmentById.get("appointment-list")!,
+      getProfile("b-mobile")
+    );
+
+    expect(list).toMatch(/data-node-id="[^"]+\.row\.0"/);
+    expect(list).toContain(
+      'data-node-id="treatment-notice.root.summary.0.children.0.row.0"'
+    );
+    expect(list).toContain(
+      'data-node-id="treatment-notice.root.summary.2.children.0.row.0"'
+    );
+    expect(today).toMatch(/data-node-id="[^"]+\.tab\.0"/);
+    expect(today).toContain('data-node-id="today.root.bottom-nav.0.tab.0"');
+    expect(calendar).toMatch(/data-node-id="[^"]+\.day\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.hour\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.cell\.0\.0"/);
+    expect(calendar).toMatch(/data-node-id="[^"]+\.block\.0"/);
+    expect(calendar).toContain(
+      'data-node-id="appointment-list.calendar.grid.cell.0.0"'
+    );
+    expect(calendar).toContain(
+      'data-node-id="appointment-list.calendar.grid.block.0"'
+    );
+  });
+});
+
+describe("spec-origin node ids", () => {
+  it("marks form inputs, selects, and their field row", () => {
+    const html = renderDocument(phase2ById.get("appointment-form")!, getProfile("b-mobile"));
+    expect(html).toMatch(
+      /<input[^>]*data-node-id="appointment-form\.root\.content\.0\.children\.1\.children\.0"/
+    );
+    expect(html).toMatch(
+      /<select[^>]*data-node-id="appointment-form\.root\.content\.0\.children\.5\.children\.0"/
+    );
+    expect(html).toMatch(
+      /<div class="row"[^>]*data-node-id="appointment-form\.root\.content\.0\.children\.0\.children\.0"/
+    );
+  });
+
+  it("marks filters, badges, text, rows, the top bar, and the tab bar", () => {
+    const list = renderDocument(
+      phase2ById.get("appointment-list")!,
+      getProfile("b-mobile")
+    );
+    expect(list).toMatch(
+      /<button class="filter"[^>]*data-node-id="appointment-list\.root\.content\.0\.children\.0\.children\.0"/
+    );
+    expect(list).toMatch(
+      /<div class="row filter-row"[^>]*data-node-id="appointment-list\.root\.content\.0\.children\.1"/
+    );
+    expect(list).toMatch(
+      /<span class="badge tone-warning"[^>]*data-node-id="appointment-list\.root\.content\.0\.children\.2\.children\.1\.children\.0"/
+    );
+    expect(list).toMatch(
+      /<span class="typo-heading-3"[^>]*data-node-id="appointment-list\.root\.content\.0\.children\.2\.children\.0\.children\.0"/
+    );
+
+    const today = renderDocument(phase2ById.get("today")!, getProfile("b-mobile"));
+    expect(today).toMatch(/<header class="topbar"[^>]*data-node-id="today\.root\.top-bar\.0"/);
+    expect(today).toMatch(
+      /<nav class="tabbar"[^>]*data-node-id="today\.root\.bottom-nav\.0"/
+    );
+    expect(today).toMatch(
+      /<div class="row"[^>]*data-node-id="today\.root\.content\.0\.children\.0\.children\.0"/
+    );
+  });
+
+  it("marks the search bar, the visible idle empty state, and detail lists", () => {
+    const search = renderDocument(
+      phase2ById.get("customer-search")!,
+      getProfile("b-mobile")
+    );
+    expect(search).toMatch(
+      /<div class="searchbar"[^>]*data-node-id="customer-search\.root\.content\.0\.children\.0"/
+    );
+    expect(search).toMatch(
+      /<div class="empty-state"[^>]*data-node-id="customer-search\.state\.idle"/
+    );
+
+    const detail = renderDocument(
+      phase2ById.get("appointment-detail")!,
+      getProfile("b-mobile")
+    );
+    expect(detail).toMatch(
+      /<div class="list-text"[^>]*data-node-id="appointment-detail\.root\.summary\.0\.children\.0"/
+    );
+    expect(detail).toMatch(
+      /<div class="row[^"]*"[^>]*data-node-id="appointment-detail\.root\.fields\.0"/
+    );
+
+    const notice = renderDocument(
+      phase2ById.get("treatment-notice")!,
+      getProfile("b-mobile")
+    );
+    expect(notice).toMatch(
+      /<div class="row"[^>]*data-node-id="treatment-notice\.root\.summary\.1"/
+    );
+    expect(notice).toMatch(
+      /<span class="typo-heading-3"[^>]*data-node-id="treatment-notice\.root\.summary\.1\.children\.0"/
+    );
+  });
+});
+
 describe("renderer motion", () => {
   it("renders node and group motion attributes plus reduced-motion fallback", () => {
     const html = renderDocument(

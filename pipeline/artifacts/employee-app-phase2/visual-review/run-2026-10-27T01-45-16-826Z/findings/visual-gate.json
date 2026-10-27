@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:50:42.213Z",
+  "gate": {
+    "passed": true,
+    "issues": [
+      {
+        "id": "VC-001",
+        "severity": "minor",
+        "code": "VISUAL_CRITIC_MINOR",
+        "pageId": "appointment-list",
+        "state": "default",
+        "message": "Each ~44px-wide block stacks three lines; the service line renders at roughly 9px and the in-block start time at roughly 7px in low-contrast gray, so the block's secondary content is hard to read at a glance. The start time also duplicates the hour grid, adding density without information. Proposal: Drop the in-block start time and keep two lines (name + service) at ≥11px, or widen the block/selected-day column so the three lines can use the app's 12–13px body scale; the row position already conveys the time.",
+        "evidence": "screenshots/appointment-list.default.png — 周三 column blocks at x≈150–198 (张女士 10:00, 李女士 14:00, 王女士 16:30, 赵女士 18:00), y≈300–660"
+      },
+      {
+        "id": "VC-002",
+        "severity": "minor",
+        "code": "VISUAL_CRITIC_MINOR",
+        "pageId": "appointment-form",
+        "state": "default",
+        "message": "The same 'ghost' emphasis renders as a bare gray text link beside the customer input and as an outlined chip on the detail pages, so the customer-picker control looks like a label rather than a tappable action and the component language is inconsistent across pages. Proposal: Give 选择 the same outlined ghost-button treatment (36–40px tall, 1px border, 8–10px radius) used for the detail-page ghost actions, and keep a single ghost style across the app.",
+        "evidence": "screenshots/appointment-form.default.png — 客户 row at y≈90–127, the 选择 action at x≈329–356 has no button chrome; compare the outlined ghost chips on customer-detail.default.png at y≈514–535"
+      },
+      {
+        "id": "VC-003",
+        "severity": "minor",
+        "code": "VISUAL_CRITIC_MINOR",
+        "pageId": "today",
+        "state": "default",
+        "message": "The two row groups share the same ListRow structure but only 我的预约 rows show a trailing chevron; the 待回访 rows read as static text, so the same row pattern carries two different affordances within one page. Proposal: Give 待回访 rows the same trailing '›' if they open the callback form, or make them visually static so all tappable rows in the page share one affordance.",
+        "evidence": "screenshots/today.default.png — 待回访 card rows '张女士 / 3 天前' and '李女士 / 7 天前' at y≈496–578; the 我的预约 rows above end with a '›' after the time"
+      }
+    ]
+  },
+  "waivedFindings": [],
+  "unwaivedGate": {
+    "passed": true,
+    "blockers": []
+  }
+}

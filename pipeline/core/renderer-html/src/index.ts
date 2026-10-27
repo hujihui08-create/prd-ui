@@ -1,4 +1,9 @@
-import type { PageSpec, Profile, SpecNode } from "@prd-ui/contracts";
+import {
+  derivedNodeId,
+  type PageSpec,
+  type Profile,
+  type SpecNode,
+} from "@prd-ui/contracts";
 import {
   createMotionContext,
   motionAttrs,
@@ -390,6 +395,11 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const listArchetype = renderSpec?.meta.archetype === "mobile-list";
       const inlineLoading =
         listArchetype || renderSpec?.meta.archetype === "detail";
+      // The plan's TabBar frame corresponds to the styled `<nav class="tabbar">`
+      // wrapper, not the inner flex row.
+      const navAttrs = navNodes[0]
+        ? motionAttrs(navNodes[0], renderMotionContext)
+        : { attrs: "", style: "" };
       const header =
         top ||
         (back
@@ -401,7 +411,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   ${header}
   <main class="app-scroll">${titleSlot}${illustration}${body}${summary}${feed}${fields}${content}${listArchetype ? errorPanel("inline") : ""}</main>
   ${actions.length > 0 ? `<div class="app-actions">${actions}</div>` : ""}
-  ${showTabs ? `<nav class="tabbar">${nav}</nav>` : ""}
+  ${showTabs ? `<nav class="tabbar"${navAttrs.attrs}${inlineStyle("", navAttrs.style)}>${nav}</nav>` : ""}
   ${inlineLoading ? "" : loadingPanel()}
   ${listArchetype ? "" : errorPanel("overlay")}
 </div>`;
@@ -409,7 +419,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "TopBar": {
       const storeName = str(props.storeName);
       const hasMessage = bool(props.hasMessage);
-      return `<header class="topbar">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<header class="topbar"${motion.attrs}${inlineStyle("", motion.style)}>
   <div class="topbar-store">${esc(storeName)}<span class="material-symbols-rounded topbar-chevron">expand_more</span></div>
   ${hasMessage ? `<span class="material-symbols-rounded topbar-bell">notifications</span>` : ""}
 </header>`;
@@ -417,24 +428,34 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "TabBar": {
       const items = stringArray(props.items);
       const active = str(props.active);
+      const tabBarId = node.id;
       return `<div class="tabbar-inner">${items
-        .map(
-          (item) => `<a class="tab ${item === active ? "active" : ""}" href="#">
+        .map((item, index) => {
+          const tabId =
+            tabBarId === undefined
+              ? ""
+              : ` data-node-id="${esc(derivedNodeId(tabBarId, "tab", index))}"`;
+          return `<a class="tab ${item === active ? "active" : ""}" href="#"${tabId}>
   <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
   <span class="tab-label">${esc(pageLabel(item))}</span>
-</a>`
-        )
+</a>`;
+        })
         .join("")}</div>`;
     }
     case "BottomNav": {
       const items = stringArray(props.items);
+      const bottomNavId = node.id;
       return `<div class="tabbar-inner">${items
-        .map(
-          (item) => `<a class="tab ${item === renderPageId ? "active" : ""}" href="#">
+        .map((item, index) => {
+          const tabId =
+            bottomNavId === undefined
+              ? ""
+              : ` data-node-id="${esc(derivedNodeId(bottomNavId, "tab", index))}"`;
+          return `<a class="tab ${item === renderPageId ? "active" : ""}" href="#"${tabId}>
   <span class="material-symbols-rounded tab-icon">${tabIcons[item] ?? "circle"}</span>
   <span class="tab-label">${esc(pageLabel(item))}</span>
-</a>`
-        )
+</a>`;
+        })
         .join("")}</div>`;
     }
     case "Stat": {
@@ -444,21 +465,27 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
 </div>`;
     }
     case "List": {
+      const listMotion = motionAttrs(node, renderMotionContext);
       if (Array.isArray(props.items)) {
-        return `<div class="list-text">${(props.items as unknown[])
-          .map((item) => {
+        const parentId = node.id;
+        return `<div class="list-text"${listMotion.attrs}${inlineStyle("", listMotion.style)}>${(props.items as unknown[])
+          .map((item, index) => {
+            const rowId =
+              parentId === undefined
+                ? ""
+                : ` data-node-id="${esc(derivedNodeId(parentId, "row", index))}"`;
             if (item !== null && typeof item === "object" && !Array.isArray(item)) {
               const record = item as Record<string, unknown>;
               const label = str(record.label);
               const value = str(record.value);
-              return `<div class="list-text-row summary-row"><span class="list-text-label">${esc(label)}</span><b class="list-text-value">${esc(value)}</b></div>`;
+              return `<div class="list-text-row summary-row"${rowId}><span class="list-text-label">${esc(label)}</span><b class="list-text-value">${esc(value)}</b></div>`;
             }
-            return `<div class="list-text-row">${esc(item)}</div>`;
+            return `<div class="list-text-row"${rowId}>${esc(item)}</div>`;
           })
           .join("")}</div>`;
       }
       const count = Math.min(Math.max(Number(props.items) || 3, 1), 6);
-      return `<div class="list-placeholder">${Array.from(
+      return `<div class="list-placeholder"${listMotion.attrs}${inlineStyle("", listMotion.style)}>${Array.from(
         { length: count },
         () =>
           `<div class="list-placeholder-row"><span class="skeleton-line wide"></span><span class="skeleton-line"></span><span class="skeleton-line short"></span></div>`
@@ -532,7 +559,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const inputType = str(props.inputType) || "text";
       const value = str(props.value);
       const required = bool(props.required);
-      const control = `<input class="input" name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${required ? ' required aria-required="true"' : ""}${value ? ` value="${esc(value)}"` : ""} />`;
+      const motion = motionAttrs(node, renderMotionContext);
+      const control = `<input class="input"${motion.attrs}${inlineStyle("", motion.style)} name="${esc(name)}" type="${esc(inputType)}" placeholder="${esc(placeholder)}"${required ? ' required aria-required="true"' : ""}${value ? ` value="${esc(value)}"` : ""} />`;
       if (inputType === "datetime-local") {
         return `<span class="datetime-control">${control}<span class="datetime-display" aria-hidden="true">${esc(placeholder)}</span></span>`;
       }
@@ -540,7 +568,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     }
     case "Select": {
       const options = stringArray(props.options);
-      return `<select class="select">${options
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<select class="select"${motion.attrs}${inlineStyle("", motion.style)}>${options
         .map((option) => `<option>${esc(option)}</option>`)
         .join("")}</select>`;
     }
@@ -583,14 +612,21 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const gap = str(props.gap);
       const variant = str(props.variant);
       const variantClass = variant === "filter" ? " filter-row" : "";
-      return `<div class="row${variantClass}" style="gap:${cssVar(gap)}">${children}</div>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="row${variantClass}"${motion.attrs}${inlineStyle(`gap:${cssVar(gap)}`, motion.style)}>${children}</div>`;
     }
-    case "Stack":
-      return `<div class="stack">${children}</div>`;
-    case "Grid":
-      return `<div class="grid">${children}</div>`;
-    case "Text":
-      return `<span class="${typoClass(node.textRole)}">${esc(props.text)}</span>`;
+    case "Stack": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="stack"${motion.attrs}${inlineStyle("", motion.style)}>${children}</div>`;
+    }
+    case "Grid": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="grid"${motion.attrs}${inlineStyle("", motion.style)}>${children}</div>`;
+    }
+    case "Text": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<span class="${typoClass(node.textRole)}"${motion.attrs}${inlineStyle("", motion.style)}>${esc(props.text)}</span>`;
+    }
     case "Icon":
       return `<span class="material-symbols-rounded icon" aria-hidden="true">${iconName(str(props.name))}</span>`;
     case "QuickAction": {
@@ -607,6 +643,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const days = Array.isArray(props.days) ? props.days : [];
       const hours = stringArray(props.hours);
       const blocks = Array.isArray(props.blocks) ? props.blocks : [];
+      const calendarId = node.id;
+      const nodeIdAttr = (
+        kind: string,
+        ...segments: Array<string | number>
+      ): string =>
+        calendarId === undefined
+          ? ""
+          : ` data-node-id="${esc(derivedNodeId(calendarId, kind, ...segments))}"`;
       const dayItems = days.map((entry) => {
         if (typeof entry === "string") {
           return { label: entry, date: "", today: false, selected: false };
@@ -621,12 +665,12 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       });
       const rowCount = Math.max(hours.length, 1);
       const header = `<div class="calendar-corner"></div>${dayItems
-        .map((day) => {
+        .map((day, dayIndex) => {
           const classes = ["calendar-day", day.selected ? "selected" : "", day.today ? "today" : ""]
             .filter(Boolean)
             .join(" ");
           const shortDate = day.date.length === 10 ? day.date.slice(5) : day.date;
-          return `<div class="${classes}"${day.selected ? ' data-selected="true"' : ""}><span>${esc(day.label)}</span><span class="calendar-date"><span class="calendar-date-full">${esc(day.date)}</span><span class="calendar-date-short">${esc(shortDate)}</span></span></div>`;
+          return `<div class="${classes}"${day.selected ? ' data-selected="true"' : ""}${nodeIdAttr("day", dayIndex)}><span>${esc(day.label)}</span><span class="calendar-date"><span class="calendar-date-full">${esc(day.date)}</span><span class="calendar-date-short">${esc(shortDate)}</span></span></div>`;
         })
         .join("")}`;
       const cells = hours
@@ -634,14 +678,14 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
           const row = dayItems
             .map(
               (day, dayIndex) =>
-                `<div class="calendar-cell${day.selected ? " selected" : ""}" data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
+                `<div class="calendar-cell${day.selected ? " selected" : ""}"${nodeIdAttr("cell", hourIndex, dayIndex)} data-slot-date="${esc(day.date)}" data-slot-time="${esc(hour)}" style="grid-column:${dayIndex + 2};grid-row:${hourIndex + 2}"></div>`
             )
             .join("");
-          return `<div class="calendar-hour" style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
+          return `<div class="calendar-hour"${nodeIdAttr("hour", hourIndex)} style="grid-column:1;grid-row:${hourIndex + 2}">${esc(hour)}</div>${row}`;
         })
         .join("");
       const blockHtml = blocks
-        .map((entry) => {
+        .map((entry, index) => {
           const record = entry as Record<string, unknown>;
           const day =
             typeof record.day === "number"
@@ -667,7 +711,7 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
             date: dayItems[day]?.date ?? "",
             time: `${String(startHour).padStart(2, "0")}:${String(startMinute).padStart(2, "0")}`,
           };
-          return `<div class="calendar-block tone-${esc(tone)}" data-block="${esc(JSON.stringify(payload))}" role="button" tabindex="0" aria-label="${esc(record.title)} ${esc(record.subtitle)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span};margin-top:${minuteOffset}px;height:${blockHeight}px;align-self:start;" title="${esc(record.title)} ${esc(record.subtitle)}">
+          return `<div class="calendar-block tone-${esc(tone)}"${nodeIdAttr("block", index)} data-block="${esc(JSON.stringify(payload))}" role="button" tabindex="0" aria-label="${esc(record.title)} ${esc(record.subtitle)}" style="grid-column:${day + 2};grid-row:${rowStart} / span ${span};margin-top:${minuteOffset}px;height:${blockHeight}px;align-self:start;" title="${esc(record.title)} ${esc(record.subtitle)}">
   <span class="calendar-block-title">${esc(record.title)}</span>
   <span class="calendar-block-subtitle">${esc(record.subtitle)}</span>
   <span class="calendar-block-time">${esc(payload.time)}</span>
@@ -708,11 +752,13 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "Badge": {
       const label = str(props.label);
       const tone = str(props.tone) || "neutral";
-      return `<span class="badge tone-${esc(tone)}">${esc(label)}</span>`;
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<span class="badge tone-${esc(tone)}"${motion.attrs}${inlineStyle("", motion.style)}>${esc(label)}</span>`;
     }
     case "SearchBar": {
       const placeholder = str(props.placeholder);
-      return `<div class="searchbar">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="searchbar"${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="material-symbols-rounded search-icon">search</span>
   <input class="search-input" data-search-input placeholder="${esc(placeholder)}" />
 </div>`;
@@ -720,7 +766,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
     case "CollapsedFilter": {
       const label = str(props.label);
       const value = str(props.value);
-      return `<button class="filter" type="button">
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<button class="filter" type="button"${motion.attrs}${inlineStyle("", motion.style)}>
   <span class="filter-label">${esc(label)}</span>
   <span class="filter-value">${esc(value)}</span>
   <span class="material-symbols-rounded filter-chevron">expand_more</span>
@@ -736,8 +783,10 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   <span class="switch-value">${esc(value)}</span>
 </div>`;
     }
-    case "SummaryRow":
-      return `<div class="summary">${esc(props.text)}</div>`;
+    case "SummaryRow": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="summary"${motion.attrs}${inlineStyle("", motion.style)}>${esc(props.text)}</div>`;
+    }
     case "InventoryCard": {
       const attributes = Array.isArray(props.attributes)
         ? (props.attributes as Array<{ label?: unknown; value?: unknown }>)
@@ -777,7 +826,8 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const icon = str(props.icon);
       const emptyKind = str(props.emptyKind);
       const variant = str(props.variant);
-      return `<div class="empty-state${variant ? ` empty-${esc(variant)}` : ""}"${emptyKind ? ` data-empty-kind="${esc(emptyKind)}"` : ""}>
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="empty-state${variant ? ` empty-${esc(variant)}` : ""}"${emptyKind ? ` data-empty-kind="${esc(emptyKind)}"` : ""}${motion.attrs}${inlineStyle("", motion.style)}>
   ${icon ? `<span class="material-symbols-rounded empty-icon">${iconName(icon)}</span>` : ""}
   <div class="empty-title">${esc(title)}</div>
   ${description ? `<div class="empty-desc">${esc(description)}</div>` : ""}

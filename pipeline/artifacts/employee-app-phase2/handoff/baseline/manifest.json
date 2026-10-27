@@ -1,0 +1,338 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:38:50.306Z",
+  "cases": [
+    {
+      "id": "today.default",
+      "pageId": "today",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "today.default.png",
+      "sha256": "sha256:a3df91c7b37a0d574d54962d0ca991b70f2633c815b77edc6756d9fc24b7f785",
+      "visualHash": "sha256:5aa5cf24bed16567434a3e1c65f06f0011fcab65c2875d89bc50beb1f0f2fc48"
+    },
+    {
+      "id": "today.state.empty",
+      "pageId": "today",
+      "state": "empty",
+      "query": {
+        "state": "empty"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "today.state.empty.png",
+      "sha256": "sha256:65bff1bee1164cd0abe81cf836a467036eed8e1ea828cce77723ccb4256f5f0a",
+      "visualHash": "sha256:559fdeebc11bdd91907b6dcf25baaf458a71bedac2283f9f20fc5656855ac3b8"
+    },
+    {
+      "id": "customer-search.default",
+      "pageId": "customer-search",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "customer-search.default.png",
+      "sha256": "sha256:f8cb0d0c554deef975811af28f9ba97789162259f6d911c1296719d1e25b476f",
+      "visualHash": "sha256:90bd4cd6deb373a7656deddd7cb0a977589af19bb645cff657ef8bc1de833943"
+    },
+    {
+      "id": "customer-search.search.results",
+      "pageId": "customer-search",
+      "state": "search:results",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "customer-search.search.results.png",
+      "sha256": "sha256:0f0818ffca5dd30a222fe3ed16e633a7600115f54dd34a1f57a2b6b95d81f6b5",
+      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+    },
+    {
+      "id": "customer-search.search.empty",
+      "pageId": "customer-search",
+      "state": "search:empty",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "customer-search.search.empty.png",
+      "sha256": "sha256:36490fba2956a8cae063f9ba0027fead8f0c3dc44fffa064f8cfd7ffb1130fc5",
+      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+    },
+    {
+      "id": "customer-detail.default",
+      "pageId": "customer-detail",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "customer-detail.default.png",
+      "sha256": "sha256:b73e7b3f341587076d6b57da4bfb32ede1e547595f99ee36e459b7629d23fa67",
+      "visualHash": "sha256:f66845744cfcb8b87cbf7e03f38215a8a82a1b833438a5179bd2fb579ffaea9a"
+    },
+    {
+      "id": "appointment-detail.default",
+      "pageId": "appointment-detail",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.default.png",
+      "sha256": "sha256:4af843e80fd838b19814e65f323dbb7c11e12b21cca8345ffc8edf532a122f45",
+      "visualHash": "sha256:38de13f0ba525d1bd2da0ef46ce58e569f000b9028c27c75fef8fe58517ef78a"
+    },
+    {
+      "id": "appointment-detail.state.loading",
+      "pageId": "appointment-detail",
+      "state": "loading",
+      "query": {
+        "state": "loading"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.state.loading.png",
+      "sha256": "sha256:b4420f375059cb62e9856fd0085c41ab417362335e35eda99684c35cc3e0ce4a",
+      "visualHash": "sha256:18e926aa2e233516ef5ca8a686eab7270ffe28a7d8a3a18f84eea88134b0eb1c"
+    },
+    {
+      "id": "appointment-detail.state.error",
+      "pageId": "appointment-detail",
+      "state": "error",
+      "query": {
+        "state": "error"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.state.error.png",
+      "sha256": "sha256:19d9f3f31954ffe710a69ed4c950f2dce302e17b0f090f58ea5ace32041c3091",
+      "visualHash": "sha256:c768cbea97566b2b86337a218aa6c9b863e82e6363f5617d61d11804f8765172"
+    },
+    {
+      "id": "appointment-detail.business.已到店",
+      "pageId": "appointment-detail",
+      "state": "business:已到店",
+      "query": {
+        "status": "已到店"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.business.已到店.png",
+      "sha256": "sha256:bf5f571affc50282b7ce340006500c23be3b12f98e1c3305db991fa8def40e04",
+      "visualHash": "sha256:5ba389d2f9b1c42e6066c4709422d02af9fc4ecad8752645cd6da03579641481"
+    },
+    {
+      "id": "appointment-detail.business.爽约",
+      "pageId": "appointment-detail",
+      "state": "business:爽约",
+      "query": {
+        "status": "爽约"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.business.爽约.png",
+      "sha256": "sha256:b747c991e1b633a46fffd4d29f14e85bfc6231ecc55491d528eb0cde1c6b8f14",
+      "visualHash": "sha256:18e926aa2e233516ef5ca8a686eab7270ffe28a7d8a3a18f84eea88134b0eb1c"
+    },
+    {
+      "id": "appointment-detail.business.已取消",
+      "pageId": "appointment-detail",
+      "state": "business:已取消",
+      "query": {
+        "status": "已取消"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-detail.business.已取消.png",
+      "sha256": "sha256:9f45ff9b3a9f7ee8a601a6b239d253ea19870c786c2b11b82ae96b049a2e0111",
+      "visualHash": "sha256:18e926aa2e233516ef5ca8a686eab7270ffe28a7d8a3a18f84eea88134b0eb1c"
+    },
+    {
+      "id": "appointment-form.default",
+      "pageId": "appointment-form",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-form.default.png",
+      "sha256": "sha256:640a6687ad26b8d7164a2ffa5e3afb0adc3b1c8a45fbf53705366198c1f26ae1",
+      "visualHash": "sha256:157162e253101d4343b554be495429ec03d24d3e43d6ec30bf5339289a5d77d1"
+    },
+    {
+      "id": "appointment-form.state.disabled",
+      "pageId": "appointment-form",
+      "state": "disabled",
+      "query": {
+        "state": "disabled"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-form.state.disabled.png",
+      "sha256": "sha256:64116362e3dd8d3b82d2ba37eb69a27a81edf089e37ddcda9a6894660198c337",
+      "visualHash": "sha256:8f31c2112638009c9971e42c249d3993526f3af9c23717e7d257854f6dc4de5b"
+    },
+    {
+      "id": "appointment-form.mode.reschedule",
+      "pageId": "appointment-form",
+      "state": "mode:reschedule",
+      "query": {
+        "mode": "reschedule",
+        "recordId": "appointment-detail"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-form.mode.reschedule.png",
+      "sha256": "sha256:66719b74bc7de4073f2870a62f0c1dd3d360a41eb003d4dc358080b22aa3a5fb",
+      "visualHash": "sha256:fe00e569c83ea279ed6ec9ffbaeb5552ab1d0dfa7c6da20e82fcad0c69f44ddd"
+    },
+    {
+      "id": "treatment-notice.default",
+      "pageId": "treatment-notice",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "treatment-notice.default.png",
+      "sha256": "sha256:e27ffebbc9276de808ee187144431450cf0bcda1db0ddedb000a0357bfd52a33",
+      "visualHash": "sha256:7aab2e43bd9efc23664737f8735b246004fc150dfc31e72763897d7813d7a323"
+    },
+    {
+      "id": "treatment-notice.business.已确认",
+      "pageId": "treatment-notice",
+      "state": "business:已确认",
+      "query": {
+        "status": "已确认"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "treatment-notice.business.已确认.png",
+      "sha256": "sha256:7fec06976eed41b65af30b1c57d87988d7f392a90e0b3e55e5001e89808068aa",
+      "visualHash": "sha256:18e926aa2e233516ef5ca8a686eab7270ffe28a7d8a3a18f84eea88134b0eb1c"
+    },
+    {
+      "id": "appointment-list.default",
+      "pageId": "appointment-list",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.default.png",
+      "sha256": "sha256:be332f2796214573b62f650c9a4bf4b4bbd21df2433ac46cf4f87d56613855c5",
+      "visualHash": "sha256:4732b708142e0712e935e49b182a88076accd3017a3fcc5e56d803026fa7b7a0"
+    },
+    {
+      "id": "appointment-list.state.loading",
+      "pageId": "appointment-list",
+      "state": "loading",
+      "query": {
+        "state": "loading"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.state.loading.png",
+      "sha256": "sha256:bf9bb415dba931cd7433cd4a6706ec63186965758d9f88796e6f90f2fd5d221c",
+      "visualHash": "sha256:61a699c1ae5fa0bba42a156d535a61fd47251b5ca905171695318511c8f645fa"
+    },
+    {
+      "id": "appointment-list.state.error",
+      "pageId": "appointment-list",
+      "state": "error",
+      "query": {
+        "state": "error"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.state.error.png",
+      "sha256": "sha256:dcb7966484dfac41d108eabebf32054f2b294d4ce69608d67549bdd3319e66c9",
+      "visualHash": "sha256:2e4ee9b489206dcc546ec55f542bd09aaf4cdf7f76dec391d6ec94346f0d3727"
+    },
+    {
+      "id": "appointment-list.state.empty",
+      "pageId": "appointment-list",
+      "state": "empty",
+      "query": {
+        "state": "empty"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.state.empty.png",
+      "sha256": "sha256:0fe4014b697558fd3cbf3a3d765728dd2ae03ef9597cb5ad55fa21b4db83f694",
+      "visualHash": "sha256:136d2681585beb67e79b2903eb8d6688045dba6abd6316b3ecf4f5f85a9973c0"
+    },
+    {
+      "id": "appointment-list.view.list",
+      "pageId": "appointment-list",
+      "state": "view:list",
+      "query": {
+        "view": "list"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.view.list.png",
+      "sha256": "sha256:65ed111ed167221bb467a34177af58c52a0520e00193a9116f6d15c6eb5d3ca1",
+      "visualHash": "sha256:f3adbab9abb3561099058b479bbc35aa4c4a0621ff1cd81d13d94d586a0068d9"
+    },
+    {
+      "id": "appointment-list.drawer",
+      "pageId": "appointment-list",
+      "state": "drawer",
+      "query": {
+        "view": "calendar"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "appointment-list.drawer.png",
+      "sha256": "sha256:e27d1f1cdff52644a100ecae75a84c563476e760a23c79727cbe348390c3632d",
+      "visualHash": "sha256:c527960550ffef0bed8cc95f9d5f7605fc0b30d65377d6e2394eb38963d793d5"
+    },
+    {
+      "id": "callback-register.default",
+      "pageId": "callback-register",
+      "state": "default",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "callback-register.default.png",
+      "sha256": "sha256:371db20a2e2fe3f946dc2e86b6d90b772a15153b0736e3fac15ffb352cf3296f",
+      "visualHash": "sha256:eda97ce815431ca86dc403852a92ab0d8f0471d1c2249c84cdc778a43ad92571"
+    }
+  ]
+}

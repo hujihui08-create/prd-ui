@@ -404,7 +404,9 @@ readback 节点增加可选字段：
 
 - 读取 `plans/`、`readback/`、`conformance/`、`parity/` 与已签核 baseline manifest。
 - 用规范化 JSON（键排序、去掉 `generatedAt`/`builtAt` 等时间戳）计算五个 hash：`planHash`、`readbackHash`、`conformanceHash`、`parityHash`、`baselineHash`。
-- signoff markdown 沿用现有 `<!-- signoff { ... } -->` 格式，必须包含 `signer`、`date`、五个 hash；缺失或不匹配即拒绝。
+- **不信任已存的 `figma-diff.*.json`**：每页从当前 plan + readback 重算 diff（`diffFigma`，默认 `maxMajor=2`），必须 passed；stored diff 必须与重算结果一致，否则 `FIGMA_DIFF_STALE` 拒绝。
+- **重算 parity 输入哈希**：`parity/figma.<page>.png` 与 baseline default case PNG 必须匹配 `parity.json` 的 `figmaHash`/`baselineHash`（以及 baseline manifest 的 `sha256`），否则 `PARITY_HASH_STALE`。
+- signoff markdown 沿用现有 `<!-- signoff { ... } -->` 格式，必须包含 `signer`、`date`、五个 hash；缺失或不匹配即拒绝。`date` 必须是合法 `YYYY-MM-DD` 且不晚于当天；可选的 `project` 必须与证据项目一致。
 - 写 `signoff/figma-sign.json`：
 
 ```json
@@ -488,7 +490,7 @@ readback 节点增加可选字段：
 }
 ```
 
-`structure:check --spec-run <dir> --metrics <file> --out <file>`：用实测值复核页高、溢出、折叠、固定 footer 遮挡，输出 `structure-measured.json`。v0.7 只报告，不自动改页面。
+`structure:check --spec-run <dir> --metrics <file> --project <project.yaml> --out <dir>`：用实测值复核页高、溢出、固定 footer 遮挡，输出 `structure-measured.json`。`--project` 为必填（页高预算/重复块阈值来自项目 YAML 的 `structure:` 覆盖）。v0.7 只报告，不自动改页面；`foldSpecId` 只记录，暂不产生 fold advisory finding（缺少项目无关的首屏契约）。
 
 ### 6.3 B3 structure diff
 
@@ -622,7 +624,7 @@ DSH_HOME="$PWD/dsh/home" pnpm block:experiment \
 3. 块级校验：catalog、slot、props、required states、block 前缀、结构 lint（块内）。
 4. 块级失败只重试该块，最多 2 次；组装失败整页重试，最多 1 次；infra 失败非零退出，不判 pass。
 5. 组装后运行 Phase 1 校验器、`render:html`、`render:measure`、`figma:plan`、`figma:conformance`。
-6. parity 可选：只有存在已签核 baseline 与 Figma PNG 时才运行；推广结论要求 parity 通过。
+6. parity 通过 `--figma <dir> --figma-baseline <dir>` 提供图与 baseline 时运行（对 experiment spec run）；缺少任一输入时 parity 记为 `not_evaluated`，结论最多 `insufficient_evidence`，永不 `promote`。
 
 预算：真实 dsh 运行上限 ¥3；超过即停止并标记 `BUDGET_EXCEEDED`，不产生通过结论。
 
@@ -632,8 +634,9 @@ DSH_HOME="$PWD/dsh/home" pnpm block:experiment \
 
 - `seams`：块边界间距偏差、双 padding、重复标题数量；目标 0。
 - `blockRetries` / `pageRetries`。
-- `tokenDrift`：硬编码样式计数（复用 token validator 的 raw value 检查）。
-- `pageHeight`：baseline vs 实验的实测高度与偏差百分比。
+- `tokenDrift`：实验块硬编码样式计数，并记录 `baselineTokenDrift`。
+- `pageHeight`：baseline vs 实验的实测 `documentHeight` Δ 与 raw `contentHeight` Δ（两者都是门禁输入）。
+- `phase1Blockers`：组装页的 Phase 1 semantic blockers。
 - `conformance` / `parity`：是否通过。
 - `costCny` / `durationMs`。
 - `status`：`passed` / `failed` / `budget_exceeded`。
@@ -641,10 +644,11 @@ DSH_HOME="$PWD/dsh/home" pnpm block:experiment \
 推广条件（全部满足）：
 
 1. 接缝缺陷 0。
-2. 页高偏差 ≤ 5%。
-3. token 漂移不高于 baseline。
-4. conformance 通过；有 baseline 时 parity 也通过。
-5. 成本 ≤ ¥3。
+2. `documentHeight` 与 `contentHeight` 的 |Δ| 都 ≤ 5%（`documentHeight` 被视口抬升，不能单独使用）。
+3. token 漂移 ≤ baseline（baseline 必须实测；缺失则 `insufficient_evidence`）。
+4. Phase 1 blockers = 0（未运行则 `insufficient_evidence`）。
+5. conformance 通过，且 parity 已评估并全部通过。
+6. 成本 ≤ ¥3。
 
 不满足则结论为 `rollback`：保留整页生成与 Part B，C 只作为实验记录，不进入 v0.8。
 
@@ -654,7 +658,7 @@ DSH_HOME="$PWD/dsh/home" pnpm block:experiment \
 
 ### 8.1 包结构
 
-`pnpm handoff:pack --spec-run <dir> --html <dir> --figma <dir> --visual-run <dir> [--assets <dir>] --out <dir> [--zip]`：
+`pnpm handoff:pack --spec-run <dir> --html <dir> --figma <dir> --visual-run <dir> [--assets <dir>] [--baseline <dir>] [--metrics <file>] --out <dir> [--zip]`：
 
 `--visual-run` 是已签核的 visual review run 目录（含 `visual-sign.json`、`state.json`、baseline manifest 与 signoff）；不接受单独一个 markdown 文件，避免无法校验 findings/baseline hash。
 
@@ -680,7 +684,8 @@ handoff/
     evidence/figma-sign.json
   screenshots/
     html/<pageId>.png
-    figma/<pageId>.png
+    figma/<pageId>.png            # from figma/parity/figma.<page>.png, hash-bound
+    figma-manual/<pageId>.png     # optional legacy crop, stale provenance only
     parity-diff/<pageId>.png
   assets/
     <asset files>
@@ -704,9 +709,13 @@ handoff/
 
 - spec run 完成，每页有 PageSpec；block manifest 若存在则 `block:verify` 通过。
 - 每页有 HTML、plan、readback、diff。
-- `figma:verify` 每页 `passed`；`conformance` 与 `parity` 汇总无 blocker。
+- `figma:verify` diff **由 pack 用当前 plan + readback 重算**并要求 passed；stored diff 必须与重算一致。
+- `conformance` 与 `parity` 汇总无 blocker；parity PNG / baseline PNG 的哈希必须匹配 `parity.json`。
+- `figma/parity/figma.<page>.png` 存在，作为 `screenshots/figma/<page>.png` 的唯一来源；手工截图只进 `screenshots/figma-manual/` 并写 known gap。
+- `render/metrics/render-metrics.json`（或 `--metrics`）存在；缺失是 blocker。
+- 供给的 `html/<page>.html` 与 `spec/page-spec/<page>.json` 的 sha256 必须匹配 `figma:conformance` 与 `visual:review` 记录的 gate-input hash；manifest 写入 `inputHashes`。
 - `figma-sign.json` 存在，且五个 hash 与当前证据一致。
-- `visual-run` 的 `state.json` 为 `passed`，`visual-sign.json` 有效，`manifestHash` / `findingsHash` 与当前 baseline/review 一致。
+- `visual-run` 的 `state.json` 为 `passed`，`visual-sign.json` 有效，`manifestHash` / `findingsHash` / `htmlHashes` 与当前 baseline/review 一致。
 - 每个 spec 引用的资产都有文件和 license 记录；无资产时 `LICENSES.md` 明确写“无第三方资产”。
 - 生成的 `HANDOFF.md` 不含 `TBD`、`TODO`、`{{` 占位符。
 - 任一不满足 → 非零退出，写明缺失项；不生成“半包”。
@@ -821,7 +830,7 @@ Playwright、PNG、zip 不进入默认离线测试；用 CLI smoke 与 fixture �
 
 1. 对 8 页运行 `figma:conformance`。
 2. 对 8 页运行 `figma:parity`（需要 baseline）。
-3. 对 8 页运行 `structure:check --metrics`。
+3. 对 8 页运行 `structure:check --metrics ... --project <yaml>`（`--project` 必填）。
 4. 汇总 JSON；任一 blocker 非零退出。
 
 ### 11.3 缺陷注入验收

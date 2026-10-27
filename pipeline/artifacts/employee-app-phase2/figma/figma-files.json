@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0",
+  "files": [
+    {
+      "pageId": "today",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "appointment-list",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "appointment-detail",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "appointment-form",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "customer-search",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "customer-detail",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "callback-register",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    },
+    {
+      "pageId": "treatment-notice",
+      "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+    }
+  ]
+}

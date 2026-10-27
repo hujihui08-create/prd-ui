@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "appointment-list.content.3",
+  "root": {
+    "id": "appointment-list.view.list",
+    "type": "Section",
+    "props": {
+      "padding": "space.1",
+      "gap": "space.2",
+      "viewPanel": "list"
+    },
+    "children": [
+      {
+        "id": "appointment-list.root.content.0.children.3.children.0",
+        "type": "Text",
+        "props": {
+          "text": "11-05 周三"
+        },
+        "textRole": "label.strong"
+      },
+      {
+        "id": "appointment-list.row.appointment.0",
+        "motionGroup": "appointment-list.row.appointment",
+        "type": "ListRow",
+        "props": {
+          "title": "张女士",
+          "subtitle": "小气泡 · 王美容",
+          "searchText": "11-05 周三 10:00-11:00 张女士 小气泡 已登记 王美容 — 星光店",
+          "meta": "10:00-11:00",
+          "status": "已登记",
+          "statusTone": "warning"
+        }
+      },
+      {
+        "id": "appointment-list.row.appointment.1",
+        "motionGroup": "appointment-list.row.appointment",
+        "type": "ListRow",
+        "props": {
+          "title": "李女士",
+          "subtitle": "补水 · 王美容",
+          "searchText": "11-05 周三 14:00-15:00 李女士 补水 已到店 王美容 — 星光店",
+          "meta": "14:00-15:00",
+          "status": "已到店",
+          "statusTone": "success"
+        }
+      },
+      {
+        "id": "appointment-list.row.appointment.2",
+        "motionGroup": "appointment-list.row.appointment",
+        "type": "ListRow",
+        "props": {
+          "title": "王女士",
+          "subtitle": "肩颈 · 赵××",
+          "searchText": "11-05 周三 16:30-17:30 王女士 肩颈 已登记 赵×× — 星光店",
+          "meta": "16:30-17:30",
+          "status": "已登记",
+          "statusTone": "warning"
+        }
+      },
+      {
+        "id": "appointment-list.row.appointment.3",
+        "motionGroup": "appointment-list.row.appointment",
+        "type": "ListRow",
+        "props": {
+          "title": "赵女士",
+          "subtitle": "补水 · 赵××",
+          "searchText": "11-05 周三 18:00-19:00 赵女士 补水 爽约 赵×× — 星光店",
+          "meta": "18:00-19:00",
+          "status": "爽约",
+          "statusTone": "danger"
+        }
+      },
+      {
+        "id": "appointment-list.state.empty.2",
+        "type": "EmptyState",
+        "props": {
+          "title": "当前条件没有预约",
+          "description": "11-05 周三 · 调整筛选条件后重试",
+          "variant": "inline"
+        },
+        "children": [
+          {
+            "id": "appointment-list.root.content.0.children.3.children.5.children.0",
+            "type": "Button",
+            "props": {
+              "label": "清空筛选",
+              "emphasis": "secondary",
+              "action": "清空筛选"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appointment-list.root.content.0.children.3.children.6",
+        "type": "Skeleton",
+        "props": {
+          "variant": "list"
+        }
+      }
+    ]
+  }
+}

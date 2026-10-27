@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pages": [
+    {
+      "pageId": "today",
+      "baseline": {
+        "documentHeight": 844,
+        "contentHeight": 732,
+        "firstScreenNodes": 15
+      },
+      "experiment": {
+        "documentHeight": 844,
+        "contentHeight": 732,
+        "firstScreenNodes": 15
+      },
+      "heightDeltaPct": 0,
+      "blocks": [
+        {
+          "blockId": "today.content.0",
+          "baselineHeight": 120,
+          "experimentHeight": 120,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "today.content.1",
+          "baselineHeight": 253,
+          "experimentHeight": 253,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "today.content.2",
+          "baselineHeight": 190,
+          "experimentHeight": 190,
+          "heightDeltaPct": 0
+        }
+      ]
+    },
+    {
+      "pageId": "appointment-list",
+      "baseline": {
+        "documentHeight": 844,
+        "contentHeight": 760,
+        "firstScreenNodes": 113
+      },
+      "experiment": {
+        "documentHeight": 844,
+        "contentHeight": 804,
+        "firstScreenNodes": 113
+      },
+      "heightDeltaPct": 0,
+      "blocks": [
+        {
+          "blockId": "appointment-list.content.0"
+        },
+        {
+          "blockId": "appointment-list.content.1"
+        },
+        {
+          "blockId": "appointment-list.content.2",
+          "baselineHeight": 630,
+          "experimentHeight": 630,
+          "heightDeltaPct": 0
+        },
+        {
+          "blockId": "appointment-list.content.3",
+          "baselineHeight": 0,
+          "experimentHeight": 0
+        }
+      ]
+    }
+  ]
+}

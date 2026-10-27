@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { existsSync, statSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,7 +11,7 @@ import {
   type FigmaReadback,
   type PageSpec,
 } from "@prd-ui/contracts";
-import { compileFigmaPlans, diffFigma } from "@prd-ui/figma";
+import { compileFigmaPlans, coverageIndex, diffFigma } from "@prd-ui/figma";
 import { getCatalog, getProfile } from "@prd-ui/design-system";
 
 export const USAGE = `Usage:
@@ -128,10 +129,40 @@ function sha256(value: string): string {
   return `sha256:${createHash("sha256").update(value, "utf8").digest("hex")}`;
 }
 
+/** Nearest ancestor that contains a `.git` entry (directory or worktree file). */
+function repoRootFor(target: string): string | undefined {
+  let current = path.resolve(target);
+  try {
+    if (!statSync(current).isDirectory()) current = path.dirname(current);
+  } catch {
+    current = path.dirname(current);
+  }
+  while (true) {
+    if (existsSync(path.join(current, ".git"))) return current;
+    const parent = path.dirname(current);
+    if (parent === current) return undefined;
+    current = parent;
+  }
+}
+
+/**
+ * Record a run path in generated evidence without machine-specific absolute
+ * paths: repo-relative when the run is inside a repo, otherwise only the run
+ * directory basename.
+ */
+export function portableSpecRun(specRun: string): string {
+  const resolved = path.resolve(specRun);
+  const root = repoRootFor(resolved);
+  if (root === undefined) return path.basename(resolved);
+  const relative = path.relative(root, resolved).split(path.sep).join("/");
+  return relative === "" ? "." : relative;
+}
+
 async function runPlan(options: PlanOptions): Promise<number> {
   if (options.specRun === undefined) throw new CliUsageError("--spec-run is required");
   if (options.out === undefined) throw new CliUsageError("--out is required");
   const specs = await loadSpecs(options.specRun);
+  const specRunRef = portableSpecRun(options.specRun);
   const plans = compileFigmaPlans(
     specs,
     (page) => getProfile(page.meta.profile),
@@ -155,12 +186,23 @@ async function runPlan(options: PlanOptions): Promise<number> {
   const indexBody = pretty({
     schemaVersion: "1.0",
     project: specs[0]?.meta.project ?? "unknown",
-    specRun: options.specRun,
+    specRun: specRunRef,
     plans: index,
   });
   await writeFile(path.join(options.out, "figma-plan.index.json"), indexBody, "utf8");
+  await writeFile(
+    path.join(options.out, "plan-coverage.json"),
+    pretty(coverageIndex(plans, specRunRef, specs[0]?.meta.project ?? "unknown")),
+    "utf8"
+  );
   if (options.json) {
-    console.log(JSON.stringify({ plans: plans.length, out: options.out }, null, 2));
+    const coverage = {
+      mapped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.mapped ?? 0), 0),
+      degraded: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.degraded ?? 0), 0),
+      unmapped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.unmapped ?? 0), 0),
+      skipped: plans.reduce((sum, plan) => sum + (plan.coverage?.summary.skipped ?? 0), 0),
+    };
+    console.log(JSON.stringify({ plans: plans.length, out: options.out, coverage }, null, 2));
   } else {
     console.log(`Figma plans: ${plans.length} -> ${options.out}`);
   }

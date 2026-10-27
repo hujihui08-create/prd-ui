@@ -7,6 +7,12 @@ import type {
   SpecNode,
 } from "@prd-ui/contracts";
 import {
+  KNOWN_PARTIAL_TYPES,
+  applyCoverage,
+  buildCoverage,
+  skipReason,
+} from "./coverage.js";
+import {
   MOBILE_HEIGHT,
   MOBILE_WIDTH,
   WEB_HEIGHT,
@@ -57,26 +63,48 @@ function childrenOf(node: SpecNode): SpecNode[] {
   return node.children ?? [];
 }
 
-function shouldSkip(node: SpecNode, ctx: Ctx): boolean {
-  if (node.type === "Skeleton" || node.type === "ErrorState") return true;
-  if (node.type === "EmptyState" && node.props?.emptyKind !== "idle") return true;
-  // Search results stay hidden until the query matches (renderer-html applySearch).
-  if (node.type === "ListRow" && typeof node.props?.searchText === "string") return true;
-  if (
-    node.type === "Section" &&
-    typeof node.props?.viewPanel === "string" &&
-    node.props.viewPanel !== ctx.defaultView
-  ) {
-    return true;
+/**
+ * Direct `.app-scroll > *` margins from renderer-html. A Figma auto-layout
+ * frame has no CSS margins, so the compiler carries them as a derived
+ * `SlotBlock` wrapper (paddingTop/paddingX/paddingBottom). Rows and Sections
+ * are not listed: `.app-scroll > .row` supplies its own horizontal padding and
+ * nested Sections keep theirs, and neither has a vertical margin.
+ */
+interface AppScrollInsets {
+  marginTop: number;
+  marginBottom: number;
+  insetX: number;
+}
+
+function appScrollInsets(profile: Profile, node: SpecNode): AppScrollInsets {
+  switch (node.type) {
+    case "Card":
+    case "Image":
+      // `.app-scroll>.card{margin:var(--space-4)}` and
+      // `.image-placeholder{margin:var(--space-4)}`.
+      return {
+        marginTop: spacePx(profile, "4"),
+        marginBottom: spacePx(profile, "4"),
+        insetX: spacePx(profile, "4"),
+      };
+    default:
+      return { marginTop: 0, marginBottom: 0, insetX: 0 };
   }
-  return false;
+}
+
+interface RenderOptions {
+  inFooter?: boolean;
+  inFilterRow?: boolean;
+  directAppScroll?: boolean;
+  /** Direct child of a horizontal Row; text inputs grow like `flex:1`. */
+  inHorizontalRow?: boolean;
 }
 
 function renderChildren(
   nodes: SpecNode[],
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
+  options: RenderOptions = {}
 ): FigmaPlanNode[] {
   return nodes.flatMap((node, index) => {
     const result = renderNode(node, ctx, `${path}.${index}`, options);
@@ -88,13 +116,21 @@ function renderNode(
   node: SpecNode,
   ctx: Ctx,
   path: string,
-  options: { inFooter?: boolean; inFilterRow?: boolean } = {}
+  options: RenderOptions = {}
 ): FigmaPlanNode | null {
-  if (shouldSkip(node, ctx)) return null;
+  if (skipReason(node, ctx.defaultView)) return null;
   const props = node.props ?? {};
   const specId = node.id ?? `${ctx.page.meta.pageId}.${path}`;
   const inFooter = options.inFooter === true;
   const inFilterRow = options.inFilterRow === true;
+  const directAppScroll = options.directAppScroll === true;
+  const inHorizontalRow = options.inHorizontalRow === true;
+  // `.app-scroll > .row` gets horizontal padding from the renderer CSS. Only a
+  // row that is a direct MobileShell slot child is in that position; nested
+  // rows keep their own (zero) padding.
+  const directRowPadding = directAppScroll
+    ? { paddingX: spacePx(ctx.profile, "4") }
+    : {};
 
   switch (node.type) {
     case "MobileShell":
@@ -123,11 +159,13 @@ function renderNode(
     case "Row": {
       const isFilterRow = str(props.variant) === "filter";
       return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`, {
-        ...options,
+        inFooter,
         inFilterRow: isFilterRow,
+        inHorizontalRow: true,
       }), {
         gap: spacePx(ctx.profile, str(props.gap)),
         alignItems: "CENTER",
+        ...directRowPadding,
       });
     }
     case "Stack":
@@ -159,7 +197,7 @@ function renderNode(
     case "FormField":
       return renderFormField(node, ctx, specId, path);
     case "Input":
-      return renderInput(props, ctx, specId);
+      return renderInput(props, ctx, specId, inHorizontalRow);
     case "Select":
       return renderSelect(props, ctx, specId);
     case "ListRow":
@@ -184,14 +222,23 @@ function renderNode(
         fill: colorToken("surface.subtle"),
         radius: radiusPx(ctx.profile, "lg"),
       });
-    default:
+    default: {
+      // Fail closed: a type the compiler does not know is never silently a plain
+      // frame. Known-but-unmapped types keep their generic frame but degrade.
+      const known = KNOWN_PARTIAL_TYPES.has(node.type);
       return frame(
         specId,
-        node.type,
+        known ? node.type : `Unmapped:${node.type}`,
         "VERTICAL",
         renderChildren(childrenOf(node), ctx, `${path}.children`),
-        { gap: 0 }
+        {
+          gap: 0,
+          ...(known
+            ? { mapping: "degraded" as const, reason: `PARTIAL_MAPPING:${node.type}` }
+            : { mapping: "unmapped" as const, reason: `UNMAPPED_COMPONENT:${node.type}` }),
+        }
       );
+    }
   }
 }
 
@@ -203,7 +250,44 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
   // Mirror renderer-html's MobileShell slot order; detail/notice archetypes put
   // their body in summary/fields, not content.
   const contentSlots = ["title", "illustration", "body", "summary", "feed", "fields", "content"] as const;
-  const content = contentSlots.flatMap((name) => renderChildren(node.slots?.[name] ?? [], ctx, name));
+  // Render the direct `.app-scroll` children in slot order, then model their CSS
+  // margins. `.app-scroll>.card{margin:16px}` is not a flex gap, so a card gets
+  // a derived SlotBlock wrapper with paddingTop/paddingX/paddingBottom; a
+  // following direct Row gets paddingTop for the collapsed margin gap. Without
+  // the wrapper the card is 390px wide and its list 358px instead of 358/326.
+  const entries = contentSlots.flatMap((name) =>
+    (node.slots?.[name] ?? []).flatMap((child, index) => {
+      const rendered = renderNode(child, ctx, `${name}.${index}`, { directAppScroll: true });
+      return rendered === null ? [] : [{ spec: child, rendered }];
+    })
+  );
+  const content = entries.map((entry, index) => {
+    const insets = appScrollInsets(ctx.profile, entry.spec);
+    const previous = index === 0 ? undefined : entries[index - 1];
+    const spacing =
+      previous === undefined
+        ? insets.marginTop
+        : Math.max(appScrollInsets(ctx.profile, previous.spec).marginBottom, insets.marginTop);
+    const isLast = index === entries.length - 1;
+    const paddingTop = spacing > 0 ? spacing : undefined;
+    const paddingX = insets.insetX > 0 ? insets.insetX : undefined;
+    const paddingBottom =
+      isLast && insets.marginBottom > 0 ? insets.marginBottom : undefined;
+    if (paddingTop === undefined && paddingX === undefined && paddingBottom === undefined) {
+      return entry.rendered;
+    }
+    return frame(
+      `${entry.rendered.specId}.slot`,
+      "SlotBlock",
+      "VERTICAL",
+      [entry.rendered],
+      {
+        ...(paddingTop === undefined ? {} : { paddingTop }),
+        ...(paddingX === undefined ? {} : { paddingX }),
+        ...(paddingBottom === undefined ? {} : { paddingBottom }),
+      }
+    );
+  });
   const actions = node.slots?.actions ?? [];
   const nav = node.slots?.["bottom-nav"] ?? [];
   const hasTop = top.length > 0;
@@ -234,6 +318,8 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
       fill: colorToken("surface.subtle"),
       gap: 0,
       clip: true,
+      // `.app-scroll{padding-bottom:var(--space-4)}`.
+      paddingBottom: spacePx(ctx.profile, "4"),
     }
   );
 
@@ -246,19 +332,35 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
             first !== undefined && first.type === "Section"
               ? childrenOf(first)
               : actions;
-          return frame(
-            `${specId}.actions`,
-            "Actions",
+          // `.app-actions` is `padding:12px 16px` plus a 1px top border. The
+          // border is a separate divider frame: a partially stroked Figma frame
+          // reserves its 1px stroke on every side for auto layout, which would
+          // shrink the button row to 356px and shift it 1px right/down.
+          const actionRow = frame(
+            `${specId}.actions.row`,
+            "ActionsRow",
             "HORIZONTAL",
             renderChildren(actionNodes, ctx, "actions", { inFooter: true }),
             {
-              padding: spacePx(ctx.profile, "3"),
+              paddingY: spacePx(ctx.profile, "3"),
               paddingX: spacePx(ctx.profile, "4"),
               gap: spacePx(ctx.profile, "2"),
-              fill: colorToken("surface.default"),
-              stroke: colorToken("border.subtle"),
-              strokeWidth: 1,
               alignItems: "CENTER",
+            }
+          );
+          return frame(
+            `${specId}.actions`,
+            "Actions",
+            "VERTICAL",
+            [
+              frame(`${specId}.actions.divider`, "ActionsDivider", "HORIZONTAL", [], {
+                height: 1,
+                fill: colorToken("border.subtle"),
+              }),
+              actionRow,
+            ],
+            {
+              fill: colorToken("surface.default"),
             }
           );
         })();
@@ -401,7 +503,9 @@ function renderCard(node: SpecNode, ctx: Ctx, specId: string, path: string): Fig
     "Body",
     "VERTICAL",
     renderChildren(childrenOf(node), ctx, `${path}.children`),
-    { gap: 0 }
+    // `.card-body { margin-top: 8px }` is the head→body rhythm. The card itself
+    // has no gap, so the derived body frame carries the offset for Figma.
+    { gap: 0, paddingTop: spacePx(ctx.profile, "2") }
   );
   return frame(specId, "Card", "VERTICAL", [
     frame(`${specId}.head`, "Head", "HORIZONTAL", head, {
@@ -412,7 +516,9 @@ function renderCard(node: SpecNode, ctx: Ctx, specId: string, path: string): Fig
     body,
   ], {
     padding: spacePx(ctx.profile, "4"),
-    gap: spacePx(ctx.profile, "2"),
+    // `.card` has no gap; `.card-body` supplies the 8px head→body rhythm with a
+    // margin, which is not a flex gap on the card itself.
+    gap: 0,
     fill: colorToken("surface.default"),
     radius: radiusPx(ctx.profile, "lg"),
     shadow: true,
@@ -439,6 +545,10 @@ function renderQuickAction(props: Record<string, unknown>, ctx: Ctx, specId: str
   ], {
     height: 56,
     layoutGrow: 1,
+    // `<button class="quick-action">` sets no padding, so the UA button padding
+    // (1px block / 6px inline in Chrome) is the computed value.
+    paddingY: 1,
+    paddingX: 6,
     fill,
     fillAlpha: tone === "customer" || tone === "inventory" ? 0.1 : 1,
     radius: radiusPx(ctx.profile, "md"),
@@ -514,7 +624,12 @@ function renderFormField(node: SpecNode, ctx: Ctx, specId: string, path: string)
   });
 }
 
-function renderInput(props: Record<string, unknown>, ctx: Ctx, specId: string): FigmaPlanNode {
+function renderInput(
+  props: Record<string, unknown>,
+  ctx: Ctx,
+  specId: string,
+  inHorizontalRow: boolean
+): FigmaPlanNode {
   return frame(specId, "Input", "HORIZONTAL", [
     text(`${specId}.placeholder`, "Placeholder", str(props.placeholder), ctx.profile, "input.md", {
       color: colorToken("text.tertiary"),
@@ -527,6 +642,9 @@ function renderInput(props: Record<string, unknown>, ctx: Ctx, specId: string): 
     strokeWidth: 1,
     radius: 8,
     alignItems: "CENTER",
+    // `.form-field .row .input{flex:1;min-width:0}`: the input fills the row
+    // while the sibling picker button hugs (`.form-field .row .btn{flex:0 0 auto}`).
+    ...(inHorizontalRow ? { layoutGrow: 1 } : {}),
   });
 }
 
@@ -610,7 +728,7 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
           color: colorToken("text.tertiary"),
         })
       ),
-      { gap: 0 }
+      { gap: 10, paddingY: 4 }
     );
   }
   const children = items.map((item, index) => {
@@ -629,14 +747,32 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
         paddingY: 10,
         gap: spacePx(ctx.profile, "3"),
         alignItems: "CENTER",
-        borderBottom: colorToken("border.subtle"),
-        borderBottomWidth: 1,
+        // `.list-text-row:last-child` suppresses the divider on the final row.
+        ...(index === items.length - 1
+          ? {}
+          : { borderBottom: colorToken("border.subtle"), borderBottomWidth: 1 }),
       });
     }
-    return text(`${specId}.row.${index}`, "Item", String(item), ctx.profile, "body.md");
+    // `.list-text-row{padding:10px 0;border-bottom:1px ...}`: a plain string
+    // item is a padded, divided row, not a bare text line.
+    return frame(
+      `${specId}.row.${index}`,
+      "Row",
+      "HORIZONTAL",
+      [
+        text(`${specId}.row.${index}.text`, "Item", String(item), ctx.profile, "body.regular"),
+      ],
+      {
+        paddingY: 10,
+        alignItems: "CENTER",
+        ...(index === items.length - 1
+          ? {}
+          : { borderBottom: colorToken("border.subtle"), borderBottomWidth: 1 }),
+      }
+    );
   });
   void path;
-  return frame(specId, "List", "VERTICAL", children, { gap: 0 });
+  return frame(specId, "List", "VERTICAL", children, { gap: 0, paddingY: 4 });
 }
 
 const DAY_WIDTH = 46;
@@ -684,6 +820,14 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
         gap: 1,
         alignItems: "CENTER",
         justifyContent: "CENTER",
+        // `.calendar-day` has a 1px border on its left and bottom edges; the
+        // selected underline replaces the bottom border with a 2px accent (the
+        // renderer paints it as an inset box-shadow, which the comparator's
+        // underline fallback accepts).
+        borderLeft: colorToken("border.subtle"),
+        borderLeftWidth: 1,
+        borderBottom: colorToken("border.subtle"),
+        borderBottomWidth: 1,
         ...(selected
           ? { borderBottom: colorToken("status.info"), borderBottomWidth: 2 }
           : {}),
@@ -708,7 +852,9 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       ], {
         width: TIME_WIDTH,
         height: ROW_HEIGHT,
-        paddingX: 4,
+        // `.calendar-hour` is `padding:2px 4px 0 0`.
+        paddingTop: 2,
+        paddingRight: 4,
         alignItems: "END",
         justifyContent: "START",
       }),
@@ -728,10 +874,13 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
         child: frame(`${specId}.cell.${rowIndex}.${dayIndex}.frame`, "Cell", "NONE", [], {
           width: DAY_WIDTH,
           height: ROW_HEIGHT,
-          fill: selected ? colorToken("status.info") : colorToken("surface.default"),
-          fillAlpha: selected ? 0.04 : 1,
-          stroke: colorToken("border.subtle"),
-          strokeWidth: 0.5,
+          // `.calendar-cell` is transparent with top/left 1px rules; a selected
+          // column only adds a 4% info tint.
+          ...(selected ? { fill: colorToken("status.info"), fillAlpha: 0.04 } : {}),
+          borderTop: colorToken("border.subtle"),
+          borderTopWidth: 1,
+          borderLeft: colorToken("border.subtle"),
+          borderLeftWidth: 1,
         }),
       });
     }
@@ -752,9 +901,11 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
       type: "ABSOLUTE",
       specId: `${specId}.block.${index}`,
       name: `Block:${title}`,
-      x: TIME_WIDTH + day * DAY_WIDTH + 1,
+      // The block fills the whole day column; its grid cell starts at the
+      // column edge and the CSS left border is inside the box.
+      x: TIME_WIDTH + day * DAY_WIDTH,
       y: HEADER_HEIGHT + Math.max(0, startHour - 9) * ROW_HEIGHT + minuteOffset,
-      width: DAY_WIDTH - 2,
+      width: DAY_WIDTH,
       height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
       child: frame(`${specId}.block.${index}.frame`, "Block", "VERTICAL", [
         text(`${specId}.block.${index}.title`, "Title", title, ctx.profile, "label.bold"),
@@ -767,7 +918,7 @@ function renderCalendar(props: Record<string, unknown>, ctx: Ctx, specId: string
           color: colorToken("text.tertiary"),
         }),
       ], {
-        width: DAY_WIDTH - 2,
+        width: DAY_WIDTH,
         height: Math.max(22, Math.round(duration * ROW_HEIGHT)),
         padding: 2,
         gap: 0,
@@ -809,7 +960,9 @@ function renderEmptyState(node: SpecNode, ctx: Ctx, specId: string, path: string
         ]),
     ...renderChildren(childrenOf(node), ctx, `${path}.children`),
   ], {
-    padding: spacePx(ctx.profile, "6"),
+    // `.empty-state` is `padding: space-6 space-4` (24px block / 16px inline).
+    paddingY: spacePx(ctx.profile, "6"),
+    paddingX: spacePx(ctx.profile, "4"),
     gap: 4,
     alignItems: "CENTER",
   });
@@ -845,7 +998,7 @@ export function compileFigmaPlan(
     "VERTICAL",
     []
   );
-  return {
+  const plan: FigmaPlan = {
     schemaVersion: "1.0",
     project: page.meta.project,
     pageId: page.meta.pageId,
@@ -859,6 +1012,9 @@ export function compileFigmaPlan(
     root,
     stats: countStats(root),
   };
+  const coverage = buildCoverage(page, plan);
+  applyCoverage(plan, coverage);
+  return plan;
 }
 
 export function compileFigmaPlans(

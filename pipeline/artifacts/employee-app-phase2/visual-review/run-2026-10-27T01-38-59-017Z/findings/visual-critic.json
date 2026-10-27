@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:45:02.149Z",
+  "runtime": "dsh",
+  "profile": "prd-ui-visual",
+  "model": "deepseek-flash",
+  "usageComplete": false,
+  "usage": {
+    "inputTokens": 39739,
+    "outputTokens": 48232,
+    "cacheReadTokens": 317184,
+    "totalTokens": 405155
+  },
+  "costCny": 0.5162630688,
+  "costSource": "pricing",
+  "budgetEnforced": true,
+  "critique": null,
+  "error": "dsh exited with 1:"
+}

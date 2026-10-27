@@ -57,7 +57,7 @@ export const SCREENSHOT_TIMEZONE = "Asia/Shanghai";
 /** Let a webfont swap repaint before the first frame is captured. */
 const FONT_SETTLE_MS = 200;
 
-const LAUNCH_ARGS = [
+export const LAUNCH_ARGS = [
   "--force-color-profile=srgb",
   "--disable-lcd-text",
   "--font-render-hinting=none",

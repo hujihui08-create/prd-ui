@@ -3,13 +3,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   AssetBriefSchema,
+  DEFAULT_STRUCTURE_CONFIG,
   UiBriefSchema,
   redactValue,
   type AssetBrief,
   type PageSpec,
+  type StructureLintReport,
   type UiBrief,
 } from "@prd-ui/contracts";
-import { compileProject } from "@prd-ui/compiler";
+import { compileProject, splitBlocks } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
 import {
   IaMapArtifactSchema,
@@ -26,6 +28,7 @@ import {
   type SpecEngineerSummary,
 } from "@prd-ui/spec-engineer";
 import { createRunId, loadProjectConfig } from "@prd-ui/orchestrator";
+import { estimatePageHeight, validateStructure } from "@prd-ui/validators";
 import { FileArtifactStore } from "./asset/artifact-store.js";
 
 const pipelineRoot = path.resolve(
@@ -400,8 +403,51 @@ export async function main(
     if (result.gate.passed) {
       for (const spec of result.specs) {
         await store.writeJson(`artifacts/page-spec/${spec.meta.pageId}.json`, spec);
+        const manifest = splitBlocks(spec, getArchetype(spec.meta.archetype));
+        await store.writeJson(`artifacts/block-manifest/${spec.meta.pageId}.json`, manifest);
       }
     }
+
+    // Structure lint is advisory in v0.7: warnings never change the gate.
+    const structureConfig = {
+      maxRepeatedSections:
+        config.structure?.maxRepeatedSections ??
+        DEFAULT_STRUCTURE_CONFIG.maxRepeatedSections,
+      pageHeightBudget: {
+        mobile:
+          config.structure?.pageHeightBudget?.mobile ??
+          DEFAULT_STRUCTURE_CONFIG.pageHeightBudget.mobile,
+        web:
+          config.structure?.pageHeightBudget?.web ??
+          DEFAULT_STRUCTURE_CONFIG.pageHeightBudget.web,
+      },
+    };
+    const structurePages = result.specs.map((spec) => {
+      const context = {
+        profile: getProfile(spec.meta.profile),
+        catalog: getCatalog(spec.meta.profile),
+        archetype: getArchetype(spec.meta.archetype),
+        structure: structureConfig,
+      };
+      return {
+        pageId: spec.meta.pageId,
+        estimatedHeight: estimatePageHeight(spec, context),
+        budget: structureConfig.pageHeightBudget[spec.meta.target],
+        findings: validateStructure(spec, context),
+      };
+    });
+    const structureReport: StructureLintReport = {
+      schemaVersion: "1.0",
+      project,
+      generatedAt: new Date().toISOString(),
+      config: structureConfig,
+      pages: structurePages,
+      summary: {
+        warnings: structurePages.reduce((sum, page) => sum + page.findings.length, 0),
+        blockers: 0,
+      },
+    };
+    await store.writeJson("findings/structure-lint.json", structureReport);
     await logger.log({
       type: "run_finished",
       passed: result.gate.passed,

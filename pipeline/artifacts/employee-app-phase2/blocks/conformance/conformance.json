@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pages": [
+    {
+      "pageId": "today",
+      "baseline": {
+        "passed": false,
+        "checked": 15,
+        "skipped": 2,
+        "blockers": 19
+      },
+      "experiment": {
+        "passed": false,
+        "checked": 15,
+        "skipped": 2,
+        "blockers": 19
+      },
+      "newBlockers": [],
+      "fixedBlockers": [],
+      "gateUsable": false,
+      "comparable": true,
+      "conformance": "failed"
+    },
+    {
+      "pageId": "appointment-list",
+      "baseline": {
+        "passed": false,
+        "checked": 113,
+        "skipped": 8,
+        "blockers": 708
+      },
+      "experiment": {
+        "passed": false,
+        "checked": 113,
+        "skipped": 8,
+        "blockers": 710
+      },
+      "newBlockers": [
+        "CONFORMANCE_NODE_MISSING|appointment-list.content.1.search|Plan node SearchBar has no HTML counterpart.",
+        "CONFORMANCE_NODE_MISSING|appointment-list.content.1.filter|Plan node CollapsedFilter has no HTML counterpart."
+      ],
+      "fixedBlockers": [],
+      "gateUsable": false,
+      "comparable": true,
+      "conformance": "failed"
+    }
+  ],
+  "note": "conformance is a tri-state: passed means the in-process gate ran with 0 blockers; failed means it ran and found blockers (including a pre-existing red baseline); not_evaluated means it did not run. newBlockers and fixedBlockers are regression diagnostics only; they never rewrite failed as passed."
+}

@@ -10,10 +10,36 @@ export type FigmaNodeType =
   | "IMAGE"
   | "ABSOLUTE";
 
+export type FigmaMappingStatus = "mapped" | "degraded" | "unmapped";
+
+export interface FigmaCoverageNode {
+  specId: string;
+  specType: string;
+  path: string;
+  status: FigmaMappingStatus | "skipped";
+  reason?: string;
+}
+
+export interface FigmaCoverage {
+  nodes: FigmaCoverageNode[];
+  summary: {
+    spec: number;
+    derived: number;
+    mapped: number;
+    degraded: number;
+    unmapped: number;
+    skipped: number;
+  };
+}
+
 export interface FigmaPlanNode {
   specId: string;
   type: FigmaNodeType;
   name: string;
+  /** Mapping provenance and status stamped by the plan compiler. */
+  origin?: "spec" | "derived";
+  mapping?: FigmaMappingStatus;
+  reason?: string;
   layoutMode?: "VERTICAL" | "HORIZONTAL" | "NONE";
   alignItems?: "CENTER" | "START" | "END";
   justifyContent?: "CENTER" | "SPACE_BETWEEN" | "START" | "END";
@@ -22,6 +48,11 @@ export interface FigmaPlanNode {
   padding?: number;
   paddingX?: number;
   paddingY?: number;
+  /** Per-side padding; overrides paddingX/paddingY/padding when present. */
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
   gap?: number;
   fill?: string;
   fillAlpha?: number;
@@ -86,6 +117,7 @@ export interface FigmaPlan {
       variants: Record<string, FigmaButtonVariant>;
     };
   };
+  coverage?: FigmaCoverage;
   root: FigmaPlanNode;
   stats: {
     frames: number;
@@ -94,6 +126,16 @@ export interface FigmaPlan {
     icons: number;
     images: number;
   };
+}
+
+export interface FigmaBorderSide {
+  width: number;
+  color: string;
+}
+
+export interface FigmaFill {
+  color: string;
+  alpha: number;
 }
 
 export interface FigmaReadbackNode {
@@ -109,8 +151,16 @@ export interface FigmaReadbackNode {
   x?: number;
   y?: number;
   fills?: string[];
+  cornerRadius?: number;
+  borderTop?: FigmaBorderSide;
+  borderBottom?: FigmaBorderSide;
+  borderLeft?: FigmaBorderSide;
+  fillDetails?: FigmaFill[];
   fontName?: { family: string; style: string };
   fontSize?: number;
+  fontWeight?: number;
+  textColor?: string;
+  lineHeight?: number;
   textStyleName?: string;
   characters?: string;
   componentName?: string;
@@ -155,6 +205,9 @@ const FigmaPlanNodeSchema: z.ZodType<FigmaPlanNode> = z.lazy(() =>
       specId: z.string().min(1),
       type: z.enum(["FRAME", "TEXT", "INSTANCE", "GLYPH", "VECTOR", "IMAGE", "ABSOLUTE"]),
       name: z.string().min(1),
+      origin: z.enum(["spec", "derived"]).optional(),
+      mapping: z.enum(["mapped", "degraded", "unmapped"]).optional(),
+      reason: z.string().min(1).optional(),
       layoutMode: z.enum(["VERTICAL", "HORIZONTAL", "NONE"]).optional(),
       alignItems: z.enum(["CENTER", "START", "END"]).optional(),
       justifyContent: z.enum(["CENTER", "SPACE_BETWEEN", "START", "END"]).optional(),
@@ -163,6 +216,10 @@ const FigmaPlanNodeSchema: z.ZodType<FigmaPlanNode> = z.lazy(() =>
       padding: z.number().nonnegative().optional(),
       paddingX: z.number().nonnegative().optional(),
       paddingY: z.number().nonnegative().optional(),
+      paddingTop: z.number().nonnegative().optional(),
+      paddingRight: z.number().nonnegative().optional(),
+      paddingBottom: z.number().nonnegative().optional(),
+      paddingLeft: z.number().nonnegative().optional(),
       gap: z.number().nonnegative().optional(),
       fill: z.string().min(1).optional(),
       fillAlpha: z.number().min(0).max(1).optional(),
@@ -234,6 +291,32 @@ const TextStyleDefSchema = z
   })
   .strict();
 
+const FigmaCoverageNodeSchema: z.ZodType<FigmaCoverageNode> = z
+  .object({
+    specId: z.string().min(1),
+    specType: z.string().min(1),
+    path: z.string().min(1),
+    status: z.enum(["mapped", "degraded", "unmapped", "skipped"]),
+    reason: z.string().min(1).optional(),
+  })
+  .strict();
+
+const FigmaCoverageSchema: z.ZodType<FigmaCoverage> = z
+  .object({
+    nodes: z.array(FigmaCoverageNodeSchema),
+    summary: z
+      .object({
+        spec: z.number().int().nonnegative(),
+        derived: z.number().int().nonnegative(),
+        mapped: z.number().int().nonnegative(),
+        degraded: z.number().int().nonnegative(),
+        unmapped: z.number().int().nonnegative(),
+        skipped: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const FigmaPlanSchema: z.ZodType<FigmaPlan> = z
   .object({
     schemaVersion: z.literal("1.0"),
@@ -271,6 +354,7 @@ export const FigmaPlanSchema: z.ZodType<FigmaPlan> = z
           .strict(),
       })
       .strict(),
+    coverage: FigmaCoverageSchema.optional(),
     root: FigmaPlanNodeSchema,
     stats: z
       .object({
@@ -307,8 +391,16 @@ const FigmaReadbackNodeSchema: z.ZodType<FigmaReadbackNode> = z.lazy(() =>
       x: z.number().optional(),
       y: z.number().optional(),
       fills: z.array(z.string()).optional(),
+      cornerRadius: z.number().nonnegative().optional(),
+      borderTop: z.object({ width: z.number().nonnegative(), color: z.string().min(1) }).strict().optional(),
+      borderBottom: z.object({ width: z.number().nonnegative(), color: z.string().min(1) }).strict().optional(),
+      borderLeft: z.object({ width: z.number().nonnegative(), color: z.string().min(1) }).strict().optional(),
+      fillDetails: z.array(z.object({ color: z.string().min(1), alpha: z.number().min(0).max(1) }).strict()).optional(),
       fontName: z.object({ family: z.string(), style: z.string() }).strict().optional(),
       fontSize: z.number().optional(),
+      fontWeight: z.number().int().min(100).max(900).optional(),
+      textColor: z.string().min(1).optional(),
+      lineHeight: z.number().nonnegative().optional(),
       textStyleName: z.string().optional(),
       characters: z.string().optional(),
       componentName: z.string().optional(),
@@ -360,3 +452,21 @@ export const FigmaDiffSchema: z.ZodType<FigmaDiff> = z
     blockerCount: z.number().int().nonnegative(),
   })
   .strict();
+
+/**
+ * Human Figma signoff block (`<!-- signoff { ... } -->`). It binds the five
+ * evidence hashes; any evidence change makes the previous block stale.
+ */
+export const FigmaSignoffBlockSchema = z
+  .object({
+    signer: z.string().min(1),
+    date: z.string().min(1),
+    project: z.string().min(1).optional(),
+    planHash: z.string().min(1),
+    readbackHash: z.string().min(1),
+    conformanceHash: z.string().min(1),
+    parityHash: z.string().min(1),
+    baselineHash: z.string().min(1),
+  })
+  .strict();
+export type FigmaSignoffBlock = z.infer<typeof FigmaSignoffBlockSchema>;

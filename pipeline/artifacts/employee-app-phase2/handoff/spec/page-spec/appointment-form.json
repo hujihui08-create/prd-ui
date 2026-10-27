@@ -1,0 +1,280 @@
+{
+  "meta": {
+    "pageId": "appointment-form",
+    "project": "employee-app-phase2",
+    "name": "新增/改期预约",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "mobile-form",
+    "purpose": "新增或改期预约：客户、项目、开始时间、结束时间、护理师、来源；new 模式客户可编辑，从列表/日历进入时客户字段打开客户搜索（mode=picker）并保留已填内容；reschedule 模式通过 `?mode=reschedule&appointmentId=<预约 id>` 恢复单据并锁定客户，按钮文案「保存改期」；开始时间须早于结束时间。",
+    "route": "/appointments/form",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-APPT-003",
+      "REQ-APPT-004",
+      "REQ-LIST-003",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "type": "MobileShell",
+    "props": {
+      "title": "新增/改期预约",
+      "back": true,
+      "showTabs": false
+    },
+    "reqRef": "REQ-APPT-003",
+    "slots": {
+      "content": [
+        {
+          "type": "Section",
+          "props": {
+            "padding": "space.4",
+            "gap": "space.3"
+          },
+          "children": [
+            {
+              "type": "FormField",
+              "props": {
+                "label": "客户",
+                "required": true,
+                "field": "customer"
+              },
+              "children": [
+                {
+                  "type": "Row",
+                  "props": {
+                    "gap": "space.2"
+                  },
+                  "children": [
+                    {
+                      "type": "Input",
+                      "props": {
+                        "name": "customer",
+                        "placeholder": "请输入客户",
+                        "required": true
+                      },
+                      "id": "appointment-form.root.content.0.children.0.children.0.children.0"
+                    },
+                    {
+                      "type": "Button",
+                      "props": {
+                        "label": "选择",
+                        "emphasis": "ghost",
+                        "action": "选择客户"
+                      },
+                      "id": "appointment-form.action.pick-customer"
+                    }
+                  ],
+                  "id": "appointment-form.root.content.0.children.0.children.0"
+                }
+              ],
+              "id": "appointment-form.field.customer"
+            },
+            {
+              "type": "FormField",
+              "props": {
+                "label": "项目",
+                "required": true,
+                "field": "project"
+              },
+              "children": [
+                {
+                  "type": "Input",
+                  "props": {
+                    "name": "project",
+                    "placeholder": "请输入项目",
+                    "required": true
+                  },
+                  "id": "appointment-form.root.content.0.children.1.children.0"
+                }
+              ],
+              "id": "appointment-form.field.project"
+            },
+            {
+              "type": "FormField",
+              "props": {
+                "label": "开始时间",
+                "required": true,
+                "field": "startTime"
+              },
+              "children": [
+                {
+                  "type": "Input",
+                  "props": {
+                    "name": "startTime",
+                    "placeholder": "请选择开始时间",
+                    "required": true,
+                    "inputType": "datetime-local"
+                  },
+                  "id": "appointment-form.root.content.0.children.2.children.0"
+                }
+              ],
+              "id": "appointment-form.field.start-time"
+            },
+            {
+              "type": "FormField",
+              "props": {
+                "label": "结束时间",
+                "required": true,
+                "field": "endTime"
+              },
+              "children": [
+                {
+                  "type": "Input",
+                  "props": {
+                    "name": "endTime",
+                    "placeholder": "请选择结束时间",
+                    "required": true,
+                    "inputType": "datetime-local"
+                  },
+                  "id": "appointment-form.root.content.0.children.3.children.0"
+                }
+              ],
+              "id": "appointment-form.field.end-time"
+            },
+            {
+              "type": "FormField",
+              "props": {
+                "label": "护理师",
+                "required": true,
+                "field": "therapist"
+              },
+              "children": [
+                {
+                  "type": "Input",
+                  "props": {
+                    "name": "therapist",
+                    "placeholder": "请输入护理师",
+                    "required": true
+                  },
+                  "id": "appointment-form.root.content.0.children.4.children.0"
+                }
+              ],
+              "id": "appointment-form.field.therapist"
+            },
+            {
+              "type": "FormField",
+              "props": {
+                "label": "来源",
+                "required": true,
+                "field": "source"
+              },
+              "children": [
+                {
+                  "type": "Select",
+                  "props": {
+                    "options": [
+                      "到店",
+                      "电话",
+                      "微信",
+                      "企微"
+                    ],
+                    "placeholder": "请选择来源"
+                  },
+                  "id": "appointment-form.root.content.0.children.5.children.0"
+                }
+              ],
+              "id": "appointment-form.field.source"
+            }
+          ],
+          "id": "appointment-form.root.content.0"
+        }
+      ],
+      "actions": [
+        {
+          "type": "Button",
+          "props": {
+            "label": "保存",
+            "emphasis": "primary",
+            "action": "保存"
+          },
+          "id": "appointment-form.action.save"
+        }
+      ]
+    },
+    "id": "appointment-form.page.root"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    },
+    "disabled": {
+      "name": "disabled"
+    }
+  },
+  "interactions": [
+    {
+      "trigger": "保存",
+      "action": "navigate",
+      "reqRef": "REQ-APPT-003"
+    },
+    {
+      "trigger": "保存改期",
+      "action": "navigate",
+      "reqRef": "REQ-APPT-003"
+    },
+    {
+      "trigger": "选择客户",
+      "action": "navigate",
+      "reqRef": "REQ-APPT-003"
+    }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-APPT-003": [
+        "appointment-form"
+      ],
+      "REQ-APPT-004": [
+        "appointment-form"
+      ],
+      "REQ-LIST-003": [
+        "appointment-form"
+      ],
+      "REQ-SHARED-001": [
+        "appointment-form"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  },
+  "formModes": [
+    {
+      "name": "new",
+      "label": "保存",
+      "actions": [
+        "保存",
+        "选择客户"
+      ],
+      "customerLocked": false
+    },
+    {
+      "name": "reschedule",
+      "label": "保存改期",
+      "actions": [
+        "保存改期"
+      ],
+      "customerLocked": true
+    }
+  ],
+  "customerPicker": "customer-search",
+  "linkedRoutes": {
+    "create": "/appointments/form",
+    "form": "/appointments/form",
+    "detail": "/appointments/detail/:id",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "list": "/appointments"
+  }
+}

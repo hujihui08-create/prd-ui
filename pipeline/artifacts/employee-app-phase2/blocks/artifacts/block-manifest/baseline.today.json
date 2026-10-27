@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "today",
+  "shell": {
+    "rootType": "MobileShell",
+    "slots": [
+      "top-bar",
+      "content",
+      "bottom-nav"
+    ],
+    "wrappers": [
+      {
+        "slot": "content",
+        "specId": "today.root.content.0",
+        "type": "Section",
+        "padding": "space.4",
+        "gap": "space.3"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "schemaVersion": "1.0",
+      "blockId": "today.content.0",
+      "pageId": "today",
+      "slot": "content",
+      "index": 0,
+      "role": "快捷操作",
+      "allowedComponents": [
+        "TopBar",
+        "TabBar",
+        "Section",
+        "Card",
+        "QuickAction",
+        "ListRow",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "today.card.quick-actions",
+        "type": "Card",
+        "props": {
+          "title": "快捷操作"
+        },
+        "children": [
+          {
+            "id": "today.root.content.0.children.0.children.0",
+            "type": "Row",
+            "props": {
+              "gap": "space.2"
+            },
+            "children": [
+              {
+                "id": "today.quick.create-order",
+                "type": "QuickAction",
+                "props": {
+                  "label": "开单",
+                  "icon": "icon-plus",
+                  "tone": "neutral"
+                }
+              },
+              {
+                "id": "today.quick.new-appointment",
+                "type": "QuickAction",
+                "props": {
+                  "label": "预约",
+                  "icon": "icon-plus",
+                  "tone": "neutral"
+                }
+              },
+              {
+                "id": "today.quick.customer-search",
+                "type": "QuickAction",
+                "props": {
+                  "label": "客户搜索",
+                  "icon": "icon-search",
+                  "tone": "customer"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "hash": "sha256:dabd02f7df83e30ad635b8bb776bbaf689f43d030dbd6baa3e842e6eff025a6a"
+    },
+    {
+      "schemaVersion": "1.0",
+      "blockId": "today.content.1",
+      "pageId": "today",
+      "slot": "content",
+      "index": 1,
+      "role": "我的预约",
+      "allowedComponents": [
+        "TopBar",
+        "TabBar",
+        "Section",
+        "Card",
+        "QuickAction",
+        "ListRow",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "today.card.appointments",
+        "type": "Card",
+        "props": {
+          "title": "我的预约",
+          "actionLabel": "查看全部",
+          "actionRoute": "/appointments"
+        },
+        "children": [
+          {
+            "id": "today.row.appointment.0",
+            "motionGroup": "today.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "张女士",
+              "subtitle": "小气泡",
+              "meta": "10:00-11:00",
+              "status": "已登记",
+              "statusTone": "warning"
+            }
+          },
+          {
+            "id": "today.row.appointment.1",
+            "motionGroup": "today.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "李女士",
+              "subtitle": "补水",
+              "meta": "14:00-15:00",
+              "status": "已到店",
+              "statusTone": "success"
+            }
+          },
+          {
+            "id": "today.row.appointment.2",
+            "motionGroup": "today.row.appointment",
+            "type": "ListRow",
+            "props": {
+              "title": "王女士",
+              "subtitle": "肩颈",
+              "meta": "16:30-17:30",
+              "status": "已登记",
+              "statusTone": "warning"
+            }
+          },
+          {
+            "id": "today.state.empty",
+            "type": "EmptyState",
+            "props": {
+              "title": "今天没有预约",
+              "description": "客户直接上门？",
+              "icon": "event_busy"
+            },
+            "children": [
+              {
+                "id": "today.root.content.0.children.1.children.3.children.0",
+                "type": "Button",
+                "props": {
+                  "label": "当场开单",
+                  "emphasis": "secondary"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "hash": "sha256:3927eff0c65cdb90f43d3ddfba270ef6c44a4310757d95d9b27d791925231e90"
+    },
+    {
+      "schemaVersion": "1.0",
+      "blockId": "today.content.2",
+      "pageId": "today",
+      "slot": "content",
+      "index": 2,
+      "role": "待回访",
+      "allowedComponents": [
+        "TopBar",
+        "TabBar",
+        "Section",
+        "Card",
+        "QuickAction",
+        "ListRow",
+        "Badge",
+        "EmptyState",
+        "Skeleton",
+        "ErrorState",
+        "Button"
+      ],
+      "tokenProfile": "b-mobile",
+      "requiredStates": [
+        "default",
+        "empty",
+        "loading",
+        "error"
+      ],
+      "root": {
+        "id": "today.card.callbacks",
+        "type": "Card",
+        "props": {
+          "title": "待回访"
+        },
+        "children": [
+          {
+            "id": "today.row.callback.0",
+            "motionGroup": "today.row.callback",
+            "type": "ListRow",
+            "props": {
+              "title": "张女士",
+              "subtitle": "小气泡",
+              "meta": "3 天前"
+            }
+          },
+          {
+            "id": "today.row.callback.1",
+            "motionGroup": "today.row.callback",
+            "type": "ListRow",
+            "props": {
+              "title": "李女士",
+              "subtitle": "补水",
+              "meta": "7 天前"
+            }
+          },
+          {
+            "id": "today.state.empty.2",
+            "type": "EmptyState",
+            "props": {
+              "title": "暂无待回访",
+              "description": "近 30 天服务过、尚未回访的记录会出现在这里",
+              "icon": "call"
+            }
+          }
+        ]
+      },
+      "hash": "sha256:6313f384f386698515e399a4fdd1bff9a5a06784ddd7759820cfdffb10c50714"
+    }
+  ],
+  "skipped": []
+}

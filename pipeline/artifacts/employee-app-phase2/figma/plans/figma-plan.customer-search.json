@@ -85,6 +85,12 @@
       "fontWeight": 400,
       "lineHeight": 18
     },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
     "b-mobile/label.bold": {
       "fontFamily": "Noto Sans SC",
       "fontSize": 12,
@@ -176,7 +182,9 @@
             "name": "Back",
             "glyph": "arrow_back_ios_new",
             "size": 20,
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           },
           {
             "specId": "customer-search.page.root.header.title",
@@ -184,14 +192,18 @@
             "name": "Title",
             "characters": "客户搜索",
             "textStyle": "b-mobile/heading.2",
-            "color": "color/text/primary"
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
           }
         ],
         "height": 48,
         "paddingX": 16,
         "gap": 8,
         "fill": "color/surface/subtle",
-        "alignItems": "CENTER"
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
       },
       {
         "specId": "customer-search.page.root.content",
@@ -217,7 +229,9 @@
                     "name": "Search",
                     "glyph": "search",
                     "size": 20,
-                    "color": "color/text/tertiary"
+                    "color": "color/text/tertiary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "customer-search.root.content.0.children.0.placeholder",
@@ -225,7 +239,9 @@
                     "name": "Placeholder",
                     "characters": "搜索客户",
                     "textStyle": "b-mobile/label.sm",
-                    "color": "color/text/tertiary"
+                    "color": "color/text/tertiary",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
                 "height": 36,
@@ -233,7 +249,9 @@
                 "gap": 8,
                 "fill": "color/surface/default",
                 "radius": 6,
-                "alignItems": "CENTER"
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
               },
               {
                 "specId": "customer-search.state.idle",
@@ -248,7 +266,9 @@
                     "characters": "输入姓名或脱敏手机号搜索客户",
                     "textStyle": "b-mobile/body.md",
                     "color": "color/text/secondary",
-                    "align": "CENTER"
+                    "align": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   },
                   {
                     "specId": "customer-search.state.idle.desc",
@@ -257,28 +277,40 @@
                     "characters": "输入关键词后显示匹配结果",
                     "textStyle": "b-mobile/label.sm",
                     "color": "color/text/tertiary",
-                    "align": "CENTER"
+                    "align": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
                   }
                 ],
-                "padding": 24,
+                "paddingY": 24,
+                "paddingX": 16,
                 "gap": 4,
-                "alignItems": "CENTER"
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
               }
             ],
             "padding": 16,
-            "gap": 8
+            "gap": 8,
+            "origin": "spec",
+            "mapping": "mapped"
           }
         ],
         "layoutGrow": 1,
         "fill": "color/surface/subtle",
         "gap": 0,
-        "clip": true
+        "clip": true,
+        "paddingBottom": 16,
+        "origin": "derived",
+        "mapping": "mapped"
       }
     ],
     "width": 390,
     "height": 844,
     "fill": "color/surface/subtle",
-    "clip": true
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
   },
   "stats": {
     "frames": 6,
@@ -286,5 +318,75 @@
     "instances": 0,
     "icons": 2,
     "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "customer-search.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.root.content.0",
+        "specType": "Section",
+        "path": "layout.slots.content[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.root.content.0.children.0",
+        "specType": "SearchBar",
+        "path": "layout.slots.content[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.state.idle",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.row.result.0",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[2]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.row.result.1",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.row.result.2",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[4]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.state.empty",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[5]",
+        "status": "skipped",
+        "reason": "SKIPPED_STATE:EmptyState"
+      },
+      {
+        "specId": "customer-search.action.clear",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[5].children[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 9,
+      "derived": 8,
+      "mapped": 13,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 4
+    }
   }
 }

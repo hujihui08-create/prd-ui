@@ -4,6 +4,7 @@ import type {
   Finding,
   Profile,
   SpecNode,
+  StructureConfig,
   UiBriefPage,
 } from "@prd-ui/contracts";
 import type { ArchetypeDef } from "@prd-ui/design-system";
@@ -27,6 +28,8 @@ export interface ValidationContext {
    * skipped when this is absent; the orchestrator always provides it.
    */
   navigation?: { primary: string[]; tabs?: string[] };
+  /** Optional structure-lint overrides; omitted keys use defaults. */
+  structure?: Partial<StructureConfig>;
 }
 
 export interface ValidationReport {

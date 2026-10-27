@@ -1,0 +1,6 @@
+{"type":"run_started","runId":"run-2026-10-27T01-38-59-017Z","project":"employee-app-phase2","cases":24,"runtime":"dsh","profile":"prd-ui-visual","timestamp":"2026-10-27T01:38:59.017Z"}
+{"type":"screenshots_captured","screenshots":24,"failed":0,"timestamp":"2026-10-27T01:39:56.376Z"}
+{"type":"diff_finished","passed":24,"failed":0,"missing":0,"timestamp":"2026-10-27T01:39:56.818Z"}
+{"type":"critic_cache_miss","cacheKey":"sha256:31930430462ca3de9218016f6b5ef0928ba2bc6e8e8b929b180c8252e60a0137","reason":"no-cache-entry","timestamp":"2026-10-27T01:39:56.820Z"}
+{"type":"critic_finished","runtime":"dsh","model":"deepseek-flash","findings":1,"costCny":0.5162630688,"costSource":"pricing","usageComplete":false,"cacheHit":false,"cacheKey":"sha256:31930430462ca3de9218016f6b5ef0928ba2bc6e8e8b929b180c8252e60a0137","timestamp":"2026-10-27T01:45:02.150Z"}
+{"type":"run_finished","status":"blocked","findings":1,"blockers":1,"signoffValid":false,"timestamp":"2026-10-27T01:45:02.153Z"}

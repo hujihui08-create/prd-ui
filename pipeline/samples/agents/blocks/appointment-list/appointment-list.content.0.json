@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "appointment-list.content.0",
+  "root": {
+    "id": "appointment-list.root.content.0.children.0",
+    "type": "Row",
+    "props": {
+      "gap": "space.2",
+      "variant": "filter"
+    },
+    "children": [
+      {
+        "id": "appointment-list.root.content.0.children.0.children.0",
+        "type": "CollapsedFilter",
+        "props": {
+          "label": "状态",
+          "value": "全部",
+          "options": [
+            "全部",
+            "已登记",
+            "已到店",
+            "爽约",
+            "已取消"
+          ]
+        }
+      },
+      {
+        "id": "appointment-list.root.content.0.children.0.children.1",
+        "type": "CollapsedFilter",
+        "props": {
+          "label": "日期",
+          "value": "11-05 周三",
+          "options": [
+            "全部",
+            "11-05 周三"
+          ]
+        }
+      }
+    ]
+  }
+}

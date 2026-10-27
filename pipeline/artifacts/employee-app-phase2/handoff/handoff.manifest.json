@@ -1,0 +1,714 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T02:16:32.426Z",
+  "pipelineVersion": "0.7.0",
+  "profile": "b-mobile",
+  "catalog": "b-mobile",
+  "pages": [
+    "appointment-detail",
+    "appointment-form",
+    "appointment-list",
+    "callback-register",
+    "customer-detail",
+    "customer-search",
+    "today",
+    "treatment-notice"
+  ],
+  "inputHashes": {
+    "html": {
+      "appointment-detail": "sha256:66f97f498a74d751962401ece8b1060689e755c06a47e88948399fee1a9abe31",
+      "appointment-form": "sha256:7ffe068cd87f08e6f7eff158d9e8acbd20a7915518b82f61faf99a0336179065",
+      "appointment-list": "sha256:407a8bf260383f14b05698235b6fafb56f5689063f4b34a364dc189a66796155",
+      "callback-register": "sha256:bbfd170bf1723dd111597584dc45ed1ee098a99c3e234180860f58baee0cca47",
+      "customer-detail": "sha256:5b049eb7e91750ca3d7f67abbfe2c80ef456d5121aa784fb6742ddef31be51ec",
+      "customer-search": "sha256:38ef8bf68b504e0324fa090aec3b58d7b90ec9e05ad23dfb0a79efe74766a2bf",
+      "today": "sha256:2dcc7f110035eaa9d71aa7a579b0352177edf83dd6d59504c153ae684e99c304",
+      "treatment-notice": "sha256:f3532b77ec1baff07a5cfaf527fa6fd870a0627fcc11d27817a50960df87129d"
+    },
+    "specs": {
+      "appointment-detail": "sha256:148570bdadf8153c51c363651623cafbe76012957f6113047e3d83987c628e1a",
+      "appointment-form": "sha256:69fe481eb5ad6152baf4781564ae322fca2f8bc826d8238f6c989e43b56ab2c0",
+      "appointment-list": "sha256:797953e59b6bdc600d85f32bff0b094bdf2c6bfa0a10e1c9c2f3906b0fff4cea",
+      "callback-register": "sha256:74dfdffd339cbfeef2046f2e7cfa60d690d651ab51a0fcf511992d75867866ad",
+      "customer-detail": "sha256:00ab527f1662d416fd4d049829759e6d7ad2a7a40415e6e5d7bdcd4fabac7b2d",
+      "customer-search": "sha256:6ac167554d2e997cd7ae124ad6df19ffb8951a22519e863fbf6abb99c48c3859",
+      "today": "sha256:3812d73e85314e26dd6d38697e65e448aab1ba08bfadd487246a119c9814eb24",
+      "treatment-notice": "sha256:382e230f59fa29695e314c3674c8060fad166ff88f7fe28d0f481214dab7d499"
+    }
+  },
+  "figma": {
+    "files": [
+      {
+        "pageId": "appointment-detail",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "appointment-form",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "appointment-list",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "callback-register",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "customer-detail",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "customer-search",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "today",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      },
+      {
+        "pageId": "treatment-notice",
+        "fileKey": "Ccy4HCkRVOVM70LDeyi4ZP"
+      }
+    ],
+    "pages": [
+      "appointment-detail",
+      "appointment-form",
+      "appointment-list",
+      "callback-register",
+      "customer-detail",
+      "customer-search",
+      "today",
+      "treatment-notice"
+    ]
+  },
+  "gates": {
+    "verify": {
+      "passed": true,
+      "hash": "sha256:f54e369ab3de71dc77fbeacc8077dc442fe95fbf14389cca7a3b2d0ee28ad986"
+    },
+    "conformance": {
+      "passed": true,
+      "hash": "sha256:693ebc4299c95946b36ec298a06691d2a3df7d890d74629409979eebde35f252"
+    },
+    "parity": {
+      "passed": true,
+      "hash": "sha256:d8c768a98a1109d7e0a8bfaad4c2e4b39eb4d5b1d226dc122a6e313c35c21998"
+    },
+    "figmaSign": {
+      "passed": true,
+      "hash": "sha256:b35f26ccc275475080ee183a89202064ad19369d0c581ba9d15f3da332d9691b"
+    },
+    "visualSign": {
+      "passed": true,
+      "hash": "sha256:6878d11e5a6c3dbbd9971dc153c455adcab50b38da1714b40f0cc5c7a897ccd4"
+    }
+  },
+  "signoffs": [
+    {
+      "type": "figma",
+      "signedBy": "胡冀徽",
+      "signedAt": "2026-10-27",
+      "hash": "sha256:b35f26ccc275475080ee183a89202064ad19369d0c581ba9d15f3da332d9691b"
+    },
+    {
+      "type": "visual",
+      "signedBy": "胡冀徽",
+      "signedAt": "2026-10-27",
+      "hash": "sha256:6878d11e5a6c3dbbd9971dc153c455adcab50b38da1714b40f0cc5c7a897ccd4"
+    }
+  ],
+  "files": [
+    {
+      "path": "HANDOFF.md",
+      "sha256": "sha256:fb16a3b01ea43f0dfa33cd5698bb55c6dd1e6cc7da24f9803e2fe2820e47e013",
+      "bytes": 5409
+    },
+    {
+      "path": "LICENSES.md",
+      "sha256": "sha256:495cbf89f2b73f5cc1bf7b6b5db0e3c592cc284c84af438a88c17eab869b2c93",
+      "bytes": 352
+    },
+    {
+      "path": "assets/LICENSES.md",
+      "sha256": "sha256:13188b86642ddc0581bca19cfb9d1cb853be86c2d2f23e93ef2d917f5315d925",
+      "bytes": 3235
+    },
+    {
+      "path": "assets/README.md",
+      "sha256": "sha256:70078847a7bbd379ca082b05dc0e29bc222d8ab13e8b0e4c99731dc2b5e4a681",
+      "bytes": 117
+    },
+    {
+      "path": "assets/icons/asset.svg",
+      "sha256": "sha256:0d3270d4346b2c1e3f5ffa317206e4a9078f54a94cabbf2200584e3e557241f8",
+      "bytes": 352
+    },
+    {
+      "path": "assets/manifest.json",
+      "sha256": "sha256:f0c85bb95f37c601f5ca1b4d377880c7ba2f727c4a6a9826c57405a6b658d6a6",
+      "bytes": 1351
+    },
+    {
+      "path": "baseline/appointment-detail.business.已到店.png",
+      "sha256": "sha256:bf5f571affc50282b7ce340006500c23be3b12f98e1c3305db991fa8def40e04",
+      "bytes": 34490
+    },
+    {
+      "path": "baseline/appointment-detail.business.已取消.png",
+      "sha256": "sha256:9f45ff9b3a9f7ee8a601a6b239d253ea19870c786c2b11b82ae96b049a2e0111",
+      "bytes": 35284
+    },
+    {
+      "path": "baseline/appointment-detail.business.爽约.png",
+      "sha256": "sha256:b747c991e1b633a46fffd4d29f14e85bfc6231ecc55491d528eb0cde1c6b8f14",
+      "bytes": 36584
+    },
+    {
+      "path": "baseline/appointment-detail.default.png",
+      "sha256": "sha256:4af843e80fd838b19814e65f323dbb7c11e12b21cca8345ffc8edf532a122f45",
+      "bytes": 38294
+    },
+    {
+      "path": "baseline/appointment-detail.state.error.png",
+      "sha256": "sha256:19d9f3f31954ffe710a69ed4c950f2dce302e17b0f090f58ea5ace32041c3091",
+      "bytes": 13070
+    },
+    {
+      "path": "baseline/appointment-detail.state.loading.png",
+      "sha256": "sha256:b4420f375059cb62e9856fd0085c41ab417362335e35eda99684c35cc3e0ce4a",
+      "bytes": 21528
+    },
+    {
+      "path": "baseline/appointment-form.default.png",
+      "sha256": "sha256:640a6687ad26b8d7164a2ffa5e3afb0adc3b1c8a45fbf53705366198c1f26ae1",
+      "bytes": 27275
+    },
+    {
+      "path": "baseline/appointment-form.mode.reschedule.png",
+      "sha256": "sha256:66719b74bc7de4073f2870a62f0c1dd3d360a41eb003d4dc358080b22aa3a5fb",
+      "bytes": 29926
+    },
+    {
+      "path": "baseline/appointment-form.state.disabled.png",
+      "sha256": "sha256:64116362e3dd8d3b82d2ba37eb69a27a81edf089e37ddcda9a6894660198c337",
+      "bytes": 31632
+    },
+    {
+      "path": "baseline/appointment-list.default.png",
+      "sha256": "sha256:be332f2796214573b62f650c9a4bf4b4bbd21df2433ac46cf4f87d56613855c5",
+      "bytes": 38528
+    },
+    {
+      "path": "baseline/appointment-list.drawer.png",
+      "sha256": "sha256:e27d1f1cdff52644a100ecae75a84c563476e760a23c79727cbe348390c3632d",
+      "bytes": 41997
+    },
+    {
+      "path": "baseline/appointment-list.state.empty.png",
+      "sha256": "sha256:0fe4014b697558fd3cbf3a3d765728dd2ae03ef9597cb5ad55fa21b4db83f694",
+      "bytes": 36362
+    },
+    {
+      "path": "baseline/appointment-list.state.error.png",
+      "sha256": "sha256:dcb7966484dfac41d108eabebf32054f2b294d4ce69608d67549bdd3319e66c9",
+      "bytes": 26498
+    },
+    {
+      "path": "baseline/appointment-list.state.loading.png",
+      "sha256": "sha256:bf9bb415dba931cd7433cd4a6706ec63186965758d9f88796e6f90f2fd5d221c",
+      "bytes": 30697
+    },
+    {
+      "path": "baseline/appointment-list.view.list.png",
+      "sha256": "sha256:65ed111ed167221bb467a34177af58c52a0520e00193a9116f6d15c6eb5d3ca1",
+      "bytes": 34587
+    },
+    {
+      "path": "baseline/callback-register.default.png",
+      "sha256": "sha256:371db20a2e2fe3f946dc2e86b6d90b772a15153b0736e3fac15ffb352cf3296f",
+      "bytes": 21798
+    },
+    {
+      "path": "baseline/customer-detail.default.png",
+      "sha256": "sha256:b73e7b3f341587076d6b57da4bfb32ede1e547595f99ee36e459b7629d23fa67",
+      "bytes": 34523
+    },
+    {
+      "path": "baseline/customer-search.default.png",
+      "sha256": "sha256:f8cb0d0c554deef975811af28f9ba97789162259f6d911c1296719d1e25b476f",
+      "bytes": 15573
+    },
+    {
+      "path": "baseline/customer-search.search.empty.png",
+      "sha256": "sha256:36490fba2956a8cae063f9ba0027fead8f0c3dc44fffa064f8cfd7ffb1130fc5",
+      "bytes": 14851
+    },
+    {
+      "path": "baseline/customer-search.search.results.png",
+      "sha256": "sha256:0f0818ffca5dd30a222fe3ed16e633a7600115f54dd34a1f57a2b6b95d81f6b5",
+      "bytes": 10603
+    },
+    {
+      "path": "baseline/manifest.json",
+      "sha256": "sha256:7e5eb352534f54133dacf67580f9b6472b354bbdf2741e11e28e5b054d58ccf5",
+      "bytes": 11177
+    },
+    {
+      "path": "baseline/today.default.png",
+      "sha256": "sha256:a3df91c7b37a0d574d54962d0ca991b70f2633c815b77edc6756d9fc24b7f785",
+      "bytes": 37329
+    },
+    {
+      "path": "baseline/today.state.empty.png",
+      "sha256": "sha256:65bff1bee1164cd0abe81cf836a467036eed8e1ea828cce77723ccb4256f5f0a",
+      "bytes": 32291
+    },
+    {
+      "path": "baseline/treatment-notice.business.已确认.png",
+      "sha256": "sha256:7fec06976eed41b65af30b1c57d87988d7f392a90e0b3e55e5001e89808068aa",
+      "bytes": 37089
+    },
+    {
+      "path": "baseline/treatment-notice.default.png",
+      "sha256": "sha256:e27ffebbc9276de808ee187144431450cf0bcda1db0ddedb000a0357bfd52a33",
+      "bytes": 36654
+    },
+    {
+      "path": "evidence/render-metrics.json",
+      "sha256": "sha256:8a25847c80d534ec96fdaa7b39c74f7977edf71197d5dc428c18ba52b427a0fb",
+      "bytes": 5321
+    },
+    {
+      "path": "evidence/spec-engineer-gate.json",
+      "sha256": "sha256:43569792106272b707d2c15c363a89d6698983c6920ecd1036b088904b737df7",
+      "bytes": 8608
+    },
+    {
+      "path": "figma/evidence/conformance.json",
+      "sha256": "sha256:baa035f6c69e64cbb0da3c913a617fef76d47dea13d617b4fc431e5b29b4f48a",
+      "bytes": 2772
+    },
+    {
+      "path": "figma/evidence/figma-diff.appointment-detail.json",
+      "sha256": "sha256:679fd39a07bb1679a68650c92403bfd7121781205145be4db98ae256d2e9c9d3",
+      "bytes": 139
+    },
+    {
+      "path": "figma/evidence/figma-diff.appointment-form.json",
+      "sha256": "sha256:a96310676160e72a6a3dc9a7f437984faedb1cd1f88d70d83432cb78a275af04",
+      "bytes": 137
+    },
+    {
+      "path": "figma/evidence/figma-diff.appointment-list.json",
+      "sha256": "sha256:bfbe1779d389a028d7011c0dda7b467e88878b2ae01321b7adb7246fe1b51562",
+      "bytes": 379
+    },
+    {
+      "path": "figma/evidence/figma-diff.callback-register.json",
+      "sha256": "sha256:473992e4f66084e8461eaab0b9cc9e2b9c88f7d304d0debc356a19c368e3c6c8",
+      "bytes": 138
+    },
+    {
+      "path": "figma/evidence/figma-diff.customer-detail.json",
+      "sha256": "sha256:9928cd275889d64709a0cfcda872c2328b255137497b08d03182456d3f88d76e",
+      "bytes": 136
+    },
+    {
+      "path": "figma/evidence/figma-diff.customer-search.json",
+      "sha256": "sha256:63be3ee1391dc27f2d049cc22596a49ffaec3332e39e83f4668c5211ca40e388",
+      "bytes": 136
+    },
+    {
+      "path": "figma/evidence/figma-diff.today.json",
+      "sha256": "sha256:377aaf73bd2ad49552b238ab6e5585111a871ebce258881f7c092b1b94919bb8",
+      "bytes": 126
+    },
+    {
+      "path": "figma/evidence/figma-diff.treatment-notice.json",
+      "sha256": "sha256:4f5686690cdf7f07bb0542898ed29bd1e619134936f86b3a9d576aa15389e6c6",
+      "bytes": 137
+    },
+    {
+      "path": "figma/evidence/figma-sign.json",
+      "sha256": "sha256:1b38e476ca01659114d047206d107bac68630cf004b22a6bd2c4292f34f7c0f1",
+      "bytes": 576
+    },
+    {
+      "path": "figma/evidence/parity.config.json",
+      "sha256": "sha256:bf3713b1862fc3e696efa985f41269ca8cb9ee4ebef7ad4a12dda9d8687d5671",
+      "bytes": 127
+    },
+    {
+      "path": "figma/evidence/parity.json",
+      "sha256": "sha256:b1854a6c7c0f9876406948d4137504a84aaf95d7bfad8a680dfa95aa73c1a432",
+      "bytes": 5252
+    },
+    {
+      "path": "figma/plans/figma-plan.appointment-detail.json",
+      "sha256": "sha256:332d25f6cb6c01f7a296601b00a1d52d121694f24152f22dfcaa42fa1e36bf5c",
+      "bytes": 42942
+    },
+    {
+      "path": "figma/plans/figma-plan.appointment-form.json",
+      "sha256": "sha256:8185be7466b68aab42d591b3ff9aaa98c6ac12e7db14214d929f2d7ec6230a90",
+      "bytes": 24790
+    },
+    {
+      "path": "figma/plans/figma-plan.appointment-list.json",
+      "sha256": "sha256:9f954dc9103d3619e390ef7d99c815e0d0069a4bf367fafdfdad0fcb80f6a536",
+      "bytes": 175754
+    },
+    {
+      "path": "figma/plans/figma-plan.callback-register.json",
+      "sha256": "sha256:e205d47e863ec5d503ef658908574c7bda1f6020d234454fe082157e16f64bb4",
+      "bytes": 20130
+    },
+    {
+      "path": "figma/plans/figma-plan.customer-detail.json",
+      "sha256": "sha256:eb666f363314ef92c0099418031d1b23e0a102d8a0eb6be8a0951e74ab54607e",
+      "bytes": 36034
+    },
+    {
+      "path": "figma/plans/figma-plan.customer-search.json",
+      "sha256": "sha256:5741a0272e832e92250fba680fdacda98ed53acf2ab4591b5b1d93c140601a62",
+      "bytes": 11299
+    },
+    {
+      "path": "figma/plans/figma-plan.today.json",
+      "sha256": "sha256:4286073292d7af44d3f8d3858de46634cdddea9b43fca193b15ccba41d25e347",
+      "bytes": 52373
+    },
+    {
+      "path": "figma/plans/figma-plan.treatment-notice.json",
+      "sha256": "sha256:37b06da86c1ff71a77413364906f252e9aa23e92704cce46eda55ffbfe39fe0b",
+      "bytes": 35598
+    },
+    {
+      "path": "figma/plans/plan-coverage.json",
+      "sha256": "sha256:925775ef255f5f602978dd6430bf61d985a48ee991b3c0fe585b5437205c2813",
+      "bytes": 26363
+    },
+    {
+      "path": "figma/readback/figma-readback.appointment-detail.json",
+      "sha256": "sha256:084e3913a791e00f6922a1a83c8d202afd5a451bccfaa7a880a320ec35329e22",
+      "bytes": 84829
+    },
+    {
+      "path": "figma/readback/figma-readback.appointment-form.json",
+      "sha256": "sha256:6632285c02e79faa1c30acccf535277bddbcc1c30e4cd09d1a87a6c0dde6d7cd",
+      "bytes": 39663
+    },
+    {
+      "path": "figma/readback/figma-readback.appointment-list.json",
+      "sha256": "sha256:1729b915cd6d0ac85753345cc459bd5f56b338a797aa455421234c50623b1952",
+      "bytes": 341507
+    },
+    {
+      "path": "figma/readback/figma-readback.callback-register.json",
+      "sha256": "sha256:32c6cf86874daa0e4c2d565148fca6a37f20b5f8f1a6a3b5d985f5abe611b313",
+      "bytes": 30432
+    },
+    {
+      "path": "figma/readback/figma-readback.customer-detail.json",
+      "sha256": "sha256:4639890b3bf6133b580f109ff6134dbbd4f9177b35f87264c431d867cbb53380",
+      "bytes": 69494
+    },
+    {
+      "path": "figma/readback/figma-readback.customer-search.json",
+      "sha256": "sha256:67eb09afb9e4c47085dda86ffff727022fe5594cecc31ffb0ce1b6116b3150b5",
+      "bytes": 11588
+    },
+    {
+      "path": "figma/readback/figma-readback.today.json",
+      "sha256": "sha256:f394a46386316a0a4c26954b548d881d2ba39d49ab5975cb38d511e41afa22ca",
+      "bytes": 98672
+    },
+    {
+      "path": "figma/readback/figma-readback.treatment-notice.json",
+      "sha256": "sha256:e5a0098ea4e17d757a09822629c3af641851266c5e882a88c554b7ed954cf8c7",
+      "bytes": 62876
+    },
+    {
+      "path": "html/appointment-detail.html",
+      "sha256": "sha256:66f97f498a74d751962401ece8b1060689e755c06a47e88948399fee1a9abe31",
+      "bytes": 73366
+    },
+    {
+      "path": "html/appointment-form.html",
+      "sha256": "sha256:7ffe068cd87f08e6f7eff158d9e8acbd20a7915518b82f61faf99a0336179065",
+      "bytes": 72377
+    },
+    {
+      "path": "html/appointment-list.html",
+      "sha256": "sha256:407a8bf260383f14b05698235b6fafb56f5689063f4b34a364dc189a66796155",
+      "bytes": 95646
+    },
+    {
+      "path": "html/callback-register.html",
+      "sha256": "sha256:bbfd170bf1723dd111597584dc45ed1ee098a99c3e234180860f58baee0cca47",
+      "bytes": 70848
+    },
+    {
+      "path": "html/customer-detail.html",
+      "sha256": "sha256:5b049eb7e91750ca3d7f67abbfe2c80ef456d5121aa784fb6742ddef31be51ec",
+      "bytes": 41206
+    },
+    {
+      "path": "html/customer-search.html",
+      "sha256": "sha256:38ef8bf68b504e0324fa090aec3b58d7b90ec9e05ad23dfb0a79efe74766a2bf",
+      "bytes": 70133
+    },
+    {
+      "path": "html/index.html",
+      "sha256": "sha256:05be91c17cd65b24a6fe8be7e7c37b38b1682cb0cde50248fc6584cc73a650d9",
+      "bytes": 2212
+    },
+    {
+      "path": "html/today.html",
+      "sha256": "sha256:2dcc7f110035eaa9d71aa7a579b0352177edf83dd6d59504c153ae684e99c304",
+      "bytes": 42670
+    },
+    {
+      "path": "html/treatment-notice.html",
+      "sha256": "sha256:f3532b77ec1baff07a5cfaf527fa6fd870a0627fcc11d27817a50960df87129d",
+      "bytes": 71371
+    },
+    {
+      "path": "screenshots/figma-manual/appointment-detail.png",
+      "sha256": "sha256:becd01ff8561010bf1b51774a57b9dd67e2dc0166ca985dbf7b177631d306a55",
+      "bytes": 74132
+    },
+    {
+      "path": "screenshots/figma-manual/appointment-form.png",
+      "sha256": "sha256:76d9245d036d5ca55d1de63ecf2dda1179443a39e3ad1d3a5011709922261cfd",
+      "bytes": 52198
+    },
+    {
+      "path": "screenshots/figma-manual/appointment-list.png",
+      "sha256": "sha256:6fd299ee7f168c6a4d993977eda62db39e2f889f89f3ecb8c9a10541167a1b7e",
+      "bytes": 95412
+    },
+    {
+      "path": "screenshots/figma-manual/callback-register.png",
+      "sha256": "sha256:1ec5eb53f4ac40b3ea6d4be8b070a972909e3658f4b7dc697e51fcc3fb79df76",
+      "bytes": 41425
+    },
+    {
+      "path": "screenshots/figma-manual/customer-detail.png",
+      "sha256": "sha256:2d8773780594c65518c22de0e18e5a757036c45783a20abd8175d9e83bfeb00f",
+      "bytes": 65652
+    },
+    {
+      "path": "screenshots/figma-manual/customer-search.png",
+      "sha256": "sha256:eab2013e548e78db3b59789a29f9d4d47091984ad952277a0b6fe7e90ba2016d",
+      "bytes": 24904
+    },
+    {
+      "path": "screenshots/figma-manual/today.png",
+      "sha256": "sha256:6329d3b4a3b863d8148afb9f2654ae6a0d93eaf0fd11d2e186a899351b54c76e",
+      "bytes": 74533
+    },
+    {
+      "path": "screenshots/figma-manual/treatment-notice.png",
+      "sha256": "sha256:a5869940cfc45e2ecc83c94dd87bca31caf6c0c1f6274a63ab824014324dc729",
+      "bytes": 68932
+    },
+    {
+      "path": "screenshots/figma/appointment-detail.png",
+      "sha256": "sha256:f8065ecedba370e5240dc68e692a709136c5cb87ed344ff21b8c27f636980571",
+      "bytes": 32917
+    },
+    {
+      "path": "screenshots/figma/appointment-form.png",
+      "sha256": "sha256:94fa767bd3deea78d501dfa9f8b558704c3450a5c0714cd757e822bd7e1dd579",
+      "bytes": 23814
+    },
+    {
+      "path": "screenshots/figma/appointment-list.png",
+      "sha256": "sha256:540880efd9e57afcd65cacae8e9a8e8c72ecbdd972f69e5ed4538226e744d1e2",
+      "bytes": 32304
+    },
+    {
+      "path": "screenshots/figma/callback-register.png",
+      "sha256": "sha256:c3c4294bc11d57cda3b0dcb2ae299b97f2817be18bb989d0c4ea9ffbbb7484ae",
+      "bytes": 18599
+    },
+    {
+      "path": "screenshots/figma/customer-detail.png",
+      "sha256": "sha256:c6730f6aa0f64ad3dfa9b8dc6dc1312efd311502c83faf9f4d8cda0f1bf1f0ed",
+      "bytes": 29258
+    },
+    {
+      "path": "screenshots/figma/customer-search.png",
+      "sha256": "sha256:5f9fbec99d5b931513e5526b5a541bafe261b6e6a5c41310e67d1e118560646d",
+      "bytes": 12397
+    },
+    {
+      "path": "screenshots/figma/today.png",
+      "sha256": "sha256:e342770284bf6b2d4316521ef83da560c2626449c994bb822dd4282986326732",
+      "bytes": 34089
+    },
+    {
+      "path": "screenshots/figma/treatment-notice.png",
+      "sha256": "sha256:7567f3427c2adfd12e2e3e1a20b11134368e4e793519a8780ad193830232cffe",
+      "bytes": 30299
+    },
+    {
+      "path": "screenshots/html/appointment-detail.png",
+      "sha256": "sha256:4af843e80fd838b19814e65f323dbb7c11e12b21cca8345ffc8edf532a122f45",
+      "bytes": 38294
+    },
+    {
+      "path": "screenshots/html/appointment-form.png",
+      "sha256": "sha256:640a6687ad26b8d7164a2ffa5e3afb0adc3b1c8a45fbf53705366198c1f26ae1",
+      "bytes": 27275
+    },
+    {
+      "path": "screenshots/html/appointment-list.png",
+      "sha256": "sha256:be332f2796214573b62f650c9a4bf4b4bbd21df2433ac46cf4f87d56613855c5",
+      "bytes": 38528
+    },
+    {
+      "path": "screenshots/html/callback-register.png",
+      "sha256": "sha256:371db20a2e2fe3f946dc2e86b6d90b772a15153b0736e3fac15ffb352cf3296f",
+      "bytes": 21798
+    },
+    {
+      "path": "screenshots/html/customer-detail.png",
+      "sha256": "sha256:12c6a5f35dc4719d89fa3f2734d59c31760e6e7f75fb09f81c800e1ddc74cdf3",
+      "bytes": 34504
+    },
+    {
+      "path": "screenshots/html/customer-search.png",
+      "sha256": "sha256:f8cb0d0c554deef975811af28f9ba97789162259f6d911c1296719d1e25b476f",
+      "bytes": 15573
+    },
+    {
+      "path": "screenshots/html/today.png",
+      "sha256": "sha256:a3df91c7b37a0d574d54962d0ca991b70f2633c815b77edc6756d9fc24b7f785",
+      "bytes": 37329
+    },
+    {
+      "path": "screenshots/html/treatment-notice.png",
+      "sha256": "sha256:e27ffebbc9276de808ee187144431450cf0bcda1db0ddedb000a0357bfd52a33",
+      "bytes": 36654
+    },
+    {
+      "path": "screenshots/parity-diff/appointment-detail.png",
+      "sha256": "sha256:143a6c68d4192361ce9776c85dc35c6ebae2eaabab67eefa5f031902917b8ce3",
+      "bytes": 27943
+    },
+    {
+      "path": "screenshots/parity-diff/appointment-form.png",
+      "sha256": "sha256:29db0754b76705dc66305795d0bd7fcacdba3a7219a9f840a5282ac332f803b0",
+      "bytes": 21178
+    },
+    {
+      "path": "screenshots/parity-diff/appointment-list.png",
+      "sha256": "sha256:5cb6055f0cab4f4032e7151993f4a51a350bbc338db7de75e916e74dc61d71cc",
+      "bytes": 32013
+    },
+    {
+      "path": "screenshots/parity-diff/callback-register.png",
+      "sha256": "sha256:c1c0b7db8af9a34968518d165a8e5aab52b481658ecc698ad41f71185ad9108b",
+      "bytes": 18114
+    },
+    {
+      "path": "screenshots/parity-diff/customer-detail.png",
+      "sha256": "sha256:f418e971d80099e4cf692831f6ca00759dfe450d0729e9cc959db561f15ec60c",
+      "bytes": 23890
+    },
+    {
+      "path": "screenshots/parity-diff/customer-search.png",
+      "sha256": "sha256:883b59b18d6fd99b3b37a26b6d933a0b01e457db15061c47eb43484c0b5d6bf6",
+      "bytes": 11789
+    },
+    {
+      "path": "screenshots/parity-diff/today.png",
+      "sha256": "sha256:a2ac4ab92f81937e3ab5c210812e2acca2e37bbad75690ade371ee1de3c08430",
+      "bytes": 26875
+    },
+    {
+      "path": "screenshots/parity-diff/treatment-notice.png",
+      "sha256": "sha256:9034226b7b2404342db86a1280c7fdb59f16bbd4dd43fbd3411df63f89dadad9",
+      "bytes": 26872
+    },
+    {
+      "path": "signoffs/figma-sign.json",
+      "sha256": "sha256:1b38e476ca01659114d047206d107bac68630cf004b22a6bd2c4292f34f7c0f1",
+      "bytes": 576
+    },
+    {
+      "path": "signoffs/visual-sign.json",
+      "sha256": "sha256:a047d6391bb1ceff9e8eda5198da26dee0fe69ad53f4f081ff9211163157b4f9",
+      "bytes": 517
+    },
+    {
+      "path": "signoffs/visual.md",
+      "sha256": "sha256:ffb5ae0dc5a9c95ddf15c86c19c50d102e978b0bbac00ca162b28db35d5a6ad2",
+      "bytes": 659
+    },
+    {
+      "path": "spec/page-spec/appointment-detail.json",
+      "sha256": "sha256:148570bdadf8153c51c363651623cafbe76012957f6113047e3d83987c628e1a",
+      "bytes": 7165
+    },
+    {
+      "path": "spec/page-spec/appointment-form.json",
+      "sha256": "sha256:69fe481eb5ad6152baf4781564ae322fca2f8bc826d8238f6c989e43b56ab2c0",
+      "bytes": 7895
+    },
+    {
+      "path": "spec/page-spec/appointment-list.json",
+      "sha256": "sha256:797953e59b6bdc600d85f32bff0b094bdf2c6bfa0a10e1c9c2f3906b0fff4cea",
+      "bytes": 16065
+    },
+    {
+      "path": "spec/page-spec/callback-register.json",
+      "sha256": "sha256:74dfdffd339cbfeef2046f2e7cfa60d690d651ab51a0fcf511992d75867866ad",
+      "bytes": 5819
+    },
+    {
+      "path": "spec/page-spec/customer-detail.json",
+      "sha256": "sha256:00ab527f1662d416fd4d049829759e6d7ad2a7a40415e6e5d7bdcd4fabac7b2d",
+      "bytes": 5024
+    },
+    {
+      "path": "spec/page-spec/customer-search.json",
+      "sha256": "sha256:6ac167554d2e997cd7ae124ad6df19ffb8951a22519e863fbf6abb99c48c3859",
+      "bytes": 4666
+    },
+    {
+      "path": "spec/page-spec/today.json",
+      "sha256": "sha256:3812d73e85314e26dd6d38697e65e448aab1ba08bfadd487246a119c9814eb24",
+      "bytes": 7577
+    },
+    {
+      "path": "spec/page-spec/treatment-notice.json",
+      "sha256": "sha256:382e230f59fa29695e314c3674c8060fad166ff88f7fe28d0f481214dab7d499",
+      "bytes": 5630
+    }
+  ],
+  "knownGaps": [
+    "Figma loading/empty/error/business state frames are not included",
+    "Figma files are referenced by fileKey; no .fig binary is bundled",
+    "screenshots/figma-manual/appointment-detail.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/appointment-form.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/appointment-list.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/callback-register.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/customer-detail.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/customer-search.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/today.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "screenshots/figma-manual/treatment-notice.png is a manual v0.6 canvas crop; it is not current Figma parity evidence",
+    "Material Symbols glyphs depend on the locally installed font",
+    "Block manifests are not included for this run; Page Specs are the source of truth.",
+    "Figma delivery-page readbacks and diffs are not included."
+  ],
+  "archive": {
+    "path": "handoff.zip",
+    "sha256": "sha256:61b216bd212fbab522de66fd2d1e052a4f9b4fb9b7cda94d134617b27796eda1",
+    "bytes": 1914093
+  }
+}

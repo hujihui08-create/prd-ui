@@ -89,6 +89,12 @@ importers:
         specifier: workspace:*
         version: link:../compiler
 
+  core/handoff:
+    dependencies:
+      '@prd-ui/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
   core/intake:
     dependencies:
       '@prd-ui/agents':
@@ -276,6 +282,9 @@ importers:
       '@prd-ui/figma':
         specifier: workspace:*
         version: link:../../core/figma
+      '@prd-ui/handoff':
+        specifier: workspace:*
+        version: link:../../core/handoff
       '@prd-ui/intake':
         specifier: workspace:*
         version: link:../../core/intake
@@ -300,6 +309,9 @@ importers:
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
+      fflate:
+        specifier: ^0.8.3
+        version: 0.8.3
       pixelmatch:
         specifier: ^8.0.0
         version: 8.0.0

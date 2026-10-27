@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "pageId": "treatment-notice",
+    "project": "employee-app-phase2",
+    "name": "术后告知",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "detail",
+    "purpose": "只读展示按项目分块的术后告知快照；未确认时可「确认已当面告知」，已确认后只读显示确认人与确认时间；notices 与 noticeBlocks 皆空时显示「暂无告知内容」且不显示确认按钮。",
+    "route": "/appointments/detail/:id/notice",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-NOTICE-001",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "type": "MobileShell",
+    "props": {
+      "title": "术后告知",
+      "tabs": [
+        "appointment-list"
+      ],
+      "back": true
+    },
+    "reqRef": "REQ-NOTICE-001",
+    "slots": {
+      "summary": [
+        {
+          "type": "Card",
+          "props": {
+            "title": "术后告知摘要",
+            "badge": "未确认",
+            "badgeTone": "warning"
+          },
+          "children": [
+            {
+              "type": "List",
+              "props": {
+                "items": [
+                  {
+                    "label": "客户",
+                    "value": "张女士"
+                  },
+                  {
+                    "label": "单号",
+                    "value": "SO20261102001"
+                  },
+                  {
+                    "label": "确认人",
+                    "value": "—"
+                  },
+                  {
+                    "label": "确认时间",
+                    "value": "—"
+                  }
+                ]
+              },
+              "id": "treatment-notice.root.summary.0.children.0"
+            }
+          ],
+          "id": "treatment-notice.card.summary"
+        },
+        {
+          "type": "Row",
+          "props": {
+            "gap": "space.2"
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {
+                "text": "告知内容"
+              },
+              "textRole": "heading.3",
+              "id": "treatment-notice.root.summary.1.children.0"
+            }
+          ],
+          "id": "treatment-notice.root.summary.1"
+        },
+        {
+          "type": "Card",
+          "props": {
+            "title": "小气泡"
+          },
+          "children": [
+            {
+              "type": "List",
+              "props": {
+                "items": [
+                  "术后 6 小时内避免沾水与化妆",
+                  "当日避免剧烈运动与高温环境"
+                ]
+              },
+              "id": "treatment-notice.root.summary.2.children.0"
+            }
+          ],
+          "id": "treatment-notice.root.summary.2"
+        },
+        {
+          "type": "Card",
+          "props": {
+            "title": "补水"
+          },
+          "children": [
+            {
+              "type": "List",
+              "props": {
+                "items": [
+                  "术后加强保湿与防晒",
+                  "24 小时内避免桑拿与高温环境"
+                ]
+              },
+              "id": "treatment-notice.root.summary.3.children.0"
+            }
+          ],
+          "id": "treatment-notice.root.summary.3"
+        }
+      ],
+      "fields": [
+        {
+          "type": "Row",
+          "props": {
+            "gap": "space.1"
+          },
+          "id": "treatment-notice.root.fields.0"
+        }
+      ],
+      "actions": [
+        {
+          "type": "Button",
+          "props": {
+            "label": "确认已当面告知",
+            "emphasis": "primary",
+            "action": "确认已当面告知"
+          },
+          "id": "treatment-notice.action.confirm"
+        }
+      ]
+    },
+    "id": "treatment-notice.page.root"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    },
+    "empty": {
+      "name": "empty"
+    },
+    "disabled": {
+      "name": "disabled"
+    }
+  },
+  "interactions": [
+    {
+      "trigger": "确认已当面告知",
+      "action": "navigate",
+      "reqRef": "REQ-NOTICE-001"
+    }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-NOTICE-001": [
+        "treatment-notice"
+      ],
+      "REQ-SHARED-001": [
+        "treatment-notice"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  },
+  "businessStates": [
+    {
+      "name": "未确认",
+      "actions": [
+        "确认已当面告知"
+      ],
+      "note": "展示分块话术与确认按钮；notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮。"
+    },
+    {
+      "name": "已确认",
+      "actions": [],
+      "note": "只读，显示确认人与确认时间；内容为快照，重新进入不变。"
+    }
+  ],
+  "noticeBlocks": [
+    {
+      "title": "小气泡",
+      "items": [
+        "术后 6 小时内避免沾水与化妆",
+        "当日避免剧烈运动与高温环境"
+      ]
+    },
+    {
+      "title": "补水",
+      "items": [
+        "术后加强保湿与防晒",
+        "24 小时内避免桑拿与高温环境"
+      ]
+    }
+  ],
+  "currentStatus": "未确认",
+  "referenceId": "SO20261102001",
+  "linkedRoutes": {
+    "create": "/appointments/form",
+    "form": "/appointments/form",
+    "detail": "/appointments/detail/:id/notice",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "list": "/appointments"
+  }
+}

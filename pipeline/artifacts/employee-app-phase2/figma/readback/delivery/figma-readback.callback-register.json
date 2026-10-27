@@ -1,15 +1,10 @@
 {
   "schemaVersion": "1.0",
   "pageId": "callback-register",
-  "builtAt": "2026-10-26T08:34:25.779Z",
+  "builtAt": "2026-10-27T02:04:38.487Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
-      "style": "Regular",
-      "fallback": false
-    },
-    {
-      "family": "Noto Sans SC",
       "style": "Regular",
       "fallback": false
     }
@@ -41,14 +36,17 @@
     "b-mobile/heading.3",
     "b-mobile/label.strong",
     "b-mobile/body.sm",
-    "b-mobile/input.md"
+    "b-mobile/input.md",
+    "b-mobile/date",
+    "b-mobile/label.bold",
+    "b-mobile/caption"
   ],
   "components": [
     "b-mobile/Button"
   ],
   "nodes": [
     {
-      "nodeId": "3:294",
+      "nodeId": "1:615",
       "type": "FRAME",
       "name": "回访登记",
       "specId": "callback-register.page.root",
@@ -69,7 +67,7 @@
       ],
       "children": [
         {
-          "nodeId": "3:295",
+          "nodeId": "1:616",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "callback-register.page.root.header",
@@ -90,7 +88,7 @@
           ],
           "children": [
             {
-              "nodeId": "3:296",
+              "nodeId": "1:617",
               "type": "GLYPH",
               "name": "Back",
               "specId": "callback-register.page.root.header.back",
@@ -107,10 +105,18 @@
                 "style": "Regular"
               },
               "fontSize": 20,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
             },
             {
-              "nodeId": "3:297",
+              "nodeId": "1:618",
               "type": "TEXT",
               "name": "Title",
               "specId": "callback-register.page.root.header.title",
@@ -128,12 +134,28 @@
                 "style": "SemiBold"
               },
               "fontSize": 16,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "3:298",
+          "nodeId": "1:619",
           "type": "FRAME",
           "name": "Content",
           "specId": "callback-register.page.root.content",
@@ -142,11 +164,11 @@
           "padding": {
             "top": 0,
             "right": 0,
-            "bottom": 0,
+            "bottom": 16,
             "left": 0
           },
           "width": 390,
-          "height": 726,
+          "height": 727,
           "x": 0,
           "y": 48,
           "fills": [
@@ -154,7 +176,7 @@
           ],
           "children": [
             {
-              "nodeId": "3:299",
+              "nodeId": "1:620",
               "type": "FRAME",
               "name": "Section",
               "specId": "callback-register.root.content.0",
@@ -172,7 +194,7 @@
               "y": 0,
               "children": [
                 {
-                  "nodeId": "3:300",
+                  "nodeId": "1:621",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.customer",
@@ -190,7 +212,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "3:301",
+                      "nodeId": "1:622",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.customer.label",
@@ -208,10 +230,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "3:302",
+                      "nodeId": "1:623",
                       "type": "FRAME",
                       "name": "Row",
                       "specId": "callback-register.root.content.0.children.0.children.0",
@@ -229,7 +260,7 @@
                       "y": 24,
                       "children": [
                         {
-                          "nodeId": "3:303",
+                          "nodeId": "1:624",
                           "type": "FRAME",
                           "name": "Input",
                           "specId": "callback-register.root.content.0.children.0.children.0.children.0",
@@ -241,7 +272,7 @@
                             "bottom": 0,
                             "left": 10
                           },
-                          "width": 92,
+                          "width": 292,
                           "height": 36,
                           "x": 0,
                           "y": 0,
@@ -250,7 +281,7 @@
                           ],
                           "children": [
                             {
-                              "nodeId": "3:305",
+                              "nodeId": "1:625",
                               "type": "TEXT",
                               "name": "Placeholder",
                               "specId": "callback-register.root.content.0.children.0.children.0.children.0.placeholder",
@@ -268,12 +299,40 @@
                                 "style": "Regular"
                               },
                               "fontSize": 14,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#5B6472",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 400,
+                              "textColor": "#5B6472",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "fillDetails": [
+                            {
+                              "color": "#FFFFFF",
+                              "alpha": 1
+                            }
+                          ],
+                          "cornerRadius": 8,
+                          "borderTop": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderLeft": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          }
                         },
                         {
-                          "nodeId": "3:306",
+                          "nodeId": "1:626",
                           "type": "INSTANCE",
                           "name": "Button:选择",
                           "specId": "callback-register.action.pick-customer",
@@ -287,21 +346,24 @@
                           },
                           "width": 58,
                           "height": 36,
-                          "x": 100,
+                          "x": 300,
                           "y": 0,
                           "componentName": "Emphasis=ghost",
                           "variantProperties": {
                             "emphasis": "ghost"
                           },
                           "characters": "选择",
-                          "children": []
+                          "children": [],
+                          "cornerRadius": 6
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "3:308",
+                  "nodeId": "1:628",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.service",
@@ -319,7 +381,7 @@
                   "y": 88,
                   "children": [
                     {
-                      "nodeId": "3:309",
+                      "nodeId": "1:629",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.service.label",
@@ -337,10 +399,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "3:310",
+                      "nodeId": "1:630",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.1.children.0",
@@ -361,7 +432,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "3:311",
+                          "nodeId": "1:631",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.1.children.0.placeholder",
@@ -379,14 +450,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "3:312",
+                  "nodeId": "1:632",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.content",
@@ -404,7 +504,7 @@
                   "y": 160,
                   "children": [
                     {
-                      "nodeId": "3:313",
+                      "nodeId": "1:633",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.content.label",
@@ -422,10 +522,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "3:314",
+                      "nodeId": "1:634",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.2.children.0",
@@ -446,7 +555,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "3:315",
+                          "nodeId": "1:635",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.2.children.0.placeholder",
@@ -464,14 +573,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "3:316",
+                  "nodeId": "1:636",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.result",
@@ -489,7 +627,7 @@
                   "y": 232,
                   "children": [
                     {
-                      "nodeId": "3:317",
+                      "nodeId": "1:637",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.result.label",
@@ -507,10 +645,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "3:318",
+                      "nodeId": "1:638",
                       "type": "FRAME",
                       "name": "Select",
                       "specId": "callback-register.root.content.0.children.3.children.0",
@@ -531,7 +678,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "3:319",
+                          "nodeId": "1:639",
                           "type": "TEXT",
                           "name": "Value",
                           "specId": "callback-register.root.content.0.children.3.children.0.value",
@@ -549,10 +696,19 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#111827",
+                          "lineHeight": 18
                         },
                         {
-                          "nodeId": "3:320",
+                          "nodeId": "1:640",
                           "type": "GLYPH",
                           "name": "Chevron",
                           "specId": "callback-register.root.content.0.children.3.children.0.chevron",
@@ -569,64 +725,171 @@
                             "style": "Regular"
                           },
                           "fontSize": 16,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472"
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "3:321",
+          "nodeId": "1:641",
           "type": "FRAME",
           "name": "Actions",
           "specId": "callback-register.page.root.actions",
-          "layoutMode": "HORIZONTAL",
-          "itemSpacing": 8,
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
           "padding": {
-            "top": 12,
-            "right": 12,
-            "bottom": 12,
-            "left": 12
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
           },
           "width": 390,
-          "height": 70,
+          "height": 69,
           "x": 0,
-          "y": 774,
+          "y": 775,
           "fills": [
             "color/surface/default"
           ],
           "children": [
             {
-              "nodeId": "3:322",
-              "type": "INSTANCE",
-              "name": "Button:保存回访",
-              "specId": "callback-register.action.save",
+              "nodeId": "1:642",
+              "type": "FRAME",
+              "name": "ActionsDivider",
+              "specId": "callback-register.page.root.actions.divider",
               "layoutMode": "HORIZONTAL",
               "itemSpacing": 0,
               "padding": {
                 "top": 0,
-                "right": 16,
+                "right": 0,
                 "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 1,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/border/subtle"
+              ],
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#E5E7EB",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 0
+            },
+            {
+              "nodeId": "1:643",
+              "type": "FRAME",
+              "name": "ActionsRow",
+              "specId": "callback-register.page.root.actions.row",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 12,
+                "right": 16,
+                "bottom": 12,
                 "left": 16
               },
-              "width": 364,
-              "height": 44,
-              "x": 13,
-              "y": 13,
-              "componentName": "Emphasis=primary",
-              "variantProperties": {
-                "emphasis": "primary"
-              },
-              "characters": "保存回访",
-              "children": []
+              "width": 390,
+              "height": 68,
+              "x": 0,
+              "y": 1,
+              "children": [
+                {
+                  "nodeId": "1:644",
+                  "type": "INSTANCE",
+                  "name": "Button:保存回访",
+                  "specId": "callback-register.action.save",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 16,
+                    "bottom": 0,
+                    "left": 16
+                  },
+                  "width": 358,
+                  "height": 44,
+                  "x": 16,
+                  "y": 12,
+                  "componentName": "Emphasis=primary",
+                  "variantProperties": {
+                    "emphasis": "primary"
+                  },
+                  "characters": "保存回访",
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 6
+                }
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         }
-      ]
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
     }
   ],
   "errors": []

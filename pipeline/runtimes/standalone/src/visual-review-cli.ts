@@ -21,6 +21,7 @@ import {
   type DiffPng,
 } from "./visual/baseline.js";
 import {
+  hashHtmlInputs,
   hashValue,
   loadVisualProject,
   manifestCaseFor,
@@ -289,6 +290,7 @@ interface ReviewArtifacts {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
+  htmlHashes?: Record<string, string>;
   specHash: string;
   cacheKey: string;
   signoff: { valid: boolean; signer?: string; date?: string; waivedFindings?: string[] };
@@ -353,6 +355,7 @@ function buildState(input: {
   usageComplete: boolean;
   manifestHash: string;
   findingsHash: string;
+  htmlHashes?: Record<string, string>;
   signoffValid: boolean;
   signer?: string;
   startedAt: string;
@@ -378,6 +381,7 @@ function buildState(input: {
     usageComplete: input.usageComplete,
     manifestHash: input.manifestHash,
     findingsHash: input.findingsHash,
+    ...(input.htmlHashes === undefined ? {} : { htmlHashes: input.htmlHashes }),
     signoff: { visual: input.signoffValid },
     startedAt: input.startedAt,
     updatedAt: input.finishedAt,
@@ -438,6 +442,7 @@ export async function main(
   let cases: VisualCase[] = [];
   let screenshots: ScreenshotEvidence[] = [];
   let diffSummary: VisualDiffSummary = { passed: 0, failed: 0, missing: 0 };
+  let htmlHashes: Record<string, string> | undefined;
 
   const log = async (event: Record<string, unknown>): Promise<void> => {
     if (store === undefined) return;
@@ -457,6 +462,10 @@ export async function main(
     project = loaded.project;
     cases = buildVisualMatrix(loaded.specs);
     await assertHtmlFiles(
+      options.htmlPath!,
+      [...new Set(cases.map((visualCase) => visualCase.pageId))]
+    );
+    htmlHashes = await hashHtmlInputs(
       options.htmlPath!,
       [...new Set(cases.map((visualCase) => visualCase.pageId))]
     );
@@ -741,6 +750,7 @@ export async function main(
       usageComplete: critic.usageComplete,
       manifestHash,
       findingsHash,
+      ...(htmlHashes === undefined ? {} : { htmlHashes }),
       specHash,
       cacheKey,
       signoff: {
@@ -776,6 +786,7 @@ export async function main(
       usageComplete: critic.usageComplete,
       manifestHash,
       findingsHash,
+      ...(htmlHashes === undefined ? {} : { htmlHashes }),
       signoffValid,
       ...(matchedSignoff === undefined ? {} : { signer: matchedSignoff.signer }),
       startedAt,
@@ -841,6 +852,7 @@ export async function main(
             usageComplete: false,
             manifestHash: failure.manifestHash as string,
             findingsHash: failure.findingsHash as string,
+            ...(htmlHashes === undefined ? {} : { htmlHashes }),
             signoffValid: false,
             startedAt,
             finishedAt: new Date().toISOString(),

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pages": [
+    {
+      "pageId": "today",
+      "findings": [],
+      "passed": true
+    },
+    {
+      "pageId": "appointment-list",
+      "findings": [],
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": true,
+    "blockers": 0
+  }
+}

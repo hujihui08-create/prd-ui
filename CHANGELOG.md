@@ -3,6 +3,142 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-27 — v0.7 signed: Figma parity green + Handoff package
+
+- Rebuilt all 8 pages in Figma desktop with plugin bundle
+  `sha256:eb862fa…1de6`; delivery file `Ccy4HCkRVOVM70LDeyi4ZP`
+  (`figma-files.json` maps all 8 pages; scratch `iL99qSPGhmh08BB9LketgF`).
+- `figma:verify` is **8/8 passed** on delivery (0 blocker; appointment-list
+  1 major, within the default threshold); top-level readbacks/diffs mirror
+  delivery for signing.
+- Plan-geometry fix (derived slot insets for detail/notice cards, form input
+  grow, notice row heights) removed the real layout offsets parity exposed.
+- Visual baseline regenerated (24 cases / 8 default); real Visual Critic:
+  **0 blocker / 0 major / 3 minor**, `awaiting_signoff` (cost ¥0.4406).
+- `figma:conformance` 0 blocker / 0 major (233 checked).
+- `figma:parity` **8/8 passed** with calibrated cross-renderer thresholds
+  (pixel ≤2%, SSIM ≥0.92, cluster ≤250; measured 0.338–1.698% /
+  0.9306–0.9884 / 99–235).
+- `v07:smoke`: `executedGatesPassed: true`, `complete: true`.
+- **Signed** by 胡冀徽 on 2026-10-27: `visual:sign` (`status: success`) and
+  `figma:sign` (five hashes bound); `handoff:pack` produced
+  `artifacts/employee-app-phase2/handoff/` with 114 files and
+  `handoff.zip` sha256 `61b216bd…96eda1`.
+- Known gaps: Figma state frames, delivery readback/diff directory, manual v0.6
+  screenshot crops; recorded in `handoff.manifest.json`.
+- v0.8 debt: `customer-detail` secondary actions are still in a filter-row;
+  add IA `actionPlacement` (footer / card-actions / overflow) before changing
+  `detailLayout`.
+- Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,readback/delivery,diff,diff/delivery,parity,figma-files.json}`.
+
+## 2026-10-26 — v0.7 final whole-branch review fixes (still not signed)
+
+### Fixed
+
+- **Stale Figma diff trust (critical)**: `figma:sign` and `handoff:pack` now
+  re-derive every page diff from the current plan + readback via `diffFigma`
+  (pure `@prd-ui/figma`) and require it to pass. A stored
+  `figma-diff.*.json` `passed: true` is only usable when it agrees with the
+  recomputed verdict (`FIGMA_DIFF_STALE` / handoff blocker otherwise).
+- **Block height gate (critical)**: the C4 height gate reads raw `contentHeight`
+  in addition to the viewport-floored `documentHeight`. The committed pilot's
+  appointment-list 760→804 content growth (+5.79%) is now a `heightDelta>5%`
+  rollback instead of a silent 0% pass; the committed evidence documents the
+  corrected metric and discrepancy.
+- **Parity input hashes**: sign/pack re-hash `figma/parity/figma.<page>.png`
+  and the signed baseline case PNG and require them to match the
+  `figmaHash`/`baselineHash` recorded in `parity.json`.
+- **Handoff screenshots**: `screenshots/figma/<page>.png` now comes from the
+  parity PNG and is hash-bound to it; legacy v0.6 manual crops go to
+  `screenshots/figma-manual/` with an explicit stale-provenance known gap.
+- **Render metrics**: `handoff:pack` accepts `--metrics <file>`, searches the
+  v0.7 `render/metrics/render-metrics.json` layout and treats missing metrics
+  as a blocker.
+- **Gate-input binding**: `figma:conformance` records per-page
+  `htmlSha256`/`specSha256`, `visual:review` records `htmlHashes`, and
+  `handoff:pack` verifies the supplied HTML/spec bytes match those gates
+  (`inputHashes` is also written to `handoff.manifest.json`).
+- **Block C4 conditions**: promotion now requires measured Phase 1 blockers,
+  token drift ≤ baseline drift, conformance, and parity; `allowedComponents`
+  and `requiredStates` are enforced by `verifyBlockContracts` in
+  `block:experiment` and `block:verify`. `block:experiment` accepts
+  `--figma`/`--figma-baseline` to run `figma:parity`; without both it can only
+  return `insufficient_evidence`.
+- **Structure diff**: compares a defined set of text-bearing props and adds a
+  positional path fallback for id-less nodes (`idless: true`).
+- **Minors**: `figma:parity` reads a pinned `parity.config.json`; `figma:serve`
+  preserves scratch vs delivery readback directories; structure-diff and
+  block-experiment artifacts use repo-relative paths; `figma:sign` rejects
+  future/mismatched-project signoffs and hardens `__proto__` hashing;
+  `--baseline` in `handoff:pack` falls back to `pipeline/baselines/<project>`.
+
+### Verified
+
+- `pnpm test` **983 passed** (87 files); `pnpm test:dsh` **4 passed** (3 files);
+  `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
+- `figma:conformance` remains **0 blocker / 0 major / 233 checked** on the 8
+  fresh phase2 pages; `v07:smoke` remains honest (`complete: false`,
+  `paritySkipped: true`).
+- `handoff:pack` still fails closed on the current stale evidence and writes no
+  partial package.
+
+## 2026-10-26 — v0.7 implementation: visual gates, structure, blocks, handoff (not signed)
+
+### Added
+
+- `pnpm v07:smoke` (`runtimes/standalone/src/v07-smoke-cli.ts`): runs
+  `figma:conformance` → `render:measure` → `structure:check` → `figma:parity` in
+  order, stops at the first failure, and writes `<out>/v07-smoke.json` plus one
+  JSON summary line. The summary separates `executedGatesPassed` from `complete`;
+  parity runs only with `--figma` + `--baseline` and every `figma.<pageId>.png`,
+  otherwise it is an explicit `skipped` that sets `paritySkipped: true` and
+  `complete: false` (not a full pass). Skip reasons use repo-relative paths.
+- v0.7 gates and evidence (Tasks 1–19): fail-closed plan mapping +
+  `plan-coverage.json`, project-agnostic `figma:conformance`, `figma:parity`,
+  `figma:serve`/`figma:sign`, `render:measure`, `structure:check --project`,
+  `structure:diff`, `block:verify`, `block:experiment`, and the fail-closed
+  `handoff:pack`.
+- Committed evidence: `pipeline/artifacts/employee-app-phase2/figma/conformance/`,
+  `.../render/{metrics,structure}/`, `.../blocks/` (sanitized, self-contained
+  copy with `conformance/` and `artifacts/block-manifest/`), and
+  `.../v07-smoke.json`.
+- `docs/handoffs/2026-10-26-v07-implementation-handoff.md`.
+
+### Verified
+
+- `pnpm test` **983 passed** (87 files); `pnpm test:dsh` **4 passed** (3 files);
+  `pnpm typecheck` clean; `pnpm --dir runtimes/figma typecheck` clean and build OK.
+- `figma:conformance`: **0 blocker / 0 major / 233 checked** on all 8 phase2
+  pages with freshly rendered HTML; `render:measure` 8 pages (no overflow);
+  `structure:check --project` 0 warnings / 0 blockers; `v07:smoke` exit 0 with
+  `executedGatesPassed: true`, `complete: false`, `paritySkipped: true` (missing
+  Figma PNGs).
+- Defect injections fail as intended: `ghost-chip` height 36 → 2
+  `CONFORMANCE_STYLE_MISMATCH height`; removed row divider → 1
+  `CONFORMANCE_STYLE_MISMATCH borderBottomWidth`; injected `Chart` →
+  `UNMAPPED_COMPONENT` with `specId today.chart.1` from `figma:verify`.
+- New-project check (`employee-app`, 2 pages): the gate chain runs without test
+  changes; `today` passes, `inventory-query` reports 6 real
+  `CONFORMANCE_NODE_MISSING` blockers for the unmapped `Switch`/`InventoryCard`
+  types (plan degraded, no HTML counterpart).
+
+### Not done / blocked
+
+- `figma:verify` is **3/8 passed** against the checked-in v0.6 readbacks (4
+  blocker / 53 major, all stale value diffs after the plan corrections). A manual
+  Figma rebuild (scratch + delivery) is required; v0.7 is **not signed**.
+- `figma:parity` has not run: no `figma/parity/figma.<page>.png` and the v0.5
+  baseline is stale after the v0.5.x CSS changes. Gate 0 (v0.6 human signoff +
+  regenerated, re-signed baseline) remains pending.
+- `handoff:pack` fails closed: exit 2 with the brief's asset path (no root
+  `manifest.json`), exit 1 with 23 blockers (missing parity evidence/diff PNGs,
+  readback `fileKey`, figma signoff, full spec-engineer gate). No partial package.
+- Block-generation pilot concluded **rollback at ¥0.3302** (7 generations, 0
+  retries, documentHeight delta 0%, 0 new seams, parity not evaluated). The
+  corrected gate also sees appointment-list contentHeight 760→804 (+5.79%), so
+  the rollback stands; it ran before the conformance remediation and needs a
+  v0.8 re-evaluation.
+
 ## 2026-10-26 — v0.7 design input: gates, structure, block generation
 
 ### Added

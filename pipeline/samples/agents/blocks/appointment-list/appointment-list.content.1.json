@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "blockId": "appointment-list.content.1",
+  "root": {
+    "id": "appointment-list.root.content.0.children.1",
+    "type": "Row",
+    "props": {
+      "gap": "space.2",
+      "variant": "filter"
+    },
+    "children": [
+      {
+        "id": "appointment-list.action.toggle-view",
+        "type": "Button",
+        "props": {
+          "label": "切换日历/列表",
+          "emphasis": "secondary",
+          "action": "切换日历/列表",
+          "viewToggle": true
+        }
+      }
+    ]
+  }
+}

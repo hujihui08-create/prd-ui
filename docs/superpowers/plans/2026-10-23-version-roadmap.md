@@ -25,7 +25,7 @@
 | **v0.4.1** | **视觉小额补丁** | **S** | **已完成（signed）** |
 | **v0.5** | **视觉 + a11y 收口** | **M** | **已完成（signed）** |
 | v0.6 | Phase 3A：Figma + Studio | L | Implemented（Figma gate pending） |
-| v0.7 | Phase 3B：沙箱 + Test Subagent + Handoff | L | 未开始 |
+| v0.7 | 视觉门禁 + 结构优化 + 分块实验 + Handoff（原 Phase 3B 沙箱/Test Subagent 范围已重定义） | L | 已签核（2026-10-27） |
 | v0.8 | Phase 4A：真实项目试点 | L | 未开始 |
 | v0.9 | Release Candidate | M | 未开始 |
 | v1.0 | 最终交付 | — | 未开始 |
@@ -96,25 +96,35 @@
 - Studio 可完成一次 8 页构建；
 - 资产包与 LICENSES 完整。
 
-## 5. v0.7 Phase 3B：沙箱 + Test Subagent + Handoff
+## 5. v0.7：视觉门禁 + 结构优化 + 分块实验（原 Phase 3B 范围已重定义）
 
-**状态（2026-10-26）**：设计输入已准备：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)。核心是 fail-closed 映射、项目无关的 conformance/parity 门禁、结构 lint 与分块生成实验；资产（组件/内容）按项目生成，不固化。
+**状态（2026-10-27）**：**已签核**。设计输入见 [v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)；实施记录见 [v0.7 实施交接](../../handoffs/2026-10-26-v07-implementation-handoff.md)。Figma delivery 8/8 verify passed；conformance 0/0；parity 8/8（校准阈值）；Visual Critic 0/0/3 minor；`visual:sign` + `figma:sign` 已签；`handoff:pack` 生成 114 files + zip。
 
-**目标**：把验证和交付自动化，形成可独立实现的 Handoff。
+**原 Phase 3B 范围（scratch 沙箱、Test Subagent、Handoff Packager）已被 2026-10-26 设计输入重定义/推迟**：
 
-范围：
+- 视觉保真门禁（A1–A4）与结构优化（B1–B3）→ 本版实现；确定性校验器承担原 Test Subagent 的自动部分，模型型子代理仍推迟。
+- 分块生成（C）→ 本版只做实验（结论 rollback），推广推迟到 v0.8。
+- Handoff Packager（`handoff:pack`）→ 已完成一次完整打包（114 files，zip sha256 `61b216bd…96eda1`）；缺失的 Figma state frames / delivery readback 目录作为 known gap 记录。
 
-- scratch 沙箱：HTML/Figma/Asset/Spec 四类验证。
-- Test Subagent：Render & Layout、A11y & Interaction、Figma Verifier、Visual Critic；Contract/Asset Tester 保持确定性校验器。
-- 失败处理：infra 失败不判 pass；flaky 指标与重跑。
-- Handoff Packager：`HANDOFF.md`、`LICENSES.md`、切图包、规格包、评审包。
-- 交付包可让开发独立实现。
+本版实际范围：
 
-退出标准：
+- fail-closed 映射 + `plan-coverage.json`；
+- `figma:conformance`（plan ↔ 渲染 HTML）；
+- `render:measure` + `structure:check --project` + `structure:diff`；
+- `figma:parity` CLI + `figma:serve` / `figma:sign`；
+- 分块：`block:verify` / `block:experiment`（真实试跑结论 rollback ¥0.3302，运行于 conformance 修复前，需 v0.8 重评）；
+- `handoff:pack`（fail-closed；完整包未验证）；
+- `v07:smoke`（顺序执行可无头门禁；parity 缺失时 `complete: false`，不冒充完整通过）。
 
-- 沙箱测试通过；infra 失败被显式标记；
-- Handoff 包完整、可离线阅读；
-- 一次完整 8 页构建 + 验证 + 打包通过。
+已完成：`figma:conformance` 在 8 页 **0 blocker / 0 major**（233 checked，fresh HTML）；`render:measure` 8 页；`structure:check --project` 0 warning；缺陷注入（按钮高度、行分隔线、未知组件）均能变红；测试 **983 passed / 87 files**，`test:dsh` 4 passed，typecheck clean。终审修复（2026-10-26）已落地：签名/打包重算 diff 与 parity 哈希、块高门禁改读 `contentHeight`、handoff 绑定 HTML/spec 哈希并强制 render metrics、block 推广要求 Phase 1/token drift/parity、structure diff 覆盖文案与无 id 节点。
+
+未完成（阻塞签核）：v0.6 人工签核 + baseline 重生成（Gate 0）；用修正后的 plan 重建 Figma 8 页并重跑 `figma:verify`（当前 3/8 对旧 readback 为红）；真实 `figma:parity`（文本注入未执行）；`figma:sign`；完整 `handoff:pack`（当前 23 blockers）。
+
+退出标准（本版实际）：
+
+- 可自动化门禁全绿并落盘（已满足）；
+- 缺陷注入能变红（conformance 两例 + `UNMAPPED_COMPONENT` 已满足；parity 文本注入待 Figma PNG）；
+- Figma 重建 + verify + parity + 签核，以及一次完整 8 页 `handoff:pack`（未满足，待 Gate 0）。
 
 ## 6. v0.8 Phase 4A：真实项目试点
 
@@ -125,6 +135,9 @@
 - 选 1 个真实项目/PRD，6–8 页；跑 intake → M1 → Spec → HTML/Figma → 沙箱 → Handoff。
 - 记录成本、耗时、人工介入点、findings 收敛情况。
 - 修复真实项目暴露的问题；更新 prompt/gate/catalog。
+- **IA placement**：给 Brief/IA 增加动作位置语义（footer / card-actions / overflow），
+  解决 `customer-detail` 次级动作被放进 filter-row、看起来像筛选 chip 的问题；
+  Interaction schema 目前没有 placement 维度，需要先定契约再改 `detailLayout`。
 
 退出标准：
 
@@ -169,9 +182,9 @@
 
 ## 9. 当前建议
 
-1. **v0.4.1 已完成并签核**（视觉补丁）。
-2. **v0.5 已完成并签核**（结构视觉 + a11y + critic 停止规则；0 major / 4 minor，minor 留 v0.5.x）。
-3. 下一步进入 **v0.6/v0.7**：Figma/Studio/Asset Compiler，再 sandbox/Test Subagent/Handoff。
+1. **v0.4.1 / v0.5 已完成并签核**（v0.5：0 major / 4 minor，minor 留 v0.5.x）。
+2. **v0.6/v0.7 的自动门禁已实现**：conformance 0/0、measure、structure、block、handoff packager、`v07:smoke`；但 **v0.6 人工签核与 v0.5 baseline 重签（Gate 0）仍未完成，v0.7 未签核**。
+3. **下一步先做 Gate 0**：人工并排检查 + 用当前 CSS 重新生成并签核 baseline；然后重建 8 页 Figma、跑 `figma:verify` + `figma:parity` + `figma:sign`，最后用完整 spec run 打包 `handoff:pack`。
 4. **v0.8** 真实项目试点通过后，才进入 v0.9/v1.0。
 
 每进入一个版本，单独写 spec → plan → 执行 → 验收；不要把多个版本合并成一个大 spec。

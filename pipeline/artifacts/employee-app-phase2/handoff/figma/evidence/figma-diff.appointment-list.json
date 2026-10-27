@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "appointment-list",
+  "passed": true,
+  "findings": [
+    {
+      "code": "FIGMA_BORDER_MISMATCH",
+      "severity": "major",
+      "message": "appointment-list.calendar.grid.day.2.frame: borderLeft color #1D4ED8 != #E5E7EB",
+      "specId": "appointment-list.calendar.grid.day.2.frame"
+    }
+  ],
+  "majorCount": 1,
+  "blockerCount": 0
+}

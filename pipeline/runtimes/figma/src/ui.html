@@ -20,6 +20,9 @@
       #status { margin-top: 14px; padding: 10px; border-radius: 6px; background: #2a2a2a; color: #b3b3b3; line-height: 1.5; white-space: pre-wrap; }
       #status.error { background: #3a1f1f; color: #ffb4b4; }
       #status.ok { background: #1f3a2a; color: #b4ffd0; }
+      #saveStatus { margin-top: 8px; color: #888; font-size: 11px; line-height: 1.5; white-space: pre-wrap; }
+      #saveStatus.ok { color: #b4ffd0; }
+      #saveStatus.error { color: #ffb4b4; }
       a { color: #9ecbff; }
       .muted { color: #888; font-size: 11px; }
     </style>
@@ -33,8 +36,10 @@
     <textarea id="planText" rows="3" placeholder="粘贴 figma-plan.<page>.json 的内容"></textarea>
     <button id="loadText" disabled>Load plan JSON</button>
     <label for="planUrl">或从 localhost 加载</label>
-    <input id="planUrl" type="text" placeholder="http://127.0.0.1:8787/figma-plan.today.json" />
+    <input id="planUrl" type="text" placeholder="http://127.0.0.1:9600/plans/figma-plan.today.json" />
     <button id="loadUrl" disabled>Load plan URL</button>
+    <label for="server">Save server（pnpm figma:serve）</label>
+    <input id="server" type="text" value="http://127.0.0.1:9600" placeholder="http://127.0.0.1:9600" />
     <label>Build mode</label>
     <div class="modes">
       <label><input type="radio" name="mode" value="scratch" checked /> Scratch + readback</label>
@@ -42,8 +47,9 @@
     </div>
     <button id="build" disabled>Build</button>
     <div id="status">Ready. 选择 plan 后开始。</div>
+    <div id="saveStatus">Auto-save: idle</div>
     <button id="copyReadback" hidden>Copy readback JSON</button>
-    <p class="muted">插件不能 headless；delivery page 已存在时会阻止。readback 下载后可交给 <code>pnpm figma:verify</code>。</p>
+    <p class="muted">插件不能 headless；delivery page 已存在时会阻止。readback/PNG 自动保存到 Save server，也可下载后交给 <code>pnpm figma:verify</code>。</p>
     <script>
       const input = document.getElementById("plan");
       const planText = document.getElementById("planText");
@@ -52,13 +58,40 @@
       const loadUrl = document.getElementById("loadUrl");
       const build = document.getElementById("build");
       const status = document.getElementById("status");
+      const saveStatus = document.getElementById("saveStatus");
+      const server = document.getElementById("server");
       const copyReadback = document.getElementById("copyReadback");
       let plan = null;
       let lastReadback = null;
+      const saveLines = [];
 
       function setStatus(text, kind) {
         status.textContent = text;
         status.className = kind || "";
+      }
+
+      function noteSave(text, kind) {
+        saveLines.push(text);
+        if (saveLines.length > 3) saveLines.shift();
+        saveStatus.textContent = saveLines.join("\n");
+        saveStatus.className = kind || "";
+      }
+
+      async function postToServer(path, body, headers) {
+        const base = server.value.trim().replace(/\/+$/, "");
+        if (!base) {
+          noteSave("Auto-save skipped: no Save server URL");
+          return false;
+        }
+        try {
+          const response = await fetch(`${base}${path}`, { method: "POST", headers, body });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          noteSave(`Auto-saved ${path}`, "ok");
+          return true;
+        } catch (error) {
+          noteSave(`Auto-save failed ${path}: ${error.message}（可下载/复制回退）`, "error");
+          return false;
+        }
       }
 
       function acceptPlan(value, source) {
@@ -154,6 +187,7 @@
         if (message.type === "readback") {
           build.disabled = false;
           const readback = message.readback;
+          const delivery = message.mode === "delivery";
           lastReadback = readback;
           copyReadback.hidden = false;
           const text = JSON.stringify(readback, null, 2);
@@ -162,7 +196,7 @@
           status.className = "ok";
           status.innerHTML = "";
           const lines = [
-            `Built ${readback.pageId}`,
+            `Built ${readback.pageId}${delivery ? " (delivery)" : ""}`,
             `${readback.fonts.length} fonts, ${readback.variables.length} variables, ${readback.textStyles.length} text styles`,
             readback.errors.length > 0 ? `errors: ${readback.errors.join("; ")}` : "no plugin errors",
           ];
@@ -174,8 +208,29 @@
           const link = document.createElement("a");
           link.href = url;
           link.download = `figma-readback.${readback.pageId}.json`;
-          link.textContent = "下载 readback JSON";
+          link.textContent = delivery
+            ? "下载 readback JSON（delivery，保存到 readback/delivery/）"
+            : "下载 readback JSON";
           status.append(link);
+          void postToServer(
+            delivery
+              ? `/save/delivery/figma-readback.${readback.pageId}.json`
+              : `/save/figma-readback.${readback.pageId}.json`,
+            text,
+            { "content-type": "application/json" }
+          );
+        }
+        if (message.type === "png") {
+          const bytes = new Uint8Array(message.bytes);
+          const url = URL.createObjectURL(new Blob([bytes], { type: "image/png" }));
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `figma.${message.pageId}.png`;
+          link.textContent = "下载 PNG";
+          const row = document.createElement("div");
+          row.append(link);
+          status.append(row);
+          void postToServer(`/save/figma.${message.pageId}.png`, bytes);
         }
       };
     </script>
