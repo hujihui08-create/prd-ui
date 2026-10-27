@@ -3806,6 +3806,7 @@
         "fill": "color/surface/subtle",
         "gap": 0,
         "clip": true,
+        "paddingBottom": 16,
         "origin": "derived",
         "mapping": "mapped"
       },
@@ -3813,28 +3814,47 @@
         "specId": "appointment-list.page.root.actions",
         "type": "FRAME",
         "name": "Actions",
-        "layoutMode": "HORIZONTAL",
+        "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "appointment-list.action.new-appointment",
-            "type": "INSTANCE",
-            "name": "Button:新增预约",
-            "component": "Button",
-            "variant": "primary",
-            "label": "新增预约",
-            "height": 44,
-            "layoutGrow": 1,
-            "origin": "spec",
+            "specId": "appointment-list.page.root.actions.divider",
+            "type": "FRAME",
+            "name": "ActionsDivider",
+            "layoutMode": "HORIZONTAL",
+            "children": [],
+            "height": 1,
+            "fill": "color/border/subtle",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "appointment-list.page.root.actions.row",
+            "type": "FRAME",
+            "name": "ActionsRow",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "appointment-list.action.new-appointment",
+                "type": "INSTANCE",
+                "name": "Button:新增预约",
+                "component": "Button",
+                "variant": "primary",
+                "label": "新增预约",
+                "height": 44,
+                "layoutGrow": 1,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingY": 12,
+            "paddingX": 16,
+            "gap": 8,
+            "alignItems": "CENTER",
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
-        "padding": 12,
-        "paddingX": 16,
-        "gap": 8,
         "fill": "color/surface/default",
-        "stroke": "color/border/subtle",
-        "strokeWidth": 1,
-        "alignItems": "CENTER",
         "origin": "derived",
         "mapping": "mapped"
       }
@@ -3847,7 +3867,7 @@
     "mapping": "mapped"
   },
   "stats": {
-    "frames": 124,
+    "frames": 126,
     "texts": 49,
     "instances": 2,
     "icons": 3,
@@ -4040,8 +4060,8 @@
     ],
     "summary": {
       "spec": 29,
-      "derived": 267,
-      "mapped": 288,
+      "derived": 269,
+      "mapped": 290,
       "degraded": 0,
       "unmapped": 0,
       "skipped": 8

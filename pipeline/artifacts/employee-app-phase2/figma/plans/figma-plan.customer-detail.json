@@ -212,529 +212,552 @@
         "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "customer-detail.root.summary.0",
+            "specId": "customer-detail.root.summary.0.slot",
             "type": "FRAME",
-            "name": "Card",
+            "name": "SlotBlock",
             "layoutMode": "VERTICAL",
             "children": [
               {
-                "specId": "customer-detail.root.summary.0.head",
+                "specId": "customer-detail.root.summary.0",
                 "type": "FRAME",
-                "name": "Head",
+                "name": "Card",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "customer-detail.root.summary.0.head",
+                    "type": "FRAME",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "customer-detail.root.summary.0.title",
+                        "type": "TEXT",
+                        "name": "Title",
+                        "characters": "客户详情摘要",
+                        "textStyle": "b-mobile/heading.2",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
+                      }
+                    ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "customer-detail.root.summary.0.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "customer-detail.root.summary.0.children.0",
+                        "type": "FRAME",
+                        "name": "List",
+                        "layoutMode": "VERTICAL",
+                        "children": [
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.0",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.0.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.0.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "姓名",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.0.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "张女士",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.1",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.1.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.1.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "手机号",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.1.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "138****0000",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.2",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.2.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.2.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "等级",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.2.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "金卡会员",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.3",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.3.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.3.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "余额",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.3.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "¥1,280.00",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.4",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.4.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.4.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "累计消费",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.4.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "¥8,600.00",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.5",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.5.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.5.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "卡张数",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.5.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "3",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.6",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.6.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.6.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "标签",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.6.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "敏感肌、老客",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.7",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.7.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.7.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "备注",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.7.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "—",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "customer-detail.root.summary.0.children.0.row.8",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.8.label",
+                                "type": "FRAME",
+                                "name": "Label",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "customer-detail.root.summary.0.children.0.row.8.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "服务记录",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "customer-detail.root.summary.0.children.0.row.8.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "10-20 · 小气泡 · A1020",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          }
+                        ],
+                        "gap": 0,
+                        "paddingY": 4,
+                        "origin": "spec",
+                        "mapping": "mapped"
+                      }
+                    ],
+                    "gap": 0,
+                    "paddingTop": 8,
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  }
+                ],
+                "padding": 16,
+                "gap": 0,
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingTop": 16,
+            "paddingX": 16,
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "customer-detail.root.fields.0.slot",
+            "type": "FRAME",
+            "name": "SlotBlock",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "customer-detail.root.fields.0",
+                "type": "FRAME",
+                "name": "Row",
                 "layoutMode": "HORIZONTAL",
                 "children": [
                   {
-                    "specId": "customer-detail.root.summary.0.title",
-                    "type": "TEXT",
-                    "name": "Title",
-                    "characters": "客户详情摘要",
-                    "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary",
-                    "origin": "derived",
+                    "specId": "customer-detail.action.new-appointment",
+                    "type": "INSTANCE",
+                    "name": "Button:新增预约",
+                    "component": "Button",
+                    "variant": "ghost-chip",
+                    "label": "新增预约",
+                    "origin": "spec",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "customer-detail.action.view-notice",
+                    "type": "INSTANCE",
+                    "name": "Button:查看告知",
+                    "component": "Button",
+                    "variant": "ghost-chip",
+                    "label": "查看告知",
+                    "origin": "spec",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "customer-detail.action.callback",
+                    "type": "INSTANCE",
+                    "name": "Button:回访登记",
+                    "component": "Button",
+                    "variant": "ghost-chip",
+                    "label": "回访登记",
+                    "origin": "spec",
                     "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN",
-                "origin": "derived",
-                "mapping": "mapped"
-              },
-              {
-                "specId": "customer-detail.root.summary.0.body",
-                "type": "FRAME",
-                "name": "Body",
-                "layoutMode": "VERTICAL",
-                "children": [
-                  {
-                    "specId": "customer-detail.root.summary.0.children.0",
-                    "type": "FRAME",
-                    "name": "List",
-                    "layoutMode": "VERTICAL",
-                    "children": [
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.0",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.0.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.0.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "姓名",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.0.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "张女士",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.1",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.1.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.1.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "手机号",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.1.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "138****0000",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.2",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.2.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.2.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "等级",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.2.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "金卡会员",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.3",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.3.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.3.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "余额",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.3.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "¥1,280.00",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.4",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.4.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.4.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "累计消费",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.4.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "¥8,600.00",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.5",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.5.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.5.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "卡张数",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.5.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "3",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.6",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.6.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.6.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "标签",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.6.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "敏感肌、老客",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.7",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.7.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.7.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "备注",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.7.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "—",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "customer-detail.root.summary.0.children.0.row.8",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.8.label",
-                            "type": "FRAME",
-                            "name": "Label",
-                            "layoutMode": "HORIZONTAL",
-                            "children": [
-                              {
-                                "specId": "customer-detail.root.summary.0.children.0.row.8.labelText",
-                                "type": "TEXT",
-                                "name": "Label",
-                                "characters": "服务记录",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
-                                "origin": "derived",
-                                "mapping": "mapped"
-                              }
-                            ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "customer-detail.root.summary.0.children.0.row.8.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "10-20 · 小气泡 · A1020",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      }
-                    ],
-                    "gap": 0,
-                    "paddingY": 4,
-                    "origin": "spec",
-                    "mapping": "mapped"
-                  }
-                ],
-                "gap": 0,
-                "paddingTop": 8,
-                "origin": "derived",
-                "mapping": "mapped"
-              }
-            ],
-            "padding": 16,
-            "gap": 0,
-            "fill": "color/surface/default",
-            "radius": 12,
-            "shadow": true,
-            "origin": "spec",
-            "mapping": "mapped"
-          },
-          {
-            "specId": "customer-detail.root.fields.0",
-            "type": "FRAME",
-            "name": "Row",
-            "layoutMode": "HORIZONTAL",
-            "children": [
-              {
-                "specId": "customer-detail.action.new-appointment",
-                "type": "INSTANCE",
-                "name": "Button:新增预约",
-                "component": "Button",
-                "variant": "ghost-chip",
-                "label": "新增预约",
-                "origin": "spec",
-                "mapping": "mapped"
-              },
-              {
-                "specId": "customer-detail.action.view-notice",
-                "type": "INSTANCE",
-                "name": "Button:查看告知",
-                "component": "Button",
-                "variant": "ghost-chip",
-                "label": "查看告知",
-                "origin": "spec",
-                "mapping": "mapped"
-              },
-              {
-                "specId": "customer-detail.action.callback",
-                "type": "INSTANCE",
-                "name": "Button:回访登记",
-                "component": "Button",
-                "variant": "ghost-chip",
-                "label": "回访登记",
+                "paddingX": 16,
                 "origin": "spec",
                 "mapping": "mapped"
               }
             ],
-            "gap": 8,
-            "alignItems": "CENTER",
-            "paddingX": 16,
-            "origin": "spec",
+            "paddingTop": 16,
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
@@ -742,6 +765,7 @@
         "fill": "color/surface/subtle",
         "gap": 0,
         "clip": true,
+        "paddingBottom": 16,
         "origin": "derived",
         "mapping": "mapped"
       },
@@ -749,28 +773,47 @@
         "specId": "customer-detail.page.root.actions",
         "type": "FRAME",
         "name": "Actions",
-        "layoutMode": "HORIZONTAL",
+        "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "customer-detail.action.view-appointment",
-            "type": "INSTANCE",
-            "name": "Button:查看预约",
-            "component": "Button",
-            "variant": "primary",
-            "label": "查看预约",
-            "height": 44,
-            "layoutGrow": 1,
-            "origin": "spec",
+            "specId": "customer-detail.page.root.actions.divider",
+            "type": "FRAME",
+            "name": "ActionsDivider",
+            "layoutMode": "HORIZONTAL",
+            "children": [],
+            "height": 1,
+            "fill": "color/border/subtle",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "customer-detail.page.root.actions.row",
+            "type": "FRAME",
+            "name": "ActionsRow",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "customer-detail.action.view-appointment",
+                "type": "INSTANCE",
+                "name": "Button:查看预约",
+                "component": "Button",
+                "variant": "primary",
+                "label": "查看预约",
+                "height": 44,
+                "layoutGrow": 1,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingY": 12,
+            "paddingX": 16,
+            "gap": 8,
+            "alignItems": "CENTER",
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
-        "padding": 12,
-        "paddingX": 16,
-        "gap": 8,
         "fill": "color/surface/default",
-        "stroke": "color/border/subtle",
-        "strokeWidth": 1,
-        "alignItems": "CENTER",
         "origin": "derived",
         "mapping": "mapped"
       }
@@ -783,7 +826,7 @@
     "mapping": "mapped"
   },
   "stats": {
-    "frames": 27,
+    "frames": 31,
     "texts": 20,
     "instances": 4,
     "icons": 1,
@@ -842,8 +885,8 @@
     ],
     "summary": {
       "spec": 8,
-      "derived": 44,
-      "mapped": 52,
+      "derived": 48,
+      "mapped": 56,
       "degraded": 0,
       "unmapped": 0,
       "skipped": 0

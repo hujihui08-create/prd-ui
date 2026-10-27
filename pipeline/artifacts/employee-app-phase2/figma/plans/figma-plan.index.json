@@ -9,7 +9,7 @@
       "file": "figma-plan.appointment-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:d213660a7d99fab0116e6a9db90361f4cc93198732857114e17eed43a5ab5606"
+      "hash": "sha256:332d25f6cb6c01f7a296601b00a1d52d121694f24152f22dfcaa42fa1e36bf5c"
     },
     {
       "pageId": "appointment-form",
@@ -17,7 +17,7 @@
       "file": "figma-plan.appointment-form.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:8ad8325be57fed5b46bc65a39361561aef63f85afc9dfcb7872ac4d3d50e1d0e"
+      "hash": "sha256:8185be7466b68aab42d591b3ff9aaa98c6ac12e7db14214d929f2d7ec6230a90"
     },
     {
       "pageId": "appointment-list",
@@ -25,7 +25,7 @@
       "file": "figma-plan.appointment-list.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:9462f26385d3154e91ec16259b39e1b63887cd0b0bf21ed78d93dccd3a9e6746"
+      "hash": "sha256:9f954dc9103d3619e390ef7d99c815e0d0069a4bf367fafdfdad0fcb80f6a536"
     },
     {
       "pageId": "callback-register",
@@ -33,7 +33,7 @@
       "file": "figma-plan.callback-register.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:ed0160ba244c64e83b03a6c8e0f3880321a3e39b4a1a06f26b0a901424265fbe"
+      "hash": "sha256:e205d47e863ec5d503ef658908574c7bda1f6020d234454fe082157e16f64bb4"
     },
     {
       "pageId": "customer-detail",
@@ -41,7 +41,7 @@
       "file": "figma-plan.customer-detail.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:73deb76e45a7a44b94ce923e94e7b8be01f276621e3855e498dd50b0b9e76929"
+      "hash": "sha256:eb666f363314ef92c0099418031d1b23e0a102d8a0eb6be8a0951e74ab54607e"
     },
     {
       "pageId": "customer-search",
@@ -49,7 +49,7 @@
       "file": "figma-plan.customer-search.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:e390dc3b2fe63cb9d9ced7b04bcad232d467e91540f254d68195771ba263d8a3"
+      "hash": "sha256:5741a0272e832e92250fba680fdacda98ed53acf2ab4591b5b1d93c140601a62"
     },
     {
       "pageId": "today",
@@ -57,7 +57,7 @@
       "file": "figma-plan.today.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:6ae924a4919cbee85b24f60134aba23f02353e4f1e189b4db4c6197b6dede9fa"
+      "hash": "sha256:4286073292d7af44d3f8d3858de46634cdddea9b43fca193b15ccba41d25e347"
     },
     {
       "pageId": "treatment-notice",
@@ -65,7 +65,7 @@
       "file": "figma-plan.treatment-notice.json",
       "width": 390,
       "height": 844,
-      "hash": "sha256:0ae6c741d1ce9396a90b0da49a00ac1f637a904a1fe7e05aea983c261d8ad90b"
+      "hash": "sha256:37b06da86c1ff71a77413364906f252e9aa23e92704cce46eda55ffbfe39fe0b"
     }
   ]
 }

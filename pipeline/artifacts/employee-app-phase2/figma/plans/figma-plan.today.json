@@ -1069,6 +1069,7 @@
         "fill": "color/surface/subtle",
         "gap": 0,
         "clip": true,
+        "paddingBottom": 16,
         "origin": "derived",
         "mapping": "mapped"
       },

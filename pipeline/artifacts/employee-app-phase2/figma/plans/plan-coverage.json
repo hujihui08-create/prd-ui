@@ -8,8 +8,8 @@
       "file": "figma-plan.appointment-detail.json",
       "summary": {
         "spec": 9,
-        "derived": 54,
-        "mapped": 63,
+        "derived": 58,
+        "mapped": 67,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 0
@@ -76,8 +76,8 @@
       "file": "figma-plan.appointment-form.json",
       "summary": {
         "spec": 17,
-        "derived": 18,
-        "mapped": 35,
+        "derived": 20,
+        "mapped": 37,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 0
@@ -192,8 +192,8 @@
       "file": "figma-plan.appointment-list.json",
       "summary": {
         "spec": 29,
-        "derived": 267,
-        "mapped": 288,
+        "derived": 269,
+        "mapped": 290,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 8
@@ -388,8 +388,8 @@
       "file": "figma-plan.callback-register.json",
       "summary": {
         "spec": 13,
-        "derived": 14,
-        "mapped": 27,
+        "derived": 16,
+        "mapped": 29,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 0
@@ -480,8 +480,8 @@
       "file": "figma-plan.customer-detail.json",
       "summary": {
         "spec": 8,
-        "derived": 44,
-        "mapped": 52,
+        "derived": 48,
+        "mapped": 56,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 0
@@ -744,8 +744,8 @@
       "file": "figma-plan.treatment-notice.json",
       "summary": {
         "spec": 11,
-        "derived": 36,
-        "mapped": 47,
+        "derived": 47,
+        "mapped": 58,
         "degraded": 0,
         "unmapped": 0,
         "skipped": 0

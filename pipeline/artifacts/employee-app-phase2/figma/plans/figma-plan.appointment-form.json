@@ -263,6 +263,7 @@
                         "strokeWidth": 1,
                         "radius": 8,
                         "alignItems": "CENTER",
+                        "layoutGrow": 1,
                         "origin": "spec",
                         "mapping": "mapped"
                       },
@@ -549,6 +550,7 @@
         "fill": "color/surface/subtle",
         "gap": 0,
         "clip": true,
+        "paddingBottom": 16,
         "origin": "derived",
         "mapping": "mapped"
       },
@@ -556,28 +558,47 @@
         "specId": "appointment-form.page.root.actions",
         "type": "FRAME",
         "name": "Actions",
-        "layoutMode": "HORIZONTAL",
+        "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "appointment-form.action.save",
-            "type": "INSTANCE",
-            "name": "Button:保存",
-            "component": "Button",
-            "variant": "primary",
-            "label": "保存",
-            "height": 44,
-            "layoutGrow": 1,
-            "origin": "spec",
+            "specId": "appointment-form.page.root.actions.divider",
+            "type": "FRAME",
+            "name": "ActionsDivider",
+            "layoutMode": "HORIZONTAL",
+            "children": [],
+            "height": 1,
+            "fill": "color/border/subtle",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "appointment-form.page.root.actions.row",
+            "type": "FRAME",
+            "name": "ActionsRow",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "appointment-form.action.save",
+                "type": "INSTANCE",
+                "name": "Button:保存",
+                "component": "Button",
+                "variant": "primary",
+                "label": "保存",
+                "height": 44,
+                "layoutGrow": 1,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingY": 12,
+            "paddingX": 16,
+            "gap": 8,
+            "alignItems": "CENTER",
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
-        "padding": 12,
-        "paddingX": 16,
-        "gap": 8,
         "fill": "color/surface/default",
-        "stroke": "color/border/subtle",
-        "strokeWidth": 1,
-        "alignItems": "CENTER",
         "origin": "derived",
         "mapping": "mapped"
       }
@@ -590,7 +611,7 @@
     "mapping": "mapped"
   },
   "stats": {
-    "frames": 18,
+    "frames": 20,
     "texts": 13,
     "instances": 2,
     "icons": 2,
@@ -703,8 +724,8 @@
     ],
     "summary": {
       "spec": 17,
-      "derived": 18,
-      "mapped": 35,
+      "derived": 20,
+      "mapped": 37,
       "degraded": 0,
       "unmapped": 0,
       "skipped": 0

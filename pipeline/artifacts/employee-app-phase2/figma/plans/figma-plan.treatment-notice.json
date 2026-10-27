@@ -212,477 +212,587 @@
         "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "treatment-notice.card.summary",
+            "specId": "treatment-notice.card.summary.slot",
             "type": "FRAME",
-            "name": "Card",
+            "name": "SlotBlock",
             "layoutMode": "VERTICAL",
             "children": [
               {
-                "specId": "treatment-notice.card.summary.head",
+                "specId": "treatment-notice.card.summary",
                 "type": "FRAME",
-                "name": "Head",
-                "layoutMode": "HORIZONTAL",
+                "name": "Card",
+                "layoutMode": "VERTICAL",
                 "children": [
                   {
-                    "specId": "treatment-notice.card.summary.title",
-                    "type": "TEXT",
-                    "name": "Title",
-                    "characters": "术后告知摘要",
-                    "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary",
+                    "specId": "treatment-notice.card.summary.head",
+                    "type": "FRAME",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
+                    "children": [
+                      {
+                        "specId": "treatment-notice.card.summary.title",
+                        "type": "TEXT",
+                        "name": "Title",
+                        "characters": "术后告知摘要",
+                        "textStyle": "b-mobile/heading.2",
+                        "color": "color/text/primary",
+                        "origin": "derived",
+                        "mapping": "mapped"
+                      },
+                      {
+                        "specId": "treatment-notice.card.summary.badge",
+                        "type": "FRAME",
+                        "name": "Badge",
+                        "layoutMode": "HORIZONTAL",
+                        "children": [
+                          {
+                            "specId": "treatment-notice.card.summary.badge.label",
+                            "type": "TEXT",
+                            "name": "Label",
+                            "characters": "未确认",
+                            "textStyle": "b-mobile/label.strong",
+                            "color": "color/status/warning",
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          }
+                        ],
+                        "height": 20,
+                        "paddingX": 6,
+                        "radius": 4,
+                        "fill": "color/status/warning",
+                        "fillAlpha": 0.12,
+                        "alignItems": "CENTER",
+                        "justifyContent": "CENTER",
+                        "origin": "derived",
+                        "mapping": "mapped"
+                      }
+                    ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN",
                     "origin": "derived",
                     "mapping": "mapped"
                   },
                   {
-                    "specId": "treatment-notice.card.summary.badge",
+                    "specId": "treatment-notice.card.summary.body",
                     "type": "FRAME",
-                    "name": "Badge",
-                    "layoutMode": "HORIZONTAL",
-                    "children": [
-                      {
-                        "specId": "treatment-notice.card.summary.badge.label",
-                        "type": "TEXT",
-                        "name": "Label",
-                        "characters": "未确认",
-                        "textStyle": "b-mobile/label.strong",
-                        "color": "color/status/warning",
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      }
-                    ],
-                    "height": 20,
-                    "paddingX": 6,
-                    "radius": 4,
-                    "fill": "color/status/warning",
-                    "fillAlpha": 0.12,
-                    "alignItems": "CENTER",
-                    "justifyContent": "CENTER",
-                    "origin": "derived",
-                    "mapping": "mapped"
-                  }
-                ],
-                "gap": 8,
-                "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN",
-                "origin": "derived",
-                "mapping": "mapped"
-              },
-              {
-                "specId": "treatment-notice.card.summary.body",
-                "type": "FRAME",
-                "name": "Body",
-                "layoutMode": "VERTICAL",
-                "children": [
-                  {
-                    "specId": "treatment-notice.root.summary.0.children.0",
-                    "type": "FRAME",
-                    "name": "List",
+                    "name": "Body",
                     "layoutMode": "VERTICAL",
                     "children": [
                       {
-                        "specId": "treatment-notice.root.summary.0.children.0.row.0",
+                        "specId": "treatment-notice.root.summary.0.children.0",
                         "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
+                        "name": "List",
+                        "layoutMode": "VERTICAL",
                         "children": [
                           {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.0.label",
+                            "specId": "treatment-notice.root.summary.0.children.0.row.0",
                             "type": "FRAME",
-                            "name": "Label",
+                            "name": "Row",
                             "layoutMode": "HORIZONTAL",
                             "children": [
                               {
-                                "specId": "treatment-notice.root.summary.0.children.0.row.0.labelText",
-                                "type": "TEXT",
+                                "specId": "treatment-notice.root.summary.0.children.0.row.0.label",
+                                "type": "FRAME",
                                 "name": "Label",
-                                "characters": "客户",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "treatment-notice.root.summary.0.children.0.row.0.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "客户",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "treatment-notice.root.summary.0.children.0.row.0.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "张女士",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
                                 "origin": "derived",
                                 "mapping": "mapped"
                               }
                             ],
-                            "width": 72,
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
                             "origin": "derived",
                             "mapping": "mapped"
                           },
                           {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.0.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "张女士",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "treatment-notice.root.summary.0.children.0.row.1",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.1.label",
+                            "specId": "treatment-notice.root.summary.0.children.0.row.1",
                             "type": "FRAME",
-                            "name": "Label",
+                            "name": "Row",
                             "layoutMode": "HORIZONTAL",
                             "children": [
                               {
-                                "specId": "treatment-notice.root.summary.0.children.0.row.1.labelText",
-                                "type": "TEXT",
+                                "specId": "treatment-notice.root.summary.0.children.0.row.1.label",
+                                "type": "FRAME",
                                 "name": "Label",
-                                "characters": "单号",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "treatment-notice.root.summary.0.children.0.row.1.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "单号",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "treatment-notice.root.summary.0.children.0.row.1.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "SO20261102001",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
                                 "origin": "derived",
                                 "mapping": "mapped"
                               }
                             ],
-                            "width": 72,
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
                             "origin": "derived",
                             "mapping": "mapped"
                           },
                           {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.1.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "SO20261102001",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "treatment-notice.root.summary.0.children.0.row.2",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.2.label",
+                            "specId": "treatment-notice.root.summary.0.children.0.row.2",
                             "type": "FRAME",
-                            "name": "Label",
+                            "name": "Row",
                             "layoutMode": "HORIZONTAL",
                             "children": [
                               {
-                                "specId": "treatment-notice.root.summary.0.children.0.row.2.labelText",
-                                "type": "TEXT",
+                                "specId": "treatment-notice.root.summary.0.children.0.row.2.label",
+                                "type": "FRAME",
                                 "name": "Label",
-                                "characters": "确认人",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "treatment-notice.root.summary.0.children.0.row.2.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "确认人",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "treatment-notice.root.summary.0.children.0.row.2.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "—",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
                                 "origin": "derived",
                                 "mapping": "mapped"
                               }
                             ],
-                            "width": 72,
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
                             "origin": "derived",
                             "mapping": "mapped"
                           },
                           {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.2.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "—",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          }
-                        ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "borderBottom": "color/border/subtle",
-                        "borderBottomWidth": 1,
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "treatment-notice.root.summary.0.children.0.row.3",
-                        "type": "FRAME",
-                        "name": "Row",
-                        "layoutMode": "HORIZONTAL",
-                        "children": [
-                          {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.3.label",
+                            "specId": "treatment-notice.root.summary.0.children.0.row.3",
                             "type": "FRAME",
-                            "name": "Label",
+                            "name": "Row",
                             "layoutMode": "HORIZONTAL",
                             "children": [
                               {
-                                "specId": "treatment-notice.root.summary.0.children.0.row.3.labelText",
-                                "type": "TEXT",
+                                "specId": "treatment-notice.root.summary.0.children.0.row.3.label",
+                                "type": "FRAME",
                                 "name": "Label",
-                                "characters": "确认时间",
-                                "textStyle": "b-mobile/body.sm",
-                                "color": "color/text/tertiary",
+                                "layoutMode": "HORIZONTAL",
+                                "children": [
+                                  {
+                                    "specId": "treatment-notice.root.summary.0.children.0.row.3.labelText",
+                                    "type": "TEXT",
+                                    "name": "Label",
+                                    "characters": "确认时间",
+                                    "textStyle": "b-mobile/body.sm",
+                                    "color": "color/text/tertiary",
+                                    "origin": "derived",
+                                    "mapping": "mapped"
+                                  }
+                                ],
+                                "width": 72,
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              },
+                              {
+                                "specId": "treatment-notice.root.summary.0.children.0.row.3.value",
+                                "type": "TEXT",
+                                "name": "Value",
+                                "characters": "—",
+                                "textStyle": "b-mobile/body.md",
+                                "color": "color/text/primary",
+                                "layoutGrow": 1,
                                 "origin": "derived",
                                 "mapping": "mapped"
                               }
                             ],
-                            "width": 72,
-                            "origin": "derived",
-                            "mapping": "mapped"
-                          },
-                          {
-                            "specId": "treatment-notice.root.summary.0.children.0.row.3.value",
-                            "type": "TEXT",
-                            "name": "Value",
-                            "characters": "—",
-                            "textStyle": "b-mobile/body.md",
-                            "color": "color/text/primary",
-                            "layoutGrow": 1,
+                            "paddingY": 10,
+                            "gap": 12,
+                            "alignItems": "CENTER",
                             "origin": "derived",
                             "mapping": "mapped"
                           }
                         ],
-                        "paddingY": 10,
-                        "gap": 12,
-                        "alignItems": "CENTER",
-                        "origin": "derived",
+                        "gap": 0,
+                        "paddingY": 4,
+                        "origin": "spec",
                         "mapping": "mapped"
                       }
                     ],
                     "gap": 0,
-                    "paddingY": 4,
-                    "origin": "spec",
+                    "paddingTop": 8,
+                    "origin": "derived",
                     "mapping": "mapped"
                   }
                 ],
+                "padding": 16,
                 "gap": 0,
-                "paddingTop": 8,
-                "origin": "derived",
-                "mapping": "mapped"
-              }
-            ],
-            "padding": 16,
-            "gap": 0,
-            "fill": "color/surface/default",
-            "radius": 12,
-            "shadow": true,
-            "origin": "spec",
-            "mapping": "mapped"
-          },
-          {
-            "specId": "treatment-notice.root.summary.1",
-            "type": "FRAME",
-            "name": "Row",
-            "layoutMode": "HORIZONTAL",
-            "children": [
-              {
-                "specId": "treatment-notice.root.summary.1.children.0",
-                "type": "TEXT",
-                "name": "Text",
-                "characters": "告知内容",
-                "textStyle": "b-mobile/heading.3",
-                "color": "color/text/primary",
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true,
                 "origin": "spec",
                 "mapping": "mapped"
               }
             ],
-            "gap": 8,
-            "alignItems": "CENTER",
+            "paddingTop": 16,
             "paddingX": 16,
-            "origin": "spec",
+            "origin": "derived",
             "mapping": "mapped"
           },
           {
-            "specId": "treatment-notice.root.summary.2",
+            "specId": "treatment-notice.root.summary.1.slot",
             "type": "FRAME",
-            "name": "Card",
+            "name": "SlotBlock",
             "layoutMode": "VERTICAL",
             "children": [
               {
-                "specId": "treatment-notice.root.summary.2.head",
+                "specId": "treatment-notice.root.summary.1",
                 "type": "FRAME",
-                "name": "Head",
+                "name": "Row",
                 "layoutMode": "HORIZONTAL",
                 "children": [
                   {
-                    "specId": "treatment-notice.root.summary.2.title",
+                    "specId": "treatment-notice.root.summary.1.children.0",
                     "type": "TEXT",
-                    "name": "Title",
-                    "characters": "小气泡",
-                    "textStyle": "b-mobile/heading.2",
+                    "name": "Text",
+                    "characters": "告知内容",
+                    "textStyle": "b-mobile/heading.3",
                     "color": "color/text/primary",
-                    "origin": "derived",
+                    "origin": "spec",
                     "mapping": "mapped"
                   }
                 ],
                 "gap": 8,
                 "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN",
-                "origin": "derived",
+                "paddingX": 16,
+                "origin": "spec",
                 "mapping": "mapped"
-              },
+              }
+            ],
+            "paddingTop": 16,
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "treatment-notice.root.summary.2.slot",
+            "type": "FRAME",
+            "name": "SlotBlock",
+            "layoutMode": "VERTICAL",
+            "children": [
               {
-                "specId": "treatment-notice.root.summary.2.body",
+                "specId": "treatment-notice.root.summary.2",
                 "type": "FRAME",
-                "name": "Body",
+                "name": "Card",
                 "layoutMode": "VERTICAL",
                 "children": [
                   {
-                    "specId": "treatment-notice.root.summary.2.children.0",
+                    "specId": "treatment-notice.root.summary.2.head",
                     "type": "FRAME",
-                    "name": "List",
-                    "layoutMode": "VERTICAL",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
                     "children": [
                       {
-                        "specId": "treatment-notice.root.summary.2.children.0.row.0",
+                        "specId": "treatment-notice.root.summary.2.title",
                         "type": "TEXT",
-                        "name": "Item",
-                        "characters": "术后 6 小时内避免沾水与化妆",
-                        "textStyle": "b-mobile/body.regular",
-                        "color": "color/text/primary",
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "treatment-notice.root.summary.2.children.0.row.1",
-                        "type": "TEXT",
-                        "name": "Item",
-                        "characters": "当日避免剧烈运动与高温环境",
-                        "textStyle": "b-mobile/body.regular",
+                        "name": "Title",
+                        "characters": "小气泡",
+                        "textStyle": "b-mobile/heading.2",
                         "color": "color/text/primary",
                         "origin": "derived",
                         "mapping": "mapped"
                       }
                     ],
-                    "gap": 0,
-                    "paddingY": 4,
-                    "origin": "spec",
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN",
+                    "origin": "derived",
                     "mapping": "mapped"
-                  }
-                ],
-                "gap": 0,
-                "paddingTop": 8,
-                "origin": "derived",
-                "mapping": "mapped"
-              }
-            ],
-            "padding": 16,
-            "gap": 0,
-            "fill": "color/surface/default",
-            "radius": 12,
-            "shadow": true,
-            "origin": "spec",
-            "mapping": "mapped"
-          },
-          {
-            "specId": "treatment-notice.root.summary.3",
-            "type": "FRAME",
-            "name": "Card",
-            "layoutMode": "VERTICAL",
-            "children": [
-              {
-                "specId": "treatment-notice.root.summary.3.head",
-                "type": "FRAME",
-                "name": "Head",
-                "layoutMode": "HORIZONTAL",
-                "children": [
+                  },
                   {
-                    "specId": "treatment-notice.root.summary.3.title",
-                    "type": "TEXT",
-                    "name": "Title",
-                    "characters": "补水",
-                    "textStyle": "b-mobile/heading.2",
-                    "color": "color/text/primary",
+                    "specId": "treatment-notice.root.summary.2.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "treatment-notice.root.summary.2.children.0",
+                        "type": "FRAME",
+                        "name": "List",
+                        "layoutMode": "VERTICAL",
+                        "children": [
+                          {
+                            "specId": "treatment-notice.root.summary.2.children.0.row.0",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "treatment-notice.root.summary.2.children.0.row.0.text",
+                                "type": "TEXT",
+                                "name": "Item",
+                                "characters": "术后 6 小时内避免沾水与化妆",
+                                "textStyle": "b-mobile/body.regular",
+                                "color": "color/text/primary",
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "treatment-notice.root.summary.2.children.0.row.1",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "treatment-notice.root.summary.2.children.0.row.1.text",
+                                "type": "TEXT",
+                                "name": "Item",
+                                "characters": "当日避免剧烈运动与高温环境",
+                                "textStyle": "b-mobile/body.regular",
+                                "color": "color/text/primary",
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "alignItems": "CENTER",
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          }
+                        ],
+                        "gap": 0,
+                        "paddingY": 4,
+                        "origin": "spec",
+                        "mapping": "mapped"
+                      }
+                    ],
+                    "gap": 0,
+                    "paddingTop": 8,
                     "origin": "derived",
                     "mapping": "mapped"
                   }
                 ],
-                "gap": 8,
-                "alignItems": "CENTER",
-                "justifyContent": "SPACE_BETWEEN",
-                "origin": "derived",
+                "padding": 16,
+                "gap": 0,
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true,
+                "origin": "spec",
                 "mapping": "mapped"
-              },
+              }
+            ],
+            "paddingTop": 16,
+            "paddingX": 16,
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "treatment-notice.root.summary.3.slot",
+            "type": "FRAME",
+            "name": "SlotBlock",
+            "layoutMode": "VERTICAL",
+            "children": [
               {
-                "specId": "treatment-notice.root.summary.3.body",
+                "specId": "treatment-notice.root.summary.3",
                 "type": "FRAME",
-                "name": "Body",
+                "name": "Card",
                 "layoutMode": "VERTICAL",
                 "children": [
                   {
-                    "specId": "treatment-notice.root.summary.3.children.0",
+                    "specId": "treatment-notice.root.summary.3.head",
                     "type": "FRAME",
-                    "name": "List",
-                    "layoutMode": "VERTICAL",
+                    "name": "Head",
+                    "layoutMode": "HORIZONTAL",
                     "children": [
                       {
-                        "specId": "treatment-notice.root.summary.3.children.0.row.0",
+                        "specId": "treatment-notice.root.summary.3.title",
                         "type": "TEXT",
-                        "name": "Item",
-                        "characters": "术后加强保湿与防晒",
-                        "textStyle": "b-mobile/body.regular",
-                        "color": "color/text/primary",
-                        "origin": "derived",
-                        "mapping": "mapped"
-                      },
-                      {
-                        "specId": "treatment-notice.root.summary.3.children.0.row.1",
-                        "type": "TEXT",
-                        "name": "Item",
-                        "characters": "24 小时内避免桑拿与高温环境",
-                        "textStyle": "b-mobile/body.regular",
+                        "name": "Title",
+                        "characters": "补水",
+                        "textStyle": "b-mobile/heading.2",
                         "color": "color/text/primary",
                         "origin": "derived",
                         "mapping": "mapped"
                       }
                     ],
+                    "gap": 8,
+                    "alignItems": "CENTER",
+                    "justifyContent": "SPACE_BETWEEN",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "treatment-notice.root.summary.3.body",
+                    "type": "FRAME",
+                    "name": "Body",
+                    "layoutMode": "VERTICAL",
+                    "children": [
+                      {
+                        "specId": "treatment-notice.root.summary.3.children.0",
+                        "type": "FRAME",
+                        "name": "List",
+                        "layoutMode": "VERTICAL",
+                        "children": [
+                          {
+                            "specId": "treatment-notice.root.summary.3.children.0.row.0",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "treatment-notice.root.summary.3.children.0.row.0.text",
+                                "type": "TEXT",
+                                "name": "Item",
+                                "characters": "术后加强保湿与防晒",
+                                "textStyle": "b-mobile/body.regular",
+                                "color": "color/text/primary",
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "alignItems": "CENTER",
+                            "borderBottom": "color/border/subtle",
+                            "borderBottomWidth": 1,
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          },
+                          {
+                            "specId": "treatment-notice.root.summary.3.children.0.row.1",
+                            "type": "FRAME",
+                            "name": "Row",
+                            "layoutMode": "HORIZONTAL",
+                            "children": [
+                              {
+                                "specId": "treatment-notice.root.summary.3.children.0.row.1.text",
+                                "type": "TEXT",
+                                "name": "Item",
+                                "characters": "24 小时内避免桑拿与高温环境",
+                                "textStyle": "b-mobile/body.regular",
+                                "color": "color/text/primary",
+                                "origin": "derived",
+                                "mapping": "mapped"
+                              }
+                            ],
+                            "paddingY": 10,
+                            "alignItems": "CENTER",
+                            "origin": "derived",
+                            "mapping": "mapped"
+                          }
+                        ],
+                        "gap": 0,
+                        "paddingY": 4,
+                        "origin": "spec",
+                        "mapping": "mapped"
+                      }
+                    ],
                     "gap": 0,
-                    "paddingY": 4,
-                    "origin": "spec",
+                    "paddingTop": 8,
+                    "origin": "derived",
                     "mapping": "mapped"
                   }
                 ],
+                "padding": 16,
                 "gap": 0,
-                "paddingTop": 8,
-                "origin": "derived",
+                "fill": "color/surface/default",
+                "radius": 12,
+                "shadow": true,
+                "origin": "spec",
                 "mapping": "mapped"
               }
             ],
-            "padding": 16,
-            "gap": 0,
-            "fill": "color/surface/default",
-            "radius": 12,
-            "shadow": true,
-            "origin": "spec",
+            "paddingTop": 16,
+            "paddingX": 16,
+            "origin": "derived",
             "mapping": "mapped"
           },
           {
-            "specId": "treatment-notice.root.fields.0",
+            "specId": "treatment-notice.root.fields.0.slot",
             "type": "FRAME",
-            "name": "Row",
-            "layoutMode": "HORIZONTAL",
-            "children": [],
-            "gap": 4,
-            "alignItems": "CENTER",
-            "paddingX": 16,
-            "origin": "spec",
+            "name": "SlotBlock",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "treatment-notice.root.fields.0",
+                "type": "FRAME",
+                "name": "Row",
+                "layoutMode": "HORIZONTAL",
+                "children": [],
+                "gap": 4,
+                "alignItems": "CENTER",
+                "paddingX": 16,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingTop": 16,
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
@@ -690,6 +800,7 @@
         "fill": "color/surface/subtle",
         "gap": 0,
         "clip": true,
+        "paddingBottom": 16,
         "origin": "derived",
         "mapping": "mapped"
       },
@@ -697,28 +808,47 @@
         "specId": "treatment-notice.page.root.actions",
         "type": "FRAME",
         "name": "Actions",
-        "layoutMode": "HORIZONTAL",
+        "layoutMode": "VERTICAL",
         "children": [
           {
-            "specId": "treatment-notice.action.confirm",
-            "type": "INSTANCE",
-            "name": "Button:确认已当面告知",
-            "component": "Button",
-            "variant": "primary",
-            "label": "确认已当面告知",
-            "height": 44,
-            "layoutGrow": 1,
-            "origin": "spec",
+            "specId": "treatment-notice.page.root.actions.divider",
+            "type": "FRAME",
+            "name": "ActionsDivider",
+            "layoutMode": "HORIZONTAL",
+            "children": [],
+            "height": 1,
+            "fill": "color/border/subtle",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "treatment-notice.page.root.actions.row",
+            "type": "FRAME",
+            "name": "ActionsRow",
+            "layoutMode": "HORIZONTAL",
+            "children": [
+              {
+                "specId": "treatment-notice.action.confirm",
+                "type": "INSTANCE",
+                "name": "Button:确认已当面告知",
+                "component": "Button",
+                "variant": "primary",
+                "label": "确认已当面告知",
+                "height": 44,
+                "layoutGrow": 1,
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "paddingY": 12,
+            "paddingX": 16,
+            "gap": 8,
+            "alignItems": "CENTER",
+            "origin": "derived",
             "mapping": "mapped"
           }
         ],
-        "padding": 12,
-        "paddingX": 16,
-        "gap": 8,
         "fill": "color/surface/default",
-        "stroke": "color/border/subtle",
-        "strokeWidth": 1,
-        "alignItems": "CENTER",
         "origin": "derived",
         "mapping": "mapped"
       }
@@ -731,7 +861,7 @@
     "mapping": "mapped"
   },
   "stats": {
-    "frames": 27,
+    "frames": 38,
     "texts": 18,
     "instances": 1,
     "icons": 1,
@@ -808,8 +938,8 @@
     ],
     "summary": {
       "spec": 11,
-      "derived": 36,
-      "mapped": 47,
+      "derived": 47,
+      "mapped": 58,
       "degraded": 0,
       "unmapped": 0,
       "skipped": 0

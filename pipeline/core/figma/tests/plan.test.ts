@@ -1,9 +1,15 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { FigmaPlanSchema, UiBriefSchema, type FigmaPlanNode } from "@prd-ui/contracts";
+import {
+  FigmaPlanSchema,
+  UiBriefSchema,
+  type FigmaPlanNode,
+  type PageSpec,
+  type SpecNode,
+} from "@prd-ui/contracts";
 import { compileProject } from "@prd-ui/compiler";
 import { getArchetype, getCatalog, getProfile } from "@prd-ui/design-system";
-import { compileFigmaPlans } from "../src/index.js";
+import { compileFigmaPlan, compileFigmaPlans } from "../src/index.js";
 
 const brief = UiBriefSchema.parse(
   JSON.parse(
@@ -359,18 +365,31 @@ describe("compileFigmaPlans", () => {
     expect(row(10)?.borderBottomWidth).toBeUndefined();
   });
 
-  it("renders string list rows at the CSS row weight (400)", () => {
+  it("renders string list rows as padded .list-text-row frames", () => {
     const notice = plans.find((plan) => plan.pageId === "treatment-notice")!;
     let list: FigmaPlanNode | undefined;
     walk(notice.root, (node) => {
       if (node.specId === "treatment-notice.root.summary.2.children.0") list = node;
     });
     expect(list?.paddingY).toBe(4);
-    expect(list?.children?.every((child) => child.type === "TEXT")).toBe(true);
-    for (const child of list?.children ?? []) {
-      expect(child.textStyle).toBe("b-mobile/body.regular");
-      expect(notice.textStyles[child.textStyle!]?.fontWeight).toBe(400);
+    const rows = list?.children ?? [];
+    expect(rows).toHaveLength(2);
+    for (const row of rows) {
+      expect(row.type).toBe("FRAME");
+      expect(row.name).toBe("Row");
+      // `.list-text-row{padding:10px 0}` plus the 1px bottom divider: 39/38px.
+      expect(row.paddingY).toBe(10);
+      expect(row.paddingX).toBeUndefined();
+      expect(row.children).toHaveLength(1);
+      expect(row.children?.[0]?.type).toBe("TEXT");
+      expect(row.children?.[0]?.textStyle).toBe("b-mobile/body.regular");
+      expect(notice.textStyles[row.children![0]!.textStyle!]?.fontWeight).toBe(400);
     }
+    // `.list-text-row:last-child{border-bottom:0}`.
+    expect(rows[0]?.borderBottom).toBe("color/border/subtle");
+    expect(rows[0]?.borderBottomWidth).toBe(1);
+    expect(rows[1]?.borderBottom).toBeUndefined();
+    expect(rows[1]?.borderBottomWidth).toBeUndefined();
   });
 
   it("pads direct app-scroll rows but not rows nested in a section or field", () => {
@@ -389,5 +408,185 @@ describe("compileFigmaPlans", () => {
     expect(
       find(form, "appointment-form.root.content.0.children.0.children.0")?.paddingX
     ).toBeUndefined();
+  });
+
+  it("insets summary cards by the .app-scroll > .card margin", () => {
+    const findWithParent = (
+      page: FigmaPlanNode
+    ): ((id: string) => { node: FigmaPlanNode; parent: FigmaPlanNode | undefined }) => {
+      const parents = new Map<FigmaPlanNode, FigmaPlanNode>();
+      const record = (node: FigmaPlanNode): void => {
+        if (node.child) {
+          parents.set(node.child, node);
+          record(node.child);
+        }
+        for (const child of node.children ?? []) {
+          parents.set(child, node);
+          record(child);
+        }
+      };
+      record(page);
+      return (id: string) => {
+        let found: FigmaPlanNode | undefined;
+        walk(page, (node) => {
+          if (node.specId === id) found = node;
+        });
+        return { node: found!, parent: found === undefined ? undefined : parents.get(found) };
+      };
+    };
+
+    for (const pageId of ["customer-detail", "appointment-detail", "treatment-notice"]) {
+      const plan = plans.find((entry) => entry.pageId === pageId)!;
+      const content = plan.root.children?.find((node) => node.name === "Content")!;
+      // `.app-scroll` has `padding-bottom:16px` and no horizontal padding; the
+      // card margin is modelled on a derived wrapper so the card (and every
+      // descendant row) is 358/326px wide, not 390/358.
+      expect(content.paddingX, pageId).toBeUndefined();
+      expect(content.paddingBottom, pageId).toBe(16);
+      expect(content.gap ?? 0, pageId).toBe(0);
+    }
+
+    const detail = plans.find((entry) => entry.pageId === "customer-detail")!;
+    const detailLookup = findWithParent(detail.root);
+    const card = detailLookup("customer-detail.root.summary.0");
+    expect(card.parent?.name).toBe("SlotBlock");
+    // First child: `.card{margin:16px}` collapses to a 16px top inset.
+    expect(card.parent?.paddingTop).toBe(16);
+    expect(card.parent?.paddingX).toBe(16);
+
+    const detailRow = detailLookup("customer-detail.root.fields.0");
+    // Direct `.app-scroll > .row` keeps its own 16px horizontal padding; the
+    // preceding card's bottom margin becomes a 16px top gap.
+    expect(detailRow.node.paddingX).toBe(16);
+    expect(detailRow.parent?.name).toBe("SlotBlock");
+    expect(detailRow.parent?.paddingTop).toBe(16);
+    expect(detailRow.parent?.paddingX).toBeUndefined();
+
+    const notice = plans.find((entry) => entry.pageId === "treatment-notice")!;
+    const noticeLookup = findWithParent(notice.root);
+    const between = noticeLookup("treatment-notice.root.summary.1");
+    expect(between.node.paddingX).toBe(16);
+    expect(between.parent?.paddingTop).toBe(16);
+  });
+
+  it("grows text inputs inside horizontal form rows", () => {
+    const form = plans.find((plan) => plan.pageId === "appointment-form")!;
+    const find = (id: string): FigmaPlanNode | undefined => {
+      let found: FigmaPlanNode | undefined;
+      walk(form.root, (node) => {
+        if (node.specId === id) found = node;
+      });
+      return found;
+    };
+    const customerRow = find("appointment-form.root.content.0.children.0.children.0")!;
+    expect(customerRow.layoutMode).toBe("HORIZONTAL");
+    const input = customerRow.children?.[0];
+    const picker = customerRow.children?.[1];
+    expect(input?.name).toBe("Input");
+    // `.form-field .row .input{flex:1;min-width:0}`: 358 - 8 - 58 = 292px.
+    expect(input?.layoutGrow).toBe(1);
+    expect(picker?.type).toBe("INSTANCE");
+    expect(picker?.layoutGrow).toBeUndefined();
+
+    // A vertical FormField child is filled by the plugin, not by a plan grow.
+    expect(find("appointment-form.root.content.0.children.1.children.0")?.layoutGrow).toBeUndefined();
+    // The select hugs its content and does not grow inside a row.
+    expect(find("appointment-form.root.content.0.children.5.children.0")?.layoutGrow).toBeUndefined();
+
+    const callback = plans.find((plan) => plan.pageId === "callback-register")!;
+    let callbackInput: FigmaPlanNode | undefined;
+    walk(callback.root, (node) => {
+      if (node.specId === "callback-register.root.content.0.children.0.children.0.children.0") {
+        callbackInput = node;
+      }
+    });
+    expect(callbackInput?.layoutGrow).toBe(1);
+  });
+
+  it("keeps the CSS calendar block height rule (22px minimum, 44px per hour)", () => {
+    const listSpec = specs.find((page) => page.meta.pageId === "appointment-list")!;
+    const findCalendar = (node: SpecNode): SpecNode | undefined => {
+      if (node.type === "CalendarGrid") return node;
+      for (const child of node.children ?? []) {
+        const found = findCalendar(child);
+        if (found !== undefined) return found;
+      }
+      for (const slot of Object.values(node.slots ?? {})) {
+        for (const child of slot) {
+          const found = findCalendar(child);
+          if (found !== undefined) return found;
+        }
+      }
+      return undefined;
+    };
+    const compileWithDuration = (duration: number): FigmaPlanNode => {
+      const clone = structuredClone(listSpec) as PageSpec;
+      const calendar = findCalendar(clone.layout);
+      expect(calendar, "calendar node").toBeDefined();
+      const blocks = calendar!.props?.blocks as Array<Record<string, unknown>>;
+      blocks[0]!.duration = duration;
+      const plan = compileFigmaPlan(
+        clone,
+        getProfile(clone.meta.profile),
+        getCatalog(clone.meta.profile)
+      );
+      let block: FigmaPlanNode | undefined;
+      walk(plan.root, (node) => {
+        if (node.specId === "appointment-list.calendar.grid.block.0") block = node;
+      });
+      expect(block, "block node").toBeDefined();
+      return block!;
+    };
+
+    // `.calendar-block` height is inline `max(22, duration * 44)`; the same
+    // height is on both the ABSOLUTE wrapper and its child frame.
+    const short = compileWithDuration(0.25);
+    expect(short.height).toBe(22);
+    expect(short.child?.height).toBe(22);
+    const hourly = compileWithDuration(1);
+    expect(hourly.height).toBe(44);
+    expect(hourly.child?.height).toBe(44);
+
+    // The 16:30 block keeps its 22px intra-hour offset on the 16:00 row.
+    const list = plans.find((plan) => plan.pageId === "appointment-list")!;
+    let offsetBlock: FigmaPlanNode | undefined;
+    walk(list.root, (node) => {
+      if (node.specId === "appointment-list.calendar.grid.block.2") offsetBlock = node;
+    });
+    expect(offsetBlock?.y).toBe(36 + 7 * 44 + 22);
+    expect(offsetBlock?.height).toBe(44);
+  });
+
+  it("models the action footer as a 1px divider plus a 12/16 inset row", () => {
+    for (const pageId of [
+      "appointment-list",
+      "appointment-form",
+      "callback-register",
+      "customer-detail",
+      "appointment-detail",
+      "treatment-notice",
+    ]) {
+      const plan = plans.find((entry) => entry.pageId === pageId)!;
+      const actions = plan.root.children?.find((node) => node.name === "Actions")!;
+      // `.app-actions{border-top:1px solid}` is a separate 1px divider frame, so
+      // the Figma stroke inset cannot shrink the button row.
+      expect(actions.layoutMode, pageId).toBe("VERTICAL");
+      expect(actions.borderTop, pageId).toBeUndefined();
+      expect(actions.padding, pageId).toBeUndefined();
+      const [divider, row] = actions.children ?? [];
+      expect(divider?.name, pageId).toBe("ActionsDivider");
+      expect(divider?.height, pageId).toBe(1);
+      expect(divider?.fill, pageId).toBe("color/border/subtle");
+      expect(row?.name, pageId).toBe("ActionsRow");
+      // `.app-actions{padding:12px 16px}`: 390 - 32 = 358px buttons.
+      expect(row?.paddingY, pageId).toBe(12);
+      expect(row?.paddingX, pageId).toBe(16);
+      expect(row?.gap, pageId).toBe(8);
+      for (const button of row?.children ?? []) {
+        expect(button.type).toBe("INSTANCE");
+        expect(button.height).toBe(44);
+        expect(button.layoutGrow).toBe(1);
+      }
+    }
   });
 });

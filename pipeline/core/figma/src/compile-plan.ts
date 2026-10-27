@@ -63,15 +63,48 @@ function childrenOf(node: SpecNode): SpecNode[] {
   return node.children ?? [];
 }
 
+/**
+ * Direct `.app-scroll > *` margins from renderer-html. A Figma auto-layout
+ * frame has no CSS margins, so the compiler carries them as a derived
+ * `SlotBlock` wrapper (paddingTop/paddingX/paddingBottom). Rows and Sections
+ * are not listed: `.app-scroll > .row` supplies its own horizontal padding and
+ * nested Sections keep theirs, and neither has a vertical margin.
+ */
+interface AppScrollInsets {
+  marginTop: number;
+  marginBottom: number;
+  insetX: number;
+}
+
+function appScrollInsets(profile: Profile, node: SpecNode): AppScrollInsets {
+  switch (node.type) {
+    case "Card":
+    case "Image":
+      // `.app-scroll>.card{margin:var(--space-4)}` and
+      // `.image-placeholder{margin:var(--space-4)}`.
+      return {
+        marginTop: spacePx(profile, "4"),
+        marginBottom: spacePx(profile, "4"),
+        insetX: spacePx(profile, "4"),
+      };
+    default:
+      return { marginTop: 0, marginBottom: 0, insetX: 0 };
+  }
+}
+
+interface RenderOptions {
+  inFooter?: boolean;
+  inFilterRow?: boolean;
+  directAppScroll?: boolean;
+  /** Direct child of a horizontal Row; text inputs grow like `flex:1`. */
+  inHorizontalRow?: boolean;
+}
+
 function renderChildren(
   nodes: SpecNode[],
   ctx: Ctx,
   path: string,
-  options: {
-    inFooter?: boolean;
-    inFilterRow?: boolean;
-    directAppScroll?: boolean;
-  } = {}
+  options: RenderOptions = {}
 ): FigmaPlanNode[] {
   return nodes.flatMap((node, index) => {
     const result = renderNode(node, ctx, `${path}.${index}`, options);
@@ -83,11 +116,7 @@ function renderNode(
   node: SpecNode,
   ctx: Ctx,
   path: string,
-  options: {
-    inFooter?: boolean;
-    inFilterRow?: boolean;
-    directAppScroll?: boolean;
-  } = {}
+  options: RenderOptions = {}
 ): FigmaPlanNode | null {
   if (skipReason(node, ctx.defaultView)) return null;
   const props = node.props ?? {};
@@ -95,6 +124,7 @@ function renderNode(
   const inFooter = options.inFooter === true;
   const inFilterRow = options.inFilterRow === true;
   const directAppScroll = options.directAppScroll === true;
+  const inHorizontalRow = options.inHorizontalRow === true;
   // `.app-scroll > .row` gets horizontal padding from the renderer CSS. Only a
   // row that is a direct MobileShell slot child is in that position; nested
   // rows keep their own (zero) padding.
@@ -131,6 +161,7 @@ function renderNode(
       return frame(specId, "Row", "HORIZONTAL", renderChildren(childrenOf(node), ctx, `${path}.children`, {
         inFooter,
         inFilterRow: isFilterRow,
+        inHorizontalRow: true,
       }), {
         gap: spacePx(ctx.profile, str(props.gap)),
         alignItems: "CENTER",
@@ -166,7 +197,7 @@ function renderNode(
     case "FormField":
       return renderFormField(node, ctx, specId, path);
     case "Input":
-      return renderInput(props, ctx, specId);
+      return renderInput(props, ctx, specId, inHorizontalRow);
     case "Select":
       return renderSelect(props, ctx, specId);
     case "ListRow":
@@ -219,9 +250,44 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
   // Mirror renderer-html's MobileShell slot order; detail/notice archetypes put
   // their body in summary/fields, not content.
   const contentSlots = ["title", "illustration", "body", "summary", "feed", "fields", "content"] as const;
-  const content = contentSlots.flatMap((name) =>
-    renderChildren(node.slots?.[name] ?? [], ctx, name, { directAppScroll: true })
+  // Render the direct `.app-scroll` children in slot order, then model their CSS
+  // margins. `.app-scroll>.card{margin:16px}` is not a flex gap, so a card gets
+  // a derived SlotBlock wrapper with paddingTop/paddingX/paddingBottom; a
+  // following direct Row gets paddingTop for the collapsed margin gap. Without
+  // the wrapper the card is 390px wide and its list 358px instead of 358/326.
+  const entries = contentSlots.flatMap((name) =>
+    (node.slots?.[name] ?? []).flatMap((child, index) => {
+      const rendered = renderNode(child, ctx, `${name}.${index}`, { directAppScroll: true });
+      return rendered === null ? [] : [{ spec: child, rendered }];
+    })
   );
+  const content = entries.map((entry, index) => {
+    const insets = appScrollInsets(ctx.profile, entry.spec);
+    const previous = index === 0 ? undefined : entries[index - 1];
+    const spacing =
+      previous === undefined
+        ? insets.marginTop
+        : Math.max(appScrollInsets(ctx.profile, previous.spec).marginBottom, insets.marginTop);
+    const isLast = index === entries.length - 1;
+    const paddingTop = spacing > 0 ? spacing : undefined;
+    const paddingX = insets.insetX > 0 ? insets.insetX : undefined;
+    const paddingBottom =
+      isLast && insets.marginBottom > 0 ? insets.marginBottom : undefined;
+    if (paddingTop === undefined && paddingX === undefined && paddingBottom === undefined) {
+      return entry.rendered;
+    }
+    return frame(
+      `${entry.rendered.specId}.slot`,
+      "SlotBlock",
+      "VERTICAL",
+      [entry.rendered],
+      {
+        ...(paddingTop === undefined ? {} : { paddingTop }),
+        ...(paddingX === undefined ? {} : { paddingX }),
+        ...(paddingBottom === undefined ? {} : { paddingBottom }),
+      }
+    );
+  });
   const actions = node.slots?.actions ?? [];
   const nav = node.slots?.["bottom-nav"] ?? [];
   const hasTop = top.length > 0;
@@ -252,6 +318,8 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
       fill: colorToken("surface.subtle"),
       gap: 0,
       clip: true,
+      // `.app-scroll{padding-bottom:var(--space-4)}`.
+      paddingBottom: spacePx(ctx.profile, "4"),
     }
   );
 
@@ -264,19 +332,35 @@ function renderMobileShell(node: SpecNode, ctx: Ctx, specId: string): FigmaPlanN
             first !== undefined && first.type === "Section"
               ? childrenOf(first)
               : actions;
-          return frame(
-            `${specId}.actions`,
-            "Actions",
+          // `.app-actions` is `padding:12px 16px` plus a 1px top border. The
+          // border is a separate divider frame: a partially stroked Figma frame
+          // reserves its 1px stroke on every side for auto layout, which would
+          // shrink the button row to 356px and shift it 1px right/down.
+          const actionRow = frame(
+            `${specId}.actions.row`,
+            "ActionsRow",
             "HORIZONTAL",
             renderChildren(actionNodes, ctx, "actions", { inFooter: true }),
             {
-              padding: spacePx(ctx.profile, "3"),
+              paddingY: spacePx(ctx.profile, "3"),
               paddingX: spacePx(ctx.profile, "4"),
               gap: spacePx(ctx.profile, "2"),
-              fill: colorToken("surface.default"),
-              stroke: colorToken("border.subtle"),
-              strokeWidth: 1,
               alignItems: "CENTER",
+            }
+          );
+          return frame(
+            `${specId}.actions`,
+            "Actions",
+            "VERTICAL",
+            [
+              frame(`${specId}.actions.divider`, "ActionsDivider", "HORIZONTAL", [], {
+                height: 1,
+                fill: colorToken("border.subtle"),
+              }),
+              actionRow,
+            ],
+            {
+              fill: colorToken("surface.default"),
             }
           );
         })();
@@ -540,7 +624,12 @@ function renderFormField(node: SpecNode, ctx: Ctx, specId: string, path: string)
   });
 }
 
-function renderInput(props: Record<string, unknown>, ctx: Ctx, specId: string): FigmaPlanNode {
+function renderInput(
+  props: Record<string, unknown>,
+  ctx: Ctx,
+  specId: string,
+  inHorizontalRow: boolean
+): FigmaPlanNode {
   return frame(specId, "Input", "HORIZONTAL", [
     text(`${specId}.placeholder`, "Placeholder", str(props.placeholder), ctx.profile, "input.md", {
       color: colorToken("text.tertiary"),
@@ -553,6 +642,9 @@ function renderInput(props: Record<string, unknown>, ctx: Ctx, specId: string): 
     strokeWidth: 1,
     radius: 8,
     alignItems: "CENTER",
+    // `.form-field .row .input{flex:1;min-width:0}`: the input fills the row
+    // while the sibling picker button hugs (`.form-field .row .btn{flex:0 0 auto}`).
+    ...(inHorizontalRow ? { layoutGrow: 1 } : {}),
   });
 }
 
@@ -661,7 +753,23 @@ function renderList(props: Record<string, unknown>, ctx: Ctx, specId: string, pa
           : { borderBottom: colorToken("border.subtle"), borderBottomWidth: 1 }),
       });
     }
-    return text(`${specId}.row.${index}`, "Item", String(item), ctx.profile, "body.regular");
+    // `.list-text-row{padding:10px 0;border-bottom:1px ...}`: a plain string
+    // item is a padded, divided row, not a bare text line.
+    return frame(
+      `${specId}.row.${index}`,
+      "Row",
+      "HORIZONTAL",
+      [
+        text(`${specId}.row.${index}.text`, "Item", String(item), ctx.profile, "body.regular"),
+      ],
+      {
+        paddingY: 10,
+        alignItems: "CENTER",
+        ...(index === items.length - 1
+          ? {}
+          : { borderBottom: colorToken("border.subtle"), borderBottomWidth: 1 }),
+      }
+    );
   });
   void path;
   return frame(specId, "List", "VERTICAL", children, { gap: 0, paddingY: 4 });
