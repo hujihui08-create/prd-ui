@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "specRun": "pipeline/artifacts/employee-app-phase2/spec-run-v08",
+  "plans": [
+    {
+      "pageId": "appointment-detail",
+      "pageName": "预约详情",
+      "file": "figma-plan.appointment-detail.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:2926a40e0343b6b0fd0bb55caa14e71c2aa84b1d8a1e5a714311a6233a537e1c"
+    },
+    {
+      "pageId": "appointment-form",
+      "pageName": "新增/改期预约",
+      "file": "figma-plan.appointment-form.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:8185be7466b68aab42d591b3ff9aaa98c6ac12e7db14214d929f2d7ec6230a90"
+    },
+    {
+      "pageId": "appointment-list",
+      "pageName": "预约列表",
+      "file": "figma-plan.appointment-list.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:ad3536606fd1fdd1e4ca3c9da7f291b3655d57161edf2dbba29454efba26b55d"
+    },
+    {
+      "pageId": "callback-register",
+      "pageName": "回访登记",
+      "file": "figma-plan.callback-register.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:e205d47e863ec5d503ef658908574c7bda1f6020d234454fe082157e16f64bb4"
+    },
+    {
+      "pageId": "customer-detail",
+      "pageName": "客户详情",
+      "file": "figma-plan.customer-detail.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:efe2ec25d1bf0bac5957af402a6e5aadfc14813b342c0118f35a01f395e8b9fc"
+    },
+    {
+      "pageId": "customer-search",
+      "pageName": "客户搜索",
+      "file": "figma-plan.customer-search.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:5741a0272e832e92250fba680fdacda98ed53acf2ab4591b5b1d93c140601a62"
+    },
+    {
+      "pageId": "today",
+      "pageName": "今日",
+      "file": "figma-plan.today.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:4286073292d7af44d3f8d3858de46634cdddea9b43fca193b15ccba41d25e347"
+    },
+    {
+      "pageId": "treatment-notice",
+      "pageName": "术后告知",
+      "file": "figma-plan.treatment-notice.json",
+      "width": 390,
+      "height": 844,
+      "hash": "sha256:37b06da86c1ff71a77413364906f252e9aa23e92704cce46eda55ffbfe39fe0b"
+    }
+  ]
+}

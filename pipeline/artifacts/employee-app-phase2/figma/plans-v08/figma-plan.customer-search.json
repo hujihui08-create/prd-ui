@@ -1,0 +1,392 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pageId": "customer-search",
+  "pageName": "客户搜索",
+  "width": 390,
+  "height": 844,
+  "background": "color/surface/subtle",
+  "tokens": {
+    "color/surface/default": "#FFFFFF",
+    "color/surface/subtle": "#F5F6F8",
+    "color/surface/raised": "#FFFFFF",
+    "color/text/primary": "#111827",
+    "color/text/secondary": "#4B5563",
+    "color/text/tertiary": "#5B6472",
+    "color/text/onAction": "#FFFFFF",
+    "color/action/primary": "#111827",
+    "color/action/secondary": "#F3F4F6",
+    "color/accent/customer": "#2563EB",
+    "color/accent/inventory": "#F97316",
+    "color/status/success": "#166534",
+    "color/status/warning": "#92400E",
+    "color/status/danger": "#991B1B",
+    "color/status/info": "#1D4ED8",
+    "color/border/subtle": "#E5E7EB",
+    "color/border/strong": "#D1D5DB",
+    "color/border/control": "#CBD5E1",
+    "space/1": "4px",
+    "space/2": "8px",
+    "space/3": "12px",
+    "space/4": "16px",
+    "space/6": "24px",
+    "space/8": "32px",
+    "radius/sm": "4px",
+    "radius/md": "6px",
+    "radius/lg": "12px",
+    "radius/full": "9999px"
+  },
+  "textStyles": {
+    "b-mobile/heading.1": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 24,
+      "fontWeight": 600,
+      "lineHeight": 32
+    },
+    "b-mobile/heading.2": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "lineHeight": 24
+    },
+    "b-mobile/heading.3": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "lineHeight": 22
+    },
+    "b-mobile/body.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 500,
+      "lineHeight": 18
+    },
+    "b-mobile/body.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.sm": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16
+    },
+    "b-mobile/label.strong": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 500,
+      "lineHeight": 16
+    },
+    "b-mobile/input.md": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/body.regular": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "lineHeight": 18
+    },
+    "b-mobile/label.bold": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16
+    },
+    "b-mobile/caption": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 10,
+      "fontWeight": 400,
+      "lineHeight": 12
+    },
+    "b-mobile/date": {
+      "fontFamily": "Noto Sans SC",
+      "fontSize": 11,
+      "fontWeight": 400,
+      "lineHeight": 13
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "fill": "color/action/primary",
+          "text": "color/text/onAction",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "secondary": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/control",
+          "text": "color/text/primary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost": {
+          "text": "color/text/secondary",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "ghost-chip": {
+          "fill": "color/surface/default",
+          "stroke": "color/border/strong",
+          "text": "color/text/primary",
+          "height": 32,
+          "radius": 8,
+          "paddingX": 12,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        },
+        "danger": {
+          "fill": "color/surface/default",
+          "stroke": "color/status/danger",
+          "strokeAlpha": 0.4,
+          "text": "color/status/danger",
+          "height": 36,
+          "radius": 6,
+          "paddingX": 16,
+          "paddingY": 0,
+          "labelTextStyle": "b-mobile/body.md"
+        }
+      }
+    }
+  },
+  "root": {
+    "specId": "customer-search.page.root",
+    "type": "FRAME",
+    "name": "客户搜索",
+    "layoutMode": "VERTICAL",
+    "children": [
+      {
+        "specId": "customer-search.page.root.header",
+        "type": "FRAME",
+        "name": "PageHeader",
+        "layoutMode": "HORIZONTAL",
+        "children": [
+          {
+            "specId": "customer-search.page.root.header.back",
+            "type": "GLYPH",
+            "name": "Back",
+            "glyph": "arrow_back_ios_new",
+            "size": 20,
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
+          },
+          {
+            "specId": "customer-search.page.root.header.title",
+            "type": "TEXT",
+            "name": "Title",
+            "characters": "客户搜索",
+            "textStyle": "b-mobile/heading.2",
+            "color": "color/text/primary",
+            "origin": "derived",
+            "mapping": "mapped"
+          }
+        ],
+        "height": 48,
+        "paddingX": 16,
+        "gap": 8,
+        "fill": "color/surface/subtle",
+        "alignItems": "CENTER",
+        "origin": "derived",
+        "mapping": "mapped"
+      },
+      {
+        "specId": "customer-search.page.root.content",
+        "type": "FRAME",
+        "name": "Content",
+        "layoutMode": "VERTICAL",
+        "children": [
+          {
+            "specId": "customer-search.root.content.0",
+            "type": "FRAME",
+            "name": "Section",
+            "layoutMode": "VERTICAL",
+            "children": [
+              {
+                "specId": "customer-search.root.content.0.children.0",
+                "type": "FRAME",
+                "name": "SearchBar",
+                "layoutMode": "HORIZONTAL",
+                "children": [
+                  {
+                    "specId": "customer-search.root.content.0.children.0.icon",
+                    "type": "GLYPH",
+                    "name": "Search",
+                    "glyph": "search",
+                    "size": 20,
+                    "color": "color/text/tertiary",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "customer-search.root.content.0.children.0.placeholder",
+                    "type": "TEXT",
+                    "name": "Placeholder",
+                    "characters": "搜索客户",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/tertiary",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  }
+                ],
+                "height": 36,
+                "paddingX": 12,
+                "gap": 8,
+                "fill": "color/surface/default",
+                "radius": 6,
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
+              },
+              {
+                "specId": "customer-search.state.idle",
+                "type": "FRAME",
+                "name": "EmptyState",
+                "layoutMode": "VERTICAL",
+                "children": [
+                  {
+                    "specId": "customer-search.state.idle.title",
+                    "type": "TEXT",
+                    "name": "Title",
+                    "characters": "输入姓名或脱敏手机号搜索客户",
+                    "textStyle": "b-mobile/body.md",
+                    "color": "color/text/secondary",
+                    "align": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  },
+                  {
+                    "specId": "customer-search.state.idle.desc",
+                    "type": "TEXT",
+                    "name": "Description",
+                    "characters": "输入关键词后显示匹配结果",
+                    "textStyle": "b-mobile/label.sm",
+                    "color": "color/text/tertiary",
+                    "align": "CENTER",
+                    "origin": "derived",
+                    "mapping": "mapped"
+                  }
+                ],
+                "paddingY": 24,
+                "paddingX": 16,
+                "gap": 4,
+                "alignItems": "CENTER",
+                "origin": "spec",
+                "mapping": "mapped"
+              }
+            ],
+            "padding": 16,
+            "gap": 8,
+            "origin": "spec",
+            "mapping": "mapped"
+          }
+        ],
+        "layoutGrow": 1,
+        "fill": "color/surface/subtle",
+        "gap": 0,
+        "clip": true,
+        "paddingBottom": 16,
+        "origin": "derived",
+        "mapping": "mapped"
+      }
+    ],
+    "width": 390,
+    "height": 844,
+    "fill": "color/surface/subtle",
+    "clip": true,
+    "origin": "spec",
+    "mapping": "mapped"
+  },
+  "stats": {
+    "frames": 6,
+    "texts": 4,
+    "instances": 0,
+    "icons": 2,
+    "images": 0
+  },
+  "coverage": {
+    "nodes": [
+      {
+        "specId": "customer-search.page.root",
+        "specType": "MobileShell",
+        "path": "layout",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.root.content.0",
+        "specType": "Section",
+        "path": "layout.slots.content[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.root.content.0.children.0",
+        "specType": "SearchBar",
+        "path": "layout.slots.content[0].children[0]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.state.idle",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[1]",
+        "status": "mapped"
+      },
+      {
+        "specId": "customer-search.row.result.0",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[2]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.row.result.1",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[3]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.row.result.2",
+        "specType": "ListRow",
+        "path": "layout.slots.content[0].children[4]",
+        "status": "skipped",
+        "reason": "SKIPPED_SEARCH_RESULT"
+      },
+      {
+        "specId": "customer-search.state.empty",
+        "specType": "EmptyState",
+        "path": "layout.slots.content[0].children[5]",
+        "status": "skipped",
+        "reason": "SKIPPED_STATE:EmptyState"
+      },
+      {
+        "specId": "customer-search.action.clear",
+        "specType": "Button",
+        "path": "layout.slots.content[0].children[5].children[0]",
+        "status": "mapped"
+      }
+    ],
+    "summary": {
+      "spec": 9,
+      "derived": 8,
+      "mapped": 13,
+      "degraded": 0,
+      "unmapped": 0,
+      "skipped": 4
+    }
+  }
+}

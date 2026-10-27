@@ -13,6 +13,7 @@
     "agent:run": "tsx runtimes/standalone/src/agent-cli.ts",
     "agent:sign": "tsx runtimes/standalone/src/agent-sign-cli.ts",
     "spec:engineer": "tsx runtimes/standalone/src/spec-cli.ts",
+    "spec:refresh": "tsx runtimes/standalone/src/spec-refresh-cli.ts",
     "structure:check": "tsx runtimes/standalone/src/structure-check-cli.ts",
     "structure:diff": "tsx runtimes/standalone/src/structure-diff-cli.ts",
     "block:verify": "tsx runtimes/standalone/src/block-verify-cli.ts",

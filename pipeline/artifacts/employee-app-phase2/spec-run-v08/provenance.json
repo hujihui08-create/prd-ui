@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "sourceSpecRun": "artifacts/employee-app-phase2/spec-run-v07",
+  "brief": "samples/projects/employee-app-phase2/ui-brief.json",
+  "briefHash": "sha256:4a70e43ac566c6171713cdf5ce31eb9126a95216ae370d71c548de4ecf31cb47",
+  "generatedAt": "2026-10-27T06:51:47.819Z",
+  "pages": [
+    "appointment-detail",
+    "appointment-form",
+    "appointment-list",
+    "callback-register",
+    "customer-detail",
+    "customer-search",
+    "today",
+    "treatment-notice"
+  ]
+}

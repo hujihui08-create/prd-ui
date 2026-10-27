@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "pageId": "customer-detail",
+    "project": "employee-app-phase2",
+    "name": "客户详情",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "detail",
+    "purpose": "查看客户基础信息、消费摘要、标签备注与最近一条服务记录；查看预约/查看告知依赖该条服务记录与告知快照，无记录或无快照时不显示对应入口；新增预约预填客户；回访登记进入表单。",
+    "route": "/customers/detail/:id",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-CUSTOMER-002",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "id": "customer-detail.page.root",
+    "type": "MobileShell",
+    "props": {
+      "title": "客户详情",
+      "tabs": [
+        "appointment-list"
+      ],
+      "back": true
+    },
+    "slots": {
+      "summary": [
+        {
+          "id": "customer-detail.root.summary.0",
+          "type": "Card",
+          "props": {
+            "title": "客户详情摘要"
+          },
+          "children": [
+            {
+              "id": "customer-detail.root.summary.0.children.0",
+              "type": "List",
+              "props": {
+                "items": [
+                  {
+                    "label": "姓名",
+                    "value": "张女士"
+                  },
+                  {
+                    "label": "手机号",
+                    "value": "138****0000"
+                  },
+                  {
+                    "label": "等级",
+                    "value": "金卡会员"
+                  },
+                  {
+                    "label": "余额",
+                    "value": "¥1,280.00"
+                  },
+                  {
+                    "label": "累计消费",
+                    "value": "¥8,600.00"
+                  },
+                  {
+                    "label": "卡张数",
+                    "value": "3"
+                  },
+                  {
+                    "label": "标签",
+                    "value": "敏感肌、老客"
+                  },
+                  {
+                    "label": "备注",
+                    "value": "—"
+                  },
+                  {
+                    "label": "服务记录",
+                    "value": "10-20 · 小气泡 · A1020"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "customer-detail.card-actions",
+          "type": "Row",
+          "props": {
+            "gap": "space.2",
+            "variant": "card-actions"
+          },
+          "children": [
+            {
+              "id": "customer-detail.action.new-appointment",
+              "type": "Button",
+              "props": {
+                "label": "新增预约",
+                "emphasis": "ghost",
+                "action": "appointment.create"
+              }
+            },
+            {
+              "id": "customer-detail.action.notice",
+              "type": "Button",
+              "props": {
+                "label": "查看告知",
+                "emphasis": "ghost",
+                "action": "treatment.notice.view"
+              }
+            },
+            {
+              "id": "customer-detail.action.callback",
+              "type": "Button",
+              "props": {
+                "label": "回访登记",
+                "emphasis": "ghost",
+                "action": "customer.callback.create"
+              }
+            }
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "id": "customer-detail.root.fields.0",
+          "type": "Row",
+          "props": {
+            "gap": "space.1"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "id": "customer-detail.action.view-appointment",
+          "type": "Button",
+          "props": {
+            "label": "查看预约",
+            "emphasis": "primary",
+            "action": "appointment.view"
+          }
+        }
+      ]
+    },
+    "reqRef": "REQ-CUSTOMER-002"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    },
+    "disabled": {
+      "name": "disabled"
+    }
+  },
+  "interactions": [
+    {
+      "trigger": "查看预约",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-002"
+    },
+    {
+      "trigger": "新增预约",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-002"
+    },
+    {
+      "trigger": "查看告知",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-002"
+    },
+    {
+      "trigger": "回访登记",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-002"
+    }
+  ],
+  "linkedRoutes": {
+    "create": "/appointments/form",
+    "detail": "/customers/detail/:id",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "form": "/appointments/form",
+    "list": "/appointments"
+  },
+  "traceability": {
+    "reqMap": {
+      "REQ-CUSTOMER-002": [
+        "customer-detail"
+      ],
+      "REQ-SHARED-001": [
+        "customer-detail"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  }
+}

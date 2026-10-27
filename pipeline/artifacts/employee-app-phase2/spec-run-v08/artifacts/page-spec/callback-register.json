@@ -1,0 +1,206 @@
+{
+  "meta": {
+    "pageId": "callback-register",
+    "project": "employee-app-phase2",
+    "name": "回访登记",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "mobile-form",
+    "purpose": "登记回访内容与结果；客户可从今日待回访区块、客户详情带入或表单内客户选择器选择；保存成功回到来源（今日待回访区块或客户详情）；未接/拒绝/稍后再联系保存后仍保留在今日待回访。",
+    "route": "/callbacks/form",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-CALLBACK-001",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "id": "callback-register.page.root",
+    "type": "MobileShell",
+    "props": {
+      "title": "回访登记",
+      "back": true,
+      "showTabs": false
+    },
+    "slots": {
+      "content": [
+        {
+          "id": "callback-register.root.content.0",
+          "type": "Section",
+          "props": {
+            "padding": "space.4",
+            "gap": "space.3"
+          },
+          "children": [
+            {
+              "id": "callback-register.field.customer",
+              "type": "FormField",
+              "props": {
+                "label": "客户",
+                "required": true,
+                "field": "customer"
+              },
+              "children": [
+                {
+                  "id": "callback-register.root.content.0.children.0.children.0",
+                  "type": "Row",
+                  "props": {
+                    "gap": "space.2"
+                  },
+                  "children": [
+                    {
+                      "id": "callback-register.root.content.0.children.0.children.0.children.0",
+                      "type": "Input",
+                      "props": {
+                        "name": "customer",
+                        "placeholder": "请输入客户",
+                        "required": true
+                      }
+                    },
+                    {
+                      "id": "callback-register.action.pick-customer",
+                      "type": "Button",
+                      "props": {
+                        "label": "选择",
+                        "emphasis": "ghost",
+                        "action": "customer.select"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "callback-register.field.service",
+              "type": "FormField",
+              "props": {
+                "label": "服务项目",
+                "required": true,
+                "field": "service"
+              },
+              "children": [
+                {
+                  "id": "callback-register.root.content.0.children.1.children.0",
+                  "type": "Input",
+                  "props": {
+                    "name": "service",
+                    "placeholder": "请输入服务项目",
+                    "required": true
+                  }
+                }
+              ]
+            },
+            {
+              "id": "callback-register.field.content",
+              "type": "FormField",
+              "props": {
+                "label": "回访内容",
+                "required": true,
+                "field": "content"
+              },
+              "children": [
+                {
+                  "id": "callback-register.root.content.0.children.2.children.0",
+                  "type": "Input",
+                  "props": {
+                    "name": "content",
+                    "placeholder": "请输入回访内容",
+                    "required": true
+                  }
+                }
+              ]
+            },
+            {
+              "id": "callback-register.field.result",
+              "type": "FormField",
+              "props": {
+                "label": "回访结果",
+                "required": true,
+                "field": "result"
+              },
+              "children": [
+                {
+                  "id": "callback-register.root.content.0.children.3.children.0",
+                  "type": "Select",
+                  "props": {
+                    "options": [
+                      "已联系",
+                      "未接",
+                      "拒绝",
+                      "稍后再联系"
+                    ],
+                    "placeholder": "请选择回访结果"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "id": "callback-register.action.save",
+          "type": "Button",
+          "props": {
+            "label": "保存回访",
+            "emphasis": "primary",
+            "action": "form.submit"
+          }
+        }
+      ]
+    },
+    "reqRef": "REQ-CALLBACK-001"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    },
+    "disabled": {
+      "name": "disabled"
+    }
+  },
+  "interactions": [
+    {
+      "trigger": "保存回访",
+      "action": "navigate",
+      "reqRef": "REQ-CALLBACK-001"
+    },
+    {
+      "trigger": "选择客户",
+      "action": "navigate",
+      "reqRef": "REQ-CALLBACK-001"
+    }
+  ],
+  "customerPicker": "customer-search",
+  "linkedRoutes": {
+    "create": "/callbacks/form",
+    "detail": "/customers/detail/:id",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "form": "/callbacks/form",
+    "list": "/appointments"
+  },
+  "traceability": {
+    "reqMap": {
+      "REQ-CALLBACK-001": [
+        "callback-register"
+      ],
+      "REQ-SHARED-001": [
+        "callback-register"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  }
+}
