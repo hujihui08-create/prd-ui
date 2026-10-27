@@ -64,7 +64,7 @@ describe("applySpecs", () => {
           reqRef: "REQ-EMP-001",
         },
         {
-          trigger: "库存查询",
+          trigger: "inventory.query",
           action: "打开库存查询页",
           nodeId: "quick-inventory",
           reqRef: "REQ-EMP-001",
@@ -103,9 +103,9 @@ describe("applySpecs", () => {
       target: "/inventory",
       reqRef: "REQ-EMP-001",
     });
-    expect(today.interactions.filter((entry) => entry.trigger === "库存查询")).toHaveLength(1);
+    expect(today.interactions.filter((entry) => entry.trigger === "inventory.query")).toHaveLength(1);
     expect(today.interactions).not.toContainEqual(
-      expect.objectContaining({ trigger: "库存查询", action: "navigate" })
+      expect.objectContaining({ trigger: "inventory.query", action: "navigate" })
     );
   });
 

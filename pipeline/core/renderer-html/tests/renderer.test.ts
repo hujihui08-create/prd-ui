@@ -229,13 +229,13 @@ describe("generic web/mobile renderer", () => {
     });
     expect(html).toContain('data-page-archetype="detail"');
     expect(html).toContain('id="interaction-config"');
-    expect(html).toContain('data-action="已到店确认"');
+    expect(html).toContain('data-action="appointment.check-in"');
     expect(html).toContain("data-business-states");
     expect(html).toContain("data-current-status");
     expect(html).toContain('[data-field="status"] .form-value');
     expect(html).toContain("bar.contains(button)");
     expect(html).toContain('"状态: " + status');
-    expect(html).toContain('action === "确认已当面告知"');
+    expect(html).toContain('action === "treatment.confirm"');
     expect(html).toContain('[data-field="confirmedBy"] .form-value');
     expect(html).toContain('"当前员工"');
     expect(html).toContain('"确认人: " + byValue');
@@ -250,7 +250,7 @@ describe("generic web/mobile renderer", () => {
     expect(search).toContain('data-empty-kind="idle"');
     expect(search).toContain('data-empty-kind="empty"');
     expect(search).toContain("data-search-text");
-    expect(search).toContain('data-action="清空关键词"');
+    expect(search).toContain('data-action="search.clear"');
     expect(search).toContain(".list-row[data-row-link]{cursor:pointer;}");
     expect(search).toContain('row.dataset.rowLink = "true"');
     expect(search).toContain('config.pageId === "customer-search"');
@@ -363,7 +363,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     );
     expect(form).toContain('data-picker-search="customer-search"');
     expect(form).toContain('type="datetime-local"');
-    expect(form).toContain('data-action="选择客户"');
+    expect(form).toContain('data-action="customer.select"');
 
     const list = renderDocument(
       phase2ById.get("appointment-list")!,

@@ -1,4 +1,4 @@
-import type { Finding, PageSpec, UiBriefPage } from "@prd-ui/contracts";
+import type { ActionRef, Finding, PageSpec, UiBriefPage } from "@prd-ui/contracts";
 import { finalizeFindings, type FindingDraft, type ValidationContext } from "./types.js";
 
 /** Roles are sets for semantic comparison; declaration order is irrelevant. */
@@ -312,41 +312,36 @@ function filterRepresented(
   return searchLike && facts.hasSearchBar;
 }
 
-function actionRepresented(action: string, facts: LayoutFacts, spec: PageSpec): boolean {
-  if (facts.buttonLabels.has(action) || facts.buttonActions.has(action)) return true;
-  if (facts.quickActionLabels.has(action)) return true;
-  if (facts.filterBarActions.has(action)) return true;
+function actionRepresented(ref: ActionRef, facts: LayoutFacts, spec: PageSpec): boolean {
+  if (facts.buttonActions.has(ref.id)) return true;
+  // Some affordances still render the label as their visible CTA (FilterBar,
+  // QuickAction); the id is the behavior, the label is the representation.
+  if (facts.buttonLabels.has(ref.label)) return true;
+  if (facts.quickActionLabels.has(ref.label)) return true;
+  if (facts.filterBarActions.has(ref.label)) return true;
 
-  if (
-    spec.formModes?.some(
-      (mode) =>
-        mode.name === action || mode.label === action || mode.actions.includes(action)
-    ) === true
-  ) {
+  if (spec.formModes?.some((mode) => mode.actions.includes(ref.id)) === true) {
     return true;
   }
 
-  if (spec.businessStates?.some((state) => state.actions.includes(action)) === true) {
+  if (spec.businessStates?.some((state) => state.actions.includes(ref.id)) === true) {
     return true;
   }
 
   // Search is implicit: the SearchBar is the action affordance.
-  if (action === "搜索" && facts.hasSearchBar) return true;
+  if (ref.id === "search.submit" && facts.hasSearchBar) return true;
 
-  if (
-    (action === "查看详情" || action === "查看完整详情") &&
-    listDetailAffordance(spec, facts)
-  ) {
+  if (ref.id === "appointment.view" && listDetailAffordance(spec, facts)) {
     return true;
   }
 
-  // The two check-in labels are the same state action; one real CTA represents
-  // both when the duplicate label is intentionally not rendered.
-  if (/到店确认|确认到店/.test(action)) {
-    const hasCheckinButton =
-      [...facts.buttonLabels].some((label) => /到店确认|确认到店/.test(label)) ||
-      [...facts.buttonActions].some((actionLabel) => /到店确认|确认到店/.test(actionLabel));
-    if (hasCheckinButton) return true;
+  // The two check-in capabilities are the same state action; one real CTA
+  // represents both when the duplicate is intentionally not rendered.
+  if (
+    (ref.id === "appointment.check-in" || ref.id === "appointment.accept") &&
+    facts.buttonActions.has("appointment.check-in")
+  ) {
+    return true;
   }
 
   return false;
@@ -516,13 +511,13 @@ function checkFieldsAndActions(spec: PageSpec, briefPage: UiBriefPage, push: Pus
 
   // Actions must be visibly rendered. Interactions only describe behaviour; a
   // trigger that never reaches the layout leaves the user without the control.
-  for (const action of briefPage.actions ?? []) {
-    if (!actionRepresented(action, facts, spec)) {
+  for (const ref of briefPage.actions ?? []) {
+    if (!actionRepresented(ref, facts, spec)) {
       push(
         "SEMANTIC-ACTION",
         "layout",
-        action,
-        `Brief action "${action}" has no Button, form mode, business state, or detail-affordance representation in the page layout.`
+        ref.id,
+        `Brief action "${ref.label}" (${ref.id}) has no Button, form mode, business state, or detail-affordance representation in the page layout.`
       );
     }
   }

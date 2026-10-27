@@ -140,7 +140,10 @@
               "createdAt"
             ],
             "actions": [
-              "新建订单"
+              {
+                "id": "order.create",
+                "label": "新建订单"
+              }
             ],
             "filterFields": [
               "status",
@@ -217,7 +220,10 @@
               "createdAt"
             ],
             "actions": [
-              "编辑订单"
+              {
+                "id": "order.edit",
+                "label": "编辑订单"
+              }
             ],
             "summaryTitle": "订单摘要",
             "fieldLabels": {
@@ -264,8 +270,14 @@
               "status"
             ],
             "actions": [
-              "保存",
-              "取消"
+              {
+                "id": "form.submit",
+                "label": "保存"
+              },
+              {
+                "id": "appointment.cancel",
+                "label": "取消"
+              }
             ],
             "fieldLabels": {
               "orderNo": "订单号",
@@ -300,7 +312,10 @@
               "timezone"
             ],
             "actions": [
-              "保存设置"
+              {
+                "id": "form.submit",
+                "label": "保存设置"
+              }
             ],
             "fieldLabels": {
               "notifications": "通知设置",
@@ -373,7 +388,10 @@
               "description"
             ],
             "actions": [
-              "立即购买"
+              {
+                "id": "purchase.create",
+                "label": "立即购买"
+              }
             ],
             "summaryTitle": "商品摘要",
             "fieldLabels": {
@@ -417,7 +435,10 @@
               "password"
             ],
             "actions": [
-              "登录"
+              {
+                "id": "auth.login",
+                "label": "登录"
+              }
             ],
             "fieldLabels": {
               "email": "邮箱",

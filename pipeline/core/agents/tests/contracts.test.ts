@@ -101,7 +101,7 @@ describe("M1 role contracts", () => {
       brief: employeeBrief,
       iaMap: IaOutputSchema.parse(iaOutput).map,
     });
-    expect(interactionPrompt).toContain("Every action listed for a page");
+    expect(interactionPrompt).toContain("Every action id listed for a page");
     expect(interactionPrompt).toContain('"motionSpec"');
 
     const visualPrompt = buildVisualStylePrompt({

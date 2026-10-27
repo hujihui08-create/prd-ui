@@ -520,18 +520,50 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
         )
       );
     }
-    const hostAction = (page.actions ?? []).find((action) =>
-      /前往客户\s*(Tab|页)|前往工作台|打开工作台|前往我的|我的\s*(Tab|页)/.test(action)
+    const hostAction = (page.actions ?? []).find((ref) =>
+      /前往客户\s*(Tab|页)|前往工作台|打开工作台|前往我的|我的\s*(Tab|页)/.test(ref.label)
     );
     if (hostAction !== undefined) {
       issues.push(
         issue(
           "BRIEF_HOST_ACTION",
           "blocker",
-          `page ${page.id} has host action ${hostAction}`,
-          hostAction
+          `page ${page.id} has host action ${hostAction.label}`,
+          hostAction.label
         )
       );
+    }
+    const actionIds = new Set<string>();
+    for (const ref of page.actions ?? []) {
+      if (actionIds.has(ref.id)) {
+        issues.push(
+          issue(
+            "BRIEF_ACTION_DUPLICATE",
+            "blocker",
+            `page ${page.id} has duplicate action id ${ref.id}`,
+            ref.id
+          )
+        );
+      }
+      actionIds.add(ref.id);
+    }
+    const requiredCapabilities: string[] = [];
+    if (page.archetype === "mobile-form") requiredCapabilities.push("form.submit");
+    if ((page.views ?? []).length > 0) requiredCapabilities.push("view.toggle");
+    if (page.customerPicker !== undefined) requiredCapabilities.push("customer.select");
+    // filter.clear is synthesized by the list template's empty state, not a
+    // brief action, so it is not required here (revisit with the placement work).
+    for (const id of requiredCapabilities) {
+      if (!actionIds.has(id)) {
+        issues.push(
+          issue(
+            "BRIEF_ACTION_CAPABILITY_MISSING",
+            "blocker",
+            `page ${page.id} requires capability ${id}`,
+            page.id
+          )
+        );
+      }
     }
     if (
       page.archetype === "detail" &&
@@ -549,28 +581,28 @@ export function runBriefGate(input: BriefGateInput): BriefGate {
       );
     }
     for (const state of page.businessStates ?? []) {
-      for (const action of state.actions) {
-        if (!(page.actions ?? []).includes(action)) {
+      for (const id of state.actions) {
+        if (!actionIds.has(id)) {
           issues.push(
             issue(
               "BRIEF_BUSINESS_STATE_ACTION_UNKNOWN",
               "blocker",
-              `state ${state.name} uses unknown action ${action}`,
-              action
+              `state ${state.name} uses unknown action ${id}`,
+              id
             )
           );
         }
       }
     }
     for (const mode of page.formModes ?? []) {
-      for (const action of mode.actions) {
-        if (!(page.actions ?? []).includes(action)) {
+      for (const id of mode.actions) {
+        if (!actionIds.has(id)) {
           issues.push(
             issue(
               "BRIEF_FORM_MODE_ACTION_UNKNOWN",
               "blocker",
-              `mode ${mode.name} uses unknown action ${action}`,
-              action
+              `mode ${mode.name} uses unknown action ${id}`,
+              id
             )
           );
         }

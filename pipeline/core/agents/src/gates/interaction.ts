@@ -65,13 +65,13 @@ export function runInteractionGate(input: InteractionGateInput): GateResult {
     if (briefPage === undefined) continue;
 
     const actions = new Set(page.triggers.map((trigger) => trigger.action.trim()));
-    for (const action of briefPage.actions ?? []) {
-      if (!actions.has(action.trim())) {
+    for (const ref of briefPage.actions ?? []) {
+      if (!actions.has(ref.id)) {
         issues.push(
           blocker(
             "INTERACTION_ACTION_MISSING",
-            `page ${page.id} does not cover action ${action}`,
-            action
+            `page ${page.id} does not cover action ${ref.label} (${ref.id})`,
+            ref.id
           )
         );
       }

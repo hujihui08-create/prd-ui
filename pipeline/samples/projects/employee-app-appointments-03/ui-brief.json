@@ -105,11 +105,26 @@
           "delegation": "委派留痕"
         },
         "actions": [
-          "已到店确认",
-          "接单并确认到店",
-          "开单",
-          "改期",
-          "取消"
+          {
+            "id": "appointment.check-in",
+            "label": "已到店确认"
+          },
+          {
+            "id": "appointment.accept",
+            "label": "接单并确认到店"
+          },
+          {
+            "id": "order.create",
+            "label": "开单"
+          },
+          {
+            "id": "appointment.reschedule",
+            "label": "改期"
+          },
+          {
+            "id": "appointment.cancel",
+            "label": "取消"
+          }
         ],
         "mockData": {
           "values": {
@@ -170,8 +185,14 @@
           "source": "来源"
         },
         "actions": [
-          "保存",
-          "保存改期"
+          {
+            "id": "form.submit",
+            "label": "保存"
+          },
+          {
+            "id": "form.reschedule",
+            "label": "保存改期"
+          }
         ]
       },
       {
@@ -215,7 +236,10 @@
           "confirmedAt": "确认时间"
         },
         "actions": [
-          "已当面告知客户，确认"
+          {
+            "id": "treatment.confirm",
+            "label": "已当面告知客户，确认"
+          }
         ],
         "mockData": {
           "values": {
@@ -289,10 +313,22 @@
           "date": "日期"
         },
         "actions": [
-          "新增预约",
-          "切换我的排单/全店",
-          "切换日历/列表",
-          "清空筛选"
+          {
+            "id": "appointment.create",
+            "label": "新增预约"
+          },
+          {
+            "id": "scope.toggle",
+            "label": "切换我的排单/全店"
+          },
+          {
+            "id": "view.toggle",
+            "label": "切换日历/列表"
+          },
+          {
+            "id": "filter.clear",
+            "label": "清空筛选"
+          }
         ],
         "filterFields": [
           "status",

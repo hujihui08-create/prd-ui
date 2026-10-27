@@ -126,13 +126,13 @@ export function runSpecEngineerGates(
     if (spec === undefined) continue;
     const triggers = new Set(spec.interactions.map((interaction) => interaction.trigger));
     for (const action of page.actions ?? []) {
-      if (!triggers.has(action)) {
+      if (!triggers.has(action.id)) {
         issues.push(
           issue(
             "SPEC_ACTION_MISSING",
             "blocker",
-            `page ${page.id} has no Page Spec interaction for action ${action}`,
-            action
+            `page ${page.id} has no Page Spec interaction for action ${action.label} (${action.id})`,
+            action.id
           )
         );
       }

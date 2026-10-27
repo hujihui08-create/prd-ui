@@ -52,7 +52,7 @@ export const interactionSpec: InteractionSpec = {
       triggers: [
         {
           nodeId: "quick-inventory",
-          action: "库存查询",
+          action: "inventory.query",
           reaction: "打开库存查询页",
         },
       ],

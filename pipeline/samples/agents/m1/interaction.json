@@ -12,19 +12,52 @@
             }
           ],
           "triggers": [
-            { "nodeId": "quick-inventory", "action": "库存查询", "reaction": "打开库存查询页" },
-            { "nodeId": "appointment-row", "action": "查看预约详情", "reaction": "展开预约详情浮层" }
+            {
+              "nodeId": "quick-inventory",
+              "action": "inventory.query",
+              "reaction": "打开库存查询页"
+            },
+            {
+              "nodeId": "appointment-row",
+              "action": "查看预约详情",
+              "reaction": "展开预约详情浮层"
+            }
           ],
           "states": {
-            "default": ["门店顶栏", "库存快捷操作", "我的预约列表", "待回访列表"],
-            "loading": ["顶栏骨架", "快捷操作骨架", "列表骨架"],
-            "empty": ["今天没有预约", "暂无待回访"],
-            "error": ["错误说明", "重试按钮"]
+            "default": [
+              "门店顶栏",
+              "库存快捷操作",
+              "我的预约列表",
+              "待回访列表"
+            ],
+            "loading": [
+              "顶栏骨架",
+              "快捷操作骨架",
+              "列表骨架"
+            ],
+            "empty": [
+              "今天没有预约",
+              "暂无待回访"
+            ],
+            "error": [
+              "错误说明",
+              "重试按钮"
+            ]
           },
-          "focusOrder": ["quick-inventory", "appointments", "callbacks"],
+          "focusOrder": [
+            "quick-inventory",
+            "appointments",
+            "callbacks"
+          ],
           "keyboard": [
-            { "key": "Tab", "action": "按焦点顺序移动" },
-            { "key": "Enter", "action": "触发当前操作" }
+            {
+              "key": "Tab",
+              "action": "按焦点顺序移动"
+            },
+            {
+              "key": "Enter",
+              "action": "触发当前操作"
+            }
           ],
           "destructiveActions": []
         },
@@ -38,20 +71,57 @@
             }
           ],
           "triggers": [
-            { "nodeId": "search", "action": "搜索", "reaction": "按产品名过滤列表" },
-            { "nodeId": "category-filter", "action": "筛选分类", "reaction": "按分类过滤列表" },
-            { "nodeId": "warning-toggle", "action": "仅看预警", "reaction": "只保留低库存或缺货产品" }
+            {
+              "nodeId": "search",
+              "action": "search.submit",
+              "reaction": "按产品名过滤列表"
+            },
+            {
+              "nodeId": "category-filter",
+              "action": "筛选分类",
+              "reaction": "按分类过滤列表"
+            },
+            {
+              "nodeId": "warning-toggle",
+              "action": "仅看预警",
+              "reaction": "只保留低库存或缺货产品"
+            }
           ],
           "states": {
-            "default": ["搜索栏", "筛选器", "汇总行", "产品卡片列表"],
-            "loading": ["搜索栏骨架", "列表骨架"],
-            "empty": ["没有匹配的产品", "清除筛选"],
-            "error": ["错误说明", "重试按钮"]
+            "default": [
+              "搜索栏",
+              "筛选器",
+              "汇总行",
+              "产品卡片列表"
+            ],
+            "loading": [
+              "搜索栏骨架",
+              "列表骨架"
+            ],
+            "empty": [
+              "没有匹配的产品",
+              "清除筛选"
+            ],
+            "error": [
+              "错误说明",
+              "重试按钮"
+            ]
           },
-          "focusOrder": ["search", "category-filter", "warning-toggle", "product-list"],
+          "focusOrder": [
+            "search",
+            "category-filter",
+            "warning-toggle",
+            "product-list"
+          ],
           "keyboard": [
-            { "key": "/", "action": "聚焦搜索框" },
-            { "key": "Escape", "action": "清除搜索并返回列表" }
+            {
+              "key": "/",
+              "action": "聚焦搜索框"
+            },
+            {
+              "key": "Escape",
+              "action": "清除搜索并返回列表"
+            }
           ],
           "destructiveActions": []
         }
@@ -59,27 +129,61 @@
     },
     "motionSpec": {
       "presets": {
-        "page-enter": { "durationMs": 200, "easing": "standard" },
-        "list-stagger": { "durationMs": 120, "easing": "standard", "staggerMs": 24 },
-        "empty-fade": { "durationMs": 320, "easing": "emphasized" }
+        "page-enter": {
+          "durationMs": 200,
+          "easing": "standard"
+        },
+        "list-stagger": {
+          "durationMs": 120,
+          "easing": "standard",
+          "staggerMs": 24
+        },
+        "empty-fade": {
+          "durationMs": 320,
+          "easing": "emphasized"
+        }
       },
       "bindings": [
-        { "pageId": "today", "preset": "page-enter" },
-        { "pageId": "today", "nodeId": "appointments", "preset": "list-stagger" },
-        { "pageId": "inventory-query", "preset": "page-enter" },
-        { "pageId": "inventory-query", "nodeId": "empty-state", "preset": "empty-fade" }
+        {
+          "pageId": "today",
+          "preset": "page-enter"
+        },
+        {
+          "pageId": "today",
+          "nodeId": "appointments",
+          "preset": "list-stagger"
+        },
+        {
+          "pageId": "inventory-query",
+          "preset": "page-enter"
+        },
+        {
+          "pageId": "inventory-query",
+          "nodeId": "empty-state",
+          "preset": "empty-fade"
+        }
       ],
       "tokens": {
-        "duration": { "fast": "120ms", "normal": "200ms", "slow": "320ms" },
+        "duration": {
+          "fast": "120ms",
+          "normal": "200ms",
+          "slow": "320ms"
+        },
         "easing": {
           "standard": "ease-out",
           "emphasized": "cubic-bezier(0.2, 0, 0, 1)"
         }
       },
-      "reducedMotion": { "fallback": "fade" }
+      "reducedMotion": {
+        "fallback": "fade"
+      }
     },
     "reviewMarkdown": "# Interaction review\n\n- 今日的库存查询操作有明确 reaction，预约列表可展开详情；状态矩阵覆盖 default/loading/empty/error。\n- 库存查询的搜索、筛选、预警开关都有明确反应。\n- 动效只使用 120/200/320ms token，并声明 reducedMotion=fade。\n- 首版没有破坏性操作，确认项为空。"
   },
-  "usage": { "inputTokens": 5200, "outputTokens": 2600, "cacheReadTokens": 0 },
+  "usage": {
+    "inputTokens": 5200,
+    "outputTokens": 2600,
+    "cacheReadTokens": 0
+  },
   "usageComplete": true
 }

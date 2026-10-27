@@ -316,7 +316,7 @@ describe("brief gate", () => {
       const page = brief.ia.pages.find((entry) => entry.id === "orders-overview")!;
       page.archetype = "home";
       page.fields = ["storeName"];
-      page.actions = ["前往客户 Tab"];
+      page.actions = [{ id: "nav.customer-tab", label: "前往客户 Tab" }];
       return brief;
     });
     const gate = gateForDraft(home);
@@ -330,7 +330,10 @@ describe("brief gate", () => {
     const missing = withBrief((brief) => {
       const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
       page.fields = ["status"];
-      page.actions = ["开单", "取消"];
+      page.actions = [
+        { id: "order.create", label: "开单" },
+        { id: "appointment.cancel", label: "取消" },
+      ];
       return brief;
     });
     expect(gateForDraft(missing).issues.map((issue) => issue.code)).toContain(
@@ -340,8 +343,8 @@ describe("brief gate", () => {
     const unknown = withBrief((brief) => {
       const page = brief.ia.pages.find((entry) => entry.id === "order-detail")!;
       page.fields = ["status"];
-      page.actions = ["开单"];
-      page.businessStates = [{ name: "已到店", actions: ["开单", "不存在"] }];
+      page.actions = [{ id: "order.create", label: "开单" }];
+      page.businessStates = [{ name: "已到店", actions: ["order.create", "不存在"] }];
       return brief;
     });
     expect(gateForDraft(unknown).issues.map((issue) => issue.code)).toContain(
@@ -352,7 +355,7 @@ describe("brief gate", () => {
   it("blocks form modes and views that the page cannot support", () => {
     const mode = withBrief((brief) => {
       const page = brief.ia.pages.find((entry) => entry.id === "order-form")!;
-      page.formModes = [{ name: "new", label: "新增", actions: ["保存草稿"] }];
+      page.formModes = [{ name: "new", label: "新增", actions: ["form.save-draft"] }];
       return brief;
     });
     expect(gateForDraft(mode).issues.map((issue) => issue.code)).toContain(

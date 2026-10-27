@@ -110,7 +110,7 @@
               "props": {
                 "label": "改期",
                 "emphasis": "ghost",
-                "action": "改期"
+                "action": "appointment.reschedule"
               },
               "id": "appointment-detail.action.reschedule"
             },
@@ -119,7 +119,7 @@
               "props": {
                 "label": "客户详情",
                 "emphasis": "ghost",
-                "action": "客户详情"
+                "action": "customer.view"
               },
               "id": "appointment-detail.action.customer"
             },
@@ -128,7 +128,7 @@
               "props": {
                 "label": "取消",
                 "emphasis": "danger",
-                "action": "取消"
+                "action": "appointment.cancel"
               },
               "id": "appointment-detail.action.cancel"
             }
@@ -142,7 +142,7 @@
           "props": {
             "label": "已到店确认",
             "emphasis": "primary",
-            "action": "已到店确认"
+            "action": "appointment.check-in"
           },
           "id": "appointment-detail.action.checkin"
         },
@@ -151,7 +151,7 @@
           "props": {
             "label": "开单",
             "emphasis": "secondary",
-            "action": "开单"
+            "action": "order.create"
           },
           "id": "appointment-detail.action.open-order"
         }
@@ -232,35 +232,35 @@
     {
       "name": "已登记",
       "actions": [
-        "已到店确认",
-        "接单并确认到店",
-        "开单",
-        "改期",
-        "取消",
-        "客户详情"
+        "appointment.check-in",
+        "appointment.accept",
+        "order.create",
+        "appointment.reschedule",
+        "appointment.cancel",
+        "customer.view"
       ],
       "note": "待分配时「已到店确认」文案为「接单并确认到店」；仅「已登记」可到店、改期、取消，由系统硬校验；「改期」入口需预约登记 + 客户查看。"
     },
     {
       "name": "已到店",
       "actions": [
-        "开单",
-        "术后告知",
-        "客户详情"
+        "order.create",
+        "treatment.notice.view",
+        "customer.view"
       ],
       "note": "底部保留开单；serviceCompleted=true 且告知快照存在时显示「术后告知」；改期与取消不出现。"
     },
     {
       "name": "爽约",
       "actions": [
-        "客户详情"
+        "customer.view"
       ],
       "note": "只读说明「爽约已记录入客户档案」；员工端不提供爽约入口；客户详情链接仅在可查看该客户时显示。"
     },
     {
       "name": "已取消",
       "actions": [
-        "客户详情"
+        "customer.view"
       ],
       "note": "只读说明「本单已取消」；底部操作栏消失；客户详情链接仅在可查看该客户时显示。"
     }

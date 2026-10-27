@@ -66,7 +66,7 @@
                       "props": {
                         "label": "选择",
                         "emphasis": "ghost",
-                        "action": "选择客户"
+                        "action": "customer.select"
                       },
                       "id": "appointment-form.action.pick-customer"
                     }
@@ -192,7 +192,7 @@
           "props": {
             "label": "保存",
             "emphasis": "primary",
-            "action": "保存"
+            "action": "form.submit"
           },
           "id": "appointment-form.action.save"
         }
@@ -254,18 +254,25 @@
       "name": "new",
       "label": "保存",
       "actions": [
+        "form.submit",
+        "customer.select"
+      ],
+      "customerLocked": false,
+      "actionLabels": [
         "保存",
         "选择客户"
-      ],
-      "customerLocked": false
+      ]
     },
     {
       "name": "reschedule",
       "label": "保存改期",
       "actions": [
-        "保存改期"
+        "form.reschedule"
       ],
-      "customerLocked": true
+      "customerLocked": true,
+      "actionLabels": [
+        "保存改期"
+      ]
     }
   ],
   "customerPicker": "customer-search",

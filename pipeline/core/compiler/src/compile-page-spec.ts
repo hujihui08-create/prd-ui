@@ -1,4 +1,5 @@
 import type {
+  ActionRef,
   Catalog,
   PageSpec,
   Profile,
@@ -32,8 +33,11 @@ const settingsFieldMeta: Record<string, { label: string; options: string[] }> = 
   timezone: { label: "时区", options: ["Asia/Shanghai", "UTC"] },
 };
 
-function btn(label: string, emphasis = "primary", action = label): SpecNode {
-  return { type: "Button", props: { label, emphasis, action } };
+function btn(action: ActionRef, emphasis = "primary"): SpecNode {
+  return {
+    type: "Button",
+    props: { label: action.label, emphasis, action: action.id },
+  };
 }
 
 const STANDARD_ICON_ASSETS: Record<string, string> = {
@@ -63,12 +67,8 @@ function standardIconId(icon: string): string {
   return STANDARD_ICON_ASSETS[icon] ?? icon;
 }
 
-function primaryAction(labels: string[], fallback: string): string {
-  return (
-    labels.find((label) => /新增|保存|提交|确认|登录/.test(label)) ??
-    labels[0] ??
-    fallback
-  );
+function primaryAction(actions: ActionRef[], fallback: ActionRef): ActionRef {
+  return actions.find((action) => action.placement === "footer") ?? actions[0] ?? fallback;
 }
 
 function text(label: string, textRole = "body.md"): SpecNode {
@@ -166,9 +166,11 @@ function fieldFormNode(
  * rest secondary. Archetypes with a conventional action set use it only when
  * the brief declares no actions.
  */
-function actionButtons(page: UiBriefPage, defaults: string[]): SpecNode[] {
-  const labels = page.actions && page.actions.length > 0 ? page.actions : defaults;
-  return labels.map((label, index) => btn(label, index === 0 ? "primary" : "secondary"));
+function actionButtons(page: UiBriefPage, defaults: ActionRef[]): SpecNode[] {
+  const actions = page.actions && page.actions.length > 0 ? page.actions : defaults;
+  return actions.map((action, index) =>
+    btn(action, index === 0 ? "primary" : "secondary")
+  );
 }
 
 /** Empty state with an illustration only when the brief explicitly supplies one. */
@@ -325,14 +327,20 @@ export function compilePageSpec(input: {
   const formModes: PageSpec["formModes"] =
     page.formModes ??
     (page.archetype === "mobile-form" &&
-    (page.actions ?? []).includes("保存") &&
-    (page.actions ?? []).includes("保存改期")
+    (page.actions ?? []).some((action) => action.id === "form.submit") &&
+    (page.actions ?? []).some((action) => action.id === "form.reschedule")
       ? [
-          { name: "new", label: "新增预约", actions: ["保存"] },
+          {
+            name: "new",
+            label: "新增预约",
+            actions: ["form.submit"],
+            actionLabels: ["保存"],
+          },
           {
             name: "reschedule",
             label: "改期",
-            actions: ["保存改期"],
+            actions: ["form.reschedule"],
+            actionLabels: ["保存改期"],
             customerLocked: true,
           },
         ]
@@ -494,7 +502,7 @@ function buildLayout(
                   type: "FilterBar",
                   props: {
                     fields: filterFields.map(labelFor),
-                    action: actions[0] ?? "新建",
+                    action: actions[0]?.label ?? "新建",
                   },
                 },
                 ...(extraActions.length > 0
@@ -553,7 +561,10 @@ function buildLayout(
             {
               type: "Section",
               props: { padding: "space.4", gap: "space.2" },
-              children: actionButtons(page, ["保存", "取消"]),
+              children: actionButtons(page, [
+                { id: "form.submit", label: "保存" },
+                { id: "appointment.cancel", label: "取消" },
+              ]),
             },
           ],
         },
@@ -591,7 +602,7 @@ function buildLayout(
               ],
             },
           ],
-          actions: actionButtons(page, ["保存"]),
+          actions: actionButtons(page, [{ id: "form.submit", label: "保存" }]),
         },
       };
     case "feed": {
@@ -847,12 +858,12 @@ function buildLayout(
         },
       }));
       const actions = page.actions ?? [];
-      const primary = primaryAction(actions, "新增");
+      const primary = primaryAction(actions, {
+        id: "appointment.create",
+        label: "新增",
+      });
       const secondaryActions = actions.filter(
-        (label) =>
-          label !== primary &&
-          label !== "查看完整详情" &&
-          !(searchField !== undefined && label === "查看详情")
+        (action) => action.id !== primary.id && action.id !== "appointment.view"
       );
       const textOf = (row: Record<string, string>, key: string): string | undefined =>
         row[key] ?? undefined;
@@ -973,8 +984,8 @@ function buildLayout(
         );
         node.children =
           searchField === undefined
-            ? [btn("清空筛选", "secondary")]
-            : [btn("清空关键词", "secondary")];
+            ? [btn({ id: "filter.clear", label: "清空筛选" }, "secondary")]
+            : [btn({ id: "search.clear", label: "清空关键词" }, "secondary")];
         if (searchField === undefined) {
           node.props = { ...node.props, variant: "inline" };
         }
@@ -1048,11 +1059,11 @@ function buildLayout(
                       {
                         type: "Row",
                         props: { gap: "space.2", variant: "filter" },
-                        children: secondaryActions.map((label) => {
-                          const button = btn(label, "secondary");
+                        children: secondaryActions.map((action) => {
+                          const button = btn(action, "secondary");
                           if (
                             interaction.views !== undefined &&
-                            /日历.*列表/.test(label)
+                            action.id === "view.toggle"
                           ) {
                             return {
                               ...button,
@@ -1145,17 +1156,17 @@ function buildLayout(
     case "mobile-form": {
       const fields = page.fields ?? [];
       const labelFor = (field: string): string => page.fieldLabels?.[field] ?? field;
-      const actions = page.actions ?? ["保存"];
-      const primary = primaryAction(actions, "保存");
+      const actions = page.actions ?? [{ id: "form.submit", label: "保存" }];
+      const primary = primaryAction(actions, { id: "form.submit", label: "保存" });
       const alternateActions = actions.filter(
-        (label) => label !== primary && /保存|提交|确认/.test(label)
+        (action) => action.id !== primary.id && action.id === "form.reschedule"
       );
       const hasCustomerField = fields.includes("customer");
       const otherActions = actions.filter(
-        (label) =>
-          label !== primary &&
-          !alternateActions.includes(label) &&
-          !(hasCustomerField && label === "选择客户")
+        (action) =>
+          action.id !== primary.id &&
+          !alternateActions.includes(action) &&
+          !(hasCustomerField && action.id === "customer.select")
       );
       const optionsFor = (field: string): string[] | undefined => {
         if (field === "source") return ["到店", "电话", "微信", "企微"];
@@ -1204,7 +1215,7 @@ function buildLayout(
                               props: {
                                 label: "选择",
                                 emphasis: "ghost",
-                                action: "选择客户",
+                                action: "customer.select",
                               },
                             },
                           ],
@@ -1220,12 +1231,12 @@ function buildLayout(
               }),
             },
             ...(page.formModes === undefined
-              ? alternateActions.map((label) => ({
+              ? alternateActions.map((action) => ({
                   type: "Row" as const,
                   props: { gap: "space.2" },
                   children: [
                     { type: "Text" as const, props: { text: "另一模式" }, textRole: "label.sm" },
-                    { type: "Text" as const, props: { text: label }, textRole: "label.strong" },
+                    { type: "Text" as const, props: { text: action.label }, textRole: "label.strong" },
                   ],
                 }))
               : []),
@@ -1235,7 +1246,7 @@ function buildLayout(
                   {
                     type: "Row" as const,
                     props: { gap: "space.2", variant: "filter" },
-                    children: otherActions.map((label) => btn(label, "ghost")),
+                    children: otherActions.map((action) => btn(action, "ghost")),
                   },
                 ]),
           ],
@@ -1268,7 +1279,7 @@ function buildLayout(
               ],
             };
           }),
-          actions: actionButtons(page, ["登录"]),
+          actions: actionButtons(page, [{ id: "auth.login", label: "登录" }]),
         },
       };
     case "onboarding":
@@ -1282,7 +1293,10 @@ function buildLayout(
           ],
           title: [text(page.name, "heading.1")],
           body: [text(page.purpose, "body.md")],
-          actions: actionButtons(page, ["开始", "稍后"]),
+          actions: actionButtons(page, [
+            { id: "onboarding.start", label: "开始" },
+            { id: "onboarding.skip", label: "稍后" },
+          ]),
         },
       };
     default:
@@ -1293,36 +1307,42 @@ function buildLayout(
 function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNode {
   const fields = page.fields ?? [];
   const summaryTitle = page.summaryTitle ?? `${page.name}摘要`;
-  const actionLabels = page.actions?.length ? page.actions : ["编辑"];
-  const primaryLabel = actionLabels[0]!;
-  const openOrderLabel = actionLabels.find((label) => label.includes("开单"));
-  const primaryLabels = [
-    primaryLabel,
-    ...(openOrderLabel !== undefined && openOrderLabel !== primaryLabel
-      ? [openOrderLabel]
-      : []),
-  ];
+  const actionRefs = page.actions?.length
+    ? page.actions
+    : [{ id: "form.submit", label: "编辑" }];
+  const primary = primaryAction(actionRefs, actionRefs[0]!);
+  const openOrder = actionRefs.find(
+    (action) => action.id === "order.create" && action.id !== primary.id
+  );
+  const footerRefs = [primary, ...(openOrder === undefined ? [] : [openOrder])];
   const values = page.mockData?.values;
   const serviceCompletedValue = values?.serviceCompleted;
   const serviceCompleted =
     serviceCompletedValue === undefined ||
     !/^(否|false|no|未完成)$/i.test(String(serviceCompletedValue).trim());
-  const checkinPrimary = primaryLabels.some((label) => /到店确认|确认到店/.test(label));
-  const secondaryLabels = actionLabels
-    .filter((label) => !primaryLabels.includes(label))
+  const checkinPrimary =
+    primary.id === "appointment.check-in" || primary.id === "appointment.accept";
+  const secondaryRefs = actionRefs
+    .filter((action) => !footerRefs.some((footer) => footer.id === action.id))
     // The footer already owns the check-in CTA; a second ghost CTA is ambiguous.
-    .filter((label) => !(checkinPrimary && /到店确认|确认到店/.test(label)))
+    .filter(
+      (action) =>
+        !(
+          checkinPrimary &&
+          (action.id === "appointment.check-in" || action.id === "appointment.accept")
+        )
+    )
     // The notice action is only valid after the service is completed.
-    .filter((label) => label !== "术后告知" || serviceCompleted);
-  const actions = primaryLabels.map((label, index) =>
-    btn(label, index === 0 ? "primary" : "secondary")
+    .filter((action) => action.id !== "treatment.notice.view" || serviceCompleted);
+  const actions = footerRefs.map((action, index) =>
+    btn(action, index === 0 ? "primary" : "secondary")
   );
-  const orderedSecondaryLabels = [
-    ...secondaryLabels.filter((label) => label !== "取消"),
-    ...secondaryLabels.filter((label) => label === "取消"),
+  const orderedSecondaryRefs = [
+    ...secondaryRefs.filter((action) => action.id !== "appointment.cancel"),
+    ...secondaryRefs.filter((action) => action.id === "appointment.cancel"),
   ];
-  const secondaryActions = orderedSecondaryLabels.map((label) =>
-    btn(label, label === "取消" ? "danger" : "ghost")
+  const secondaryActions = orderedSecondaryRefs.map((action) =>
+    btn(action, action.id === "appointment.cancel" ? "danger" : "ghost")
   );
   const noticeBlocks = page.noticeBlocks ?? [];
   const hasNoticeBlocks = noticeBlocks.length > 0;
@@ -1471,7 +1491,7 @@ function detailLayout(page: UiBriefPage, nav: string[], tabs: string[]): SpecNod
 function buildInteractions(page: UiBriefPage): PageSpec["interactions"] {
   const reqRef = page.reqRefs[0] as ReqId | undefined;
   return (page.actions ?? []).map((action) => ({
-    trigger: action,
+    trigger: action.id,
     action: "navigate",
     reqRef,
   }));

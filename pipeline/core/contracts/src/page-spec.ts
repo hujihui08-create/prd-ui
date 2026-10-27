@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ReqId } from "./ids.js";
 import { PageIdSchema, type PageId } from "./page-id.js";
+import { ActionIdSchema, type ActionId } from "./action.js";
 
 export type Target = "web" | "mobile";
 
@@ -135,12 +136,14 @@ export interface PageSpec {
   /** Optional; carried for Phase 2 renderer/Figma consumers. */
   motion?: PageMotion;
   /** Allowed actions per business status, carried from the signed brief. */
-  businessStates?: Array<{ name: string; actions: string[]; note?: string }>;
+  businessStates?: Array<{ name: string; actions: ActionId[]; note?: string }>;
   /** New/reschedule modes for mobile form pages. */
   formModes?: Array<{
     name: "new" | "reschedule";
     label: string;
-    actions: string[];
+    actions: ActionId[];
+    /** Display labels parallel to `actions`; keeps copy out of the id. */
+    actionLabels?: string[];
     customerLocked?: boolean;
   }>;
   views?: Array<"calendar" | "list">;
@@ -227,7 +230,7 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
         z
           .object({
             name: z.string().min(1),
-            actions: z.array(z.string().min(1)),
+            actions: z.array(ActionIdSchema),
             note: z.string().min(1).optional(),
           })
           .strict()
@@ -239,7 +242,8 @@ export const PageSpecSchema: z.ZodType<PageSpec> = z
           .object({
             name: z.enum(["new", "reschedule"]),
             label: z.string().min(1),
-            actions: z.array(z.string().min(1)),
+            actions: z.array(ActionIdSchema),
+            actionLabels: z.array(z.string().min(1)).optional(),
             customerLocked: z.boolean().optional(),
           })
           .strict()

@@ -137,7 +137,7 @@
           "props": {
             "label": "确认已当面告知",
             "emphasis": "primary",
-            "action": "确认已当面告知"
+            "action": "treatment.confirm"
           },
           "id": "treatment-notice.action.confirm"
         }
@@ -185,7 +185,7 @@
     {
       "name": "未确认",
       "actions": [
-        "确认已当面告知"
+        "treatment.confirm"
       ],
       "note": "展示分块话术与确认按钮；notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮。"
     },

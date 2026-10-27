@@ -1377,7 +1377,7 @@ function renderInteractionScript(): string {
     for (const button of qsa("[data-action]")) {
       button.addEventListener("click", () => {
         const action = button.dataset.action;
-        if (action === "改期" && config.linkedRoutes.form) {
+        if (action === "appointment.reschedule" && config.linkedRoutes.form) {
           const recordKey = config.referenceId ?? config.pageId;
           const record = {
             customer: summaryValue("客户"),
@@ -1399,26 +1399,26 @@ function renderInteractionScript(): string {
               : "&recordId=" + encodeURIComponent(recordKey));
           return;
         }
-        if (action === "术后告知") {
+        if (action === "treatment.notice.view") {
           if (config.linkedRoutes.notice) location.href = config.linkedRoutes.notice;
           else showHint("当前切片没有告知页");
           return;
         }
-        if (action === "客户详情") {
+        if (action === "customer.view") {
           if (config.linkedRoutes.customer) location.href = config.linkedRoutes.customer;
           else showHint("当前切片没有客户详情页");
           return;
         }
-        if (action === "开单") {
+        if (action === "order.create") {
           showHint("开单流程不在本切片");
           return;
         }
-        if (action === "已到店确认" || action === "接单并确认到店") {
+        if (action === "appointment.check-in" || action === "appointment.accept") {
           status = (states.find((state) => state.name.indexOf("到店") >= 0) ?? states[1] ?? currentState())?.name ?? status;
-        } else if (action === "取消") {
+        } else if (action === "appointment.cancel") {
           if (!window.confirm("确认取消本单？")) return;
           status = (states.find((state) => state.name.indexOf("取消") >= 0) ?? states[states.length - 1])?.name ?? status;
-        } else if (action === "确认已当面告知") {
+        } else if (action === "treatment.confirm") {
           status = (states.find((state) => state.name.indexOf("已确认") >= 0) ?? states[states.length - 1])?.name ?? status;
         }
         apply();
@@ -1530,11 +1530,11 @@ function renderInteractionScript(): string {
       }
     }
     const customerPickerButton = document.querySelector(
-      '[data-field=customer] [data-action="选择客户"]'
+      '[data-field=customer] [data-action="customer.select"]'
     );
     const apply = () => {
       if (submit) {
-        submit.textContent = current.actions[0] ?? submit.textContent;
+        submit.textContent = current.actionLabels?.[0] ?? submit.textContent;
         submit.dataset.action = current.actions[0] ?? submit.dataset.action;
         if (current.name === "reschedule" && rescheduleRecord === null) {
           submit.disabled = true;
@@ -1597,7 +1597,7 @@ function renderInteractionScript(): string {
       if (empty) empty.hidden = query.length === 0 || visible > 0;
     };
     input.addEventListener("input", apply);
-    const clear = document.querySelector('[data-action="清空关键词"]');
+    const clear = document.querySelector('[data-action="search.clear"]');
     if (clear) {
       clear.addEventListener("click", () => {
         input.value = "";
@@ -1758,7 +1758,7 @@ function renderInteractionScript(): string {
       if (title) title.textContent = "选择客户";
     }
     if (pickerSearch && document.body.dataset.pageKind === "form") {
-      const button = document.querySelector('[data-action="选择客户"]');
+      const button = document.querySelector('[data-action="customer.select"]');
       if (button) {
         button.addEventListener("click", () => {
           const draft = {};
@@ -1869,7 +1869,7 @@ function renderInteractionScript(): string {
   }
 
   function applyFilterActions() {
-    for (const button of qsa('[data-action="清空筛选"]')) {
+    for (const button of qsa('[data-action="filter.clear"]')) {
       button.addEventListener("click", () => {
         location.href = location.pathname;
       });

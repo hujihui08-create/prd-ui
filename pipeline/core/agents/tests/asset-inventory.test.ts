@@ -5,7 +5,11 @@ import { employeeBrief } from "./fixtures.js";
 describe("standard asset inventory", () => {
   it("maps standard actions to A-library icon ids and dedupes", () => {
     const brief = structuredClone(employeeBrief);
-    brief.ia.pages[0]!.actions = ["新建预约", "搜索客户", "设置"];
+    brief.ia.pages[0]!.actions = [
+      { id: "appointment.create", label: "新建预约" },
+      { id: "customer.search", label: "搜索客户" },
+      { id: "settings.open", label: "设置" },
+    ];
     brief.ia.pages[0]!.content = {
       quickActions: [
         { label: "开单", icon: "plus" },

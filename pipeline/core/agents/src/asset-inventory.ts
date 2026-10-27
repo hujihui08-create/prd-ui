@@ -86,7 +86,7 @@ export function deriveStandardAssetInventory(
     if (archetypeIcon !== undefined) addIcon(icons, placeholders, archetypeIcon);
     for (const action of page.actions ?? []) {
       const hint = Object.entries(ACTION_HINTS).find(([token]) =>
-        action.includes(token)
+        action.label.includes(token)
       );
       if (hint !== undefined) addIcon(icons, placeholders, hint[1]);
     }

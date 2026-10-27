@@ -217,7 +217,7 @@ describe("interaction gate", () => {
     const spec: InteractionSpec = {
       pages: interaction.interactionSpec.pages.map((page) =>
         page.id === "today"
-          ? { ...page, triggers: page.triggers.filter((trigger) => trigger.action !== "开单") }
+          ? { ...page, triggers: page.triggers.filter((trigger) => trigger.action !== "order.create") }
           : page
       ),
     };

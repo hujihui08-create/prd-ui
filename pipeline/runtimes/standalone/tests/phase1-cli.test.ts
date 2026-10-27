@@ -335,7 +335,10 @@ describe("phase1 CLI", () => {
       reqRefs: ["REQ-ORDER-009"],
       fields: ["customerName", "phone", "email"],
       filterFields: ["name", "phone"],
-      actions: ["新建客户", "导出客户"],
+      actions: [
+        { id: "customer.create", label: "新建客户" },
+        { id: "customer.export", label: "导出客户" },
+      ],
       emptyTitle: "暂无客户",
     });
     brief.traceability.reqMap["REQ-ORDER-009"] = ["customers-list"];

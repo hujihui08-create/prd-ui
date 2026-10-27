@@ -147,7 +147,10 @@ const customersPage: UiBriefPage = {
   reqRefs: ["REQ-ORDER-009"],
   fields: ["customerName", "phone", "email"],
   filterFields: ["name", "phone"],
-  actions: ["新建客户", "导出客户"],
+  actions: [
+    { id: "customer.create", label: "新建客户" },
+    { id: "customer.export", label: "导出客户" },
+  ],
   emptyTitle: "暂无客户",
 };
 
@@ -171,7 +174,7 @@ const contactsPage: UiBriefPage = {
   reqRefs: ["REQ-CRM-001"],
   fields: ["name", "email", "phone"],
   filterFields: ["name", "email"],
-  actions: ["新建联系人"],
+  actions: [{ id: "customer.create", label: "新建联系人" }],
   emptyTitle: "暂无联系人",
   emptyAssetRef: "empty-contacts",
 };
@@ -440,7 +443,7 @@ describe("brief semantic validation", () => {
       (finding) => finding.ruleId === "SEMANTIC-ACTION"
     );
     expect(findings.map((finding) => finding.evidence).sort(), findingDetail(report)).toEqual(
-      ["新建客户", "导出客户"].sort()
+      ["customer.create", "customer.export"].sort()
     );
     expect(findings.every((finding) => finding.severity === "blocker")).toBe(true);
     expect(report.passed).toBe(false);
@@ -562,7 +565,7 @@ describe("brief semantic validation", () => {
       ...customersPage,
       fields: ["customer"],
       filterFields: [],
-      actions: ["导出"],
+      actions: [{ id: "customer.export-preview", label: "导出" }],
     };
 
     const report = validatePageSpec(
@@ -576,7 +579,9 @@ describe("brief semantic validation", () => {
       (finding) => finding.ruleId === "SEMANTIC-ACTION"
     );
     expect(fieldFindings.map((finding) => finding.evidence)).toEqual(["customer"]);
-    expect(actionFindings.map((finding) => finding.evidence)).toEqual(["导出"]);
+    expect(actionFindings.map((finding) => finding.evidence)).toEqual([
+      "customer.export-preview",
+    ]);
   });
 
   it("accepts a feed page whose brief emptyTitle is rendered", () => {
@@ -687,7 +692,7 @@ describe("structural semantic representations", () => {
       report.findings
         .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
         .map((finding) => finding.evidence)
-    ).toContain("搜索");
+    ).toContain("search.submit");
   });
 
   it("accepts form modes for alternate save actions", () => {
@@ -704,7 +709,7 @@ describe("structural semantic representations", () => {
       report.findings
         .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
         .map((finding) => finding.evidence)
-    ).toContain("保存改期");
+    ).toContain("form.reschedule");
   });
 
   it("accepts a CalendarGrid for date/time fields", () => {
@@ -730,7 +735,7 @@ describe("structural semantic representations", () => {
     const actions = report.findings
       .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
       .map((finding) => finding.evidence);
-    expect(actions, findingDetail(report)).toContain("术后告知");
+    expect(actions, findingDetail(report)).toContain("treatment.notice.view");
   });
 
   it("accepts list rows/views as the detail affordance", () => {
@@ -742,7 +747,7 @@ describe("structural semantic representations", () => {
     const actions = report.findings
       .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
       .map((finding) => finding.evidence);
-    expect(actions, findingDetail(report)).toContain("查看完整详情");
+    expect(actions, findingDetail(report)).toContain("appointment.view");
   });
 
   it("does not accept a bare Text node as an action representation", () => {
@@ -758,7 +763,7 @@ describe("structural semantic representations", () => {
       report.findings
         .filter((finding) => finding.ruleId === "SEMANTIC-ACTION")
         .map((finding) => finding.evidence)
-    ).toContain("搜索");
+    ).toContain("search.submit");
   });
 });
 

@@ -1,5 +1,11 @@
 import { z } from "zod";
 import { PageIdSchema, type PageId } from "./page-id.js";
+import {
+  ActionIdSchema,
+  ActionRefSchema,
+  type ActionId,
+  type ActionRef,
+} from "./action.js";
 
 export interface UiBriefPageContent {
   storeName?: string;
@@ -52,20 +58,24 @@ export interface UiBriefPage {
   fields?: string[];
   /** Display labels keyed by field id; defaults to the field id. */
   fieldLabels?: Record<string, string>;
-  actions?: string[];
+  actions?: ActionRef[];
+  /** Overflow trigger label; defaults to 更多 when overflow actions exist. */
+  overflowLabel?: string;
   filterFields?: string[];
   emptyTitle?: string;
   emptyAssetRef?: string;
   summaryTitle?: string;
   /** Per-project notice blocks for treatment/handoff detail pages. */
   noticeBlocks?: Array<{ title: string; items: string[] }>;
-  /** Allowed actions per business status; actions must be a subset of `actions`. */
-  businessStates?: Array<{ name: string; actions: string[]; note?: string }>;
+  /** Allowed actions per business status; ids must be a subset of `actions`. */
+  businessStates?: Array<{ name: string; actions: ActionId[]; note?: string }>;
   /** New/reschedule modes for mobile form pages. */
   formModes?: Array<{
     name: "new" | "reschedule";
     label: string;
-    actions: string[];
+    actions: ActionId[];
+    /** Display labels parallel to `actions`; keeps copy out of the id. */
+    actionLabels?: string[];
     customerLocked?: boolean;
   }>;
   /** Calendar/list views for two-dimensional mobile list pages. */
@@ -214,7 +224,8 @@ export const UiBriefPageSchema = z
     reqRefs: z.array(z.string().regex(/^REQ-[A-Z0-9]+-\d+$/)).min(1),
     fields: z.array(z.string().min(1)).optional(),
     fieldLabels: z.record(z.string().min(1), z.string().min(1)).optional(),
-    actions: z.array(z.string().min(1)).optional(),
+    actions: z.array(ActionRefSchema).optional(),
+    overflowLabel: z.string().min(1).optional(),
     filterFields: z.array(z.string().min(1)).optional(),
     emptyTitle: z.string().min(1).optional(),
     emptyAssetRef: z.string().min(1).optional(),
@@ -234,7 +245,7 @@ export const UiBriefPageSchema = z
         z
           .object({
             name: z.string().min(1),
-            actions: z.array(z.string().min(1)),
+            actions: z.array(ActionIdSchema),
             note: z.string().min(1).optional(),
           })
           .strict()
@@ -246,7 +257,8 @@ export const UiBriefPageSchema = z
           .object({
             name: z.enum(["new", "reschedule"]),
             label: z.string().min(1),
-            actions: z.array(z.string().min(1)),
+            actions: z.array(ActionIdSchema),
+            actionLabels: z.array(z.string().min(1)).optional(),
             customerLocked: z.boolean().optional(),
           })
           .strict()

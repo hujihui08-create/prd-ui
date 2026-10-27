@@ -138,7 +138,10 @@ export function buildInteractionPrompt(input: InteractionPromptInput): string {
     purpose: page.purpose,
     archetype: page.archetype,
     requiredStates: page.requiredStates,
-    actions: page.actions ?? [],
+    actions: (page.actions ?? []).map((action) => ({
+      id: action.id,
+      label: action.label,
+    })),
     fields: page.fields ?? [],
     filterFields: page.filterFields ?? [],
   }));
@@ -191,7 +194,7 @@ export function buildInteractionPrompt(input: InteractionPromptInput): string {
     "",
     "## Required coverage",
     "- Every page in the brief appears exactly once in interactionSpec.pages.",
-    "- Every action listed for a page appears in that page's triggers with a concrete reaction.",
+    "- Every action id listed for a page appears in that page's triggers with a concrete reaction; `trigger.action` must be the action id, not its label.",
     "- Every state named in the brief's requiredStates exists as a key in states.",
     "- default/loading/empty/error are always present; default must describe real content.",
     "- Every destructive action states its confirmation.",

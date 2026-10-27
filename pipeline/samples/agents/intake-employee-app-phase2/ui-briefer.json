@@ -140,7 +140,8 @@
               ],
               "appointmentsEmptyTitle": "今天没有预约",
               "callbacksEmptyTitle": "暂无待回访"
-            }
+            },
+            "actions": []
           },
           {
             "id": "customer-search",
@@ -177,8 +178,14 @@
               "store": "门店"
             },
             "actions": [
-              "搜索",
-              "查看详情"
+              {
+                "id": "search.submit",
+                "label": "搜索"
+              },
+              {
+                "id": "appointment.view",
+                "label": "查看详情"
+              }
             ],
             "filterFields": [
               "keyword"
@@ -251,10 +258,22 @@
               "serviceRecord": "服务记录"
             },
             "actions": [
-              "查看预约",
-              "新增预约",
-              "查看告知",
-              "回访登记"
+              {
+                "id": "appointment.view",
+                "label": "查看预约"
+              },
+              {
+                "id": "appointment.create",
+                "label": "新增预约"
+              },
+              {
+                "id": "treatment.notice.view",
+                "label": "查看告知"
+              },
+              {
+                "id": "customer.callback.create",
+                "label": "回访登记"
+              }
             ],
             "mockData": {
               "values": {
@@ -324,47 +343,68 @@
               "serviceCompleted": "服务完成"
             },
             "actions": [
-              "已到店确认",
-              "接单并确认到店",
-              "开单",
-              "改期",
-              "取消",
-              "术后告知",
-              "客户详情"
+              {
+                "id": "appointment.check-in",
+                "label": "已到店确认"
+              },
+              {
+                "id": "appointment.accept",
+                "label": "接单并确认到店"
+              },
+              {
+                "id": "order.create",
+                "label": "开单"
+              },
+              {
+                "id": "appointment.reschedule",
+                "label": "改期"
+              },
+              {
+                "id": "appointment.cancel",
+                "label": "取消"
+              },
+              {
+                "id": "treatment.notice.view",
+                "label": "术后告知"
+              },
+              {
+                "id": "customer.view",
+                "label": "客户详情"
+              }
             ],
             "businessStates": [
               {
                 "name": "已登记",
                 "actions": [
-                  "已到店确认",
-                  "接单并确认到店",
-                  "开单",
-                  "改期",
-                  "取消",
-                  "客户详情"
+                  "appointment.check-in",
+                  "appointment.accept",
+                  "order.create",
+                  "appointment.reschedule",
+                  "appointment.cancel",
+                  "customer.view"
                 ],
                 "note": "待分配时「已到店确认」文案为「接单并确认到店」；仅「已登记」可到店、改期、取消，由系统硬校验；「改期」入口需预约登记 + 客户查看。"
               },
               {
                 "name": "已到店",
                 "actions": [
-                  "开单",
-                  "术后告知",
-                  "客户详情"
+                  "order.create",
+                  "treatment.notice.view",
+                  "customer.view"
                 ],
                 "note": "底部保留开单；serviceCompleted=true 且告知快照存在时显示「术后告知」；改期与取消不出现。"
               },
               {
                 "name": "爽约",
                 "actions": [
-                  "客户详情"
+                  "customer.view"
                 ],
                 "note": "只读说明「爽约已记录入客户档案」；员工端不提供爽约入口；客户详情链接仅在可查看该客户时显示。"
               },
               {
                 "name": "已取消",
                 "actions": [
-                  "客户详情"
+                  "customer.view"
                 ],
                 "note": "只读说明「本单已取消」；底部操作栏消失；客户详情链接仅在可查看该客户时显示。"
               }
@@ -428,27 +468,43 @@
               "source": "来源"
             },
             "actions": [
-              "保存",
-              "保存改期",
-              "选择客户"
+              {
+                "id": "form.submit",
+                "label": "保存"
+              },
+              {
+                "id": "form.reschedule",
+                "label": "保存改期"
+              },
+              {
+                "id": "customer.select",
+                "label": "选择客户"
+              }
             ],
             "formModes": [
               {
                 "name": "new",
                 "label": "保存",
                 "actions": [
+                  "form.submit",
+                  "customer.select"
+                ],
+                "customerLocked": false,
+                "actionLabels": [
                   "保存",
                   "选择客户"
-                ],
-                "customerLocked": false
+                ]
               },
               {
                 "name": "reschedule",
                 "label": "保存改期",
                 "actions": [
-                  "保存改期"
+                  "form.reschedule"
                 ],
-                "customerLocked": true
+                "customerLocked": true,
+                "actionLabels": [
+                  "保存改期"
+                ]
               }
             ]
           },
@@ -495,7 +551,10 @@
               "confirmedAt": "确认时间"
             },
             "actions": [
-              "确认已当面告知"
+              {
+                "id": "treatment.confirm",
+                "label": "确认已当面告知"
+              }
             ],
             "noticeBlocks": [
               {
@@ -517,7 +576,7 @@
               {
                 "name": "未确认",
                 "actions": [
-                  "确认已当面告知"
+                  "treatment.confirm"
                 ],
                 "note": "展示分块话术与确认按钮；notices 与 noticeBlocks 皆空时进入只读空态，显示「暂无告知内容」且不显示确认按钮。"
               },
@@ -586,9 +645,18 @@
               "store": "门店"
             },
             "actions": [
-              "新增预约",
-              "切换日历/列表",
-              "查看完整详情"
+              {
+                "id": "appointment.create",
+                "label": "新增预约"
+              },
+              {
+                "id": "view.toggle",
+                "label": "切换日历/列表"
+              },
+              {
+                "id": "appointment.view",
+                "label": "查看完整详情"
+              }
             ],
             "filterFields": [
               "status",
@@ -681,8 +749,14 @@
               "result": "回访结果"
             },
             "actions": [
-              "保存回访",
-              "选择客户"
+              {
+                "id": "form.submit",
+                "label": "保存回访"
+              },
+              {
+                "id": "customer.select",
+                "label": "选择客户"
+              }
             ]
           }
         ],

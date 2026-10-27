@@ -5,17 +5,41 @@
     "sourcePrdHash": "sha256:employee-app-slice",
     "date": "2026-10-20",
     "profile": "b-mobile",
-    "platforms": ["mobile"]
+    "platforms": [
+      "mobile"
+    ]
   },
   "product": {
     "name": "员工端",
     "type": "b-end-mobile",
-    "goals": ["一线员工在手机完成接待、回访、库存查询"],
-    "users": ["美容师", "店长", "库管", "前台"],
-    "roles": ["store_manager", "beautician", "front_desk", "warehouse"],
-    "scope": ["今日", "库存查询"],
-    "nonGoals": ["开单", "调拨", "欠款还款", "预约日历"],
-    "successMetrics": ["能看清当天预约和库存预警"]
+    "goals": [
+      "一线员工在手机完成接待、回访、库存查询"
+    ],
+    "users": [
+      "美容师",
+      "店长",
+      "库管",
+      "前台"
+    ],
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk",
+      "warehouse"
+    ],
+    "scope": [
+      "今日",
+      "库存查询"
+    ],
+    "nonGoals": [
+      "开单",
+      "调拨",
+      "欠款还款",
+      "预约日历"
+    ],
+    "successMetrics": [
+      "能看清当天预约和库存预警"
+    ]
   },
   "ia": {
     "pages": [
@@ -27,16 +51,37 @@
         "target": "mobile",
         "profile": "b-mobile",
         "route": "/today",
-        "roles": ["store_manager", "beautician", "front_desk", "warehouse"],
-        "requiredStates": ["default", "empty", "loading", "error"],
-        "reqRefs": ["REQ-EMP-001"],
-        "actions": ["库存查询"],
+        "roles": [
+          "store_manager",
+          "beautician",
+          "front_desk",
+          "warehouse"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-EMP-001"
+        ],
+        "actions": [
+          {
+            "id": "inventory.query",
+            "label": "库存查询"
+          }
+        ],
         "emptyTitle": "今天没有预约",
         "content": {
           "storeName": "星光店",
           "hasMessage": false,
           "quickActions": [
-            { "label": "库存查询", "icon": "inventory", "tone": "inventory" }
+            {
+              "label": "库存查询",
+              "icon": "inventory",
+              "tone": "inventory"
+            }
           ],
           "appointments": [
             {
@@ -69,8 +114,16 @@
             }
           ],
           "callbacks": [
-            { "customer": "王女士", "item": "小气泡", "daysAgo": "3 天前" },
-            { "customer": "赵女士", "item": "补水", "daysAgo": "5 天前" }
+            {
+              "customer": "王女士",
+              "item": "小气泡",
+              "daysAgo": "3 天前"
+            },
+            {
+              "customer": "赵女士",
+              "item": "补水",
+              "daysAgo": "5 天前"
+            }
           ],
           "appointmentsEmptyTitle": "今天没有预约",
           "callbacksEmptyTitle": "暂无待回访"
@@ -84,11 +137,29 @@
         "target": "mobile",
         "profile": "b-mobile",
         "route": "/inventory",
-        "roles": ["store_manager", "warehouse", "beautician", "front_desk"],
-        "requiredStates": ["default", "empty", "loading", "error"],
-        "reqRefs": ["REQ-EMP-002"],
-        "fields": ["当前库存", "可用库存"],
-        "filterFields": ["产品分类", "仅看预警"],
+        "roles": [
+          "store_manager",
+          "warehouse",
+          "beautician",
+          "front_desk"
+        ],
+        "requiredStates": [
+          "default",
+          "empty",
+          "loading",
+          "error"
+        ],
+        "reqRefs": [
+          "REQ-EMP-002"
+        ],
+        "fields": [
+          "当前库存",
+          "可用库存"
+        ],
+        "filterFields": [
+          "产品分类",
+          "仅看预警"
+        ],
         "emptyTitle": "没有匹配的产品",
         "content": {
           "inventorySummary": "共 128 个产品",
@@ -99,9 +170,18 @@
               "badge": "低库存",
               "badgeTone": "warning",
               "attributes": [
-                { "label": "属性", "value": "耗材" },
-                { "label": "分类", "value": "面膜类" },
-                { "label": "单位", "value": "瓶" }
+                {
+                  "label": "属性",
+                  "value": "耗材"
+                },
+                {
+                  "label": "分类",
+                  "value": "面膜类"
+                },
+                {
+                  "label": "单位",
+                  "value": "瓶"
+                }
               ],
               "currentStock": "1 瓶 2 次",
               "availableStock": "1 瓶 2 次",
@@ -113,9 +193,18 @@
               "badge": "缺货",
               "badgeTone": "danger",
               "attributes": [
-                { "label": "属性", "value": "耗材" },
-                { "label": "分类", "value": "原液类" },
-                { "label": "单位", "value": "盒" }
+                {
+                  "label": "属性",
+                  "value": "耗材"
+                },
+                {
+                  "label": "分类",
+                  "value": "原液类"
+                },
+                {
+                  "label": "单位",
+                  "value": "盒"
+                }
               ],
               "currentStock": "0",
               "availableStock": "0"
@@ -124,9 +213,18 @@
               "name": "光子仪器",
               "spec": "（标准台）",
               "attributes": [
-                { "label": "属性", "value": "仪器" },
-                { "label": "分类", "value": "仪器类" },
-                { "label": "单位", "value": "台" }
+                {
+                  "label": "属性",
+                  "value": "仪器"
+                },
+                {
+                  "label": "分类",
+                  "value": "仪器类"
+                },
+                {
+                  "label": "单位",
+                  "value": "台"
+                }
               ],
               "currentStock": "3 台",
               "availableStock": "3 台"
@@ -135,9 +233,18 @@
               "name": "焕颜精华",
               "spec": "（30ml）",
               "attributes": [
-                { "label": "属性", "value": "零售" },
-                { "label": "分类", "value": "精华类" },
-                { "label": "单位", "value": "盒" }
+                {
+                  "label": "属性",
+                  "value": "零售"
+                },
+                {
+                  "label": "分类",
+                  "value": "精华类"
+                },
+                {
+                  "label": "单位",
+                  "value": "盒"
+                }
               ],
               "currentStock": "5 盒",
               "availableStock": "5 盒",
@@ -147,29 +254,50 @@
               "name": "舒缓面膜",
               "spec": "（25ml）",
               "attributes": [
-                { "label": "属性", "value": "耗材" },
-                { "label": "分类", "value": "面膜类" },
-                { "label": "单位", "value": "盒" }
+                {
+                  "label": "属性",
+                  "value": "耗材"
+                },
+                {
+                  "label": "分类",
+                  "value": "面膜类"
+                },
+                {
+                  "label": "单位",
+                  "value": "盒"
+                }
               ],
               "currentStock": "8 盒",
               "availableStock": "8 盒"
             }
           ]
-        }
+        },
+        "actions": []
       }
     ],
     "navigation": {
-      "primary": ["今日", "库存查询"],
-      "tabs": ["今日", "库存查询"]
+      "primary": [
+        "今日",
+        "库存查询"
+      ],
+      "tabs": [
+        "今日",
+        "库存查询"
+      ]
     },
     "flows": [
       {
         "id": "daily-workspace",
-        "steps": ["today", "inventory-query"]
+        "steps": [
+          "today",
+          "inventory-query"
+        ]
       },
       {
         "id": "warehouse-landing",
-        "steps": ["inventory-query"]
+        "steps": [
+          "inventory-query"
+        ]
       }
     ],
     "landingByRole": {
@@ -181,10 +309,23 @@
       {
         "name": "Product",
         "fields": [
-          { "name": "name", "type": "string", "required": true },
-          { "name": "spec", "type": "string" },
-          { "name": "currentStock", "type": "string" },
-          { "name": "availableStock", "type": "string" }
+          {
+            "name": "name",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "name": "currentStock",
+            "type": "string"
+          },
+          {
+            "name": "availableStock",
+            "type": "string"
+          }
         ]
       }
     ]
@@ -224,8 +365,12 @@
   ],
   "traceability": {
     "reqMap": {
-      "REQ-EMP-001": ["today"],
-      "REQ-EMP-002": ["inventory-query"]
+      "REQ-EMP-001": [
+        "today"
+      ],
+      "REQ-EMP-002": [
+        "inventory-query"
+      ]
     },
     "unmapped": []
   }

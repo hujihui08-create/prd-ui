@@ -33,7 +33,10 @@ export const employeeBrief: UiBrief = {
         roles: ["beautician"],
         requiredStates: ["default", "empty", "loading", "error"],
         reqRefs: ["REQ-EMP-001"],
-        actions: ["开单", "预约"],
+        actions: [
+          { id: "order.create", label: "开单" },
+          { id: "appointment.create", label: "预约" },
+        ],
       },
       {
         id: "inventory-query",
@@ -98,8 +101,8 @@ export const interactionOutput = {
         id: "today",
         transitions: [],
         triggers: [
-          { action: "开单", reaction: "打开开单流程" },
-          { action: "预约", reaction: "打开预约表单" },
+          { action: "order.create", reaction: "打开开单流程" },
+          { action: "appointment.create", reaction: "打开预约表单" },
         ],
         states: {
           default: ["预约列表"],

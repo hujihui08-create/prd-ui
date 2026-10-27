@@ -36,7 +36,7 @@ const interactionSpec: InteractionSpec = {
         { from: "today", to: "inventory-query", trigger: "点击库存查询" },
       ],
       triggers: [
-        { nodeId: "quick-inventory", action: "库存查询", reaction: "打开库存查询页" },
+        { nodeId: "quick-inventory", action: "inventory.query", reaction: "打开库存查询页" },
       ],
       states: {
         default: ["门店顶栏", "库存快捷操作"],
@@ -301,7 +301,7 @@ describe("spec:engineer CLI", () => {
     expect(today.interactions).toEqual(
       expect.arrayContaining([
         {
-          trigger: "库存查询",
+          trigger: "inventory.query",
           action: "打开库存查询页",
           nodeId: "quick-inventory",
           reqRef: "REQ-EMP-001",

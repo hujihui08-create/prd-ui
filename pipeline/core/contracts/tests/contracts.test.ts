@@ -195,18 +195,25 @@ describe("contracts", () => {
     const page = {
       ...minimalBrief.ia.pages[0]!,
       fields: ["status"],
-      actions: ["已到店确认", "开单", "取消"],
+      actions: [
+        { id: "appointment.check-in", label: "已到店确认" },
+        { id: "order.create", label: "开单" },
+        { id: "appointment.cancel", label: "取消" },
+      ],
       businessStates: [
-        { name: "已登记", actions: ["已到店确认", "开单", "取消"] },
-        { name: "已到店", actions: ["开单"] },
+        {
+          name: "已登记",
+          actions: ["appointment.check-in", "order.create", "appointment.cancel"],
+        },
+        { name: "已到店", actions: ["order.create"] },
         { name: "已取消", actions: [], note: "本单已取消" },
       ],
       formModes: [
-        { name: "new" as const, label: "新增预约", actions: ["保存"] },
+        { name: "new" as const, label: "新增预约", actions: ["form.submit"] },
         {
           name: "reschedule" as const,
           label: "改期",
-          actions: ["保存改期"],
+          actions: ["form.reschedule"],
           customerLocked: true,
         },
       ],
@@ -292,9 +299,14 @@ describe("contracts", () => {
   it("carries interaction metadata on a page spec", () => {
     const spec = {
       ...minimalPageSpec,
-      businessStates: [{ name: "已登记", actions: ["开单"] }],
+      businessStates: [{ name: "已登记", actions: ["order.create"] }],
       formModes: [
-        { name: "reschedule", label: "改期", actions: ["保存改期"], customerLocked: true },
+        {
+          name: "reschedule",
+          label: "改期",
+          actions: ["form.reschedule"],
+          customerLocked: true,
+        },
       ],
       views: ["calendar", "list"],
       defaultView: "calendar",
@@ -310,7 +322,7 @@ describe("contracts", () => {
       },
     };
     const parsed = PageSpecSchema.parse(spec);
-    expect(parsed.businessStates?.[0]?.actions).toEqual(["开单"]);
+    expect(parsed.businessStates?.[0]?.actions).toEqual(["order.create"]);
     expect(parsed.currentStatus).toBe("已登记");
     expect(parsed.linkedRoutes?.form).toBe("/appointments/form");
   });
@@ -550,5 +562,40 @@ describe("contracts", () => {
     expect(parsed.interactions[0]?.nodeId).toBe("quick-inventory");
     expect(parsed.motion?.bindings[0]?.preset).toBe("page-enter");
     expect(PageSpecSchema.parse(minimalPageSpec)).not.toHaveProperty("motion");
+  });
+});
+
+describe("action refs", () => {
+  it("accepts namespaced ids with labels", async () => {
+    const { ActionRefSchema } = await import("../src/index.js");
+    expect(
+      ActionRefSchema.safeParse({ id: "appointment.reschedule", label: "改期" }).success
+    ).toBe(true);
+    expect(
+      ActionRefSchema.safeParse({
+        id: "appointment.reschedule",
+        label: "调整时间",
+        placement: "footer",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rejects non-namespaced or non-ascii ids", async () => {
+    const { ActionRefSchema } = await import("../src/index.js");
+    expect(ActionRefSchema.safeParse({ id: "改期", label: "改期" }).success).toBe(false);
+    expect(ActionRefSchema.safeParse({ id: "Reschedule", label: "改期" }).success).toBe(false);
+    expect(ActionRefSchema.safeParse({ id: "appointment", label: "改期" }).success).toBe(false);
+  });
+
+  it("rejects legacy string actions in a brief", () => {
+    const page = {
+      ...minimalBrief.ia.pages[0]!,
+      actions: ["保存"],
+    };
+    const result = UiBriefSchema.safeParse({
+      ...minimalBrief,
+      ia: { ...minimalBrief.ia, pages: [page] },
+    });
+    expect(result.success).toBe(false);
   });
 });

@@ -42,7 +42,7 @@ describe("UI briefer prompt", () => {
     expect(prompt).toContain("formModes");
     expect(prompt).toContain("views");
     expect(prompt).toContain("searchIdleTitle");
-    expect(prompt).toContain("must be a subset of page.actions");
+    expect(prompt).toContain("must be an action id present in page.actions");
   });
 
   it("requires picker and calendar metadata", () => {

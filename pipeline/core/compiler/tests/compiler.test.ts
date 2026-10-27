@@ -143,7 +143,7 @@ describe("compileProject", () => {
     );
     expect(empty).toBeDefined();
     const actions = (empty!.children ?? []).map((node) => node.props?.action);
-    expect(actions).toEqual(["清空关键词"]);
+    expect(actions).toEqual(["search.clear"]);
   });
 
   it("defaults picker and calendar metadata for the signed phase2 brief", () => {
@@ -471,7 +471,7 @@ describe("brief-driven page content", () => {
         therapist: "护理师",
       },
       filterFields: ["status"],
-      actions: ["新增预约"],
+      actions: [{ id: "appointment.create", label: "新增预约" }],
       mockData: {
         rows: [
           {
@@ -539,7 +539,7 @@ describe("brief-driven page content", () => {
       reqRefs: ["REQ-ORDER-001"],
       fields: ["customer", "project", "source"],
       fieldLabels: { customer: "客户", project: "项目", source: "来源" },
-      actions: ["保存", "保存改期"],
+      actions: [{ id: "form.submit", label: "保存" }, { id: "form.reschedule", label: "保存改期" }],
     };
     const custom = structuredClone(brief);
     custom.ia.pages.push(page);
@@ -567,7 +567,7 @@ describe("brief-driven page content", () => {
       "选择",
       "保存",
     ]);
-    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("选择客户");
+    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("customer.select");
     expect(nodesOf(spec, "Text").map((node) => node.props?.text)).toContain("保存改期");
   });
 
@@ -638,7 +638,7 @@ describe("brief-driven page content", () => {
       fields: ["name", "phone", "store"],
       fieldLabels: { name: "姓名", phone: "手机号", store: "门店", keyword: "关键词" },
       filterFields: ["keyword"],
-      actions: ["新建客户"],
+      actions: [{ id: "customer.create", label: "新建客户" }],
       mockData: {
         rows: [{ name: "张女士", phone: "138****0000", store: "星光店" }],
       },
@@ -765,7 +765,7 @@ describe("brief-driven page content", () => {
         requiredStates: ["default", "loading", "error"],
         reqRefs: ["REQ-ORDER-001"],
         fields: ["name"],
-        actions: ["编辑客户", "导出客户"],
+        actions: [{ id: "customer.edit", label: "编辑客户" }, { id: "customer.export", label: "导出客户" }],
       },
       {
         id: "action-form",
@@ -779,7 +779,7 @@ describe("brief-driven page content", () => {
         requiredStates: ["default", "loading", "error", "disabled"],
         reqRefs: ["REQ-ORDER-001"],
         fields: ["name"],
-        actions: ["保存草稿", "提交"],
+        actions: [{ id: "form.save-draft", label: "保存草稿" }, { id: "form.submit", label: "提交" }],
       },
       {
         id: "action-settings",
@@ -793,7 +793,7 @@ describe("brief-driven page content", () => {
         requiredStates: ["default", "loading", "error"],
         reqRefs: ["REQ-ORDER-001"],
         fields: ["notifications"],
-        actions: ["保存", "重置"],
+        actions: [{ id: "form.submit", label: "保存" }, { id: "form.reset", label: "重置" }],
       },
       {
         id: "action-auth",
@@ -807,7 +807,7 @@ describe("brief-driven page content", () => {
         requiredStates: ["default", "loading", "error", "disabled"],
         reqRefs: ["REQ-ORDER-001"],
         fields: ["email", "password"],
-        actions: ["登录", "注册"],
+        actions: [{ id: "auth.login", label: "登录" }, { id: "auth.register", label: "注册" }],
       },
       {
         id: "action-onboarding",
@@ -820,7 +820,7 @@ describe("brief-driven page content", () => {
         roles: ["viewer"],
         requiredStates: ["default", "loading", "error"],
         reqRefs: ["REQ-ORDER-001"],
-        actions: ["开始", "稍后"],
+        actions: [{ id: "onboarding.start", label: "开始" }, { id: "onboarding.skip", label: "稍后" }],
       },
     ];
 
@@ -833,14 +833,14 @@ describe("brief-driven page content", () => {
       const spec = compiledById.get(page.id)!;
       const serialized = JSON.stringify(spec.layout);
       for (const action of page.actions ?? []) {
-        expect(serialized, `${page.id} layout`).toContain(action);
+        expect(serialized, `${page.id} layout`).toContain(action.id);
       }
       expect(
         nodesOf(spec, "Button")
           .map((node) => node.props?.label)
           .sort(),
         page.id
-      ).toEqual([...(page.actions ?? [])].sort());
+      ).toEqual((page.actions ?? []).map((action) => action.label).sort());
     }
   });
 
@@ -879,7 +879,7 @@ describe("brief-driven page content", () => {
       archetype: "mobile-form",
       route: "/appointments/form",
       fields: ["customer"],
-      actions: ["保存", "保存改期"],
+      actions: [{ id: "form.submit", label: "保存" }, { id: "form.reschedule", label: "保存改期" }],
     };
     const customerPage: UiBriefPage = {
       ...mobileBase,
@@ -889,7 +889,7 @@ describe("brief-driven page content", () => {
       archetype: "detail",
       route: "/customers/:id",
       fields: ["name"],
-      actions: ["查看预约"],
+      actions: [{ id: "appointment.view", label: "查看预约" }],
     };
     const noticePage: UiBriefPage = {
       ...mobileBase,
@@ -899,7 +899,7 @@ describe("brief-driven page content", () => {
       archetype: "detail",
       route: "/appointments/detail/:id/notice",
       fields: ["customer"],
-      actions: ["确认已当面告知"],
+      actions: [{ id: "treatment.confirm", label: "确认已当面告知" }],
       noticeBlocks: [{ title: "小气泡", items: ["注意防晒"] }],
     };
     const detailPage: UiBriefPage = {
@@ -911,10 +911,10 @@ describe("brief-driven page content", () => {
       route: "/appointments/detail/:id",
       fields: ["customer", "status"],
       fieldLabels: { customer: "客户", status: "状态" },
-      actions: ["已到店确认", "接单并确认到店", "开单", "改期", "取消", "术后告知", "客户详情"],
+      actions: [{ id: "appointment.check-in", label: "已到店确认" }, { id: "appointment.accept", label: "接单并确认到店" }, { id: "order.create", label: "开单" }, { id: "appointment.reschedule", label: "改期" }, { id: "appointment.cancel", label: "取消" }, { id: "treatment.notice.view", label: "术后告知" }, { id: "customer.view", label: "客户详情" }],
       businessStates: [
-        { name: "已登记", actions: ["已到店确认", "接单并确认到店", "开单", "改期", "取消"] },
-        { name: "已到店", actions: ["开单", "术后告知", "客户详情"] },
+        { name: "已登记", actions: ["appointment.check-in", "appointment.accept", "order.create", "appointment.reschedule", "appointment.cancel"] },
+        { name: "已到店", actions: ["order.create", "treatment.notice.view", "customer.view"] },
         { name: "爽约", actions: [], note: "爽约已记录入客户档案" },
         { name: "已取消", actions: [], note: "本单已取消" },
       ],
@@ -934,7 +934,11 @@ describe("brief-driven page content", () => {
       detail: "/appointments/detail/:id",
     });
     expect(nodesOf(spec, "Button").map((node) => node.props?.action)).toEqual(
-      expect.arrayContaining(["已到店确认", "开单", "取消"])
+      expect.arrayContaining([
+        "appointment.check-in",
+        "order.create",
+        "appointment.cancel",
+      ])
     );
     // customer and status arrive through the summary List, so the fields slot
     // keeps only the secondary actions.
@@ -955,7 +959,7 @@ describe("brief-driven page content", () => {
       archetype: "mobile-form",
       route: "/appointments/new",
       fields: ["customer"],
-      actions: ["保存", "保存改期"],
+      actions: [{ id: "form.submit", label: "保存" }, { id: "form.reschedule", label: "保存改期" }],
     };
     const formSpec = compileMobilePage(formPage);
     expect(formSpec.formModes?.map((mode) => mode.name)).toEqual(["new", "reschedule"]);
@@ -970,7 +974,7 @@ describe("brief-driven page content", () => {
       route: "/appointments",
       fields: ["time", "customer"],
       fieldLabels: { time: "时间段", customer: "客户" },
-      actions: ["新增预约", "切换日历/列表"],
+      actions: [{ id: "appointment.create", label: "新增预约" }, { id: "view.toggle", label: "切换日历/列表" }],
       mockData: { rows: [{ time: "10:00-11:00", customer: "张女士" }] },
     };
     const listSpec = compileMobilePage(listPage);
@@ -998,7 +1002,7 @@ describe("brief-driven page content", () => {
       fieldLabels: { name: "姓名", phone: "手机号", store: "门店" },
       filterFields: ["keyword"],
       searchIdleTitle: "输入姓名或脱敏手机号搜索客户",
-      actions: ["清空关键词"],
+      actions: [{ id: "search.clear", label: "清空关键词" }],
       mockData: { rows: [{ name: "张女士", phone: "138****0000", store: "星光店" }] },
     };
     const spec = compileMobilePage(page);
@@ -1011,7 +1015,7 @@ describe("brief-driven page content", () => {
     expect(
       emptyStates.find((node) => node.props?.emptyKind === "idle")?.props?.title
     ).toBe("输入姓名或脱敏手机号搜索客户");
-    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("清空关键词");
+    expect(nodesOf(spec, "Button")[0]?.props?.action).toBe("search.clear");
   });
 
   it("compiles a custom customers-list page with its own content", () => {
@@ -1028,7 +1032,7 @@ describe("brief-driven page content", () => {
       reqRefs: ["REQ-ORDER-009"],
       fields: ["customerName", "phone", "email"],
       filterFields: ["name", "phone"],
-      actions: ["新建客户", "导出客户"],
+      actions: [{ id: "customer.create", label: "新建客户" }, { id: "customer.export", label: "导出客户" }],
       emptyTitle: "暂无客户",
     };
 
@@ -1168,7 +1172,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       "datetime-local"
     );
     const pick = nodesOf(form, "Button").find(
-      (button) => button.props?.action === "选择客户"
+      (button) => button.props?.action === "customer.select"
     );
     expect(pick?.props?.label).toBe("选择");
     const customerField = nodesOf(form, "FormField").find(
@@ -1212,13 +1216,13 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
     expect(detail.referenceId).toBeUndefined();
     expect(form.referenceId).toBeUndefined();
     expect(nodesOf(detail, "Button").map((node) => node.props?.action)).not.toContain(
-      "接单并确认到店"
+      "appointment.accept"
     );
     expect(nodesOf(detail, "Button").map((node) => node.props?.action)).not.toContain(
-      "术后告知"
+      "treatment.notice.view"
     );
     expect(nodesOf(list, "Button").map((node) => node.props?.action)).not.toContain(
-      "查看完整详情"
+      "appointment.view"
     );
     expect(
       nodesOf(detail, "Text").map((node) => node.props?.text)
@@ -1237,7 +1241,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       (candidate) => candidate.meta.pageId === "appointment-detail"
     )!;
     expect(nodesOf(spec, "Button").map((node) => node.props?.action)).toContain(
-      "术后告知"
+      "treatment.notice.view"
     );
   });
 
@@ -1274,7 +1278,7 @@ describe("v0.4 picker, dates, and fidelity fixes", () => {
       reqRefs: ["REQ-CRM-001"],
       fields: ["name", "email", "phone"],
       filterFields: ["name", "email"],
-      actions: ["新建联系人"],
+      actions: [{ id: "customer.create", label: "新建联系人" }],
       emptyTitle: "暂无联系人",
       emptyAssetRef: "empty-contacts",
     };

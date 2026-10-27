@@ -136,8 +136,14 @@
           "createdAt"
         ],
         "actions": [
-          "新建订单",
-          "搜索"
+          {
+            "id": "order.create",
+            "label": "新建订单"
+          },
+          {
+            "id": "search.submit",
+            "label": "搜索"
+          }
         ],
         "filterFields": [
           "status",
@@ -213,8 +219,14 @@
           "createdAt"
         ],
         "actions": [
-          "编辑订单",
-          "返回列表"
+          {
+            "id": "order.edit",
+            "label": "编辑订单"
+          },
+          {
+            "id": "nav.back",
+            "label": "返回列表"
+          }
         ],
         "mockData": {
           "values": {
@@ -260,8 +272,14 @@
           "status"
         ],
         "actions": [
-          "保存",
-          "取消"
+          {
+            "id": "form.submit",
+            "label": "保存"
+          },
+          {
+            "id": "appointment.cancel",
+            "label": "取消"
+          }
         ],
         "fieldLabels": {
           "orderNo": "订单号",
@@ -296,7 +314,10 @@
           "timezone"
         ],
         "actions": [
-          "保存设置"
+          {
+            "id": "form.submit",
+            "label": "保存设置"
+          }
         ],
         "fieldLabels": {
           "notifications": "通知设置",
@@ -369,7 +390,10 @@
           "description"
         ],
         "actions": [
-          "立即购买"
+          {
+            "id": "purchase.create",
+            "label": "立即购买"
+          }
         ],
         "mockData": {
           "values": {
@@ -412,7 +436,10 @@
           "password"
         ],
         "actions": [
-          "登录"
+          {
+            "id": "auth.login",
+            "label": "登录"
+          }
         ],
         "fieldLabels": {
           "email": "邮箱",

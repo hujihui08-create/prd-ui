@@ -539,7 +539,7 @@ describe("runM1", () => {
           page.id === "today"
             ? {
                 ...page,
-                triggers: page.triggers.filter((trigger) => trigger.action !== "开单"),
+                triggers: page.triggers.filter((trigger) => trigger.action !== "order.create"),
               }
             : page
         ),
@@ -569,7 +569,7 @@ describe("runM1", () => {
           page.id === "today"
             ? {
                 ...page,
-                triggers: page.triggers.filter((trigger) => trigger.action !== "开单"),
+                triggers: page.triggers.filter((trigger) => trigger.action !== "order.create"),
               }
             : page
         ),
