@@ -58,7 +58,7 @@
 | 保存改期 | `form.reschedule` |
 | 保存回访 | `form.submit` |
 | 保存设置 | `form.submit` |
-| 切换我的排单/全店 | `view.toggle` |
+| 切换我的排单/全店 | `scope.toggle` |
 | 切换日历/列表 | `view.toggle` |
 | 取消 | `appointment.cancel` |
 | 回访登记 | `customer.callback.create` |

@@ -201,6 +201,8 @@ export interface UiBriefPage {
     name: "new" | "reschedule";
     label: string;
     actions: ActionId[];
+    /** Display labels parallel to `actions`; keeps copy out of the id. */
+    actionLabels?: string[];
     customerLocked?: boolean;
   }>;
 }
@@ -237,6 +239,8 @@ formModes?: Array<{ name: string; label: string; actions: ActionId[] }>;
 | `filter.clear` | 清空筛选 |
 | `search.clear` | 清空关键词 |
 | `view.toggle` | 切换日历/列表 |
+| `scope.toggle` | 切换「我的/全店」等范围 |
+| `form.cancel` | 取消表单 |
 
 规则：
 
@@ -289,8 +293,8 @@ brief gate 新增：
 - `ACTION_CAPABILITY_REQUIRED`（blocker）：页面结构要求某能力但缺少对应 id：
   - `mobile-form` 必须有 `form.submit`；
   - 声明 `views` 的列表必须有 `view.toggle`；
-  - 有 `customerPicker` 的表单必须有 `customer.select`；
-  - 有 `filterFields` 的列表必须有 `filter.clear`。
+  - 有 `customerPicker` 的表单必须有 `customer.select`。
+  `filter.clear` 不作为必需项：列表模板在空态里合成该按钮，签核 brief 不声明它。
 - `ACTION_CAPABILITY_MISMATCH`（warning）：同一能力 id 在同页出现两次（例如两个
   `form.submit`），提示人工确认。
 
@@ -308,11 +312,16 @@ brief gate 新增：
 
 #### A1.8 迁移
 
-- `UiBrief` schema 升 **major**（2.0）；旧 brief 明确拒绝，错误码
-  `BRIEF_SCHEMA_UNSUPPORTED`，不做 label→id 自动迁移（会伪造行为身份）。
-- 5 组 intake fixture 与 8 页 brief 全部重写为 `ActionRef[]`。
+- `UiBrief` schema 升 **major**（2.0）：`actions` 必须是 `{id,label}`，旧 string
+  actions 被 schema 拒绝；不做 label→id 自动迁移（会伪造行为身份）。
+- 迁移范围：5 个 `samples/projects/*/ui-brief.json`、4 个
+  `samples/agents/intake*/ui-briefer.json`、`samples/ui-brief.sample.json`。
+- 已签核产物里的 Page Spec（`figma/spec-source`、`spec-run-v07`）就地迁移
+  Button/businessStates/formModes 的 action 值；`handoff/` 包保持历史原样
+  （hash 已过期，不再作为签核输入）。
 - 8 页 brief 重新生成 → **brief hash 变化 → 重新签核**（IA 不变，只重签 brief）。
-- `PageSpec.meta.version` `0.1.0` → `0.2.0`。
+- `PageSpec.meta.version` 保持 `0.1.0`：当前没有真实 spec run 重生成；批次 3
+  用真实 run 重打包时再升 `0.2.0`。
 - 视觉不变（label 不变），因此 **不需要**重做 visual baseline；但 HTML 的
   `data-action` 值变化，交互测试要同步。
 
