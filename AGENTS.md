@@ -5,15 +5,15 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 ## Layout
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
-- **Branch topology:** `main` carries the v0.7 docs only. The v0.7 code (43 commits) is on `v0.7-visual-gates`, checked out clean at `.worktrees/v0.7` (gitignored) and **not merged**. Run v0.7+ commands there; `main`'s `pipeline/` has none of the v0.7 CLIs.
+- **Branch topology:** `main` carries the merged v0.7 code and docs (`v0.7.0` tag). The `v0.7-visual-gates` branch and `.worktrees/v0.7` are kept for history; do not develop there. v0.8 work happens on `main`.
 - `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `asset-compiler`, `agents`, `spec-engineer`, `intake`, `visual-review`, `figma`, `handoff`.
 - `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `render:measure`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `structure:check`, `structure:diff`, `block:verify`, `block:experiment`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `figma:conformance`, `figma:parity`, `figma:serve`, `figma:sign`, `handoff:pack`, `v07:smoke`, `studio:prepare`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
 - `pipeline/runtimes/figma` — Figma sandbox plugin (`src/plugin.ts` + `src/ui.html`), bundled to gitignored `dist/` with esbuild; manual Figma gate.
 - `pipeline/studio` — read-only Vite/React/Tailwind v4 + shadcn workbench; reads generated `public/studio-data.json` + copied HTML; never orchestrates.
 - `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). `pipeline/dsh/home/profiles/prd-ui-visual` — Visual Critic profile (vision provider, 65536 maxTokens; kept tools are `read`, `read_image`, `glob`, `grep`, `skill`, `working_directory`, and session-state tools; no write/edit/bash/workflow/subagent/web; see `pipeline/dsh/README.md`). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
-- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`), block fixtures (`agents/blocks`, v0.7 branch), plus Visual Critic fixtures (`agents/visual-critic`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
-- `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page exit evidence. On `main` it holds HTML/screenshots/asset review; on the v0.7 branch it also holds `figma/{spec-source,plans,readback,diff,parity,conformance,signoff,figma-files.json}`, `render/{metrics,structure}`, `blocks/`, `visual-review/`, `v07-smoke.json`, and the signed `handoff/` package.
+- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`), block fixtures (`agents/blocks`), plus Visual Critic fixtures (`agents/visual-critic`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
+- `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page exit evidence: HTML, screenshots, asset review, `figma/{spec-source,plans,readback,diff,parity,conformance,signoff,figma-files.json}`, `render/{metrics,structure}`, `blocks/`, `visual-review/`, `v07-smoke.json`, and the signed `handoff/` package.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
 - `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption; `pipeline/docs/prd-review-briefer.md` — PRD review, UI Brief, signoffs, resume, publish.
 - `README.md` and `CHANGELOG.md` — project overview and change record.
@@ -157,15 +157,14 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 
 ## Current state (v0.7 signed, 2026-10-27)
 
-**Where the work is:** `main` has only the v0.7 design/plan docs. The v0.7
-implementation is 43 commits on `v0.7-visual-gates`, checked out clean at
-`.worktrees/v0.7` and **not merged**. All results below were produced there;
-the v0.7 handoffs live there too and disappear from `main`'s tree until merge.
+**Where the work is:** `main` now carries the merged v0.7 code (merge commit,
+tag `v0.7.0`). `.worktrees/v0.7` is kept for history only; v0.8 work happens on
+`main`. The v0.7 handoffs and evidence are now in `main`'s tree.
 
-Verified in the worktree: `pnpm test` **987 passed** (87 files), `pnpm test:dsh`
-**4 passed** (3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma
-typecheck` clean and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0
-blockers across demo-orders, employee-app, 03-slice, and phase2.
+Verified on `main` after the merge: `pnpm test` **987 passed** (87 files),
+`pnpm test:dsh` **4 passed** (3 files), `pnpm typecheck` clean, `pnpm --dir
+runtimes/figma typecheck` clean and build OK. `phase1:verify` is 8 / 2 / 4 / 8
+pages with 0 blockers across demo-orders, employee-app, 03-slice, and phase2.
 
 v0.7 exit (signed by 胡冀徽 on 2026-10-27): `figma:conformance` **0 blocker / 0
 major / 233 checked** on fresh HTML; `render:measure` 8 pages with no overflow;
@@ -179,9 +178,10 @@ cluster 99–235); `figma:sign` (five hashes) and `visual:sign` recorded;
 `pipeline/artifacts/employee-app-phase2/handoff/` (114 files, `handoff.zip`
 sha256 `61b216bd…96eda1`, five gates passed, both signoffs inside).
 
-Next: merge `v0.7-visual-gates` locally, then v0.8 (real-project pilot + IA
-`actionPlacement` contract). RC v0.9; final v1.0. Latest handoffs (on the v0.7
-branch until merge): `docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
+Next: v0.8 batches 1–8 + v0.8.1 on `main` (see the debt spec and
+`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md`). RC v0.9;
+final v1.0. Latest handoffs:
+`docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
 `docs/handoffs/2026-10-26-v07-implementation-handoff.md` (the latter's §10 is
 the debt list).
 
