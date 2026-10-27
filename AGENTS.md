@@ -180,7 +180,8 @@ cluster 99–235); `figma:sign` (five hashes) and `visual:sign` recorded;
 sha256 `61b216bd…96eda1`, five gates passed, both signoffs inside).
 
 Next: v0.8 Batch 2 (end-to-end `actionId`), then batches 3–8 + v0.8.1. See
-`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md` and
+`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md`,
+`docs/superpowers/plans/2026-10-27-v08-debt-closure-batch2.md`, and
 `docs/handoffs/2026-10-27-v08-batch1.md`. RC v0.9; final v1.0. Latest v0.7
 handoffs: `docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
 `docs/handoffs/2026-10-26-v07-implementation-handoff.md` (the latter's §10 is
