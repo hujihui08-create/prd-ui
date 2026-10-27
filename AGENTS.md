@@ -5,14 +5,15 @@ This repository is a PRD → UI pipeline. The architecture is one core plus two 
 ## Layout
 
 - `pipeline/` — the pnpm workspace; all commands run from here. The repo root has no package manifest.
-- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `asset-compiler`, `agents`, `spec-engineer`, `intake`, `visual-review`, `figma`.
-- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `studio:prepare`).
+- **Branch topology:** `main` carries the v0.7 docs only. The v0.7 code (43 commits) is on `v0.7-visual-gates`, checked out clean at `.worktrees/v0.7` (gitignored) and **not merged**. Run v0.7+ commands there; `main`'s `pipeline/` has none of the v0.7 CLIs.
+- `pipeline/core/*` — runtime-neutral packages: `contracts`, `design-system`, `compiler`, `validators`, `renderer-html`, `orchestrator`, `asset-review`, `asset-compiler`, `agents`, `spec-engineer`, `intake`, `visual-review`, `figma`, `handoff`.
+- `pipeline/runtimes/standalone` — file-system and model adapters plus the CLIs (`phase1:verify`, `render:html`, `render:measure`, `asset:review`, `asset:compile`, `agent:run`, `agent:sign`, `spec:engineer`, `structure:check`, `structure:diff`, `block:verify`, `block:experiment`, `intake:run`, `visual:review`, `visual:baseline`, `visual:sign`, `figma:plan`, `figma:verify`, `figma:conformance`, `figma:parity`, `figma:serve`, `figma:sign`, `handoff:pack`, `v07:smoke`, `studio:prepare`).
 - `pipeline/runtimes/dsh` — dsh Cordis plugin/tools/headless adapter plus the M1 agent runner; bundles to `dist/plugin.js` with esbuild.
 - `pipeline/runtimes/figma` — Figma sandbox plugin (`src/plugin.ts` + `src/ui.html`), bundled to gitignored `dist/` with esbuild; manual Figma gate.
 - `pipeline/studio` — read-only Vite/React/Tailwind v4 + shadcn workbench; reads generated `public/studio-data.json` + copied HTML; never orchestrates.
 - `pipeline/dsh/home/profiles/prd-ui-assets` — project-local dsh profile for asset review. `pipeline/dsh/home/profiles/prd-ui-agents` — M1 profile (base/headless/pi-ai, no tool plugin, 32768 maxTokens). `pipeline/dsh/home/profiles/prd-ui-intake` — intake profile (same bundles, 65536 maxTokens for 8-page PRD review). `pipeline/dsh/home/profiles/prd-ui-visual` — Visual Critic profile (vision provider, 65536 maxTokens; kept tools are `read`, `read_image`, `glob`, `grep`, `skill`, `working_directory`, and session-state tools; no write/edit/bash/workflow/subagent/web; see `pipeline/dsh/README.md`). Profile definitions are versioned; `node_modules/`, sessions, attachments, and credentials are ignored. Never modify `~/.dsh`; `DSH_HOME` points here.
-- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), and intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`), plus Visual Critic fixtures (`agents/visual-critic`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
-- `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page Phase 2 exit HTML, screenshots, and asset review evidence.
+- `pipeline/samples/` — `employee-app` (2-page mobile slice), `projects/employee-app-appointments-03` (4-page real-PRD test slice from `03-预约与告知`), `projects/employee-app-phase2` (8-page Phase 2 exit slice from 00–04), `demo-crm`, `projects/demo-orders-intake` (8-page signed intake brief), M0 asset fixtures (`assets/m0`, `assets/m0-scenarios`), M1 agent fixtures (`agents/m1`), intake fixtures (`agents/intake`, `agents/intake-employee-app`, `agents/intake-appointments-03`, `agents/intake-employee-app-phase2`), block fixtures (`agents/blocks`, v0.7 branch), plus Visual Critic fixtures (`agents/visual-critic`). The 8-page sample acceptance project is `samples/project.demo-orders-intake.yaml`.
+- `pipeline/artifacts/employee-app/` — checked-in rendered HTML and screenshots. `pipeline/artifacts/employee-app-appointments-03/` — the 03 real-PRD slice's 4 HTML pages and Playwright screenshots. `pipeline/artifacts/employee-app-phase2/` — the 8-page exit evidence. On `main` it holds HTML/screenshots/asset review; on the v0.7 branch it also holds `figma/{spec-source,plans,readback,diff,parity,conformance,signoff,figma-files.json}`, `render/{metrics,structure}`, `blocks/`, `visual-review/`, `v07-smoke.json`, and the signed `handoff/` package.
 - `spike/` — historical Phase 0 Figma spike with its own pnpm workspace; read-only context, do not rewrite.
 - `pipeline/docs/asset-review-m0.md` — M0 asset-review usage; `pipeline/docs/agent-m1.md` — M1 agent-layer usage, artifacts, signoffs, exit codes; `pipeline/docs/spec-engineer-v0.md` — Page Spec consumption; `pipeline/docs/prd-review-briefer.md` — PRD review, UI Brief, signoffs, resume, publish.
 - `README.md` and `CHANGELOG.md` — project overview and change record.
@@ -58,6 +59,25 @@ pnpm studio:prepare --spec-run /tmp/spec-v05/run-2026-10-23T06-07-48-403Z --html
 pnpm studio:build
 pnpm studio:smoke --json
 
+# v0.7: plan↔HTML conformance, render metrics, structure, parity, smoke, handoff
+rm -rf /tmp/html-v07-final
+pnpm render:html --run artifacts/employee-app-phase2/figma/spec-source --out /tmp/html-v07-final
+pnpm figma:conformance --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --plans artifacts/employee-app-phase2/figma/plans --out artifacts/employee-app-phase2/figma/conformance
+pnpm render:measure --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --out artifacts/employee-app-phase2/render/metrics
+pnpm structure:check --spec-run artifacts/employee-app-phase2/figma/spec-source --metrics artifacts/employee-app-phase2/render/metrics/render-metrics.json --project samples/projects/employee-app-phase2/project.yaml --out artifacts/employee-app-phase2/render/structure
+pnpm structure:diff --before <spec-run> --after <spec-run> --out /tmp/structure-diff.json
+pnpm block:verify --spec-run <spec-run> --json
+pnpm block:experiment --project samples/projects/employee-app-phase2/project.yaml --baseline artifacts/employee-app-phase2/figma/spec-source --pages today,appointment-list --fixtures samples/agents/blocks --runs /tmp/block-experiment
+# parity needs real Figma PNGs (<figma>/parity/figma.<page>.png) + a signed baseline
+pnpm figma:parity --figma artifacts/employee-app-phase2/figma/parity --baseline baselines/employee-app-phase2 --spec-run artifacts/employee-app-phase2/figma/spec-source --out artifacts/employee-app-phase2/figma/parity
+# one smoke runs conformance → render:measure → structure:check → figma:parity (stops at the first failure)
+pnpm v07:smoke --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --project samples/projects/employee-app-phase2/project.yaml --figma artifacts/employee-app-phase2/figma --baseline baselines/employee-app-phase2 --out artifacts/employee-app-phase2 --json
+# manual Figma gate: serve plans, build in the plugin, then verify/parity/sign
+pnpm figma:serve --figma artifacts/employee-app-phase2/figma --port 9600
+pnpm figma:verify --plan artifacts/employee-app-phase2/figma/plans/figma-plan.<page>.json --readback artifacts/employee-app-phase2/figma/readback/figma-readback.<page>.json --out artifacts/employee-app-phase2/figma/diff/figma-diff.<page>.json
+pnpm figma:sign --figma artifacts/employee-app-phase2/figma --baseline baselines/employee-app-phase2 --signoff-figma /tmp/signoff-figma.md
+pnpm handoff:pack --spec-run artifacts/employee-app-phase2/figma/spec-source --html /tmp/html-v07-final --figma artifacts/employee-app-phase2/figma --visual-run artifacts/employee-app-phase2/visual-review --assets artifacts/employee-app-phase2/asset-compiler/phase2 --baseline baselines/employee-app-phase2 --out artifacts/employee-app-phase2/handoff --zip
+
 # Real dsh: export .env first; the CLI does not auto-load it.
 set -a; . ./.env; set +a
 DSH_HOME="$PWD/dsh/home" pnpm asset:review --project samples/projects/employee-app/project.yaml --assets samples/assets/m0 --runtime dsh --runs /tmp/m0-runs-dsh
@@ -93,49 +113,131 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   waivers only apply to `VISUAL_CRITIC_BLOCKER`.
 - `pnpm test:dsh` fails with an install hint if the pinned dsh binary is
   missing; only `SKIP_DSH=1` skips it.
+- `figma:conformance` compares each committed plan against the **rendered** HTML
+  (Playwright computed styles) and exits 1 on blockers, 2 on infrastructure
+  errors. It needs fresh HTML: `artifacts/employee-app-phase2/html` predates the
+  v0.5.x colour tokens and the v0.7 `data-node-id` coverage, so re-render into
+  `/tmp` first.
+- `render:measure` writes `render-metrics.json`; `structure:check` consumes it
+  and **requires `--project`** (project overrides live in the YAML). Measured
+  structure findings are warnings in v0.7; the CLI only exits 1 on a blocker.
+- `figma:parity` needs real `<figma>/parity/figma.<pageId>.png` files plus a
+  signed baseline (`manifest.json`); it never updates the baseline. A committed
+  `<out>/parity.config.json` pins thresholds for later runs; explicit flags still
+  override them. Calibrated cross-renderer thresholds are pixel ≤2%, SSIM ≥0.92,
+  cluster ≤250 (not the stricter defaults).
+- `v07:smoke` runs conformance → render:measure → structure:check →
+  figma:parity (only with both `--figma` and `--baseline` and every Figma PNG
+  present) and stops at the first failure; it writes `<out>/v07-smoke.json` and
+  prints one JSON summary line. A skipped parity sets `paritySkipped: true` and
+  `complete: false` — a skip is never a full pass. It does **not** run
+  `figma:verify`, which needs manual Figma readbacks.
+- `figma:serve` serves plans and accepts readback/PNG saves from the plugin.
+  Scratch readbacks save to `readback/`, delivery builds to `readback/delivery/`,
+  and the exported PNG to `parity/figma.<page>.png`. `figma:sign` binds five
+  evidence hashes, **re-derives every stored diff from the current plan +
+  readback** (`FIGMA_DIFF_STALE`), and re-hashes the parity PNG + baseline PNG
+  (`PARITY_HASH_STALE`). A stored `passed: true` is never trusted on its own.
+- `handoff:pack` is fail-closed: it re-derives Figma diffs, re-hashes parity
+  inputs, checks conformance + visual signoffs, the signed baseline, the
+  spec-engineer gate, assets/licenses, and placeholders before staging; a failure
+  leaves no output directory. It requires `render/metrics/render-metrics.json`
+  (or `--metrics`), binds supplied HTML/Page Spec bytes to the conformance and
+  visual inputs, and uses `figma/parity/figma.<page>.png` for
+  `screenshots/figma/` (legacy manual crops go to `screenshots/figma-manual/`
+  with a known-gap note).
+- `block:verify` verifies `artifacts/block-manifest/<pageId>.json` (round-trip +
+  allowedComponents/requiredStates); `block:experiment` is the block-generation
+  pilot (`--fixtures` is the deterministic free path, `--runtime dsh` the real
+  one). Promotion requires measured `contentHeight` **and** `documentHeight`
+  deltas ≤5%, Phase 1 0 blockers, token drift ≤ baseline, conformance, and
+  parity; without `--figma` + `--figma-baseline` it can only return
+  `insufficient_evidence`.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-## Current state (v0.6 gate evidence complete, human signoff pending, 2026-10-26)
+## Current state (v0.7 signed, 2026-10-27)
 
-Verified: `pnpm test` 704 passed, `pnpm test:dsh` 4 passed, `pnpm typecheck`
-clean. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
-demo-orders, employee-app, 03-slice, and phase2 projects.
+**Where the work is:** `main` has only the v0.7 design/plan docs. The v0.7
+implementation is 43 commits on `v0.7-visual-gates`, checked out clean at
+`.worktrees/v0.7` and **not merged**. All results below were produced there;
+the v0.7 handoffs live there too and disappear from `main`'s tree until merge.
 
-v0.5 remains the last signed milestone. v0.6 Phase 3A is implemented in the
-automatable parts: `core/figma` plan compiler + readback diff, `runtimes/figma`
-plugin/UI/bundle, `core/asset-compiler` + `asset:compile`, and a read-only
-Studio (`studio/`, shadcn/Tailwind). `figma:plan` generates 8 plans; M0 assets
-package 13/13 and phase2 frozen icons 4/4.
+Verified in the worktree: `pnpm test` **987 passed** (87 files), `pnpm test:dsh`
+**4 passed** (3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma
+typecheck` clean and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0
+blockers across demo-orders, employee-app, 03-slice, and phase2.
 
-The real Figma gate ran on 2026-10-26: 8/8 scratch pages and 8/8 delivery pages
-built in Figma desktop, all `figma:verify` runs **passed (0 blocker / 0 major /
-0 findings)** with 16 `errors: []` readbacks. A second fidelity pass aligned
-buttons (incl. a `ghost-chip` variant), row dividers, tab labels/icons, input
-styles, select values, empty states and the calendar against the HTML
-baselines. Durable evidence lives in
-`pipeline/artifacts/employee-app-phase2/figma/` (`spec-source/`, `plans/`,
-`readback/{,delivery}/`, `diff/{,delivery}/`, `screenshots/`, `README.md`);
-Figma files are scratch `iL99qSPGhmh08BB9LketgF` and delivery
-`ne1JYKpfjDivRr0nK5jm4S` (Drafts). The gate exposed and fixed six real bugs
-(dynamic-page mainComponent, instance children, variable-paint opacity, dropped
-summary/fields slots, search rows, view-panel padding); `pnpm studio:smoke` is
-the headless Studio gate. v0.6 still needs the **human** side-by-side visual check
-and signoff, so it is **not signed** and cannot be `passed`.
+v0.7 exit (signed by 胡冀徽 on 2026-10-27): `figma:conformance` **0 blocker / 0
+major / 233 checked** on fresh HTML; `render:measure` 8 pages with no overflow;
+`structure:check --project` 0 warnings / 0 blockers; delivery `figma:verify`
+**8/8 passed** in `fileKey Ccy4HCkRVOVM70LDeyi4ZP` (0 blocker; appointment-list
+1 major within threshold); visual baseline regenerated (24 cases / 8 default),
+Visual Critic **0 blocker / 0 major / 3 minor** (¥0.4406); `figma:parity` **8/8**
+with calibrated thresholds (measured pixel 0.338–1.698%, SSIM 0.9306–0.9884,
+cluster 99–235); `figma:sign` (five hashes) and `visual:sign` recorded;
+`v07:smoke` `complete: true`; `handoff:pack` produced
+`pipeline/artifacts/employee-app-phase2/handoff/` (114 files, `handoff.zip`
+sha256 `61b216bd…96eda1`, five gates passed, both signoffs inside).
 
-v0.5.x debt cleanup landed on 2026-10-26: disabled datetime container, loading
-selected-column skeleton, and `YYYY-MM-DD HH:mm` confirmed time; the Sunday
-column tint was not reproducible and needed no code change. **The v0.5 visual
-baseline is stale after those CSS changes**; the next visual gate must regenerate
-and re-sign it.
+Next: merge `v0.7-visual-gates` locally, then v0.8 (real-project pilot + IA
+`actionPlacement` contract). RC v0.9; final v1.0. Latest handoffs (on the v0.7
+branch until merge): `docs/handoffs/2026-10-26-v07-final-review-fixes.md` and
+`docs/handoffs/2026-10-26-v07-implementation-handoff.md` (the latter's §10 is
+the debt list).
 
-Next: run the manual Figma checklist in
-`pipeline/artifacts/employee-app-phase2/figma/README.md`, sign v0.6, then start
-v0.7 (sandbox/Test Subagent/Handoff). Phase 4 pilot is v0.8; RC v0.9; final v1.0.
-Handoff: `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (latest);
-`docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` (v0.5.x/v0.6.x debt);
-`docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` (overall session
-state); v0.6 details in
-`docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md`.
+## Technical debt (v0.8 backlog, as of 2026-10-27)
+
+> Design spec with the D1–D16 contract/acceptance details and the 2026-10-27
+> decisions: `docs/superpowers/specs/2026-10-27-v08-debt-closure-design.md`
+> (on `main`).
+
+- **Action contract (D2, highest priority):** the brief has no action identity
+  or placement. v0.8 replaces `actions: string[]` with `ActionRef[]`
+  (`id`/`label`/`placement`) **end-to-end** — compiler `Button.action`, HTML
+  `data-action`, inline JS dispatch, and gates — so label renames stop changing
+  behavior. It also adds an `ActionMenu` for overflow and moves `detail`'s
+  secondary actions from the `fields` filter-row to summary `card-actions`.
+  Old briefs are rejected (schema major), and the 8-page brief is regenerated
+  and re-signed.
+- **Figma state frames (D16):** Figma carries only the default state. v0.8
+  builds multi-state plans (`figma-plan.<page>.<variant>.json`), per-variant
+  conformance/verify/parity, and pilots `today`; the 8-page 24-case rollout is
+  v0.8.1.
+- **Block generation:** the pilot concluded `rollback` at ¥0.3302, but it ran
+  before the conformance remediation (baseline was then 19 / 708 blockers).
+  Re-run `block:experiment` before treating that as final. Open issues:
+  `requiredStates` semantics, preserving baseline node ids, conformance cost of
+  new nodes.
+- **Unmapped component types:** the `employee-app` sample's `inventory-query`
+  uses `Switch` + `InventoryCard`; they exist in the compiler and validators but
+  the renderer branches omit `data-node-id` and the plan renders empty frames,
+  so conformance reports 6 `CONFORMANCE_NODE_MISSING`. Decision: complete both
+  mappings (renderer id + Figma styles) in v0.8; genuinely unknown types are
+  rejected in Phase 1.
+- **Renderer/compiler pairing rule:** `checked` counts depend on renderer
+  `data-node-id`. Adding a component type requires updating all five touchpoints
+  (contract, catalogs, renderer, plan compiler/coverage, plugin/tests).
+- **Parity thresholds:** the single 2% / 0.92 / 250 bound is 5× looser than the
+  best page's measured score. v0.8 switches to per-case thresholds =
+  measured + margin, capped at the current global values (tighten only), with
+  `measured` and `baselineHash` recorded in `parity.config.json` and the config
+  hash bound into signoff.
+- **Visual Critic minors (v0.7.x):** appointment-list calendar block density /
+  repeated times; appointment-form 选择 lacks ghost-button chrome; today's
+  callback row lacks a chevron.
+- **`figma/spec-source` is not a full spec run:** it has `artifacts/page-spec`
+  but no `findings/spec-engineer-gate.json`. `spec-run-v07` is a real run whose
+  8 page specs are byte-identical; v0.8 repacks from it and records `specRun`
+  in the handoff manifest.
+- **Handoff known gaps** (recorded in `handoff.manifest.json`): v0.8 closes
+  delivery readback/diff, the Material Symbols font subset, the manual v0.6
+  crops, and block manifests; state frames are D16; no `.fig` binary is a
+  permanent gap (fileKey only).
+- **v0.6.x leftovers:** full component library and the Material Symbols vector
+  set were deferred to v0.9/v1.0 (the font subset lands in v0.8); readback
+  orchestration folds into the smoke step.
+- **`v07:smoke` excludes `figma:verify`** today; v0.8 adds it as a fifth step
+  (headless on committed readbacks), so `complete` requires verify.
 
 ## Architecture boundaries
 
@@ -154,8 +256,10 @@ state); v0.6 details in
   human signoffs. `DshAgentRunner` owns one model call plus one schema repair.
 - New runtime-neutral behavior belongs in `core/`; file-system, model, and
   process wiring belongs in `runtimes/`.
-- `core/figma` consumes `contracts` + `design-system`; `core/asset-compiler`
-  consumes `contracts`; `studio` is an independent read-only app.
+- `core/figma` consumes `contracts` + `design-system`; `core/asset-compiler` and
+  `core/handoff` consume `contracts`; `studio` is an independent read-only app.
+  `core/` must not import Playwright, pngjs, pixelmatch, fflate, or `node:fs` —
+  browser/PNG/zip/filesystem work belongs to `runtimes/standalone`.
 - `runtimes/dsh` and `runtimes/figma` build `dist/` with esbuild; the other
   packages are consumed as TypeScript source via tsx/vitest.
 - SVG→PNG rendering lives in `runtimes/standalone`; `@resvg/resvg-js` must not
@@ -214,11 +318,16 @@ state); v0.6 details in
 - `docs/superpowers/specs/2026-10-22-v04-motion-visual-regression-design.md` — motion presets, semantic node ids, visual review/gates/cache, picker/date.
 - `docs/superpowers/specs/2026-10-23-v041-visual-patch-design.md` — v0.4.1 signed patch: today CTA, 7-column week, inline error, datetime display, reschedule storage.
 - `docs/superpowers/specs/2026-10-23-v05-visual-a11y-closure-design.md` — v0.5 signed: loading/empty/mode/a11y/critic stop rule.
-- `docs/superpowers/specs/2026-10-23-v06-figma-studio-asset-compiler-design.md` — v0.6 implemented (automatable parts): Figma plan/plugin/readback diff, Asset Compiler, read-only Studio; Figma gate pending.
+- `docs/superpowers/specs/2026-10-23-v06-figma-studio-asset-compiler-design.md` — v0.6 Figma plan/plugin/readback diff, Asset Compiler, read-only Studio (implemented and signed as part of the v0.6/v0.7 chain).
 - `docs/superpowers/specs/2026-10-26-v07-visual-gates-structure-block-input.md` — v0.7 design input: fail-closed mapping, project-agnostic conformance/parity gates, structure lint, block generation experiment.
+- `docs/superpowers/plans/2026-10-26-v07-visual-gates-structure-handoff.md` — v0.7 implementation plan (gates, structure, blocks, handoff).
+- `docs/superpowers/specs/2026-10-27-v08-debt-closure-design.md` — v0.8 design input: D1–D16 debt contracts, the 2026-10-27 decisions (end-to-end actionId, ActionMenu, multi-state, per-case parity), batches, and v0.8/v0.8.1 exit criteria (on `main`).
 - `docs/superpowers/plans/2026-10-23-v06-figma-studio-asset-compiler.md` — v0.6 implementation plan (Figma, Asset Compiler, Studio).
 - `docs/superpowers/plans/2026-10-21-phase-2-remaining-work.md` — remaining Phase 2 work (briefer data, M1 profiles, assets, real PRD, motion, visual diff).
-- `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — latest: v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke`, stale baseline caveat.
+- `docs/handoffs/2026-10-26-v07-final-review-fixes.md` — v0.7 final review fixes (stale diff recompute, parity hashes, contentHeight gate, handoff input binding, block C4, structure diff). On the `v0.7-visual-gates` branch / worktree.
+- `docs/handoffs/2026-10-26-v07-implementation-handoff.md` — v0.7 gates/smoke/evidence, conformance 0/0, parity calibration, **§10 debt list**, manual Figma checklist. On the `v0.7-visual-gates` branch / worktree.
+- `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` — v0.6 Figma gate evidence and fidelity pass (historical; its readbacks predate the v0.7 plans).
+- `docs/handoffs/2026-10-26-v05x-v06x-debt-cleanup.md` — v0.5.x fixes, Sunday-tint recheck, Studio `studio:smoke` (historical: the stale-baseline caveat it records is resolved — v0.7 regenerated and signed the baseline).
 - `docs/handoffs/2026-10-26-v041-v05-v06-session-handoff.md` — overall session handoff (v0.4.1/v0.5 signed, v0.6 Figma gate blocked, worktree/next steps).
 - `docs/handoffs/2026-10-25-v06-phase3a-progress-handoff.md` — detailed v0.6 progress handoff (Figma gate pending, 688 tests at Phase 3A, Studio/Asset evidence).
 - `docs/handoffs/2026-10-23-v05-visual-a11y-closure-handoff.md` — v0.5 signed handoff (loading/empty/mode/a11y/stop rule, v0.5.x minors).
