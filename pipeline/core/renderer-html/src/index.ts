@@ -578,8 +578,10 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
   <h2 class="feed-title">${esc(props.title)}</h2>
   <p class="feed-body">${esc(props.body)}</p>
 </article>`;
-    case "Image":
-      return `<div class="image-placeholder"><span class="material-symbols-rounded">image</span><span>${esc(props.assetRef ?? "image")}</span></div>`;
+    case "Image": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<div class="image-placeholder"${motion.attrs}${inlineStyle("", motion.style)}><span class="material-symbols-rounded">image</span><span>${esc(props.assetRef ?? "image")}</span></div>`;
+    }
     case "Section": {
       const padding = str(props.padding);
       const gap = str(props.gap);
@@ -627,8 +629,10 @@ function renderNode(node: SpecNode, profile: Profile, depth = 0): string {
       const motion = motionAttrs(node, renderMotionContext);
       return `<span class="${typoClass(node.textRole)}"${motion.attrs}${inlineStyle("", motion.style)}>${esc(props.text)}</span>`;
     }
-    case "Icon":
-      return `<span class="material-symbols-rounded icon" aria-hidden="true">${iconName(str(props.name))}</span>`;
+    case "Icon": {
+      const motion = motionAttrs(node, renderMotionContext);
+      return `<span class="material-symbols-rounded icon" aria-hidden="true"${motion.attrs}${inlineStyle("", motion.style)}>${iconName(str(props.name))}</span>`;
+    }
     case "QuickAction": {
       const label = str(props.label);
       const icon = str(props.icon);

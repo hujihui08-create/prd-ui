@@ -169,6 +169,10 @@ export function buildCoverage(spec: PageSpec, plan: FigmaPlan): FigmaCoverage {
       nodes.push({ specId: node.id!, specType: node.type, path, status: "unmapped", reason });
       return;
     }
+    if (reason?.startsWith("PARTIAL_MAPPING")) {
+      nodes.push({ specId: node.id!, specType: node.type, path, status: "skipped", reason });
+      return;
+    }
     if (reason) {
       nodes.push({ specId: node.id!, specType: node.type, path, status: "degraded", reason });
       return;

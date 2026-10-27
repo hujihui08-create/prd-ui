@@ -115,3 +115,24 @@ describe("inventory component coverage", () => {
     expect(degraded).toEqual([]);
   });
 });
+
+describe("partial component coverage", () => {
+  it("marks known-partial types as skipped with a reason", () => {
+    const today = structuredClone(
+      specs.find((spec) => spec.meta.pageId === "today")!
+    );
+    const section = today.layout.slots!.content![0]!;
+    section.children = [
+      ...(section.children ?? []),
+      { id: "today.stat", type: "Stat", props: { label: "今日预约", value: "6" } },
+    ];
+    const plan = compileFigmaPlans(
+      [today],
+      (page) => getProfile(page.meta.profile),
+      (page) => getCatalog(page.meta.profile)
+    )[0]!;
+    const entry = plan.coverage!.nodes.find((node) => node.specId === "today.stat");
+    expect(entry?.status).toBe("skipped");
+    expect(entry?.reason).toBe("PARTIAL_MAPPING:Stat");
+  });
+});

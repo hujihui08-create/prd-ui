@@ -322,6 +322,14 @@ function renderNode(
         fill: colorToken("surface.subtle"),
         radius: radiusPx(ctx.profile, "lg"),
       });
+    case "Icon":
+      return glyph(
+        specId,
+        "Icon",
+        str(props.name) || "circle",
+        24,
+        colorToken("text.secondary")
+      );
     default: {
       // Fail closed: a type the compiler does not know is never silently a plain
       // frame. Known-but-unmapped types keep their generic frame but degrade.
