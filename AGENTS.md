@@ -161,7 +161,7 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
 tag `v0.7.0`). `.worktrees/v0.7` is kept for history only; v0.8 work happens on
 `main`. The v0.7 handoffs and evidence are now in `main`'s tree.
 
-Verified on `main`: `pnpm test` **997 passed** (88 files, after v0.8 Batch 2),
+Verified on `main`: `pnpm test` **1008 passed** (90 files, after v0.8 Batch 3),
 `pnpm test:dsh` **4 passed** (3 files), `pnpm typecheck` clean, `pnpm --dir
 runtimes/figma typecheck` clean and build OK. `phase1:verify` is 8 / 2 / 4 / 8
 pages with 0 blockers across demo-orders, employee-app, 03-slice, and phase2.
@@ -179,8 +179,8 @@ cluster 99–235); `figma:sign` (five hashes) and `visual:sign` recorded;
 `pipeline/artifacts/employee-app-phase2/handoff/` (114 files, `handoff.zip`
 sha256 `61b216bd…96eda1`, five gates passed, both signoffs inside).
 
-Next: v0.8 Batch 3 (placement + `ActionMenu` + baseline re-sign), then batches
-4–8 + v0.8.1. See
+Next: v0.8 Batch 3 human gates (visual baseline + critic + sign, Figma rebuild +
+verify/parity/sign), then batches 4–8 + v0.8.1. See
 `docs/superpowers/plans/2026-10-27-v08-debt-closure-batch0-1.md`,
 `docs/superpowers/plans/2026-10-27-v08-debt-closure-batch2.md`,
 `docs/superpowers/plans/2026-10-27-v08-debt-closure-batch3.md`,
@@ -200,8 +200,13 @@ the debt list).
   (`id`/`label`/`placement`); behavior dispatches on capability ids
   (`core/contracts/src/action.ts`), labels are display-only, and inline JS has no
   Chinese behavior keys. `formModes.actionLabels` carries per-mode copy. Legacy
-  string actions are rejected. `placement` is stored but consumed in Batch 3,
-  together with the `ActionMenu` overflow work.
+  string actions are rejected.
+- **Placement + ActionMenu (D2 continuation):** implemented in v0.8 Batch 3.
+  `resolveActionPlacements` cascades footer → 3 card-actions → overflow;
+  `detail` secondary actions live in a summary `card-actions` row and the rest
+  go to an `ActionMenu` (hidden Figma sheet + modal HTML sheet). The 8-page
+  `spec-run-v08` and `figma/plans-v08` are regenerated; visual baseline and
+  Figma readbacks are **pending human signoff**.
 - **Figma state frames (D16):** Figma carries only the default state. v0.8
   builds multi-state plans (`figma-plan.<page>.<variant>.json`), per-variant
   conformance/verify/parity, and pilots `today`; the 8-page 24-case rollout is
