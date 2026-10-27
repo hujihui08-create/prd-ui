@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:45:02.152Z",
+  "gate": {
+    "passed": false,
+    "issues": [
+      {
+        "id": "VISUAL_CRITIC_UNAVAILABLE",
+        "severity": "blocker",
+        "code": "VISUAL_CRITIC_UNAVAILABLE",
+        "message": "dsh exited with 1:"
+      }
+    ]
+  },
+  "waivedFindings": [],
+  "unwaivedGate": {
+    "passed": false,
+    "blockers": [
+      {
+        "id": "VISUAL_CRITIC_UNAVAILABLE",
+        "severity": "blocker",
+        "code": "VISUAL_CRITIC_UNAVAILABLE",
+        "message": "dsh exited with 1:"
+      }
+    ]
+  }
+}

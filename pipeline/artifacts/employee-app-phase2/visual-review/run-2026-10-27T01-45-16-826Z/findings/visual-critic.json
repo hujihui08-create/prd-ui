@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:50:42.210Z",
+  "runtime": "dsh",
+  "profile": "prd-ui-visual",
+  "model": "deepseek-flash",
+  "usageComplete": true,
+  "usage": {
+    "inputTokens": 27261,
+    "outputTokens": 41104,
+    "cacheReadTokens": 615552,
+    "totalTokens": 683917
+  },
+  "costCny": 0.44061416640000006,
+  "costSource": "pricing",
+  "budgetEnforced": true,
+  "critique": {
+    "verdict": "changes",
+    "findings": [
+      {
+        "id": "VC-001",
+        "severity": "minor",
+        "pageId": "appointment-list",
+        "state": "default",
+        "evidence": "screenshots/appointment-list.default.png — 周三 column blocks at x≈150–198 (张女士 10:00, 李女士 14:00, 王女士 16:30, 赵女士 18:00), y≈300–660",
+        "issue": "Each ~44px-wide block stacks three lines; the service line renders at roughly 9px and the in-block start time at roughly 7px in low-contrast gray, so the block's secondary content is hard to read at a glance. The start time also duplicates the hour grid, adding density without information.",
+        "proposal": "Drop the in-block start time and keep two lines (name + service) at ≥11px, or widen the block/selected-day column so the three lines can use the app's 12–13px body scale; the row position already conveys the time."
+      },
+      {
+        "id": "VC-002",
+        "severity": "minor",
+        "pageId": "appointment-form",
+        "state": "default",
+        "evidence": "screenshots/appointment-form.default.png — 客户 row at y≈90–127, the 选择 action at x≈329–356 has no button chrome; compare the outlined ghost chips on customer-detail.default.png at y≈514–535",
+        "issue": "The same 'ghost' emphasis renders as a bare gray text link beside the customer input and as an outlined chip on the detail pages, so the customer-picker control looks like a label rather than a tappable action and the component language is inconsistent across pages.",
+        "proposal": "Give 选择 the same outlined ghost-button treatment (36–40px tall, 1px border, 8–10px radius) used for the detail-page ghost actions, and keep a single ghost style across the app."
+      },
+      {
+        "id": "VC-003",
+        "severity": "minor",
+        "pageId": "today",
+        "state": "default",
+        "evidence": "screenshots/today.default.png — 待回访 card rows '张女士 / 3 天前' and '李女士 / 7 天前' at y≈496–578; the 我的预约 rows above end with a '›' after the time",
+        "issue": "The two row groups share the same ListRow structure but only 我的预约 rows show a trailing chevron; the 待回访 rows read as static text, so the same row pattern carries two different affordances within one page.",
+        "proposal": "Give 待回访 rows the same trailing '›' if they open the callback form, or make them visually static so all tappable rows in the page share one affordance."
+      }
+    ],
+    "summary": "The pages share a coherent neutral/navy system with consistent card, detail-list, form, and fixed-action patterns; hierarchy and spacing are generally clean, and the empty/loading/error states are legible and on-brand. Three minor polish items remain: the calendar block's in-block start time is ~7px and redundant, the form's 选择 ghost action doesn't match the outlined ghost buttons on the detail pages, and the 待回访 rows lack the chevron affordance used in 我的预约."
+  },
+  "error": null
+}

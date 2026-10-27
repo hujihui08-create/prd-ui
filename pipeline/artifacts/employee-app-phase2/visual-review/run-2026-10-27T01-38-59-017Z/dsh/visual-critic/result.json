@@ -1,0 +1,11 @@
+{
+  "error": "dsh exited with 1:",
+  "usage": {
+    "inputTokens": 39739,
+    "outputTokens": 48232,
+    "cacheReadTokens": 317184,
+    "totalTokens": 405155
+  },
+  "usageComplete": false,
+  "attempts": []
+}

@@ -176,15 +176,19 @@ signed.** `figma:conformance` is **0 blocker / 0 major / 233 checked** on the 8
 phase2 pages; `render:measure` is 8 pages with no overflow and
 `structure:check --project` is 0 warnings / 0 blockers. On 2026-10-27 the plugin
 rebuilt **scratch 8/8 + delivery 8/8** in Figma desktop (`fileKey` scratch
-`iL99qSPGhmh08BB9LketgF`, delivery `ff6GLUDoFgynQPtWhxwi43`), all 16 readbacks
+`iL99qSPGhmh08BB9LketgF`, delivery `Ccy4HCkRVOVM70LDeyi4ZP`), all 16 readbacks
 have `errors: []`, and scratch/delivery `figma:verify` are **8/8 passed**
 (0 blocker; appointment-list 1 major). `figma-files.json` records the delivery
 keys. Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,diff,parity}`.
 
-`figma:parity` now runs on real delivery PNGs but is **8/8 failed against the
-stale v0.5 baseline** (pixel 0.36%–3.59%, SSIM 0.734–0.988, cluster 99–588).
-That is expected before Gate 0; `figma:sign` and `handoff:pack` stay fail-closed
-until the human regenerates/signs the visual baseline and parity is green.
+The visual baseline was regenerated on 2026-10-27 (24 cases / 8 default) and the
+real Visual Critic returned **0 blocker / 0 major / 3 minor** (`awaiting_signoff`).
+After a plan-geometry fix (detail/notice card insets, form input grow, notice row
+heights), `figma:parity` is **8/8 passed** with calibrated thresholds
+(pixel ≤2%, SSIM ≥0.92, cluster ≤250; measured 0.338–1.698% / 0.9306–0.9884 /
+99–235). `v07:smoke` is `executedGatesPassed: true`, `complete: true`.
+Only the human double signoff remains: `visual:sign` + `figma:sign`, then
+`handoff:pack`.
 
 The whole-branch review fixes are in: stored `figma-diff.*.json` `passed` flags
 are re-derived from plan + readback, parity PNG/baseline PNG hashes are
@@ -194,16 +198,16 @@ parity evidence, handoff requires render metrics and binds supplied HTML/spec
 bytes to conformance + visual inputs, and structure diff covers text props and
 id-less nodes. Details: `docs/handoffs/2026-10-26-v07-final-review-fixes.md`.
 
-v0.5 remains the last signed milestone. **Gate 0 is still pending**: the v0.6
-human side-by-side visual signoff was never done, and the v0.5 visual baseline
-is stale after the v0.5.x CSS changes, so the next visual gate must regenerate
-and re-sign it (`visual:baseline` is human-only). The block-generation pilot
-concluded **rollback at ¥0.3302** (evidence copied to
-`pipeline/artifacts/employee-app-phase2/blocks/`); it ran before the conformance
-remediation, so a v0.8 re-evaluation is required before treating that as final.
+v0.5 remains the last signed milestone. Gate 0's automated parts are done
+(regenerated baseline + Visual Critic), but the **human signoffs are still
+pending**: `/tmp/signoff-visual-v07.md` (`visual:sign`) and
+`/tmp/signoff-figma-v07.md` (`figma:sign`). `handoff:pack` remains fail-closed
+until both exist. The block-generation pilot concluded **rollback at ¥0.3302**
+(evidence copied to `pipeline/artifacts/employee-app-phase2/blocks/`); it ran
+before the conformance remediation, so a v0.8 re-evaluation is required before
+treating that as final.
 
-Next: Gate 0 (human regenerated/re-signed baseline), rerun `figma:parity`, then
-`figma:sign`, `visual:review/sign`, and `handoff:pack` against the full run.
+Next: run the two sign commands, then `handoff:pack` against the full run.
 Phase 4 pilot is v0.8; RC v0.9; final v1.0. Handoff (latest):
 `docs/handoffs/2026-10-26-v07-final-review-fixes.md`; then
 `docs/handoffs/2026-10-26-v07-implementation-handoff.md`,

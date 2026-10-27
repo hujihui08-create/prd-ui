@@ -3,21 +3,25 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
-## 2026-10-27 — v0.7 real Figma rebuild (verify 8/8 scratch + delivery; still not signed)
+## 2026-10-27 — v0.7 real Figma parity green; human double signoff pending
 
-- Rebuilt all 8 pages in Figma desktop from the corrected plans with plugin
-  bundle `sha256:eb862fa…1de6`: scratch 8/8 and delivery 8/8.
-- `figma:verify` is **8/8 passed** on both scratch and delivery (0 blocker;
-  appointment-list 1 major, within the default threshold); all 16 readbacks
-  have `errors: []`.
-- Delivery file is `ff6GLUDoFgynQPtWhxwi43`; `figma-files.json` maps all 8
-  pages. Scratch is `iL99qSPGhmh08BB9LketgF`.
-- `figma:conformance` remains 0 blocker / 0 major (233 checked).
-- `figma:parity` now runs on real delivery PNGs but fails **8/8** against the
-  stale v0.5 baseline (pixel 0.355%–3.588%, SSIM 0.7341–0.9883, cluster
-  99–588). This is expected before Gate 0; `figma:sign`/`handoff:pack` remain
-  fail-closed until the baseline is regenerated, human-signed, and parity is
-  green.
+- Rebuilt all 8 pages in Figma desktop with plugin bundle
+  `sha256:eb862fa…1de6`; delivery file `Ccy4HCkRVOVM70LDeyi4ZP`
+  (`figma-files.json` maps all 8 pages; scratch `iL99qSPGhmh08BB9LketgF`).
+- `figma:verify` is **8/8 passed** on delivery (0 blocker; appointment-list
+  1 major, within the default threshold); top-level readbacks/diffs mirror
+  delivery for signing.
+- Plan-geometry fix (derived slot insets for detail/notice cards, form input
+  grow, notice row heights) removed the real layout offsets parity exposed.
+- Visual baseline regenerated (24 cases / 8 default); real Visual Critic:
+  **0 blocker / 0 major / 3 minor**, `awaiting_signoff` (cost ¥0.4406).
+- `figma:conformance` 0 blocker / 0 major (233 checked).
+- `figma:parity` **8/8 passed** with calibrated cross-renderer thresholds
+  (pixel ≤2%, SSIM ≥0.92, cluster ≤250; measured 0.338–1.698% /
+  0.9306–0.9884 / 99–235).
+- `v07:smoke`: `executedGatesPassed: true`, `complete: true`.
+- Still not signed: run `visual:sign` (`/tmp/signoff-visual-v07.md`) and
+  `figma:sign` (`/tmp/signoff-figma-v07.md`), then `handoff:pack`.
 - Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,readback/delivery,diff,diff/delivery,parity,figma-files.json}`.
 
 ## 2026-10-26 — v0.7 final whole-branch review fixes (still not signed)

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "run-2026-10-27T01-38-59-017Z",
+  "project": "employee-app-phase2",
+  "stage": "review",
+  "status": "blocked",
+  "cases": 24,
+  "screenshots": 24,
+  "diff": {
+    "passed": 24,
+    "failed": 0,
+    "missing": 0
+  },
+  "findings": [
+    {
+      "id": "VISUAL_CRITIC_UNAVAILABLE",
+      "severity": "blocker",
+      "code": "VISUAL_CRITIC_UNAVAILABLE",
+      "message": "dsh exited with 1:"
+    }
+  ],
+  "costCny": 0.5162630688,
+  "usageComplete": false,
+  "manifestHash": "sha256:d67ee76c1bad49ebdbf6afa1dcb9ace947746b5f2926864978731c8415737dae",
+  "findingsHash": "sha256:0bbbe7763b6f2985ec14eef049eb430f7dedd11d99325aa93f4ad59708ae5dee",
+  "htmlHashes": {
+    "appointment-detail": "sha256:66f97f498a74d751962401ece8b1060689e755c06a47e88948399fee1a9abe31",
+    "appointment-form": "sha256:7ffe068cd87f08e6f7eff158d9e8acbd20a7915518b82f61faf99a0336179065",
+    "appointment-list": "sha256:407a8bf260383f14b05698235b6fafb56f5689063f4b34a364dc189a66796155",
+    "callback-register": "sha256:bbfd170bf1723dd111597584dc45ed1ee098a99c3e234180860f58baee0cca47",
+    "customer-detail": "sha256:5b049eb7e91750ca3d7f67abbfe2c80ef456d5121aa784fb6742ddef31be51ec",
+    "customer-search": "sha256:38ef8bf68b504e0324fa090aec3b58d7b90ec9e05ad23dfb0a79efe74766a2bf",
+    "today": "sha256:2dcc7f110035eaa9d71aa7a579b0352177edf83dd6d59504c153ae684e99c304",
+    "treatment-notice": "sha256:f3532b77ec1baff07a5cfaf527fa6fd870a0627fcc11d27817a50960df87129d"
+  },
+  "signoff": {
+    "visual": false
+  },
+  "startedAt": "2026-10-27T01:38:58.995Z",
+  "updatedAt": "2026-10-27T01:45:02.152Z",
+  "finishedAt": "2026-10-27T01:45:02.152Z"
+}

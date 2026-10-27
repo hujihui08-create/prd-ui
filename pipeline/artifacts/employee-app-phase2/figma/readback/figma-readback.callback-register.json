@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "callback-register",
-  "builtAt": "2026-10-27T01:18:02.651Z",
+  "builtAt": "2026-10-27T02:04:38.487Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -30,8 +30,8 @@
     "color/border/control"
   ],
   "textStyles": [
-    "b-mobile/heading.2",
     "b-mobile/body.md",
+    "b-mobile/heading.2",
     "b-mobile/label.sm",
     "b-mobile/heading.3",
     "b-mobile/label.strong",
@@ -46,7 +46,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "4:1134",
+      "nodeId": "1:615",
       "type": "FRAME",
       "name": "回访登记",
       "specId": "callback-register.page.root",
@@ -67,7 +67,7 @@
       ],
       "children": [
         {
-          "nodeId": "4:1135",
+          "nodeId": "1:616",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "callback-register.page.root.header",
@@ -88,7 +88,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:1136",
+              "nodeId": "1:617",
               "type": "GLYPH",
               "name": "Back",
               "specId": "callback-register.page.root.header.back",
@@ -116,7 +116,7 @@
               "textColor": "#111827"
             },
             {
-              "nodeId": "4:1137",
+              "nodeId": "1:618",
               "type": "TEXT",
               "name": "Title",
               "specId": "callback-register.page.root.header.title",
@@ -155,7 +155,7 @@
           "cornerRadius": 0
         },
         {
-          "nodeId": "4:1138",
+          "nodeId": "1:619",
           "type": "FRAME",
           "name": "Content",
           "specId": "callback-register.page.root.content",
@@ -164,11 +164,11 @@
           "padding": {
             "top": 0,
             "right": 0,
-            "bottom": 0,
+            "bottom": 16,
             "left": 0
           },
           "width": 390,
-          "height": 726,
+          "height": 727,
           "x": 0,
           "y": 48,
           "fills": [
@@ -176,7 +176,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:1139",
+              "nodeId": "1:620",
               "type": "FRAME",
               "name": "Section",
               "specId": "callback-register.root.content.0",
@@ -194,7 +194,7 @@
               "y": 0,
               "children": [
                 {
-                  "nodeId": "4:1140",
+                  "nodeId": "1:621",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.customer",
@@ -212,7 +212,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "4:1141",
+                      "nodeId": "1:622",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.customer.label",
@@ -242,7 +242,7 @@
                       "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:1142",
+                      "nodeId": "1:623",
                       "type": "FRAME",
                       "name": "Row",
                       "specId": "callback-register.root.content.0.children.0.children.0",
@@ -260,7 +260,7 @@
                       "y": 24,
                       "children": [
                         {
-                          "nodeId": "4:1143",
+                          "nodeId": "1:624",
                           "type": "FRAME",
                           "name": "Input",
                           "specId": "callback-register.root.content.0.children.0.children.0.children.0",
@@ -272,7 +272,7 @@
                             "bottom": 0,
                             "left": 10
                           },
-                          "width": 92,
+                          "width": 292,
                           "height": 36,
                           "x": 0,
                           "y": 0,
@@ -281,7 +281,7 @@
                           ],
                           "children": [
                             {
-                              "nodeId": "4:1144",
+                              "nodeId": "1:625",
                               "type": "TEXT",
                               "name": "Placeholder",
                               "specId": "callback-register.root.content.0.children.0.children.0.children.0.placeholder",
@@ -332,7 +332,7 @@
                           }
                         },
                         {
-                          "nodeId": "4:1145",
+                          "nodeId": "1:626",
                           "type": "INSTANCE",
                           "name": "Button:选择",
                           "specId": "callback-register.action.pick-customer",
@@ -346,7 +346,7 @@
                           },
                           "width": 58,
                           "height": 36,
-                          "x": 100,
+                          "x": 300,
                           "y": 0,
                           "componentName": "Emphasis=ghost",
                           "variantProperties": {
@@ -363,7 +363,7 @@
                   "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:1147",
+                  "nodeId": "1:628",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.service",
@@ -381,7 +381,7 @@
                   "y": 88,
                   "children": [
                     {
-                      "nodeId": "4:1148",
+                      "nodeId": "1:629",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.service.label",
@@ -411,7 +411,7 @@
                       "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:1149",
+                      "nodeId": "1:630",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.1.children.0",
@@ -432,7 +432,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:1150",
+                          "nodeId": "1:631",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.1.children.0.placeholder",
@@ -486,7 +486,7 @@
                   "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:1151",
+                  "nodeId": "1:632",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.content",
@@ -504,7 +504,7 @@
                   "y": 160,
                   "children": [
                     {
-                      "nodeId": "4:1152",
+                      "nodeId": "1:633",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.content.label",
@@ -534,7 +534,7 @@
                       "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:1153",
+                      "nodeId": "1:634",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "callback-register.root.content.0.children.2.children.0",
@@ -555,7 +555,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:1154",
+                          "nodeId": "1:635",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "callback-register.root.content.0.children.2.children.0.placeholder",
@@ -609,7 +609,7 @@
                   "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:1155",
+                  "nodeId": "1:636",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "callback-register.field.result",
@@ -627,7 +627,7 @@
                   "y": 232,
                   "children": [
                     {
-                      "nodeId": "4:1156",
+                      "nodeId": "1:637",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "callback-register.field.result.label",
@@ -657,7 +657,7 @@
                       "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:1157",
+                      "nodeId": "1:638",
                       "type": "FRAME",
                       "name": "Select",
                       "specId": "callback-register.root.content.0.children.3.children.0",
@@ -678,7 +678,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:1158",
+                          "nodeId": "1:639",
                           "type": "TEXT",
                           "name": "Value",
                           "specId": "callback-register.root.content.0.children.3.children.0.value",
@@ -708,7 +708,7 @@
                           "lineHeight": 18
                         },
                         {
-                          "nodeId": "4:1159",
+                          "nodeId": "1:640",
                           "type": "GLYPH",
                           "name": "Chevron",
                           "specId": "callback-register.root.content.0.children.3.children.0.chevron",
@@ -772,56 +772,106 @@
           "cornerRadius": 0
         },
         {
-          "nodeId": "4:1160",
+          "nodeId": "1:641",
           "type": "FRAME",
           "name": "Actions",
           "specId": "callback-register.page.root.actions",
-          "layoutMode": "HORIZONTAL",
-          "itemSpacing": 8,
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
           "padding": {
-            "top": 12,
-            "right": 12,
-            "bottom": 12,
-            "left": 12
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
           },
           "width": 390,
-          "height": 70,
+          "height": 69,
           "x": 0,
-          "y": 774,
+          "y": 775,
           "fills": [
             "color/surface/default"
           ],
           "children": [
             {
-              "nodeId": "4:1161",
-              "type": "INSTANCE",
-              "name": "Button:保存回访",
-              "specId": "callback-register.action.save",
+              "nodeId": "1:642",
+              "type": "FRAME",
+              "name": "ActionsDivider",
+              "specId": "callback-register.page.root.actions.divider",
               "layoutMode": "HORIZONTAL",
               "itemSpacing": 0,
               "padding": {
                 "top": 0,
-                "right": 16,
+                "right": 0,
                 "bottom": 0,
-                "left": 16
+                "left": 0
               },
-              "width": 364,
-              "height": 44,
-              "x": 13,
-              "y": 13,
-              "componentName": "Emphasis=primary",
-              "variantProperties": {
-                "emphasis": "primary"
-              },
-              "characters": "保存回访",
+              "width": 390,
+              "height": 1,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/border/subtle"
+              ],
               "children": [],
               "fillDetails": [
                 {
-                  "color": "#111827",
+                  "color": "#E5E7EB",
                   "alpha": 1
                 }
               ],
-              "cornerRadius": 6
+              "cornerRadius": 0
+            },
+            {
+              "nodeId": "1:643",
+              "type": "FRAME",
+              "name": "ActionsRow",
+              "specId": "callback-register.page.root.actions.row",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 12,
+                "right": 16,
+                "bottom": 12,
+                "left": 16
+              },
+              "width": 390,
+              "height": 68,
+              "x": 0,
+              "y": 1,
+              "children": [
+                {
+                  "nodeId": "1:644",
+                  "type": "INSTANCE",
+                  "name": "Button:保存回访",
+                  "specId": "callback-register.action.save",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 16,
+                    "bottom": 0,
+                    "left": 16
+                  },
+                  "width": 358,
+                  "height": 44,
+                  "x": 16,
+                  "y": 12,
+                  "componentName": "Emphasis=primary",
+                  "variantProperties": {
+                    "emphasis": "primary"
+                  },
+                  "characters": "保存回访",
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 6
+                }
+              ],
+              "cornerRadius": 0
             }
           ],
           "fillDetails": [
@@ -830,19 +880,7 @@
               "alpha": 1
             }
           ],
-          "cornerRadius": 0,
-          "borderTop": {
-            "width": 1,
-            "color": "#E5E7EB"
-          },
-          "borderBottom": {
-            "width": 1,
-            "color": "#E5E7EB"
-          },
-          "borderLeft": {
-            "width": 1,
-            "color": "#E5E7EB"
-          }
+          "cornerRadius": 0
         }
       ],
       "fillDetails": [

@@ -1,7 +1,7 @@
 # 会话交接：v0.7 自动门禁实现与证据（人工 Figma 重建 / Gate 0 待办）
 
-- 日期：2026-10-26（2026-10-27 更新：Figma 重建完成，parity 因 stale baseline 仍红）
-- 状态：**v0.7 自动化门禁与 Figma 重建已完成；visual baseline 重生成/签核（Gate 0）、parity、`figma:sign`、`handoff:pack` 仍未完成，v0.7 未签核**
+- 日期：2026-10-26（2026-10-27 更新：Figma 重建 + baseline 重生成 + parity 全绿；等待人工双签）
+- 状态：**v0.7 全部自动化门禁已绿（smoke `complete: true`）；只差 `visual:sign` + `figma:sign` + `handoff:pack` 的人工签核，v0.7 未签核**
 - 上一版：[v0.6 Figma 门禁证据](2026-10-26-v06-figma-gate-evidence.md)
 - 设计输入：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)
 
@@ -11,12 +11,16 @@
 `render:measure` 8 页、`structure:check` 0 warning。2026-10-27 在真实 Figma 桌面版完成
 **scratch 8/8 + delivery 8/8 重建**，16 份 readback `errors: []`，scratch/delivery
 `figma:verify` 均 **8/8 passed**（0 blocker；appointment-list 1 major，默认阈值内）。
-delivery 文件为 `ff6GLUDoFgynQPtWhxwi43`，`figma-files.json` 已记录 8 页映射。
+delivery 文件为 `Ccy4HCkRVOVM70LDeyi4ZP`，`figma-files.json` 已记录 8 页映射。
 
-`figma:parity` 已能对真实 delivery PNG 运行，但对当前 **stale v0.5 baseline** 8/8 失败
-（pixel 0.36%–3.59%，SSIM 0.734–0.988，cluster 99–588），因此 **v0.7 仍未签核**。
-下一步是 Gate 0：人工重生成并签核 visual baseline，重跑 parity，再 `figma:sign`/`handoff:pack`。
-`handoff:pack` 目前仍 fail-closed。
+visual baseline 已于 2026-10-27 重生成（24 cases / 8 default）；真实 Visual Critic
+结果为 **0 blocker / 0 major / 3 minor**（`awaiting_signoff`，成本 ¥0.4406）。
+plan 几何修复后 parity 对真实 delivery PNG **8/8 通过**（校准阈值 pixel ≤2%、
+SSIM ≥0.92、cluster ≤250；修复前 customer-detail 3.2%/0.775、treatment-notice
+3.24%/0.78，均因真实布局偏移失败）。`v07:smoke` 现在 `complete: true`。
+
+只剩人工双签：`visual:sign` 与 `figma:sign`；之后 `handoff:pack`。签核文件已准备：
+`/tmp/signoff-visual-v07.md`、`/tmp/signoff-figma-v07.md`。**v0.7 仍未签核。**
 
 ## 2. 本次交付
 
@@ -138,15 +142,16 @@ summary：`{"blockers":0,"majors":0,"pages":8}`。
 `FIGMA_NODE_EXTRA`/`FIGMA_HIERARCHY`/`FIGMA_LAYOUT_MODE`。plan 已按 HTML 修正
 （Task 20a），不重建 Figma 就无法变绿。
 
-### 3.5 2026-10-27 真实 Figma 重建与 parity 诊断
+### 3.5 2026-10-27 真实 Figma 重建、baseline 重生成与 parity
 
 - 插件 bundle `sha256:eb862fa29a61d92a85c4cf14fed87bad2148138bb0d0301f51c403ccd2211de6`，已复制到 `~/Downloads/prd-ui-figma/dist/`。
-- scratch：8/8 重建，8/8 `figma:verify` passed（0 blocker；appointment-list 1 major）。
-- delivery：新空白文件 `ff6GLUDoFgynQPtWhxwi43`，8/8 重建，8/8 `figma:verify` passed（0 blocker；appointment-list 1 major）。
-- 16 份 readback `errors: []`；`readback/delivery/`、`diff/delivery/`、`parity/figma.<page>.png` 已更新。
-- `figma:conformance` 仍为 0 blocker / 0 major（233 checked）。
-- `figma:parity` 对 stale v0.5 baseline：8/8 failed（pixel 0.355%–3.588%，SSIM 0.7341–0.9883，cluster 99–588）。这不是实现失败，而是 Gate 0 尚未重生成 baseline；**不得据此签核**。
-- `figma:sign` / `handoff:pack` 仍应 fail-closed，直到 baseline 重签、parity 变绿。
+- 第一次 scratch/delivery 8/8 重建后 parity 暴露真实几何偏移（detail/notice 卡片少 16px 边距、form 输入框缺 grow、notice 行高不对）；plan 几何修复后 delivery 8/8 用新 plans 重建。
+- delivery：新空白文件 `Ccy4HCkRVOVM70LDeyi4ZP`，8/8 `figma:verify` passed（0 blocker；appointment-list 1 major）。顶层 `readback/` 与 `diff/` 已镜像 delivery（scratch 重建未重复；旧 scratch 证据不再作为签核输入）。
+- visual baseline 2026-10-27 重生成（24 cases / 8 default）；Visual Critic：0 blocker / 0 major / 3 minor，`awaiting_signoff`。
+- `figma:conformance` 0 blocker / 0 major（233 checked）。
+- `figma:parity` 校准后 **8/8 passed**：pixel 0.338%–1.698%，SSIM 0.9306–0.9884，cluster 99–235；阈值 pixel ≤2%、SSIM ≥0.92、cluster ≤250，写入 `parity/parity.config.json`。
+- `v07:smoke`：`executedGatesPassed: true`、`complete: true`。
+- 剩余：`visual:sign` + `figma:sign`，然后 `handoff:pack`。
 
 ## 4. 缺陷注入验收
 

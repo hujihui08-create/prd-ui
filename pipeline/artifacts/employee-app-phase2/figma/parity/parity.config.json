@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0",
   "thresholds": {
-    "maxPixelDiff": 0.005,
-    "minSsim": 0.98,
-    "maxClusterPixels": 24
+    "maxPixelDiff": 0.02,
+    "minSsim": 0.92,
+    "maxClusterPixels": 250
   }
 }

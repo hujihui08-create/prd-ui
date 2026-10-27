@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "customer-search",
-  "builtAt": "2026-10-27T01:21:02.325Z",
+  "builtAt": "2026-10-27T02:04:32.539Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -46,7 +46,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "1:703",
+      "nodeId": "1:602",
       "type": "FRAME",
       "name": "客户搜索",
       "specId": "customer-search.page.root",
@@ -67,7 +67,7 @@
       ],
       "children": [
         {
-          "nodeId": "1:704",
+          "nodeId": "1:603",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "customer-search.page.root.header",
@@ -88,7 +88,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:705",
+              "nodeId": "1:604",
               "type": "GLYPH",
               "name": "Back",
               "specId": "customer-search.page.root.header.back",
@@ -116,7 +116,7 @@
               "textColor": "#111827"
             },
             {
-              "nodeId": "1:706",
+              "nodeId": "1:605",
               "type": "TEXT",
               "name": "Title",
               "specId": "customer-search.page.root.header.title",
@@ -155,7 +155,7 @@
           "cornerRadius": 0
         },
         {
-          "nodeId": "1:707",
+          "nodeId": "1:606",
           "type": "FRAME",
           "name": "Content",
           "specId": "customer-search.page.root.content",
@@ -164,7 +164,7 @@
           "padding": {
             "top": 0,
             "right": 0,
-            "bottom": 0,
+            "bottom": 16,
             "left": 0
           },
           "width": 390,
@@ -176,7 +176,7 @@
           ],
           "children": [
             {
-              "nodeId": "1:708",
+              "nodeId": "1:607",
               "type": "FRAME",
               "name": "Section",
               "specId": "customer-search.root.content.0",
@@ -194,7 +194,7 @@
               "y": 0,
               "children": [
                 {
-                  "nodeId": "1:709",
+                  "nodeId": "1:608",
                   "type": "FRAME",
                   "name": "SearchBar",
                   "specId": "customer-search.root.content.0.children.0",
@@ -215,7 +215,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "1:710",
+                      "nodeId": "1:609",
                       "type": "GLYPH",
                       "name": "Search",
                       "specId": "customer-search.root.content.0.children.0.icon",
@@ -243,7 +243,7 @@
                       "textColor": "#5B6472"
                     },
                     {
-                      "nodeId": "1:711",
+                      "nodeId": "1:610",
                       "type": "TEXT",
                       "name": "Placeholder",
                       "specId": "customer-search.root.content.0.children.0.placeholder",
@@ -282,7 +282,7 @@
                   "cornerRadius": 6
                 },
                 {
-                  "nodeId": "1:712",
+                  "nodeId": "1:611",
                   "type": "FRAME",
                   "name": "EmptyState",
                   "specId": "customer-search.state.idle",
@@ -300,7 +300,7 @@
                   "y": 60,
                   "children": [
                     {
-                      "nodeId": "1:713",
+                      "nodeId": "1:612",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "customer-search.state.idle.title",
@@ -330,7 +330,7 @@
                       "lineHeight": 18
                     },
                     {
-                      "nodeId": "1:714",
+                      "nodeId": "1:613",
                       "type": "TEXT",
                       "name": "Description",
                       "specId": "customer-search.state.idle.desc",
