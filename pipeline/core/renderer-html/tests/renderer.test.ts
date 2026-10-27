@@ -1024,3 +1024,17 @@ describe("renderer motion", () => {
     expect(root).not.toContain("data-motion-preset");
   });
 });
+
+describe("node id emission", () => {
+  it("emits data-node-id for Switch and InventoryCard", () => {
+    const spec = byId.get("inventory-query");
+    expect(spec).toBeDefined();
+    const html = renderDocument(spec!, getProfile("b-mobile"));
+    expect(html).toContain(
+      'data-node-id="inventory-query.root.content.0.children.1.children.1"'
+    );
+    expect(html).toContain(
+      'data-node-id="inventory-query.root.content.0.children.3"'
+    );
+  });
+});
