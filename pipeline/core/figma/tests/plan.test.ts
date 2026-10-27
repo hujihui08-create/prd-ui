@@ -590,3 +590,44 @@ describe("compileFigmaPlans", () => {
     }
   });
 });
+
+describe("inventory component mapping", () => {
+  const employeeBrief = UiBriefSchema.parse(
+    JSON.parse(readFileSync("samples/projects/employee-app/ui-brief.json", "utf8"))
+  );
+  const employeeSpecs = compileProject(employeeBrief, {
+    getProfile,
+    getCatalog,
+    getArchetype,
+  });
+  const employeePlans = compileFigmaPlans(
+    employeeSpecs,
+    (page) => getProfile(page.meta.profile),
+    (page) => getCatalog(page.meta.profile)
+  );
+  const plan = employeePlans.find((p) => p.pageId === "inventory-query")!;
+
+  function find(specId: string): FigmaPlanNode | undefined {
+    let hit: FigmaPlanNode | undefined;
+    walk(plan.root, (node) => {
+      if (node.specId === specId) hit = node;
+    });
+    return hit;
+  }
+
+  it("builds a HORIZONTAL Switch with a track", () => {
+    const sw = find("inventory-query.root.content.0.children.1.children.1");
+    expect(sw?.name).toBe("Switch");
+    expect(sw?.layoutMode).toBe("HORIZONTAL");
+    expect(sw?.children?.some((child) => child.name === "Track")).toBe(true);
+  });
+
+  it("builds a structured InventoryCard", () => {
+    const card = find("inventory-query.root.content.0.children.3");
+    expect(card?.name).toBe("InventoryCard");
+    expect(card?.layoutMode).toBe("VERTICAL");
+    expect(card?.padding).toBe(16);
+    expect(card?.gap).toBe(8);
+    expect(card?.children?.length).toBeGreaterThan(0);
+  });
+});

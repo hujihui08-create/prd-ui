@@ -89,3 +89,29 @@ describe("figma coverage", () => {
     ).toBe(true);
   });
 });
+
+describe("inventory component coverage", () => {
+  const employeeBrief = UiBriefSchema.parse(
+    JSON.parse(readFileSync("samples/projects/employee-app/ui-brief.json", "utf8"))
+  );
+  const employeeSpecs = compileProject(employeeBrief, {
+    getProfile,
+    getCatalog,
+    getArchetype,
+  });
+  const employeePlans = compileFigmaPlans(
+    employeeSpecs,
+    (page) => getProfile(page.meta.profile),
+    (page) => getCatalog(page.meta.profile)
+  );
+
+  it("maps Switch and InventoryCard without degrade reasons", () => {
+    const plan = employeePlans.find((p) => p.pageId === "inventory-query")!;
+    expect(plan.coverage!.summary.degraded).toBe(0);
+    expect(plan.coverage!.summary.unmapped).toBe(0);
+    const degraded = plan.coverage!.nodes.filter(
+      (node) => node.status === "degraded" || node.status === "unmapped"
+    );
+    expect(degraded).toEqual([]);
+  });
+});

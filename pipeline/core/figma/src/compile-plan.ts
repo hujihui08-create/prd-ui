@@ -210,12 +210,112 @@ function renderNode(
       return renderEmptyState(node, ctx, specId, path);
     case "SummaryRow":
       return text(specId, "Summary", str(props.text), ctx.profile, "label.sm");
-    case "InventoryCard":
-      return frame(specId, "InventoryCard", "VERTICAL", [], {
-        fill: colorToken("surface.default"),
-        radius: radiusPx(ctx.profile, "lg"),
-        padding: spacePx(ctx.profile, "4"),
+    case "Switch": {
+      const state = str(props.state) || "off";
+      const children = [
+        text(`${specId}.label`, "Label", str(props.label), ctx.profile, "body.md", {
+          origin: "derived",
+        }),
+        frame(`${specId}.track`, "Track", "NONE", [], {
+          width: 36,
+          height: 20,
+          radius: 10,
+          fill:
+            state === "on"
+              ? colorToken("status.success")
+              : colorToken("border.strong"),
+          origin: "derived",
+        }),
+        text(`${specId}.value`, "Value", str(props.value), ctx.profile, "label.sm", {
+          origin: "derived",
+        }),
+      ];
+      return frame(specId, "Switch", "HORIZONTAL", children, {
+        gap: 6,
+        alignItems: "CENTER",
       });
+    }
+    case "InventoryCard": {
+      const attributes = Array.isArray(props.attributes)
+        ? (props.attributes as Array<{ label?: unknown; value?: unknown }>)
+        : [];
+      const head = frame(
+        `${specId}.head`,
+        "Head",
+        "HORIZONTAL",
+        [
+          text(`${specId}.name`, "Name", str(props.name), ctx.profile, "heading.3", {
+            origin: "derived",
+          }),
+          ...(str(props.spec) === ""
+            ? []
+            : [
+                text(`${specId}.spec`, "Spec", str(props.spec), ctx.profile, "body.sm", {
+                  origin: "derived",
+                }),
+              ]),
+        ],
+        { gap: 2, alignItems: "CENTER", origin: "derived" }
+      );
+      const attrRows = attributes.map((attribute, index) =>
+        text(
+          `${specId}.attr.${index}`,
+          "Attr",
+          `${str(attribute.label)} ${str(attribute.value)}`,
+          ctx.profile,
+          "body.sm",
+          { origin: "derived" }
+        )
+      );
+      const numbers = frame(
+        `${specId}.numbers`,
+        "Numbers",
+        "VERTICAL",
+        [
+          text(
+            `${specId}.current`,
+            "Current",
+            `${str(props.currentLabel)} ${str(props.currentStock)}`,
+            ctx.profile,
+            "body.sm",
+            { origin: "derived" }
+          ),
+          text(
+            `${specId}.available`,
+            "Available",
+            `${str(props.availableLabel)} ${str(props.availableStock)}`,
+            ctx.profile,
+            "body.sm",
+            { origin: "derived" }
+          ),
+          ...(str(props.inTransit) === ""
+            ? []
+            : [
+                text(
+                  `${specId}.transit`,
+                  "InTransit",
+                  str(props.inTransit),
+                  ctx.profile,
+                  "body.sm",
+                  { origin: "derived" }
+                ),
+              ]),
+        ],
+        { gap: 2, origin: "derived" }
+      );
+      return frame(
+        specId,
+        "InventoryCard",
+        "VERTICAL",
+        [head, ...attrRows, numbers],
+        {
+          fill: colorToken("surface.default"),
+          radius: radiusPx(ctx.profile, "lg"),
+          padding: spacePx(ctx.profile, "4"),
+          gap: spacePx(ctx.profile, "2"),
+        }
+      );
+    }
     case "Image":
       return frame(specId, "Image", "VERTICAL", [], {
         height: 180,

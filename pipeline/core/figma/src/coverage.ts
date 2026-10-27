@@ -16,7 +16,6 @@ export const KNOWN_PARTIAL_TYPES = new Set([
   "Pagination",
   "PageShell",
   "Stat",
-  "Switch",
 ]);
 
 /**
@@ -47,7 +46,19 @@ export const CONSUMED_PROPS: Record<string, readonly string[]> = {
   CalendarGrid: ["days", "hours", "blocks", "viewPanel"],
   EmptyState: ["title", "description", "icon", "emptyKind", "action", "variant"],
   SummaryRow: ["text"],
-  InventoryCard: ["title", "value", "tone"],
+  InventoryCard: [
+    "name",
+    "spec",
+    "badge",
+    "badgeTone",
+    "attributes",
+    "currentLabel",
+    "currentStock",
+    "availableLabel",
+    "availableStock",
+    "inTransit",
+  ],
+  Switch: ["label", "value", "state"],
   Image: ["alt"],
   Skeleton: [],
   ErrorState: [],
