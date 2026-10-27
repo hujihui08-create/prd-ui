@@ -3,7 +3,7 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
-## 2026-10-27 — v0.7 real Figma parity green; human double signoff pending
+## 2026-10-27 — v0.7 signed: Figma parity green + Handoff package
 
 - Rebuilt all 8 pages in Figma desktop with plugin bundle
   `sha256:eb862fa…1de6`; delivery file `Ccy4HCkRVOVM70LDeyi4ZP`
@@ -20,8 +20,15 @@ All notable changes to the PRD → UI pipeline are recorded here. Dates are loca
   (pixel ≤2%, SSIM ≥0.92, cluster ≤250; measured 0.338–1.698% /
   0.9306–0.9884 / 99–235).
 - `v07:smoke`: `executedGatesPassed: true`, `complete: true`.
-- Still not signed: run `visual:sign` (`/tmp/signoff-visual-v07.md`) and
-  `figma:sign` (`/tmp/signoff-figma-v07.md`), then `handoff:pack`.
+- **Signed** by 胡冀徽 on 2026-10-27: `visual:sign` (`status: success`) and
+  `figma:sign` (five hashes bound); `handoff:pack` produced
+  `artifacts/employee-app-phase2/handoff/` with 114 files and
+  `handoff.zip` sha256 `61b216bd…96eda1`.
+- Known gaps: Figma state frames, delivery readback/diff directory, manual v0.6
+  screenshot crops; recorded in `handoff.manifest.json`.
+- v0.8 debt: `customer-detail` secondary actions are still in a filter-row;
+  add IA `actionPlacement` (footer / card-actions / overflow) before changing
+  `detailLayout`.
 - Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,readback/delivery,diff,diff/delivery,parity,figma-files.json}`.
 
 ## 2026-10-26 — v0.7 final whole-branch review fixes (still not signed)

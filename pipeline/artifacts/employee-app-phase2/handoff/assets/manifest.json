@@ -1,0 +1,60 @@
+{
+  "project": "asset-review",
+  "profile": "b-mobile",
+  "assets": [
+    {
+      "id": "icon-home",
+      "kind": "icon",
+      "files": [
+        {
+          "path": "icons/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "library": "lucide",
+      "hash": "sha256:f52d3f7ef406fd03495195a9fb4926ba91d0ba79d63c338b643fd711f0504c42"
+    },
+    {
+      "id": "icon-plus",
+      "kind": "icon",
+      "files": [
+        {
+          "path": "icons/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "library": "lucide",
+      "hash": "sha256:f52d3f7ef406fd03495195a9fb4926ba91d0ba79d63c338b643fd711f0504c42"
+    },
+    {
+      "id": "icon-search",
+      "kind": "icon",
+      "files": [
+        {
+          "path": "icons/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "library": "lucide",
+      "hash": "sha256:f52d3f7ef406fd03495195a9fb4926ba91d0ba79d63c338b643fd711f0504c42"
+    },
+    {
+      "id": "icon-user",
+      "kind": "icon",
+      "files": [
+        {
+          "path": "icons/asset.svg",
+          "format": "svg"
+        }
+      ],
+      "license": "ISC",
+      "library": "lucide",
+      "hash": "sha256:f52d3f7ef406fd03495195a9fb4926ba91d0ba79d63c338b643fd711f0504c42"
+    }
+  ],
+  "placeholders": [],
+  "complete": true
+}

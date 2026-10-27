@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "pages": [
+    {
+      "pageId": "appointment-detail",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 727,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 727,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 20,
+      "widest": {
+        "specId": "appointment-detail.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 159
+    },
+    {
+      "pageId": "appointment-form",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 727,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 727,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 17,
+      "widest": {
+        "specId": "appointment-form.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 275
+    },
+    {
+      "pageId": "appointment-list",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 760,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 760,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 125,
+      "widest": {
+        "specId": "appointment-list.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 16
+    },
+    {
+      "pageId": "callback-register",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 727,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 727,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 13,
+      "widest": {
+        "specId": "callback-register.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 419
+    },
+    {
+      "pageId": "customer-detail",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 727,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 727,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 17,
+      "widest": {
+        "specId": "customer-detail.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 241
+    },
+    {
+      "pageId": "customer-search",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 796,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 796,
+        "scrollHeight": 796,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 4,
+      "widest": {
+        "specId": "customer-search.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": false,
+        "height": 0,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 0
+    },
+    {
+      "pageId": "today",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 732,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 732,
+        "scrollHeight": 732,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 18,
+      "widest": {
+        "specId": "today.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": false,
+        "height": 0,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 0
+    },
+    {
+      "pageId": "treatment-notice",
+      "target": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentHeight": 844,
+      "contentHeight": 727,
+      "scrollContainer": {
+        "selector": ".app-scroll",
+        "clientHeight": 727,
+        "scrollHeight": 727,
+        "overflowY": "auto"
+      },
+      "firstScreenNodes": 18,
+      "widest": {
+        "specId": "treatment-notice.page.root",
+        "width": 390,
+        "overflowX": false
+      },
+      "fixedFooter": {
+        "present": true,
+        "height": 69,
+        "overlapsContent": false
+      },
+      "contentBottomGap": 116
+    }
+  ]
+}

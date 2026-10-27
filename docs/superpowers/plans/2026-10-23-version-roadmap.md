@@ -25,7 +25,7 @@
 | **v0.4.1** | **视觉小额补丁** | **S** | **已完成（signed）** |
 | **v0.5** | **视觉 + a11y 收口** | **M** | **已完成（signed）** |
 | v0.6 | Phase 3A：Figma + Studio | L | Implemented（Figma gate pending） |
-| v0.7 | 视觉门禁 + 结构优化 + 分块实验（原 Phase 3B 沙箱/Test Subagent/Handoff 范围已重定义） | L | Implemented（自动门禁；Figma 重建/parity/签核待办，未签） |
+| v0.7 | 视觉门禁 + 结构优化 + 分块实验 + Handoff（原 Phase 3B 沙箱/Test Subagent 范围已重定义） | L | 已签核（2026-10-27） |
 | v0.8 | Phase 4A：真实项目试点 | L | 未开始 |
 | v0.9 | Release Candidate | M | 未开始 |
 | v1.0 | 最终交付 | — | 未开始 |
@@ -98,13 +98,13 @@
 
 ## 5. v0.7：视觉门禁 + 结构优化 + 分块实验（原 Phase 3B 范围已重定义）
 
-**状态（2026-10-26）**：**可自动化部分已实现，未签核**。设计输入见 [v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)；实施记录见 [v0.7 实施交接](../../handoffs/2026-10-26-v07-implementation-handoff.md)。
+**状态（2026-10-27）**：**已签核**。设计输入见 [v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)；实施记录见 [v0.7 实施交接](../../handoffs/2026-10-26-v07-implementation-handoff.md)。Figma delivery 8/8 verify passed；conformance 0/0；parity 8/8（校准阈值）；Visual Critic 0/0/3 minor；`visual:sign` + `figma:sign` 已签；`handoff:pack` 生成 114 files + zip。
 
 **原 Phase 3B 范围（scratch 沙箱、Test Subagent、Handoff Packager）已被 2026-10-26 设计输入重定义/推迟**：
 
 - 视觉保真门禁（A1–A4）与结构优化（B1–B3）→ 本版实现；确定性校验器承担原 Test Subagent 的自动部分，模型型子代理仍推迟。
 - 分块生成（C）→ 本版只做实验（结论 rollback），推广推迟到 v0.8。
-- Handoff Packager（`handoff:pack`）→ 机制已实现且 fail-closed，但尚未完成一次完整打包（当前 23 blockers），**不能宣称已验证**；待 Figma 重建、parity、签核后复跑。
+- Handoff Packager（`handoff:pack`）→ 已完成一次完整打包（114 files，zip sha256 `61b216bd…96eda1`）；缺失的 Figma state frames / delivery readback 目录作为 known gap 记录。
 
 本版实际范围：
 
@@ -135,6 +135,9 @@
 - 选 1 个真实项目/PRD，6–8 页；跑 intake → M1 → Spec → HTML/Figma → 沙箱 → Handoff。
 - 记录成本、耗时、人工介入点、findings 收敛情况。
 - 修复真实项目暴露的问题；更新 prompt/gate/catalog。
+- **IA placement**：给 Brief/IA 增加动作位置语义（footer / card-actions / overflow），
+  解决 `customer-detail` 次级动作被放进 filter-row、看起来像筛选 chip 的问题；
+  Interaction schema 目前没有 placement 维度，需要先定契约再改 `detailLayout`。
 
 退出标准：
 

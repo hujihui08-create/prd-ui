@@ -1,0 +1,896 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "callback-register",
+  "builtAt": "2026-10-27T02:04:38.487Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong",
+    "color/border/control"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm",
+    "b-mobile/input.md",
+    "b-mobile/date",
+    "b-mobile/label.bold",
+    "b-mobile/caption"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "1:615",
+      "type": "FRAME",
+      "name": "回访登记",
+      "specId": "callback-register.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "1:616",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "callback-register.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:617",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "callback-register.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
+            },
+            {
+              "nodeId": "1:618",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "callback-register.page.root.header.title",
+              "width": 64,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "回访登记",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
+            }
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
+        },
+        {
+          "nodeId": "1:619",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "callback-register.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 16,
+            "left": 0
+          },
+          "width": 390,
+          "height": 727,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:620",
+              "type": "FRAME",
+              "name": "Section",
+              "specId": "callback-register.root.content.0",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 12,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 308,
+              "x": 0,
+              "y": 0,
+              "children": [
+                {
+                  "nodeId": "1:621",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "callback-register.field.customer",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 60,
+                  "x": 16,
+                  "y": 16,
+                  "children": [
+                    {
+                      "nodeId": "1:622",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "callback-register.field.customer.label",
+                      "width": 358,
+                      "height": 18,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "客户*",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Medium"
+                      },
+                      "fontSize": 13,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
+                    },
+                    {
+                      "nodeId": "1:623",
+                      "type": "FRAME",
+                      "name": "Row",
+                      "specId": "callback-register.root.content.0.children.0.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 8,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 24,
+                      "children": [
+                        {
+                          "nodeId": "1:624",
+                          "type": "FRAME",
+                          "name": "Input",
+                          "specId": "callback-register.root.content.0.children.0.children.0.children.0",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 10,
+                            "bottom": 0,
+                            "left": 10
+                          },
+                          "width": 292,
+                          "height": 36,
+                          "x": 0,
+                          "y": 0,
+                          "fills": [
+                            "color/surface/default"
+                          ],
+                          "children": [
+                            {
+                              "nodeId": "1:625",
+                              "type": "TEXT",
+                              "name": "Placeholder",
+                              "specId": "callback-register.root.content.0.children.0.children.0.children.0.placeholder",
+                              "width": 70,
+                              "height": 18,
+                              "x": 11,
+                              "y": 9,
+                              "fills": [
+                                "color/text/tertiary"
+                              ],
+                              "textStyleName": "b-mobile/input.md",
+                              "characters": "请输入客户",
+                              "fontName": {
+                                "family": "Noto Sans SC",
+                                "style": "Regular"
+                              },
+                              "fontSize": 14,
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#5B6472",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 400,
+                              "textColor": "#5B6472",
+                              "lineHeight": 18
+                            }
+                          ],
+                          "fillDetails": [
+                            {
+                              "color": "#FFFFFF",
+                              "alpha": 1
+                            }
+                          ],
+                          "cornerRadius": 8,
+                          "borderTop": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderLeft": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          }
+                        },
+                        {
+                          "nodeId": "1:626",
+                          "type": "INSTANCE",
+                          "name": "Button:选择",
+                          "specId": "callback-register.action.pick-customer",
+                          "layoutMode": "HORIZONTAL",
+                          "itemSpacing": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 16,
+                            "bottom": 0,
+                            "left": 16
+                          },
+                          "width": 58,
+                          "height": 36,
+                          "x": 300,
+                          "y": 0,
+                          "componentName": "Emphasis=ghost",
+                          "variantProperties": {
+                            "emphasis": "ghost"
+                          },
+                          "characters": "选择",
+                          "children": [],
+                          "cornerRadius": 6
+                        }
+                      ],
+                      "cornerRadius": 0
+                    }
+                  ],
+                  "cornerRadius": 0
+                },
+                {
+                  "nodeId": "1:628",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "callback-register.field.service",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 60,
+                  "x": 16,
+                  "y": 88,
+                  "children": [
+                    {
+                      "nodeId": "1:629",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "callback-register.field.service.label",
+                      "width": 358,
+                      "height": 18,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "服务项目*",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Medium"
+                      },
+                      "fontSize": 13,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
+                    },
+                    {
+                      "nodeId": "1:630",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "callback-register.root.content.0.children.1.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 24,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:631",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "callback-register.root.content.0.children.1.children.0.placeholder",
+                          "width": 98,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/input.md",
+                          "characters": "请输入服务项目",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Regular"
+                          },
+                          "fontSize": 14,
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
+                        }
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
+                    }
+                  ],
+                  "cornerRadius": 0
+                },
+                {
+                  "nodeId": "1:632",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "callback-register.field.content",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 60,
+                  "x": 16,
+                  "y": 160,
+                  "children": [
+                    {
+                      "nodeId": "1:633",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "callback-register.field.content.label",
+                      "width": 358,
+                      "height": 18,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "回访内容*",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Medium"
+                      },
+                      "fontSize": 13,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
+                    },
+                    {
+                      "nodeId": "1:634",
+                      "type": "FRAME",
+                      "name": "Input",
+                      "specId": "callback-register.root.content.0.children.2.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 24,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:635",
+                          "type": "TEXT",
+                          "name": "Placeholder",
+                          "specId": "callback-register.root.content.0.children.2.children.0.placeholder",
+                          "width": 98,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "textStyleName": "b-mobile/input.md",
+                          "characters": "请输入回访内容",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Regular"
+                          },
+                          "fontSize": 14,
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
+                        }
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
+                    }
+                  ],
+                  "cornerRadius": 0
+                },
+                {
+                  "nodeId": "1:636",
+                  "type": "FRAME",
+                  "name": "FormField",
+                  "specId": "callback-register.field.result",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 6,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "width": 358,
+                  "height": 60,
+                  "x": 16,
+                  "y": 232,
+                  "children": [
+                    {
+                      "nodeId": "1:637",
+                      "type": "TEXT",
+                      "name": "Label",
+                      "specId": "callback-register.field.result.label",
+                      "width": 358,
+                      "height": 18,
+                      "x": 0,
+                      "y": 0,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "回访结果*",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Medium"
+                      },
+                      "fontSize": 13,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
+                    },
+                    {
+                      "nodeId": "1:638",
+                      "type": "FRAME",
+                      "name": "Select",
+                      "specId": "callback-register.root.content.0.children.3.children.0",
+                      "layoutMode": "HORIZONTAL",
+                      "itemSpacing": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 10,
+                        "bottom": 0,
+                        "left": 10
+                      },
+                      "width": 358,
+                      "height": 36,
+                      "x": 0,
+                      "y": 24,
+                      "fills": [
+                        "color/surface/default"
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "1:639",
+                          "type": "TEXT",
+                          "name": "Value",
+                          "specId": "callback-register.root.content.0.children.3.children.0.value",
+                          "width": 42,
+                          "height": 18,
+                          "x": 11,
+                          "y": 9,
+                          "fills": [
+                            "color/text/primary"
+                          ],
+                          "textStyleName": "b-mobile/input.md",
+                          "characters": "已联系",
+                          "fontName": {
+                            "family": "Noto Sans SC",
+                            "style": "Regular"
+                          },
+                          "fontSize": 14,
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#111827",
+                          "lineHeight": 18
+                        },
+                        {
+                          "nodeId": "1:640",
+                          "type": "GLYPH",
+                          "name": "Chevron",
+                          "specId": "callback-register.root.content.0.children.3.children.0.chevron",
+                          "width": 16,
+                          "height": 16,
+                          "x": 331,
+                          "y": 10,
+                          "fills": [
+                            "color/text/tertiary"
+                          ],
+                          "characters": "expand_more",
+                          "fontName": {
+                            "family": "Material Symbols Rounded",
+                            "style": "Regular"
+                          },
+                          "fontSize": 16,
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472"
+                        }
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
+                    }
+                  ],
+                  "cornerRadius": 0
+                }
+              ],
+              "cornerRadius": 0
+            }
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
+        },
+        {
+          "nodeId": "1:641",
+          "type": "FRAME",
+          "name": "Actions",
+          "specId": "callback-register.page.root.actions",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "width": 390,
+          "height": 69,
+          "x": 0,
+          "y": 775,
+          "fills": [
+            "color/surface/default"
+          ],
+          "children": [
+            {
+              "nodeId": "1:642",
+              "type": "FRAME",
+              "name": "ActionsDivider",
+              "specId": "callback-register.page.root.actions.divider",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "width": 390,
+              "height": 1,
+              "x": 0,
+              "y": 0,
+              "fills": [
+                "color/border/subtle"
+              ],
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#E5E7EB",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 0
+            },
+            {
+              "nodeId": "1:643",
+              "type": "FRAME",
+              "name": "ActionsRow",
+              "specId": "callback-register.page.root.actions.row",
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 12,
+                "right": 16,
+                "bottom": 12,
+                "left": 16
+              },
+              "width": 390,
+              "height": 68,
+              "x": 0,
+              "y": 1,
+              "children": [
+                {
+                  "nodeId": "1:644",
+                  "type": "INSTANCE",
+                  "name": "Button:保存回访",
+                  "specId": "callback-register.action.save",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 16,
+                    "bottom": 0,
+                    "left": 16
+                  },
+                  "width": 358,
+                  "height": 44,
+                  "x": 16,
+                  "y": 12,
+                  "componentName": "Emphasis=primary",
+                  "variantProperties": {
+                    "emphasis": "primary"
+                  },
+                  "characters": "保存回访",
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 6
+                }
+              ],
+              "cornerRadius": 0
+            }
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
+        }
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
+    }
+  ],
+  "errors": []
+}

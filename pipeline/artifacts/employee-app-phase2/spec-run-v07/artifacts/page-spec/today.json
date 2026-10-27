@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "pageId": "today",
+    "project": "employee-app-phase2",
+    "name": "今日",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "home",
+    "purpose": "门店首页：展示门店名、快捷操作、我的预约与待回访；消息入口固定不显示；我的预约区块与行跳转需预约登记或到院分配，缺权时不显示。",
+    "route": "/today",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-TODAY-001",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "type": "MobileShell",
+    "props": {
+      "title": "今日",
+      "tabs": [
+        "today",
+        "appointment-list"
+      ],
+      "showTabs": true,
+      "storeName": "星光店",
+      "hasMessage": false,
+      "activeTab": "today"
+    },
+    "reqRef": "REQ-TODAY-001",
+    "slots": {
+      "top-bar": [
+        {
+          "type": "TopBar",
+          "props": {
+            "storeName": "星光店",
+            "hasMessage": false
+          },
+          "id": "today.root.top-bar.0"
+        }
+      ],
+      "content": [
+        {
+          "type": "Section",
+          "props": {
+            "padding": "space.4",
+            "gap": "space.3"
+          },
+          "children": [
+            {
+              "type": "Card",
+              "props": {
+                "title": "快捷操作"
+              },
+              "children": [
+                {
+                  "type": "Row",
+                  "props": {
+                    "gap": "space.2"
+                  },
+                  "children": [
+                    {
+                      "type": "QuickAction",
+                      "props": {
+                        "label": "开单",
+                        "icon": "icon-plus",
+                        "tone": "neutral"
+                      },
+                      "id": "today.quick.create-order"
+                    },
+                    {
+                      "type": "QuickAction",
+                      "props": {
+                        "label": "预约",
+                        "icon": "icon-plus",
+                        "tone": "neutral"
+                      },
+                      "id": "today.quick.new-appointment"
+                    },
+                    {
+                      "type": "QuickAction",
+                      "props": {
+                        "label": "客户搜索",
+                        "icon": "icon-search",
+                        "tone": "customer"
+                      },
+                      "id": "today.quick.customer-search"
+                    }
+                  ],
+                  "id": "today.root.content.0.children.0.children.0"
+                }
+              ],
+              "id": "today.card.quick-actions"
+            },
+            {
+              "type": "Card",
+              "props": {
+                "title": "我的预约",
+                "actionLabel": "查看全部",
+                "actionRoute": "/appointments"
+              },
+              "children": [
+                {
+                  "type": "ListRow",
+                  "props": {
+                    "title": "张女士",
+                    "subtitle": "小气泡",
+                    "meta": "10:00-11:00",
+                    "status": "已登记",
+                    "statusTone": "warning"
+                  },
+                  "motionGroup": "today.row.appointment",
+                  "id": "today.row.appointment.0"
+                },
+                {
+                  "type": "ListRow",
+                  "props": {
+                    "title": "李女士",
+                    "subtitle": "补水",
+                    "meta": "14:00-15:00",
+                    "status": "已到店",
+                    "statusTone": "success"
+                  },
+                  "motionGroup": "today.row.appointment",
+                  "id": "today.row.appointment.1"
+                },
+                {
+                  "type": "ListRow",
+                  "props": {
+                    "title": "王女士",
+                    "subtitle": "肩颈",
+                    "meta": "16:30-17:30",
+                    "status": "已登记",
+                    "statusTone": "warning"
+                  },
+                  "motionGroup": "today.row.appointment",
+                  "id": "today.row.appointment.2"
+                },
+                {
+                  "type": "EmptyState",
+                  "props": {
+                    "title": "今天没有预约",
+                    "description": "客户直接上门？",
+                    "icon": "event_busy"
+                  },
+                  "children": [
+                    {
+                      "type": "Button",
+                      "props": {
+                        "label": "当场开单",
+                        "emphasis": "secondary"
+                      },
+                      "id": "today.root.content.0.children.1.children.3.children.0"
+                    }
+                  ],
+                  "id": "today.state.empty"
+                }
+              ],
+              "id": "today.card.appointments"
+            },
+            {
+              "type": "Card",
+              "props": {
+                "title": "待回访"
+              },
+              "children": [
+                {
+                  "type": "ListRow",
+                  "props": {
+                    "title": "张女士",
+                    "subtitle": "小气泡",
+                    "meta": "3 天前"
+                  },
+                  "motionGroup": "today.row.callback",
+                  "id": "today.row.callback.0"
+                },
+                {
+                  "type": "ListRow",
+                  "props": {
+                    "title": "李女士",
+                    "subtitle": "补水",
+                    "meta": "7 天前"
+                  },
+                  "motionGroup": "today.row.callback",
+                  "id": "today.row.callback.1"
+                },
+                {
+                  "type": "EmptyState",
+                  "props": {
+                    "title": "暂无待回访",
+                    "description": "近 30 天服务过、尚未回访的记录会出现在这里",
+                    "icon": "call"
+                  },
+                  "id": "today.state.empty.2"
+                }
+              ],
+              "id": "today.card.callbacks"
+            }
+          ],
+          "id": "today.root.content.0"
+        }
+      ],
+      "bottom-nav": [
+        {
+          "type": "TabBar",
+          "props": {
+            "items": [
+              "today",
+              "appointment-list"
+            ],
+            "active": "today"
+          },
+          "id": "today.root.bottom-nav.0"
+        }
+      ]
+    },
+    "id": "today.page.root"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "empty": {
+      "name": "empty"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    },
+    "disabled": {
+      "name": "disabled"
+    }
+  },
+  "interactions": [],
+  "traceability": {
+    "reqMap": {
+      "REQ-TODAY-001": [
+        "today"
+      ],
+      "REQ-SHARED-001": [
+        "today"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  },
+  "linkedRoutes": {
+    "create": "/appointments/form",
+    "form": "/appointments/form",
+    "detail": "/customers/detail/:id",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "list": "/appointments"
+  }
+}

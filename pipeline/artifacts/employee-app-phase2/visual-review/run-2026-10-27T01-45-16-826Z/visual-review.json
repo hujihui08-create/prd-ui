@@ -2,7 +2,7 @@
   "runDir": "/Users/jihui/Desktop/产品、ui/.worktrees/v0.7/pipeline/artifacts/employee-app-phase2/visual-review/run-2026-10-27T01-45-16-826Z",
   "runId": "run-2026-10-27T01-45-16-826Z",
   "project": "employee-app-phase2",
-  "status": "awaiting_signoff",
+  "status": "passed",
   "cases": 24,
   "screenshots": 24,
   "diff": {
@@ -56,7 +56,10 @@
   "specHash": "sha256:d1006139d5c3f891dba76088904b775bbc142f2aebf8dcafb77eff58a3507e27",
   "cacheKey": "sha256:31930430462ca3de9218016f6b5ef0928ba2bc6e8e8b929b180c8252e60a0137",
   "signoff": {
-    "valid": false
+    "valid": true,
+    "signer": "胡冀徽",
+    "date": "2026-10-27",
+    "waivedFindings": []
   },
   "critic": {
     "runtime": "dsh",

@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "pageId": "customer-search",
+    "project": "employee-app-phase2",
+    "name": "客户搜索",
+    "target": "mobile",
+    "profile": "b-mobile",
+    "archetype": "mobile-list",
+    "purpose": "按姓名或脱敏手机号搜索当前员工可查看的客户；首次进入未输入关键词时不返回客户列表，仅显示搜索提示；无匹配时显示空态与「清空关键词」；支持 standalone 与 picker 两种模式，picker 从新增/改期表单客户字段进入，选择后返回表单并保留已填内容。",
+    "route": "/customers/search",
+    "roles": [
+      "store_manager",
+      "beautician",
+      "front_desk"
+    ],
+    "reqRefs": [
+      "REQ-CUSTOMER-001",
+      "REQ-SHARED-001"
+    ],
+    "version": "0.1.0"
+  },
+  "layout": {
+    "type": "MobileShell",
+    "props": {
+      "title": "客户搜索",
+      "back": true,
+      "showTabs": false
+    },
+    "reqRef": "REQ-CUSTOMER-001",
+    "slots": {
+      "content": [
+        {
+          "type": "Section",
+          "props": {
+            "padding": "space.4",
+            "gap": "space.2"
+          },
+          "children": [
+            {
+              "type": "SearchBar",
+              "props": {
+                "placeholder": "搜索客户"
+              },
+              "id": "customer-search.root.content.0.children.0"
+            },
+            {
+              "type": "EmptyState",
+              "props": {
+                "title": "输入姓名或脱敏手机号搜索客户",
+                "description": "输入关键词后显示匹配结果",
+                "emptyKind": "idle"
+              },
+              "id": "customer-search.state.idle"
+            },
+            {
+              "type": "ListRow",
+              "props": {
+                "title": "张女士",
+                "subtitle": "138****0000 · 星光店",
+                "searchText": "张女士 138****0000 星光店"
+              },
+              "motionGroup": "customer-search.row.result",
+              "id": "customer-search.row.result.0"
+            },
+            {
+              "type": "ListRow",
+              "props": {
+                "title": "李女士",
+                "subtitle": "139****0000 · 星光店",
+                "searchText": "李女士 139****0000 星光店"
+              },
+              "motionGroup": "customer-search.row.result",
+              "id": "customer-search.row.result.1"
+            },
+            {
+              "type": "ListRow",
+              "props": {
+                "title": "王女士",
+                "subtitle": "137****0000 · 星光店",
+                "searchText": "王女士 137****0000 星光店"
+              },
+              "motionGroup": "customer-search.row.result",
+              "id": "customer-search.row.result.2"
+            },
+            {
+              "type": "EmptyState",
+              "props": {
+                "title": "没有匹配的客户",
+                "description": "全部 · 调整筛选条件后重试",
+                "emptyKind": "empty"
+              },
+              "children": [
+                {
+                  "type": "Button",
+                  "props": {
+                    "label": "清空关键词",
+                    "emphasis": "secondary",
+                    "action": "清空关键词"
+                  },
+                  "id": "customer-search.action.clear"
+                }
+              ],
+              "id": "customer-search.state.empty"
+            }
+          ],
+          "id": "customer-search.root.content.0"
+        }
+      ]
+    },
+    "id": "customer-search.page.root"
+  },
+  "states": {
+    "default": {
+      "name": "default"
+    },
+    "empty": {
+      "name": "empty"
+    },
+    "loading": {
+      "name": "loading"
+    },
+    "error": {
+      "name": "error"
+    }
+  },
+  "interactions": [
+    {
+      "trigger": "搜索",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-001"
+    },
+    {
+      "trigger": "查看详情",
+      "action": "navigate",
+      "reqRef": "REQ-CUSTOMER-001"
+    }
+  ],
+  "traceability": {
+    "reqMap": {
+      "REQ-CUSTOMER-001": [
+        "customer-search"
+      ],
+      "REQ-SHARED-001": [
+        "customer-search"
+      ]
+    },
+    "designDefaults": [],
+    "unmapped": []
+  },
+  "searchIdleTitle": "输入姓名或脱敏手机号搜索客户",
+  "emptyTitle": "没有匹配的客户",
+  "pickerReturnTo": "appointment-form",
+  "linkedRoutes": {
+    "create": "/appointments/form",
+    "form": "/appointments/form",
+    "detail": "/customers/detail/:id",
+    "customer": "/customers/detail/:id",
+    "notice": "/appointments/detail/:id/notice",
+    "list": "/appointments"
+  }
+}

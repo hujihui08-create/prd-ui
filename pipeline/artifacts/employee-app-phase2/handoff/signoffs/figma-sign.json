@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "signer": "胡冀徽",
+  "date": "2026-10-27",
+  "planHash": "sha256:c37c48f093d1438992b598886519a2c9b44e4918d7c67b962ca903f047dbad1c",
+  "readbackHash": "sha256:5db3b478ccc77751f23cd6375428954d34cd65e03f4a90e0ba266975a7ad9e81",
+  "conformanceHash": "sha256:693ebc4299c95946b36ec298a06691d2a3df7d890d74629409979eebde35f252",
+  "parityHash": "sha256:d8c768a98a1109d7e0a8bfaad4c2e4b39eb4d5b1d226dc122a6e313c35c21998",
+  "baselineHash": "sha256:82f88f6338072c5a905418c675d802aa8c44d0300fa62dd50ee5400faca7c6fd"
+}

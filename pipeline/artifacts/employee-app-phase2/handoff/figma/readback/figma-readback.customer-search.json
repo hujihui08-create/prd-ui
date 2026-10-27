@@ -1,0 +1,388 @@
+{
+  "schemaVersion": "1.0",
+  "pageId": "customer-search",
+  "builtAt": "2026-10-27T02:04:32.539Z",
+  "fonts": [
+    {
+      "family": "Material Symbols Rounded",
+      "style": "Regular",
+      "fallback": false
+    }
+  ],
+  "variables": [
+    "color/surface/default",
+    "color/surface/subtle",
+    "color/surface/raised",
+    "color/text/primary",
+    "color/text/secondary",
+    "color/text/tertiary",
+    "color/text/onAction",
+    "color/action/primary",
+    "color/action/secondary",
+    "color/accent/customer",
+    "color/accent/inventory",
+    "color/status/success",
+    "color/status/warning",
+    "color/status/danger",
+    "color/status/info",
+    "color/border/subtle",
+    "color/border/strong",
+    "color/border/control"
+  ],
+  "textStyles": [
+    "b-mobile/body.md",
+    "b-mobile/heading.2",
+    "b-mobile/label.sm",
+    "b-mobile/heading.3",
+    "b-mobile/label.strong",
+    "b-mobile/body.sm",
+    "b-mobile/input.md",
+    "b-mobile/date",
+    "b-mobile/label.bold",
+    "b-mobile/caption"
+  ],
+  "components": [
+    "b-mobile/Button"
+  ],
+  "nodes": [
+    {
+      "nodeId": "1:602",
+      "type": "FRAME",
+      "name": "客户搜索",
+      "specId": "customer-search.page.root",
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "width": 390,
+      "height": 844,
+      "x": 0,
+      "y": 0,
+      "fills": [
+        "color/surface/subtle"
+      ],
+      "children": [
+        {
+          "nodeId": "1:603",
+          "type": "FRAME",
+          "name": "PageHeader",
+          "specId": "customer-search.page.root.header",
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 8,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "width": 390,
+          "height": 48,
+          "x": 0,
+          "y": 0,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:604",
+              "type": "GLYPH",
+              "name": "Back",
+              "specId": "customer-search.page.root.header.back",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 14,
+              "fills": [
+                "color/text/primary"
+              ],
+              "characters": "arrow_back_ios_new",
+              "fontName": {
+                "family": "Material Symbols Rounded",
+                "style": "Regular"
+              },
+              "fontSize": 20,
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
+            },
+            {
+              "nodeId": "1:605",
+              "type": "TEXT",
+              "name": "Title",
+              "specId": "customer-search.page.root.header.title",
+              "width": 64,
+              "height": 24,
+              "x": 44,
+              "y": 12,
+              "fills": [
+                "color/text/primary"
+              ],
+              "textStyleName": "b-mobile/heading.2",
+              "characters": "客户搜索",
+              "fontName": {
+                "family": "Noto Sans SC",
+                "style": "SemiBold"
+              },
+              "fontSize": 16,
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
+            }
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
+        },
+        {
+          "nodeId": "1:606",
+          "type": "FRAME",
+          "name": "Content",
+          "specId": "customer-search.page.root.content",
+          "layoutMode": "VERTICAL",
+          "itemSpacing": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 16,
+            "left": 0
+          },
+          "width": 390,
+          "height": 796,
+          "x": 0,
+          "y": 48,
+          "fills": [
+            "color/surface/subtle"
+          ],
+          "children": [
+            {
+              "nodeId": "1:607",
+              "type": "FRAME",
+              "name": "Section",
+              "specId": "customer-search.root.content.0",
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 8,
+              "padding": {
+                "top": 16,
+                "right": 16,
+                "bottom": 16,
+                "left": 16
+              },
+              "width": 390,
+              "height": 162,
+              "x": 0,
+              "y": 0,
+              "children": [
+                {
+                  "nodeId": "1:608",
+                  "type": "FRAME",
+                  "name": "SearchBar",
+                  "specId": "customer-search.root.content.0.children.0",
+                  "layoutMode": "HORIZONTAL",
+                  "itemSpacing": 8,
+                  "padding": {
+                    "top": 0,
+                    "right": 12,
+                    "bottom": 0,
+                    "left": 12
+                  },
+                  "width": 358,
+                  "height": 36,
+                  "x": 16,
+                  "y": 16,
+                  "fills": [
+                    "color/surface/default"
+                  ],
+                  "children": [
+                    {
+                      "nodeId": "1:609",
+                      "type": "GLYPH",
+                      "name": "Search",
+                      "specId": "customer-search.root.content.0.children.0.icon",
+                      "width": 20,
+                      "height": 20,
+                      "x": 12,
+                      "y": 8,
+                      "fills": [
+                        "color/text/tertiary"
+                      ],
+                      "characters": "search",
+                      "fontName": {
+                        "family": "Material Symbols Rounded",
+                        "style": "Regular"
+                      },
+                      "fontSize": 20,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#5B6472",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 400,
+                      "textColor": "#5B6472"
+                    },
+                    {
+                      "nodeId": "1:610",
+                      "type": "TEXT",
+                      "name": "Placeholder",
+                      "specId": "customer-search.root.content.0.children.0.placeholder",
+                      "width": 48,
+                      "height": 16,
+                      "x": 40,
+                      "y": 10,
+                      "fills": [
+                        "color/text/tertiary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "搜索客户",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#5B6472",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 400,
+                      "textColor": "#5B6472",
+                      "lineHeight": 16
+                    }
+                  ],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 6
+                },
+                {
+                  "nodeId": "1:611",
+                  "type": "FRAME",
+                  "name": "EmptyState",
+                  "specId": "customer-search.state.idle",
+                  "layoutMode": "VERTICAL",
+                  "itemSpacing": 4,
+                  "padding": {
+                    "top": 24,
+                    "right": 16,
+                    "bottom": 24,
+                    "left": 16
+                  },
+                  "width": 358,
+                  "height": 86,
+                  "x": 16,
+                  "y": 60,
+                  "children": [
+                    {
+                      "nodeId": "1:612",
+                      "type": "TEXT",
+                      "name": "Title",
+                      "specId": "customer-search.state.idle.title",
+                      "width": 182,
+                      "height": 18,
+                      "x": 88,
+                      "y": 24,
+                      "fills": [
+                        "color/text/secondary"
+                      ],
+                      "textStyleName": "b-mobile/body.md",
+                      "characters": "输入姓名或脱敏手机号搜索客户",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Medium"
+                      },
+                      "fontSize": 13,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
+                    },
+                    {
+                      "nodeId": "1:613",
+                      "type": "TEXT",
+                      "name": "Description",
+                      "specId": "customer-search.state.idle.desc",
+                      "width": 144,
+                      "height": 16,
+                      "x": 107,
+                      "y": 46,
+                      "fills": [
+                        "color/text/tertiary"
+                      ],
+                      "textStyleName": "b-mobile/label.sm",
+                      "characters": "输入关键词后显示匹配结果",
+                      "fontName": {
+                        "family": "Noto Sans SC",
+                        "style": "Regular"
+                      },
+                      "fontSize": 12,
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#5B6472",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 400,
+                      "textColor": "#5B6472",
+                      "lineHeight": 16
+                    }
+                  ],
+                  "cornerRadius": 0
+                }
+              ],
+              "cornerRadius": 0
+            }
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
+        }
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
+    }
+  ],
+  "errors": []
+}

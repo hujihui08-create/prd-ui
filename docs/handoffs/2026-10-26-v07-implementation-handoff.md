@@ -1,7 +1,7 @@
 # 会话交接：v0.7 自动门禁实现与证据（人工 Figma 重建 / Gate 0 待办）
 
-- 日期：2026-10-26（2026-10-27 更新：Figma 重建 + baseline 重生成 + parity 全绿；等待人工双签）
-- 状态：**v0.7 全部自动化门禁已绿（smoke `complete: true`）；只差 `visual:sign` + `figma:sign` + `handoff:pack` 的人工签核，v0.7 未签核**
+- 日期：2026-10-26（2026-10-27 更新：Figma 重建 + baseline 重生成 + parity 全绿 + 双签 + Handoff）
+- 状态：**v0.7 已签核（胡冀徽，2026-10-27）；Handoff 包已生成（114 files + zip）**
 - 上一版：[v0.6 Figma 门禁证据](2026-10-26-v06-figma-gate-evidence.md)
 - 设计输入：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)
 
@@ -14,13 +14,15 @@
 delivery 文件为 `Ccy4HCkRVOVM70LDeyi4ZP`，`figma-files.json` 已记录 8 页映射。
 
 visual baseline 已于 2026-10-27 重生成（24 cases / 8 default）；真实 Visual Critic
-结果为 **0 blocker / 0 major / 3 minor**（`awaiting_signoff`，成本 ¥0.4406）。
+结果为 **0 blocker / 0 major / 3 minor**（成本 ¥0.4406），已由胡冀徽 `visual:sign`。
 plan 几何修复后 parity 对真实 delivery PNG **8/8 通过**（校准阈值 pixel ≤2%、
 SSIM ≥0.92、cluster ≤250；修复前 customer-detail 3.2%/0.775、treatment-notice
 3.24%/0.78，均因真实布局偏移失败）。`v07:smoke` 现在 `complete: true`。
 
-只剩人工双签：`visual:sign` 与 `figma:sign`；之后 `handoff:pack`。签核文件已准备：
-`/tmp/signoff-visual-v07.md`、`/tmp/signoff-figma-v07.md`。**v0.7 仍未签核。**
+胡冀徽已于 2026-10-27 完成 `figma:sign`（五 hash 绑定）。`handoff:pack` 生成
+`artifacts/employee-app-phase2/handoff/`：114 files、`handoff.zip` sha256
+`61b216bd…96eda1`；`handoff.manifest.json` 五个 gate 均 passed，figma/visual
+两个 signoff 都在包内。
 
 ## 2. 本次交付
 
@@ -371,14 +373,16 @@ pnpm figma:sign --figma artifacts/employee-app-phase2/figma \
 
 ## 10. 已知缺口与剩余债
 
-- **v0.6 readback/diff 过期**：verify 3/8 是假红，但也不能当作通过；必须重建。
-- **parity 从未在 v0.7 对真实 PNG 运行**：跳过不是通过；阈值仍需首个真实样本校准。
-- **已提交的 `artifacts/employee-app-phase2/html` 过期**：早于 v0.5.x 颜色 token
-  （secondary/tertiary）和 v0.7 的 `data-node-id` 覆盖；所有门禁必须用 fresh HTML。
-  是否需要刷新这份历史 HTML 留待 Gate 0 一并决定（baseline 也要重生成）。
-- **baseline 过期**：v0.5.x CSS 变更后未重签；parity 与 handoff 的 baselineHash 都依赖它。
 - **`figma/spec-source` 不是完整 spec run**：没有 `findings/spec-engineer-gate.json`，
   `handoff:pack` 必然 fail-closed；正式打包应使用真实 spec run 目录。
+- **IA/placement 债（v0.8）**：`detail` 模板把 `customer-detail` 的次级动作
+  （新增预约 / 查看告知 / 回访登记）放进 `fields` 槽的 `variant:"filter"` 行，
+  视觉上像筛选 chip，语义上不够清楚。Interaction agent 的 schema 没有 placement
+  字段，这是编译器模板决策；v0.8 应给 Brief/IA 增加 `actionPlacement`
+  （footer / card-actions / overflow）或在模板里改为明确的 card-actions 行。
+- **3 个 Visual Critic minor**：appointment-list 日历块三行密度/时间重复、
+  appointment-form “选择”缺少 ghost button chrome、today 待回访行缺少 chevron；
+  记录为 v0.7.x 视觉债，不影响本次签核。
 - **`handoff:pack` 不再信任已提交 diff**（终审修复）：它从当前 plan + readback
   重算每页 diff，并要求 stored diff 与重算结果一致；重建后仍必须重新生成 diff，
   否则它以 `figma verify failed` / `figma diff evidence is stale` fail-closed。

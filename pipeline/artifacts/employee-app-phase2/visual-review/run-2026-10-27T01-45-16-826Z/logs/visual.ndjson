@@ -4,3 +4,4 @@
 {"type":"critic_cache_miss","cacheKey":"sha256:31930430462ca3de9218016f6b5ef0928ba2bc6e8e8b929b180c8252e60a0137","reason":"no-cache-entry","timestamp":"2026-10-27T01:46:33.621Z"}
 {"type":"critic_finished","runtime":"dsh","model":"deepseek-flash","findings":3,"costCny":0.44061416640000006,"costSource":"pricing","usageComplete":true,"cacheHit":false,"cacheKey":"sha256:31930430462ca3de9218016f6b5ef0928ba2bc6e8e8b929b180c8252e60a0137","timestamp":"2026-10-27T01:50:42.211Z"}
 {"type":"run_finished","status":"awaiting_signoff","findings":3,"blockers":0,"signoffValid":false,"timestamp":"2026-10-27T01:50:42.214Z"}
+{"type":"signoff_finalized","runId":"run-2026-10-27T01-45-16-826Z","status":"success","signer":"胡冀徽","manifestHash":"sha256:d67ee76c1bad49ebdbf6afa1dcb9ace947746b5f2926864978731c8415737dae","findingsHash":"sha256:81d3c72b65609b2d191c7777047a96034954231069f3a1d146b199fa729cca49","waivedFindings":[],"cachePersisted":true,"timestamp":"2026-10-27T02:15:53.376Z"}
