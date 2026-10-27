@@ -1,9 +1,48 @@
-# employee-app-phase2 · Figma gate evidence (v0.6)
+# employee-app-phase2 · Figma gate evidence
+
+## v0.7 run (2026-10-27)
+
+Plugin bundle `sha256:eb862fa29a61d92a85c4cf14fed87bad2148138bb0d0301f51c403ccd2211de6`
+(`runtimes/figma/dist/code.js`, copied to `~/Downloads/prd-ui-figma/dist/`).
+
+| Check | Result |
+|---|---|
+| Scratch pages | 8/8 built in Figma desktop |
+| Scratch `figma:verify` | 8/8 `passed` — 0 blocker; appointment-list 1 major |
+| Delivery pages | 8/8 built in a new blank Figma file |
+| Delivery `figma:verify` | 8/8 `passed` — 0 blocker; appointment-list 1 major |
+| Readback errors | 0 on all 16 readbacks |
+| `figma:conformance` | 0 blocker / 0 major (233 checked) |
+| `figma:parity` vs current baseline | **8/8 failed** — baseline is stale v0.5; Gate 0 must regenerate and sign it |
+| Human visual signoff | **pending** |
+
+Figma files (Drafts, both named `Untitled`):
+
+- Scratch: `fileKey iL99qSPGhmh08BB9LketgF` — pages `今日 [scratch] … 预约列表 [scratch]`.
+- Delivery: `fileKey ff6GLUDoFgynQPtWhxwi43` — new blank file, pages `今日 … 预约列表` + `Page 1`.
+- `figma-files.json` maps all 8 delivery pages to the delivery fileKey.
+
+Parity diagnostic against the stale baseline (not a signed gate):
+
+| page | pixel diff | SSIM | max diff cluster |
+|---|---:|---:|---:|
+| appointment-detail | 3.588% | 0.7341 | 336 |
+| appointment-form | 1.816% | 0.9127 | 588 |
+| appointment-list | 1.465% | 0.9403 | 588 |
+| callback-register | 1.022% | 0.9492 | 588 |
+| customer-detail | 3.224% | 0.7746 | 588 |
+| customer-search | 0.355% | 0.9883 | 144 |
+| today | 1.226% | 0.9527 | 99 |
+| treatment-notice | 3.240% | 0.7816 | 588 |
+
+These failures are expected before Gate 0: the current baseline was generated from
+the stale v0.5 HTML. **Do not sign v0.7 from this state.** Regenerate and human-sign
+the baseline, rerun `figma:parity`, then `figma:sign`.
+
+## v0.6 history (2026-10-26)
 
 Gate run: 2026-10-26 (structural gate + fidelity pass), plugin bundle
 `sha256:4f6aedcd6456…` (`runtimes/figma/dist/code.js`).
-
-## Result
 
 | Check | Result |
 |---|---|
@@ -17,7 +56,7 @@ Gate run: 2026-10-26 (structural gate + fidelity pass), plugin bundle
 Figma files (Drafts, both named `Untitled`):
 
 - Scratch: `fileKey iL99qSPGhmh08BB9LketgF` — pages `今日 [scratch] … 预约列表 [scratch]`.
-- Delivery: `fileKey ne1JYKpfjDivRr0nK5jm4S` — pages `今日 … 预约列表` + `Page 1`.
+- Delivery: `fileKey ne1JYKpfjDivRr0nK5jm4S` — pages `今日 … 预约列表` + `Page 1` (superseded by the v0.7 delivery file above).
 - Both files: 25 variables (`b-mobile Tokens`, 17 base + 8 alpha variants), 6 text styles, one `b-mobile/Button` component set.
 
 ## Layout
@@ -100,8 +139,9 @@ Plugin UI (`runtimes/figma/src/ui.html`): build mode is a radio pair instead of 
 
 ## Manual Figma checklist (human, before signing)
 
-1. Open `ne1JYKpfjDivRr0nK5jm4S` and compare each page with
-   `pipeline/baselines/employee-app-phase2/<page>.default.png` (or the HTML in
+1. Open the v0.7 delivery file `ff6GLUDoFgynQPtWhxwi43` (v0.6 delivery
+   `ne1JYKpfjDivRr0nK5jm4S` is historical) and compare each page with
+   `pipeline/baselines/employee-app-phase2/<page>.default.png` (or the fresh HTML in
    `pipeline/artifacts/employee-app-phase2/html/`).
 2. Build/re-export each page so the plugin saves a current
    `parity/figma.<page>.png`. `figma:parity` and `handoff:pack` use that PNG as
@@ -147,7 +187,8 @@ overwrite the scratch readback.
 
 ## Caveats
 
-- **The v0.7 regenerated plans invalidate this v0.6 evidence**: the card/quick-action/calendar/list style corrections mean the checked-in `readback/`, `diff/` and `screenshots/*` are stale. `figma:sign` re-derives each diff and refuses the stored `passed: true` flags until the 8 Figma pages are rebuilt and fresh readbacks are captured.
+- **The v0.6 evidence is superseded by the 2026-10-27 rebuild.** The current `readback/`, `readback/delivery/`, `diff/`, `diff/delivery/` and `parity/figma.<page>.png` are from the v0.7 plans and current plugin bundle; the v0.6 `screenshots/*` crops remain historical only.
+- **Parity is still red against the stale v0.5 baseline.** `figma:sign` will refuse until Gate 0 regenerates and human-signs the visual baseline, then `figma:parity` is rerun. Structural verify being 8/8 is not a v0.7 signoff.
 - The `screenshots/*` crops are v0.6 manual canvas captures, not parity evidence. A handoff package copies them only to `screenshots/figma-manual/` with a known-gap note; the primary `screenshots/figma/<page>.png` comes from `parity/figma.<page>.png`.
 - Figma scratch pages are volatile: closing the tab before copying readbacks loses them.
 - The registered development plugin points at `~/Downloads/prd-ui-figma/`; after

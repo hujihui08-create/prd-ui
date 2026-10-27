@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "appointment-form",
-  "builtAt": "2026-10-26T08:21:52.235Z",
+  "builtAt": "2026-10-27T01:17:39.765Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -30,8 +30,8 @@
     "color/border/control"
   ],
   "textStyles": [
-    "b-mobile/body.md",
     "b-mobile/heading.2",
+    "b-mobile/body.md",
     "b-mobile/label.sm",
     "b-mobile/heading.3",
     "b-mobile/label.strong",
@@ -43,7 +43,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "4:319",
+      "nodeId": "4:808",
       "type": "FRAME",
       "name": "新增/改期预约",
       "specId": "appointment-form.page.root",
@@ -64,7 +64,7 @@
       ],
       "children": [
         {
-          "nodeId": "4:320",
+          "nodeId": "4:809",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "appointment-form.page.root.header",
@@ -85,7 +85,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:321",
+              "nodeId": "4:810",
               "type": "GLYPH",
               "name": "Back",
               "specId": "appointment-form.page.root.header.back",
@@ -102,10 +102,18 @@
                 "style": "Regular"
               },
               "fontSize": 20,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
             },
             {
-              "nodeId": "4:322",
+              "nodeId": "4:811",
               "type": "TEXT",
               "name": "Title",
               "specId": "appointment-form.page.root.header.title",
@@ -123,12 +131,28 @@
                 "style": "SemiBold"
               },
               "fontSize": 16,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:323",
+          "nodeId": "4:812",
           "type": "FRAME",
           "name": "Content",
           "specId": "appointment-form.page.root.content",
@@ -149,7 +173,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:324",
+              "nodeId": "4:813",
               "type": "FRAME",
               "name": "Section",
               "specId": "appointment-form.root.content.0",
@@ -167,7 +191,7 @@
               "y": 0,
               "children": [
                 {
-                  "nodeId": "4:325",
+                  "nodeId": "4:814",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.customer",
@@ -185,7 +209,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "4:326",
+                      "nodeId": "4:815",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.customer.label",
@@ -203,10 +227,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:327",
+                      "nodeId": "4:816",
                       "type": "FRAME",
                       "name": "Row",
                       "specId": "appointment-form.root.content.0.children.0.children.0",
@@ -224,7 +257,7 @@
                       "y": 24,
                       "children": [
                         {
-                          "nodeId": "4:328",
+                          "nodeId": "4:817",
                           "type": "FRAME",
                           "name": "Input",
                           "specId": "appointment-form.root.content.0.children.0.children.0.children.0",
@@ -245,7 +278,7 @@
                           ],
                           "children": [
                             {
-                              "nodeId": "4:329",
+                              "nodeId": "4:818",
                               "type": "TEXT",
                               "name": "Placeholder",
                               "specId": "appointment-form.root.content.0.children.0.children.0.children.0.placeholder",
@@ -263,12 +296,40 @@
                                 "style": "Regular"
                               },
                               "fontSize": 14,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#5B6472",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 400,
+                              "textColor": "#5B6472",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "fillDetails": [
+                            {
+                              "color": "#FFFFFF",
+                              "alpha": 1
+                            }
+                          ],
+                          "cornerRadius": 8,
+                          "borderTop": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          },
+                          "borderLeft": {
+                            "width": 1,
+                            "color": "#CBD5E1"
+                          }
                         },
                         {
-                          "nodeId": "4:330",
+                          "nodeId": "4:819",
                           "type": "INSTANCE",
                           "name": "Button:选择",
                           "specId": "appointment-form.action.pick-customer",
@@ -289,14 +350,17 @@
                             "emphasis": "ghost"
                           },
                           "characters": "选择",
-                          "children": []
+                          "children": [],
+                          "cornerRadius": 6
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:332",
+                  "nodeId": "4:821",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.project",
@@ -314,7 +378,7 @@
                   "y": 88,
                   "children": [
                     {
-                      "nodeId": "4:333",
+                      "nodeId": "4:822",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.project.label",
@@ -332,10 +396,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:334",
+                      "nodeId": "4:823",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "appointment-form.root.content.0.children.1.children.0",
@@ -356,7 +429,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:335",
+                          "nodeId": "4:824",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "appointment-form.root.content.0.children.1.children.0.placeholder",
@@ -374,14 +447,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:336",
+                  "nodeId": "4:825",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.start-time",
@@ -399,7 +501,7 @@
                   "y": 160,
                   "children": [
                     {
-                      "nodeId": "4:337",
+                      "nodeId": "4:826",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.start-time.label",
@@ -417,10 +519,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:338",
+                      "nodeId": "4:827",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "appointment-form.root.content.0.children.2.children.0",
@@ -441,7 +552,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:339",
+                          "nodeId": "4:828",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "appointment-form.root.content.0.children.2.children.0.placeholder",
@@ -459,14 +570,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:340",
+                  "nodeId": "4:829",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.end-time",
@@ -484,7 +624,7 @@
                   "y": 232,
                   "children": [
                     {
-                      "nodeId": "4:341",
+                      "nodeId": "4:830",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.end-time.label",
@@ -502,10 +642,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:342",
+                      "nodeId": "4:831",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "appointment-form.root.content.0.children.3.children.0",
@@ -526,7 +675,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:343",
+                          "nodeId": "4:832",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "appointment-form.root.content.0.children.3.children.0.placeholder",
@@ -544,14 +693,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:344",
+                  "nodeId": "4:833",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.therapist",
@@ -569,7 +747,7 @@
                   "y": 304,
                   "children": [
                     {
-                      "nodeId": "4:345",
+                      "nodeId": "4:834",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.therapist.label",
@@ -587,10 +765,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:346",
+                      "nodeId": "4:835",
                       "type": "FRAME",
                       "name": "Input",
                       "specId": "appointment-form.root.content.0.children.4.children.0",
@@ -611,7 +798,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:347",
+                          "nodeId": "4:836",
                           "type": "TEXT",
                           "name": "Placeholder",
                           "specId": "appointment-form.root.content.0.children.4.children.0.placeholder",
@@ -629,14 +816,43 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472",
+                          "lineHeight": 18
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:348",
+                  "nodeId": "4:837",
                   "type": "FRAME",
                   "name": "FormField",
                   "specId": "appointment-form.field.source",
@@ -654,7 +870,7 @@
                   "y": 376,
                   "children": [
                     {
-                      "nodeId": "4:349",
+                      "nodeId": "4:838",
                       "type": "TEXT",
                       "name": "Label",
                       "specId": "appointment-form.field.source.label",
@@ -672,10 +888,19 @@
                         "style": "Medium"
                       },
                       "fontSize": 13,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#4B5563",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 500,
+                      "textColor": "#4B5563",
+                      "lineHeight": 18
                     },
                     {
-                      "nodeId": "4:350",
+                      "nodeId": "4:839",
                       "type": "FRAME",
                       "name": "Select",
                       "specId": "appointment-form.root.content.0.children.5.children.0",
@@ -696,7 +921,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:351",
+                          "nodeId": "4:840",
                           "type": "TEXT",
                           "name": "Value",
                           "specId": "appointment-form.root.content.0.children.5.children.0.value",
@@ -714,10 +939,19 @@
                             "style": "Regular"
                           },
                           "fontSize": 14,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#111827",
+                          "lineHeight": 18
                         },
                         {
-                          "nodeId": "4:352",
+                          "nodeId": "4:841",
                           "type": "GLYPH",
                           "name": "Chevron",
                           "specId": "appointment-form.root.content.0.children.5.children.0.chevron",
@@ -734,18 +968,54 @@
                             "style": "Regular"
                           },
                           "fontSize": 16,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#5B6472",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#5B6472"
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#FFFFFF",
+                          "alpha": 1
+                        }
+                      ],
+                      "cornerRadius": 8,
+                      "borderTop": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderBottom": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      },
+                      "borderLeft": {
+                        "width": 1,
+                        "color": "#CBD5E1"
+                      }
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:353",
+          "nodeId": "4:842",
           "type": "FRAME",
           "name": "Actions",
           "specId": "appointment-form.page.root.actions",
@@ -766,7 +1036,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:354",
+              "nodeId": "4:843",
               "type": "INSTANCE",
               "name": "Button:保存",
               "specId": "appointment-form.action.save",
@@ -787,11 +1057,44 @@
                 "emphasis": "primary"
               },
               "characters": "保存",
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 6
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0,
+          "borderTop": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderBottom": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderLeft": {
+            "width": 1,
+            "color": "#E5E7EB"
+          }
         }
-      ]
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
     }
   ],
   "errors": []

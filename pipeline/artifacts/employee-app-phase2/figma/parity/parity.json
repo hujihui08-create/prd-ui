@@ -1,0 +1,255 @@
+{
+  "schemaVersion": "1.0",
+  "project": "employee-app-phase2",
+  "generatedAt": "2026-10-27T01:24:54.821Z",
+  "thresholds": {
+    "maxPixelDiff": 0.005,
+    "minSsim": 0.98,
+    "maxClusterPixels": 24
+  },
+  "pages": [
+    {
+      "pageId": "appointment-detail",
+      "passed": false,
+      "pixelDiffRatio": 0.035876169643942156,
+      "ssim": 0.7341127067966258,
+      "maxDiffCluster": 336,
+      "baselineFile": "../../../../baselines/employee-app-phase2/appointment-detail.default.png",
+      "figmaFile": "figma.appointment-detail.png",
+      "baselineHash": "sha256:e742fa14d5c3de3479a73604269f5ebfc62c80fb7a98a69beb1e29fdd47e09aa",
+      "figmaHash": "sha256:bcfae13bc464db2de16f617bd4d06909dd9c07ccf218e41a3b33e9b544e0146b",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/appointment-detail.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 3.59% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.7341 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 336px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "appointment-form",
+      "passed": false,
+      "pixelDiffRatio": 0.018161380483655364,
+      "ssim": 0.9127201604926639,
+      "maxDiffCluster": 588,
+      "baselineFile": "../../../../baselines/employee-app-phase2/appointment-form.default.png",
+      "figmaFile": "figma.appointment-form.png",
+      "baselineHash": "sha256:05fbd68c93914ef1602b9fc108d811e7b4e04fe4aa9da1afdf3492a77accd369",
+      "figmaHash": "sha256:6fbb2c14dd1898372e2b1df5e3b91f6fbc2ef49d7106d8a8dc61ef9c5322d503",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/appointment-form.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 1.82% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.9127 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 588px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "appointment-list",
+      "passed": false,
+      "pixelDiffRatio": 0.014649410620974601,
+      "ssim": 0.9403273265852271,
+      "maxDiffCluster": 588,
+      "baselineFile": "../../../../baselines/employee-app-phase2/appointment-list.default.png",
+      "figmaFile": "figma.appointment-list.png",
+      "baselineHash": "sha256:0d36b35d3653b8360e58705c2317975d2f4c04731a6a695d35ceec84dce568aa",
+      "figmaHash": "sha256:2720b3e42f4cc3abeba46ed6b293598c89194722caf18f37109357d8e70c98a6",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/appointment-list.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 1.46% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.9403 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 588px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "callback-register",
+      "passed": false,
+      "pixelDiffRatio": 0.010219953821849556,
+      "ssim": 0.9491617053093656,
+      "maxDiffCluster": 588,
+      "baselineFile": "../../../../baselines/employee-app-phase2/callback-register.default.png",
+      "figmaFile": "figma.callback-register.png",
+      "baselineHash": "sha256:38bbbcd1624194793fa25915c732df6449175074b7edba51ab7a26242b508c2b",
+      "figmaHash": "sha256:88fab3646f456f30a09837d5bfb24ce23ba55d3b5902cf7221945025bf68b603",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/callback-register.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 1.02% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.9492 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 588px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "customer-detail",
+      "passed": false,
+      "pixelDiffRatio": 0.032239640296512335,
+      "ssim": 0.7746329686678161,
+      "maxDiffCluster": 588,
+      "baselineFile": "../../../../baselines/employee-app-phase2/customer-detail.default.png",
+      "figmaFile": "figma.customer-detail.png",
+      "baselineHash": "sha256:04c9f3ca6349ad636b20b5207008f093d08c207f8a4278fc9e317c482c5b9a0b",
+      "figmaHash": "sha256:5c546ce0ab5da6f6de506812ce599481e069a63f0bb96d03b0c55cd6d06cfa96",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/customer-detail.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 3.22% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.7746 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 588px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "customer-search",
+      "passed": false,
+      "pixelDiffRatio": 0.0035545023696682463,
+      "ssim": 0.9883209414382707,
+      "maxDiffCluster": 144,
+      "baselineFile": "../../../../baselines/employee-app-phase2/customer-search.default.png",
+      "figmaFile": "figma.customer-search.png",
+      "baselineHash": "sha256:5dbcb3a50d3f9be286ada3a1a0b52163bf5cdaff83892d8f688d2ebcd7841c30",
+      "figmaHash": "sha256:5f9fbec99d5b931513e5526b5a541bafe261b6e6a5c41310e67d1e118560646d",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/customer-search.png",
+      "findings": [
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 144px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "today",
+      "passed": false,
+      "pixelDiffRatio": 0.012258476121035363,
+      "ssim": 0.952726671122333,
+      "maxDiffCluster": 99,
+      "baselineFile": "../../../../baselines/employee-app-phase2/today.default.png",
+      "figmaFile": "figma.today.png",
+      "baselineHash": "sha256:59bf398abf04047603d64ebf4be8a0bfec904f37aec7159dae2b7d2c9cd486dd",
+      "figmaHash": "sha256:e342770284bf6b2d4316521ef83da560c2626449c994bb822dd4282986326732",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/today.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 1.23% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.9527 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 99px > 24px."
+        }
+      ]
+    },
+    {
+      "pageId": "treatment-notice",
+      "passed": false,
+      "pixelDiffRatio": 0.03240065621582209,
+      "ssim": 0.7816203410211257,
+      "maxDiffCluster": 588,
+      "baselineFile": "../../../../baselines/employee-app-phase2/treatment-notice.default.png",
+      "figmaFile": "figma.treatment-notice.png",
+      "baselineHash": "sha256:da11d010ceb55e2f64a6b6f3d582085e480d33941046ea3b7579163fd5c4c0de",
+      "figmaHash": "sha256:6b18a6ed938a8b177862d3ec4c067f811eb299164d6cc3eb90893ea1476743bb",
+      "width": 390,
+      "height": 844,
+      "diffFile": "diff/treatment-notice.png",
+      "findings": [
+        {
+          "code": "PARITY_PIXEL_DIFF",
+          "severity": "blocker",
+          "message": "Pixel diff 3.24% > 0.50%."
+        },
+        {
+          "code": "PARITY_SSIM",
+          "severity": "blocker",
+          "message": "SSIM 0.7816 < 0.9800."
+        },
+        {
+          "code": "PARITY_DIFF_CLUSTER",
+          "severity": "blocker",
+          "message": "Largest diff cluster 588px > 24px."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "passed": false,
+    "failed": 8,
+    "pages": 8
+  }
+}

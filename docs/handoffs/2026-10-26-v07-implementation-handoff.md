@@ -1,18 +1,22 @@
 # 会话交接：v0.7 自动门禁实现与证据（人工 Figma 重建 / Gate 0 待办）
 
-- 日期：2026-10-26
-- 状态：**v0.7 可自动化部分已实现并验证；Figma 重建、parity、签核与 Gate 0 仍未完成，v0.7 未签核**
+- 日期：2026-10-26（2026-10-27 更新：Figma 重建完成，parity 因 stale baseline 仍红）
+- 状态：**v0.7 自动化门禁与 Figma 重建已完成；visual baseline 重生成/签核（Gate 0）、parity、`figma:sign`、`handoff:pack` 仍未完成，v0.7 未签核**
 - 上一版：[v0.6 Figma 门禁证据](2026-10-26-v06-figma-gate-evidence.md)
 - 设计输入：[v0.7 输入：视觉门禁、结构优化与分块生成](../specs/2026-10-26-v07-visual-gates-structure-block-input.md)
 
 ## 1. 一句话状态
 
 `figma:conformance`（plan ↔ HTML）在 8 页上 **0 blocker / 0 major**（233 项检查）；
-`render:measure` 8 页、`structure:check` 0 warning；`v07:smoke` 退出 0，但
-`executedGatesPassed: true` / `complete: false` / `paritySkipped: true`（parity 未运行，
-不是完整通过）。`figma:verify` 因 **v0.6 readback 过期** 仍为红（3/8 passed，4 blocker / 53 major），
-parity 未运行（没有 Figma PNG 和可用的已签核 baseline），`handoff:pack` fail-closed
-（exit 1，23 blockers，未产出目录）。v0.6 人工签核与 baseline 重生成（Gate 0）仍是最前置的阻塞项。
+`render:measure` 8 页、`structure:check` 0 warning。2026-10-27 在真实 Figma 桌面版完成
+**scratch 8/8 + delivery 8/8 重建**，16 份 readback `errors: []`，scratch/delivery
+`figma:verify` 均 **8/8 passed**（0 blocker；appointment-list 1 major，默认阈值内）。
+delivery 文件为 `ff6GLUDoFgynQPtWhxwi43`，`figma-files.json` 已记录 8 页映射。
+
+`figma:parity` 已能对真实 delivery PNG 运行，但对当前 **stale v0.5 baseline** 8/8 失败
+（pixel 0.36%–3.59%，SSIM 0.734–0.988，cluster 99–588），因此 **v0.7 仍未签核**。
+下一步是 Gate 0：人工重生成并签核 visual baseline，重跑 parity，再 `figma:sign`/`handoff:pack`。
+`handoff:pack` 目前仍 fail-closed。
 
 ## 2. 本次交付
 
@@ -133,6 +137,16 @@ summary：`{"blockers":0,"majors":0,"pages":8}`。
 **没有** `UNMAPPED_COMPONENT`/`SPEC_NODE_ID_MISSING`/`FIGMA_NODE_MISSING`/
 `FIGMA_NODE_EXTRA`/`FIGMA_HIERARCHY`/`FIGMA_LAYOUT_MODE`。plan 已按 HTML 修正
 （Task 20a），不重建 Figma 就无法变绿。
+
+### 3.5 2026-10-27 真实 Figma 重建与 parity 诊断
+
+- 插件 bundle `sha256:eb862fa29a61d92a85c4cf14fed87bad2148138bb0d0301f51c403ccd2211de6`，已复制到 `~/Downloads/prd-ui-figma/dist/`。
+- scratch：8/8 重建，8/8 `figma:verify` passed（0 blocker；appointment-list 1 major）。
+- delivery：新空白文件 `ff6GLUDoFgynQPtWhxwi43`，8/8 重建，8/8 `figma:verify` passed（0 blocker；appointment-list 1 major）。
+- 16 份 readback `errors: []`；`readback/delivery/`、`diff/delivery/`、`parity/figma.<page>.png` 已更新。
+- `figma:conformance` 仍为 0 blocker / 0 major（233 checked）。
+- `figma:parity` 对 stale v0.5 baseline：8/8 failed（pixel 0.355%–3.588%，SSIM 0.7341–0.9883，cluster 99–588）。这不是实现失败，而是 Gate 0 尚未重生成 baseline；**不得据此签核**。
+- `figma:sign` / `handoff:pack` 仍应 fail-closed，直到 baseline 重签、parity 变绿。
 
 ## 4. 缺陷注入验收
 

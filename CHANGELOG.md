@@ -3,6 +3,23 @@
 All notable changes to the PRD → UI pipeline are recorded here. Dates are local
 (Asia/Shanghai) work dates; commits are local-only (no push).
 
+## 2026-10-27 — v0.7 real Figma rebuild (verify 8/8 scratch + delivery; still not signed)
+
+- Rebuilt all 8 pages in Figma desktop from the corrected plans with plugin
+  bundle `sha256:eb862fa…1de6`: scratch 8/8 and delivery 8/8.
+- `figma:verify` is **8/8 passed** on both scratch and delivery (0 blocker;
+  appointment-list 1 major, within the default threshold); all 16 readbacks
+  have `errors: []`.
+- Delivery file is `ff6GLUDoFgynQPtWhxwi43`; `figma-files.json` maps all 8
+  pages. Scratch is `iL99qSPGhmh08BB9LketgF`.
+- `figma:conformance` remains 0 blocker / 0 major (233 checked).
+- `figma:parity` now runs on real delivery PNGs but fails **8/8** against the
+  stale v0.5 baseline (pixel 0.355%–3.588%, SSIM 0.7341–0.9883, cluster
+  99–588). This is expected before Gate 0; `figma:sign`/`handoff:pack` remain
+  fail-closed until the baseline is regenerated, human-signed, and parity is
+  green.
+- Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,readback/delivery,diff,diff/delivery,parity,figma-files.json}`.
+
 ## 2026-10-26 — v0.7 final whole-branch review fixes (still not signed)
 
 ### Fixed

@@ -164,21 +164,27 @@ DSH_HOME="$PWD/dsh/home" pnpm agent:run --project samples/projects/employee-app/
   defaults to the visual run's baseline files, then `pipeline/baselines/<project>`.
 - There is no lint or format script; `pnpm typecheck` is the static gate.
 
-## Current state (v0.7 automatable gates implemented, final review fixes landed, Figma rebuild + Gate 0 pending, 2026-10-26)
+## Current state (v0.7 automation + Figma rebuild complete, Gate 0/parity/signoff pending, 2026-10-27)
 
 Verified: `pnpm test` **983 passed** (87 files), `pnpm test:dsh` **4 passed**
 (3 files), `pnpm typecheck` clean, `pnpm --dir runtimes/figma typecheck` clean
 and build OK. `phase1:verify` is 8 / 2 / 4 / 8 pages with 0 blockers across the
 demo-orders, employee-app, 03-slice, and phase2 projects.
 
-**v0.7 is implemented in the parts that do not need Figma desktop, and is not
+**v0.7 is implemented and the real Figma rebuild is complete, but it is not
 signed.** `figma:conformance` is **0 blocker / 0 major / 233 checked** on the 8
-phase2 pages using freshly rendered HTML (`/tmp/html-v07-final2`) and the
-committed corrected plans; `render:measure` is 8 pages with no overflow and
-`structure:check --project` is 0 warnings / 0 blockers. `v07:smoke` exits 0 with
-`executedGatesPassed: true`, `complete: false`, `paritySkipped: true` because no
-`figma/parity/figma.<page>.png` exist (not a full pass).
-Evidence: `pipeline/artifacts/employee-app-phase2/{figma/conformance,render,v07-smoke.json}`.
+phase2 pages; `render:measure` is 8 pages with no overflow and
+`structure:check --project` is 0 warnings / 0 blockers. On 2026-10-27 the plugin
+rebuilt **scratch 8/8 + delivery 8/8** in Figma desktop (`fileKey` scratch
+`iL99qSPGhmh08BB9LketgF`, delivery `ff6GLUDoFgynQPtWhxwi43`), all 16 readbacks
+have `errors: []`, and scratch/delivery `figma:verify` are **8/8 passed**
+(0 blocker; appointment-list 1 major). `figma-files.json` records the delivery
+keys. Evidence: `pipeline/artifacts/employee-app-phase2/figma/{readback,diff,parity}`.
+
+`figma:parity` now runs on real delivery PNGs but is **8/8 failed against the
+stale v0.5 baseline** (pixel 0.36%–3.59%, SSIM 0.734–0.988, cluster 99–588).
+That is expected before Gate 0; `figma:sign` and `handoff:pack` stay fail-closed
+until the human regenerates/signs the visual baseline and parity is green.
 
 The whole-branch review fixes are in: stored `figma-diff.*.json` `passed` flags
 are re-derived from plan + readback, parity PNG/baseline PNG hashes are
@@ -188,14 +194,6 @@ parity evidence, handoff requires render metrics and binds supplied HTML/spec
 bytes to conformance + visual inputs, and structure diff covers text props and
 id-less nodes. Details: `docs/handoffs/2026-10-26-v07-final-review-fixes.md`.
 
-`figma:verify` is **red against the checked-in v0.6 readbacks** (3/8 passed;
-4 blocker / 53 major, all stale value diffs, no coverage findings) because
-Task 20a corrected the plans. A real Figma rebuild (scratch + delivery) is
-required before verify/parity/`figma:sign` can be green. `handoff:pack` fails
-closed on the current evidence (stale diffs, missing parity PNG/`parity.json`,
-missing readback `fileKey`, missing figma signoff, and no `htmlHashes` in the
-old visual state); no partial package is written.
-
 v0.5 remains the last signed milestone. **Gate 0 is still pending**: the v0.6
 human side-by-side visual signoff was never done, and the v0.5 visual baseline
 is stale after the v0.5.x CSS changes, so the next visual gate must regenerate
@@ -204,17 +202,9 @@ concluded **rollback at ¥0.3302** (evidence copied to
 `pipeline/artifacts/employee-app-phase2/blocks/`); it ran before the conformance
 remediation, so a v0.8 re-evaluation is required before treating that as final.
 
-v0.6 Phase 3A (Figma plan compiler + plugin/readback diff, Asset Compiler, and
-the read-only Studio) remains implemented in its automatable parts; its
-2026-10-26 gate evidence (8/8 scratch + 8/8 delivery verify passed, 16
-`errors: []` readbacks) is historical and **not** v0.7-green because the plans
-changed afterwards. See the v0.6 note in
-`pipeline/artifacts/employee-app-phase2/figma/README.md`.
-
-Next: Gate 0 (v0.6 human check + regenerated baseline), then rebuild the 8 Figma
-pages from the corrected plans, re-run `figma:verify` + `figma:parity`, sign
-`figma:sign`, and re-run `handoff:pack` against a full spec run. Phase 4 pilot
-is v0.8; RC v0.9; final v1.0. Handoff (latest):
+Next: Gate 0 (human regenerated/re-signed baseline), rerun `figma:parity`, then
+`figma:sign`, `visual:review/sign`, and `handoff:pack` against the full run.
+Phase 4 pilot is v0.8; RC v0.9; final v1.0. Handoff (latest):
 `docs/handoffs/2026-10-26-v07-final-review-fixes.md`; then
 `docs/handoffs/2026-10-26-v07-implementation-handoff.md`,
 `docs/handoffs/2026-10-26-v06-figma-gate-evidence.md` (v0.6 evidence),

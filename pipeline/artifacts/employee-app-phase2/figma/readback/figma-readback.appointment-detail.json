@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "appointment-detail",
-  "builtAt": "2026-10-26T08:21:30.936Z",
+  "builtAt": "2026-10-27T01:17:25.828Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -30,8 +30,8 @@
     "color/border/control"
   ],
   "textStyles": [
-    "b-mobile/body.md",
     "b-mobile/heading.2",
+    "b-mobile/body.md",
     "b-mobile/label.sm",
     "b-mobile/heading.3",
     "b-mobile/label.strong",
@@ -42,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "4:170",
+      "nodeId": "4:739",
       "type": "FRAME",
       "name": "预约详情",
       "specId": "appointment-detail.page.root",
@@ -63,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "4:171",
+          "nodeId": "4:740",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "appointment-detail.page.root.header",
@@ -84,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:172",
+              "nodeId": "4:741",
               "type": "GLYPH",
               "name": "Back",
               "specId": "appointment-detail.page.root.header.back",
@@ -101,10 +101,18 @@
                 "style": "Regular"
               },
               "fontSize": 20,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
             },
             {
-              "nodeId": "4:173",
+              "nodeId": "4:742",
               "type": "TEXT",
               "name": "Title",
               "specId": "appointment-detail.page.root.header.title",
@@ -122,12 +130,28 @@
                 "style": "SemiBold"
               },
               "fontSize": 16,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:174",
+          "nodeId": "4:743",
           "type": "FRAME",
           "name": "Content",
           "specId": "appointment-detail.page.root.content",
@@ -148,12 +172,12 @@
           ],
           "children": [
             {
-              "nodeId": "4:175",
+              "nodeId": "4:744",
               "type": "FRAME",
               "name": "Card",
               "specId": "appointment-detail.card.summary",
               "layoutMode": "VERTICAL",
-              "itemSpacing": 8,
+              "itemSpacing": 0,
               "padding": {
                 "top": 16,
                 "right": 16,
@@ -161,7 +185,7 @@
                 "left": 16
               },
               "width": 390,
-              "height": 493,
+              "height": 500,
               "x": 0,
               "y": 0,
               "fills": [
@@ -169,7 +193,7 @@
               ],
               "children": [
                 {
-                  "nodeId": "4:176",
+                  "nodeId": "4:745",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "appointment-detail.card.summary.head",
@@ -187,7 +211,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "4:177",
+                      "nodeId": "4:746",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "appointment-detail.card.summary.title",
@@ -205,10 +229,19 @@
                         "style": "SemiBold"
                       },
                       "fontSize": 16,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#111827",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 600,
+                      "textColor": "#111827",
+                      "lineHeight": 24
                     },
                     {
-                      "nodeId": "4:178",
+                      "nodeId": "4:747",
                       "type": "FRAME",
                       "name": "Badge",
                       "specId": "appointment-detail.card.summary.badge",
@@ -229,7 +262,7 @@
                       ],
                       "children": [
                         {
-                          "nodeId": "4:179",
+                          "nodeId": "4:748",
                           "type": "TEXT",
                           "name": "Label",
                           "specId": "appointment-detail.card.summary.badge.label",
@@ -247,50 +280,67 @@
                             "style": "Medium"
                           },
                           "fontSize": 12,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#92400E",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 500,
+                          "textColor": "#92400E",
+                          "lineHeight": 16
                         }
-                      ]
+                      ],
+                      "fillDetails": [
+                        {
+                          "color": "#92400E",
+                          "alpha": 0.11999999731779099
+                        }
+                      ],
+                      "cornerRadius": 4
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:180",
+                  "nodeId": "4:749",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "appointment-detail.card.summary.body",
                   "layoutMode": "VERTICAL",
                   "itemSpacing": 0,
                   "padding": {
-                    "top": 0,
+                    "top": 8,
                     "right": 0,
                     "bottom": 0,
                     "left": 0
                   },
                   "width": 358,
-                  "height": 429,
+                  "height": 444,
                   "x": 16,
-                  "y": 48,
+                  "y": 40,
                   "children": [
                     {
-                      "nodeId": "4:181",
+                      "nodeId": "4:750",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "appointment-detail.root.summary.0.children.0",
                       "layoutMode": "VERTICAL",
                       "itemSpacing": 0,
                       "padding": {
-                        "top": 0,
+                        "top": 4,
                         "right": 0,
-                        "bottom": 0,
+                        "bottom": 4,
                         "left": 0
                       },
                       "width": 358,
-                      "height": 429,
+                      "height": 436,
                       "x": 0,
-                      "y": 0,
+                      "y": 8,
                       "children": [
                         {
-                          "nodeId": "4:182",
+                          "nodeId": "4:751",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.0",
@@ -305,10 +355,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 0,
+                          "y": 4,
                           "children": [
                             {
-                              "nodeId": "4:183",
+                              "nodeId": "4:752",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.0.label",
@@ -326,7 +376,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:184",
+                                  "nodeId": "4:753",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.0.labelText",
@@ -344,12 +394,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:185",
+                              "nodeId": "4:754",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.0.value",
@@ -367,12 +427,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:186",
+                          "nodeId": "4:755",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.1",
@@ -387,10 +469,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 39,
+                          "y": 43,
                           "children": [
                             {
-                              "nodeId": "4:187",
+                              "nodeId": "4:756",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.1.label",
@@ -408,7 +490,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:188",
+                                  "nodeId": "4:757",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.1.labelText",
@@ -426,12 +508,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:189",
+                              "nodeId": "4:758",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.1.value",
@@ -449,12 +541,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:190",
+                          "nodeId": "4:759",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.2",
@@ -469,10 +583,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 78,
+                          "y": 82,
                           "children": [
                             {
-                              "nodeId": "4:191",
+                              "nodeId": "4:760",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.2.label",
@@ -490,7 +604,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:192",
+                                  "nodeId": "4:761",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.2.labelText",
@@ -508,12 +622,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:193",
+                              "nodeId": "4:762",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.2.value",
@@ -531,12 +655,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:194",
+                          "nodeId": "4:763",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.3",
@@ -551,10 +697,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 117,
+                          "y": 121,
                           "children": [
                             {
-                              "nodeId": "4:195",
+                              "nodeId": "4:764",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.3.label",
@@ -572,7 +718,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:196",
+                                  "nodeId": "4:765",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.3.labelText",
@@ -590,12 +736,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:197",
+                              "nodeId": "4:766",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.3.value",
@@ -613,12 +769,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:198",
+                          "nodeId": "4:767",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.4",
@@ -633,10 +811,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 156,
+                          "y": 160,
                           "children": [
                             {
-                              "nodeId": "4:199",
+                              "nodeId": "4:768",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.4.label",
@@ -654,7 +832,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:200",
+                                  "nodeId": "4:769",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.4.labelText",
@@ -672,12 +850,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:201",
+                              "nodeId": "4:770",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.4.value",
@@ -695,12 +883,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:202",
+                          "nodeId": "4:771",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.5",
@@ -715,10 +925,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 195,
+                          "y": 199,
                           "children": [
                             {
-                              "nodeId": "4:203",
+                              "nodeId": "4:772",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.5.label",
@@ -736,7 +946,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:204",
+                                  "nodeId": "4:773",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.5.labelText",
@@ -754,12 +964,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:205",
+                              "nodeId": "4:774",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.5.value",
@@ -777,12 +997,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:206",
+                          "nodeId": "4:775",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.6",
@@ -797,10 +1039,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 234,
+                          "y": 238,
                           "children": [
                             {
-                              "nodeId": "4:207",
+                              "nodeId": "4:776",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.6.label",
@@ -818,7 +1060,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:208",
+                                  "nodeId": "4:777",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.6.labelText",
@@ -836,12 +1078,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:209",
+                              "nodeId": "4:778",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.6.value",
@@ -859,12 +1111,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:210",
+                          "nodeId": "4:779",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.7",
@@ -879,10 +1153,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 273,
+                          "y": 277,
                           "children": [
                             {
-                              "nodeId": "4:211",
+                              "nodeId": "4:780",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.7.label",
@@ -900,7 +1174,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:212",
+                                  "nodeId": "4:781",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.7.labelText",
@@ -918,12 +1192,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:213",
+                              "nodeId": "4:782",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.7.value",
@@ -941,12 +1225,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:214",
+                          "nodeId": "4:783",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.8",
@@ -961,10 +1267,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 312,
+                          "y": 316,
                           "children": [
                             {
-                              "nodeId": "4:215",
+                              "nodeId": "4:784",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.8.label",
@@ -982,7 +1288,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:216",
+                                  "nodeId": "4:785",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.8.labelText",
@@ -1000,12 +1306,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:217",
+                              "nodeId": "4:786",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.8.value",
@@ -1023,12 +1339,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:218",
+                          "nodeId": "4:787",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.9",
@@ -1043,10 +1381,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 351,
+                          "y": 355,
                           "children": [
                             {
-                              "nodeId": "4:219",
+                              "nodeId": "4:788",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.9.label",
@@ -1064,7 +1402,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:220",
+                                  "nodeId": "4:789",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.9.labelText",
@@ -1082,12 +1420,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:221",
+                              "nodeId": "4:790",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.9.value",
@@ -1105,12 +1453,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:222",
+                          "nodeId": "4:791",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "appointment-detail.root.summary.0.children.0.row.10",
@@ -1123,12 +1493,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 39,
+                          "height": 38,
                           "x": 0,
-                          "y": 390,
+                          "y": 394,
                           "children": [
                             {
-                              "nodeId": "4:223",
+                              "nodeId": "4:792",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "appointment-detail.root.summary.0.children.0.row.10.label",
@@ -1146,7 +1516,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:224",
+                                  "nodeId": "4:793",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "appointment-detail.root.summary.0.children.0.row.10.labelText",
@@ -1164,12 +1534,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:225",
+                              "nodeId": "4:794",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "appointment-detail.root.summary.0.children.0.row.10.value",
@@ -1187,18 +1567,37 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 }
-              ]
+              ],
+              "fillDetails": [
+                {
+                  "color": "#FFFFFF",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 12
             },
             {
-              "nodeId": "4:226",
+              "nodeId": "4:795",
               "type": "FRAME",
               "name": "Row",
               "specId": "appointment-detail.root.fields.0",
@@ -1206,17 +1605,17 @@
               "itemSpacing": 8,
               "padding": {
                 "top": 0,
-                "right": 0,
+                "right": 16,
                 "bottom": 0,
-                "left": 0
+                "left": 16
               },
               "width": 390,
               "height": 36,
               "x": 0,
-              "y": 493,
+              "y": 500,
               "children": [
                 {
-                  "nodeId": "4:227",
+                  "nodeId": "4:796",
                   "type": "INSTANCE",
                   "name": "Button:改期",
                   "specId": "appointment-detail.action.reschedule",
@@ -1230,17 +1629,36 @@
                   },
                   "width": 52,
                   "height": 32,
-                  "x": 0,
+                  "x": 16,
                   "y": 2,
                   "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
                     "emphasis": "ghost-chip"
                   },
                   "characters": "改期",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  }
                 },
                 {
-                  "nodeId": "4:229",
+                  "nodeId": "4:798",
                   "type": "INSTANCE",
                   "name": "Button:客户详情",
                   "specId": "appointment-detail.action.customer",
@@ -1254,17 +1672,36 @@
                   },
                   "width": 78,
                   "height": 32,
-                  "x": 60,
+                  "x": 76,
                   "y": 2,
                   "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
                     "emphasis": "ghost-chip"
                   },
                   "characters": "客户详情",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  }
                 },
                 {
-                  "nodeId": "4:231",
+                  "nodeId": "4:800",
                   "type": "INSTANCE",
                   "name": "Button:取消",
                   "specId": "appointment-detail.action.cancel",
@@ -1278,21 +1715,48 @@
                   },
                   "width": 60,
                   "height": 36,
-                  "x": 146,
+                  "x": 162,
                   "y": 0,
                   "componentName": "Emphasis=danger",
                   "variantProperties": {
                     "emphasis": "danger"
                   },
                   "characters": "取消",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 6,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#991B1B"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#991B1B"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#991B1B"
+                  }
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:233",
+          "nodeId": "4:802",
           "type": "FRAME",
           "name": "Actions",
           "specId": "appointment-detail.page.root.actions",
@@ -1313,7 +1777,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:234",
+              "nodeId": "4:803",
               "type": "INSTANCE",
               "name": "Button:已到店确认",
               "specId": "appointment-detail.action.checkin",
@@ -1334,10 +1798,17 @@
                 "emphasis": "primary"
               },
               "characters": "已到店确认",
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 6
             },
             {
-              "nodeId": "4:236",
+              "nodeId": "4:805",
               "type": "INSTANCE",
               "name": "Button:开单",
               "specId": "appointment-detail.action.open-order",
@@ -1358,11 +1829,56 @@
                 "emphasis": "secondary"
               },
               "characters": "开单",
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#FFFFFF",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 6,
+              "borderTop": {
+                "width": 1,
+                "color": "#CBD5E1"
+              },
+              "borderBottom": {
+                "width": 1,
+                "color": "#CBD5E1"
+              },
+              "borderLeft": {
+                "width": 1,
+                "color": "#CBD5E1"
+              }
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0,
+          "borderTop": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderBottom": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderLeft": {
+            "width": 1,
+            "color": "#E5E7EB"
+          }
         }
-      ]
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
     }
   ],
   "errors": []

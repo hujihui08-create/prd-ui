@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "customer-detail",
-  "builtAt": "2026-10-26T08:21:20.139Z",
+  "builtAt": "2026-10-27T01:18:13.619Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -30,19 +30,23 @@
     "color/border/control"
   ],
   "textStyles": [
-    "b-mobile/body.md",
     "b-mobile/heading.2",
+    "b-mobile/body.md",
     "b-mobile/label.sm",
     "b-mobile/heading.3",
     "b-mobile/label.strong",
-    "b-mobile/body.sm"
+    "b-mobile/body.sm",
+    "b-mobile/input.md",
+    "b-mobile/date",
+    "b-mobile/label.bold",
+    "b-mobile/caption"
   ],
   "components": [
     "b-mobile/Button"
   ],
   "nodes": [
     {
-      "nodeId": "4:113",
+      "nodeId": "4:1164",
       "type": "FRAME",
       "name": "客户详情",
       "specId": "customer-detail.page.root",
@@ -63,7 +67,7 @@
       ],
       "children": [
         {
-          "nodeId": "4:114",
+          "nodeId": "4:1165",
           "type": "FRAME",
           "name": "PageHeader",
           "specId": "customer-detail.page.root.header",
@@ -84,7 +88,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:115",
+              "nodeId": "4:1166",
               "type": "GLYPH",
               "name": "Back",
               "specId": "customer-detail.page.root.header.back",
@@ -101,10 +105,18 @@
                 "style": "Regular"
               },
               "fontSize": 20,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 400,
+              "textColor": "#111827"
             },
             {
-              "nodeId": "4:116",
+              "nodeId": "4:1167",
               "type": "TEXT",
               "name": "Title",
               "specId": "customer-detail.page.root.header.title",
@@ -122,12 +134,28 @@
                 "style": "SemiBold"
               },
               "fontSize": 16,
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "fontWeight": 600,
+              "textColor": "#111827",
+              "lineHeight": 24
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:117",
+          "nodeId": "4:1168",
           "type": "FRAME",
           "name": "Content",
           "specId": "customer-detail.page.root.content",
@@ -148,12 +176,12 @@
           ],
           "children": [
             {
-              "nodeId": "4:118",
+              "nodeId": "4:1169",
               "type": "FRAME",
               "name": "Card",
               "specId": "customer-detail.root.summary.0",
               "layoutMode": "VERTICAL",
-              "itemSpacing": 8,
+              "itemSpacing": 0,
               "padding": {
                 "top": 16,
                 "right": 16,
@@ -161,7 +189,7 @@
                 "left": 16
               },
               "width": 390,
-              "height": 415,
+              "height": 422,
               "x": 0,
               "y": 0,
               "fills": [
@@ -169,7 +197,7 @@
               ],
               "children": [
                 {
-                  "nodeId": "4:119",
+                  "nodeId": "4:1170",
                   "type": "FRAME",
                   "name": "Head",
                   "specId": "customer-detail.root.summary.0.head",
@@ -187,7 +215,7 @@
                   "y": 16,
                   "children": [
                     {
-                      "nodeId": "4:120",
+                      "nodeId": "4:1171",
                       "type": "TEXT",
                       "name": "Title",
                       "specId": "customer-detail.root.summary.0.title",
@@ -205,48 +233,58 @@
                         "style": "SemiBold"
                       },
                       "fontSize": 16,
-                      "children": []
+                      "children": [],
+                      "fillDetails": [
+                        {
+                          "color": "#111827",
+                          "alpha": 1
+                        }
+                      ],
+                      "fontWeight": 600,
+                      "textColor": "#111827",
+                      "lineHeight": 24
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 },
                 {
-                  "nodeId": "4:121",
+                  "nodeId": "4:1172",
                   "type": "FRAME",
                   "name": "Body",
                   "specId": "customer-detail.root.summary.0.body",
                   "layoutMode": "VERTICAL",
                   "itemSpacing": 0,
                   "padding": {
-                    "top": 0,
+                    "top": 8,
                     "right": 0,
                     "bottom": 0,
                     "left": 0
                   },
                   "width": 358,
-                  "height": 351,
+                  "height": 366,
                   "x": 16,
-                  "y": 48,
+                  "y": 40,
                   "children": [
                     {
-                      "nodeId": "4:122",
+                      "nodeId": "4:1173",
                       "type": "FRAME",
                       "name": "List",
                       "specId": "customer-detail.root.summary.0.children.0",
                       "layoutMode": "VERTICAL",
                       "itemSpacing": 0,
                       "padding": {
-                        "top": 0,
+                        "top": 4,
                         "right": 0,
-                        "bottom": 0,
+                        "bottom": 4,
                         "left": 0
                       },
                       "width": 358,
-                      "height": 351,
+                      "height": 358,
                       "x": 0,
-                      "y": 0,
+                      "y": 8,
                       "children": [
                         {
-                          "nodeId": "4:123",
+                          "nodeId": "4:1174",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.0",
@@ -261,10 +299,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 0,
+                          "y": 4,
                           "children": [
                             {
-                              "nodeId": "4:124",
+                              "nodeId": "4:1175",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.0.label",
@@ -282,7 +320,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:125",
+                                  "nodeId": "4:1176",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.0.labelText",
@@ -300,12 +338,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:126",
+                              "nodeId": "4:1177",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.0.value",
@@ -323,12 +371,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:127",
+                          "nodeId": "4:1178",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.1",
@@ -343,10 +413,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 39,
+                          "y": 43,
                           "children": [
                             {
-                              "nodeId": "4:128",
+                              "nodeId": "4:1179",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.1.label",
@@ -364,7 +434,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:129",
+                                  "nodeId": "4:1180",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.1.labelText",
@@ -382,12 +452,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:130",
+                              "nodeId": "4:1181",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.1.value",
@@ -405,12 +485,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:131",
+                          "nodeId": "4:1182",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.2",
@@ -425,10 +527,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 78,
+                          "y": 82,
                           "children": [
                             {
-                              "nodeId": "4:132",
+                              "nodeId": "4:1183",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.2.label",
@@ -446,7 +548,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:133",
+                                  "nodeId": "4:1184",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.2.labelText",
@@ -464,12 +566,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:134",
+                              "nodeId": "4:1185",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.2.value",
@@ -487,12 +599,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:135",
+                          "nodeId": "4:1186",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.3",
@@ -507,10 +641,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 117,
+                          "y": 121,
                           "children": [
                             {
-                              "nodeId": "4:136",
+                              "nodeId": "4:1187",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.3.label",
@@ -528,7 +662,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:137",
+                                  "nodeId": "4:1188",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.3.labelText",
@@ -546,12 +680,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:138",
+                              "nodeId": "4:1189",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.3.value",
@@ -569,12 +713,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:139",
+                          "nodeId": "4:1190",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.4",
@@ -589,10 +755,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 156,
+                          "y": 160,
                           "children": [
                             {
-                              "nodeId": "4:140",
+                              "nodeId": "4:1191",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.4.label",
@@ -610,7 +776,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:141",
+                                  "nodeId": "4:1192",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.4.labelText",
@@ -628,12 +794,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:142",
+                              "nodeId": "4:1193",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.4.value",
@@ -651,12 +827,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:143",
+                          "nodeId": "4:1194",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.5",
@@ -671,10 +869,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 195,
+                          "y": 199,
                           "children": [
                             {
-                              "nodeId": "4:144",
+                              "nodeId": "4:1195",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.5.label",
@@ -692,7 +890,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:145",
+                                  "nodeId": "4:1196",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.5.labelText",
@@ -710,12 +908,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:146",
+                              "nodeId": "4:1197",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.5.value",
@@ -733,12 +941,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:147",
+                          "nodeId": "4:1198",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.6",
@@ -753,10 +983,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 234,
+                          "y": 238,
                           "children": [
                             {
-                              "nodeId": "4:148",
+                              "nodeId": "4:1199",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.6.label",
@@ -774,7 +1004,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:149",
+                                  "nodeId": "4:1200",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.6.labelText",
@@ -792,12 +1022,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:150",
+                              "nodeId": "4:1201",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.6.value",
@@ -815,12 +1055,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:151",
+                          "nodeId": "4:1202",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.7",
@@ -835,10 +1097,10 @@
                           "width": 358,
                           "height": 39,
                           "x": 0,
-                          "y": 273,
+                          "y": 277,
                           "children": [
                             {
-                              "nodeId": "4:152",
+                              "nodeId": "4:1203",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.7.label",
@@ -856,7 +1118,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:153",
+                                  "nodeId": "4:1204",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.7.labelText",
@@ -874,12 +1136,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:154",
+                              "nodeId": "4:1205",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.7.value",
@@ -897,12 +1169,34 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "4:155",
+                          "nodeId": "4:1206",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "customer-detail.root.summary.0.children.0.row.8",
@@ -915,12 +1209,12 @@
                             "left": 0
                           },
                           "width": 358,
-                          "height": 39,
+                          "height": 38,
                           "x": 0,
-                          "y": 312,
+                          "y": 316,
                           "children": [
                             {
-                              "nodeId": "4:156",
+                              "nodeId": "4:1207",
                               "type": "FRAME",
                               "name": "Label",
                               "specId": "customer-detail.root.summary.0.children.0.row.8.label",
@@ -938,7 +1232,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "4:157",
+                                  "nodeId": "4:1208",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "customer-detail.root.summary.0.children.0.row.8.labelText",
@@ -956,12 +1250,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "4:158",
+                              "nodeId": "4:1209",
                               "type": "TEXT",
                               "name": "Value",
                               "specId": "customer-detail.root.summary.0.children.0.row.8.value",
@@ -979,18 +1283,37 @@
                                 "style": "Medium"
                               },
                               "fontSize": 13,
-                              "children": []
+                              "children": [],
+                              "fillDetails": [
+                                {
+                                  "color": "#111827",
+                                  "alpha": 1
+                                }
+                              ],
+                              "fontWeight": 500,
+                              "textColor": "#111827",
+                              "lineHeight": 18
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "cornerRadius": 0
                 }
-              ]
+              ],
+              "fillDetails": [
+                {
+                  "color": "#FFFFFF",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 12
             },
             {
-              "nodeId": "4:159",
+              "nodeId": "4:1210",
               "type": "FRAME",
               "name": "Row",
               "specId": "customer-detail.root.fields.0",
@@ -998,17 +1321,17 @@
               "itemSpacing": 8,
               "padding": {
                 "top": 0,
-                "right": 0,
+                "right": 16,
                 "bottom": 0,
-                "left": 0
+                "left": 16
               },
               "width": 390,
               "height": 32,
               "x": 0,
-              "y": 415,
+              "y": 422,
               "children": [
                 {
-                  "nodeId": "4:160",
+                  "nodeId": "4:1211",
                   "type": "INSTANCE",
                   "name": "Button:新增预约",
                   "specId": "customer-detail.action.new-appointment",
@@ -1022,17 +1345,36 @@
                   },
                   "width": 78,
                   "height": 32,
-                  "x": 0,
+                  "x": 16,
                   "y": 0,
                   "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
                     "emphasis": "ghost-chip"
                   },
                   "characters": "新增预约",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  }
                 },
                 {
-                  "nodeId": "4:162",
+                  "nodeId": "4:1213",
                   "type": "INSTANCE",
                   "name": "Button:查看告知",
                   "specId": "customer-detail.action.view-notice",
@@ -1046,17 +1388,36 @@
                   },
                   "width": 78,
                   "height": 32,
-                  "x": 86,
+                  "x": 102,
                   "y": 0,
                   "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
                     "emphasis": "ghost-chip"
                   },
                   "characters": "查看告知",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  }
                 },
                 {
-                  "nodeId": "4:164",
+                  "nodeId": "4:1215",
                   "type": "INSTANCE",
                   "name": "Button:回访登记",
                   "specId": "customer-detail.action.callback",
@@ -1070,21 +1431,48 @@
                   },
                   "width": 78,
                   "height": 32,
-                  "x": 172,
+                  "x": 188,
                   "y": 0,
                   "componentName": "Emphasis=ghost-chip",
                   "variantProperties": {
                     "emphasis": "ghost-chip"
                   },
                   "characters": "回访登记",
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "borderTop": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderBottom": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  },
+                  "borderLeft": {
+                    "width": 1,
+                    "color": "#D1D5DB"
+                  }
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "4:166",
+          "nodeId": "4:1217",
           "type": "FRAME",
           "name": "Actions",
           "specId": "customer-detail.page.root.actions",
@@ -1105,7 +1493,7 @@
           ],
           "children": [
             {
-              "nodeId": "4:167",
+              "nodeId": "4:1218",
               "type": "INSTANCE",
               "name": "Button:查看预约",
               "specId": "customer-detail.action.view-appointment",
@@ -1126,11 +1514,44 @@
                 "emphasis": "primary"
               },
               "characters": "查看预约",
-              "children": []
+              "children": [],
+              "fillDetails": [
+                {
+                  "color": "#111827",
+                  "alpha": 1
+                }
+              ],
+              "cornerRadius": 6
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0,
+          "borderTop": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderBottom": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderLeft": {
+            "width": 1,
+            "color": "#E5E7EB"
+          }
         }
-      ]
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
     }
   ],
   "errors": []

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "pageId": "today",
-  "builtAt": "2026-10-26T08:33:52.015Z",
+  "builtAt": "2026-10-27T01:19:55.208Z",
   "fonts": [
     {
       "family": "Material Symbols Rounded",
@@ -42,7 +42,7 @@
   ],
   "nodes": [
     {
-      "nodeId": "3:22",
+      "nodeId": "1:127",
       "type": "FRAME",
       "name": "今日",
       "specId": "today.page.root",
@@ -63,7 +63,7 @@
       ],
       "children": [
         {
-          "nodeId": "3:23",
+          "nodeId": "1:128",
           "type": "FRAME",
           "name": "TopBar",
           "specId": "today.root.top-bar.0",
@@ -84,7 +84,7 @@
           ],
           "children": [
             {
-              "nodeId": "3:24",
+              "nodeId": "1:129",
               "type": "FRAME",
               "name": "Store",
               "specId": "today.root.top-bar.0.left",
@@ -102,7 +102,7 @@
               "y": 12,
               "children": [
                 {
-                  "nodeId": "3:25",
+                  "nodeId": "1:130",
                   "type": "TEXT",
                   "name": "StoreName",
                   "specId": "today.root.top-bar.0.store",
@@ -120,10 +120,19 @@
                     "style": "SemiBold"
                   },
                   "fontSize": 16,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 600,
+                  "textColor": "#111827",
+                  "lineHeight": 24
                 },
                 {
-                  "nodeId": "3:26",
+                  "nodeId": "1:131",
                   "type": "GLYPH",
                   "name": "Chevron",
                   "specId": "today.root.top-bar.0.chevron",
@@ -140,14 +149,30 @@
                     "style": "Regular"
                   },
                   "fontSize": 20,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#4B5563",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 400,
+                  "textColor": "#4B5563"
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "3:27",
+          "nodeId": "1:132",
           "type": "FRAME",
           "name": "Content",
           "specId": "today.page.root.content",
@@ -168,7 +193,7 @@
           ],
           "children": [
             {
-              "nodeId": "3:28",
+              "nodeId": "1:133",
               "type": "FRAME",
               "name": "Section",
               "specId": "today.root.content.0",
@@ -186,12 +211,12 @@
               "y": 0,
               "children": [
                 {
-                  "nodeId": "3:29",
+                  "nodeId": "1:134",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.quick-actions",
                   "layoutMode": "VERTICAL",
-                  "itemSpacing": 8,
+                  "itemSpacing": 0,
                   "padding": {
                     "top": 16,
                     "right": 16,
@@ -207,7 +232,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "3:30",
+                      "nodeId": "1:135",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.quick-actions.head",
@@ -225,7 +250,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "3:31",
+                          "nodeId": "1:136",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.quick-actions.title",
@@ -243,30 +268,40 @@
                             "style": "SemiBold"
                           },
                           "fontSize": 16,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 600,
+                          "textColor": "#111827",
+                          "lineHeight": 24
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     },
                     {
-                      "nodeId": "3:32",
+                      "nodeId": "1:137",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.quick-actions.body",
                       "layoutMode": "VERTICAL",
                       "itemSpacing": 0,
                       "padding": {
-                        "top": 0,
+                        "top": 8,
                         "right": 0,
                         "bottom": 0,
                         "left": 0
                       },
                       "width": 326,
-                      "height": 56,
+                      "height": 64,
                       "x": 16,
-                      "y": 48,
+                      "y": 40,
                       "children": [
                         {
-                          "nodeId": "3:33",
+                          "nodeId": "1:138",
                           "type": "FRAME",
                           "name": "Row",
                           "specId": "today.root.content.0.children.0.children.0",
@@ -281,20 +316,20 @@
                           "width": 326,
                           "height": 56,
                           "x": 0,
-                          "y": 0,
+                          "y": 8,
                           "children": [
                             {
-                              "nodeId": "3:34",
+                              "nodeId": "1:139",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.create-order",
                               "layoutMode": "HORIZONTAL",
                               "itemSpacing": 8,
                               "padding": {
-                                "top": 0,
-                                "right": 0,
-                                "bottom": 0,
-                                "left": 0
+                                "top": 1,
+                                "right": 6,
+                                "bottom": 1,
+                                "left": 6
                               },
                               "width": 103.33333587646484,
                               "height": 56,
@@ -305,13 +340,13 @@
                               ],
                               "children": [
                                 {
-                                  "nodeId": "3:35",
+                                  "nodeId": "1:140",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.create-order.icon",
                                   "width": 24,
                                   "height": 24,
-                                  "x": 22.666669845581055,
+                                  "x": 22.666667938232422,
                                   "y": 16,
                                   "fills": [
                                     "color/action/primary"
@@ -322,16 +357,24 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 24,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#111827",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#111827"
                                 },
                                 {
-                                  "nodeId": "3:36",
+                                  "nodeId": "1:141",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.create-order.label",
                                   "width": 26,
                                   "height": 18,
-                                  "x": 54.66667175292969,
+                                  "x": 54.66666793823242,
                                   "y": 19,
                                   "fills": [
                                     "color/text/primary"
@@ -343,33 +386,49 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#111827",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#111827",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "fillDetails": [
+                                {
+                                  "color": "#F5F6F8",
+                                  "alpha": 1
+                                }
+                              ],
+                              "cornerRadius": 6
                             },
                             {
-                              "nodeId": "3:37",
+                              "nodeId": "1:142",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.new-appointment",
                               "layoutMode": "HORIZONTAL",
                               "itemSpacing": 8,
                               "padding": {
-                                "top": 0,
-                                "right": 0,
-                                "bottom": 0,
-                                "left": 0
+                                "top": 1,
+                                "right": 6,
+                                "bottom": 1,
+                                "left": 6
                               },
                               "width": 103.33332824707031,
                               "height": 56,
-                              "x": 111.33334350585938,
+                              "x": 111.33333587646484,
                               "y": 0,
                               "fills": [
                                 "color/surface/subtle"
                               ],
                               "children": [
                                 {
-                                  "nodeId": "3:38",
+                                  "nodeId": "1:143",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.new-appointment.icon",
@@ -386,10 +445,18 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 24,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#111827",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#111827"
                                 },
                                 {
-                                  "nodeId": "3:39",
+                                  "nodeId": "1:144",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.new-appointment.label",
@@ -407,22 +474,38 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#111827",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#111827",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "fillDetails": [
+                                {
+                                  "color": "#F5F6F8",
+                                  "alpha": 1
+                                }
+                              ],
+                              "cornerRadius": 6
                             },
                             {
-                              "nodeId": "3:40",
+                              "nodeId": "1:145",
                               "type": "FRAME",
                               "name": "QuickAction",
                               "specId": "today.quick.customer-search",
                               "layoutMode": "HORIZONTAL",
                               "itemSpacing": 8,
                               "padding": {
-                                "top": 0,
-                                "right": 0,
-                                "bottom": 0,
-                                "left": 0
+                                "top": 1,
+                                "right": 6,
+                                "bottom": 1,
+                                "left": 6
                               },
                               "width": 103.33332824707031,
                               "height": 56,
@@ -433,7 +516,7 @@
                               ],
                               "children": [
                                 {
-                                  "nodeId": "3:41",
+                                  "nodeId": "1:146",
                                   "type": "GLYPH",
                                   "name": "Icon",
                                   "specId": "today.quick.customer-search.icon",
@@ -450,10 +533,18 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 24,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#2563EB",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#2563EB"
                                 },
                                 {
-                                  "nodeId": "3:42",
+                                  "nodeId": "1:147",
                                   "type": "TEXT",
                                   "name": "Label",
                                   "specId": "today.quick.customer-search.label",
@@ -471,23 +562,48 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#111827",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#111827",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "fillDetails": [
+                                {
+                                  "color": "#2563EB",
+                                  "alpha": 0.10000000149011612
+                                }
+                              ],
+                              "cornerRadius": 6
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 12
                 },
                 {
-                  "nodeId": "3:43",
+                  "nodeId": "1:148",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.appointments",
                   "layoutMode": "VERTICAL",
-                  "itemSpacing": 8,
+                  "itemSpacing": 0,
                   "padding": {
                     "top": 16,
                     "right": 16,
@@ -503,7 +619,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "3:44",
+                      "nodeId": "1:149",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.appointments.head",
@@ -521,7 +637,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "3:45",
+                          "nodeId": "1:150",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.appointments.title",
@@ -539,10 +655,19 @@
                             "style": "SemiBold"
                           },
                           "fontSize": 16,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 600,
+                          "textColor": "#111827",
+                          "lineHeight": 24
                         },
                         {
-                          "nodeId": "3:46",
+                          "nodeId": "1:151",
                           "type": "TEXT",
                           "name": "Action",
                           "specId": "today.card.appointments.action",
@@ -560,30 +685,40 @@
                             "style": "Regular"
                           },
                           "fontSize": 12,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#4B5563",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 400,
+                          "textColor": "#4B5563",
+                          "lineHeight": 16
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     },
                     {
-                      "nodeId": "3:47",
+                      "nodeId": "1:152",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.appointments.body",
                       "layoutMode": "VERTICAL",
                       "itemSpacing": 0,
                       "padding": {
-                        "top": 0,
+                        "top": 8,
                         "right": 0,
                         "bottom": 0,
                         "left": 0
                       },
                       "width": 326,
-                      "height": 189,
+                      "height": 197,
                       "x": 16,
-                      "y": 48,
+                      "y": 40,
                       "children": [
                         {
-                          "nodeId": "3:48",
+                          "nodeId": "1:153",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.0",
@@ -598,10 +733,10 @@
                           "width": 326,
                           "height": 63,
                           "x": 0,
-                          "y": 0,
+                          "y": 8,
                           "children": [
                             {
-                              "nodeId": "3:49",
+                              "nodeId": "1:154",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.0.main",
@@ -619,7 +754,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "3:50",
+                                  "nodeId": "1:155",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.0.titleRow",
@@ -637,7 +772,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "3:51",
+                                      "nodeId": "1:156",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.0.title",
@@ -655,10 +790,19 @@
                                         "style": "SemiBold"
                                       },
                                       "fontSize": 15,
-                                      "children": []
+                                      "children": [],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#111827",
+                                          "alpha": 1
+                                        }
+                                      ],
+                                      "fontWeight": 600,
+                                      "textColor": "#111827",
+                                      "lineHeight": 22
                                     },
                                     {
-                                      "nodeId": "3:52",
+                                      "nodeId": "1:157",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.0.badge",
@@ -679,7 +823,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "3:53",
+                                          "nodeId": "1:158",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.0.badge.label",
@@ -697,14 +841,31 @@
                                             "style": "Medium"
                                           },
                                           "fontSize": 12,
-                                          "children": []
+                                          "children": [],
+                                          "fillDetails": [
+                                            {
+                                              "color": "#92400E",
+                                              "alpha": 1
+                                            }
+                                          ],
+                                          "fontWeight": 500,
+                                          "textColor": "#92400E",
+                                          "lineHeight": 16
                                         }
-                                      ]
+                                      ],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#92400E",
+                                          "alpha": 0.11999999731779099
+                                        }
+                                      ],
+                                      "cornerRadius": 4
                                     }
-                                  ]
+                                  ],
+                                  "cornerRadius": 0
                                 },
                                 {
-                                  "nodeId": "3:54",
+                                  "nodeId": "1:159",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.0.subtitle",
@@ -722,12 +883,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "3:55",
+                              "nodeId": "1:160",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.0.meta",
@@ -745,7 +916,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "3:56",
+                                  "nodeId": "1:161",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.0.metaText",
@@ -763,10 +934,19 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 },
                                 {
-                                  "nodeId": "3:57",
+                                  "nodeId": "1:162",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.0.chevron",
@@ -783,14 +963,36 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 16,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472"
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "3:58",
+                          "nodeId": "1:163",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.1",
@@ -805,10 +1007,10 @@
                           "width": 326,
                           "height": 63,
                           "x": 0,
-                          "y": 63,
+                          "y": 71,
                           "children": [
                             {
-                              "nodeId": "3:59",
+                              "nodeId": "1:164",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.1.main",
@@ -826,7 +1028,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "3:60",
+                                  "nodeId": "1:165",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.1.titleRow",
@@ -844,7 +1046,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "3:61",
+                                      "nodeId": "1:166",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.1.title",
@@ -862,10 +1064,19 @@
                                         "style": "SemiBold"
                                       },
                                       "fontSize": 15,
-                                      "children": []
+                                      "children": [],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#111827",
+                                          "alpha": 1
+                                        }
+                                      ],
+                                      "fontWeight": 600,
+                                      "textColor": "#111827",
+                                      "lineHeight": 22
                                     },
                                     {
-                                      "nodeId": "3:62",
+                                      "nodeId": "1:167",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.1.badge",
@@ -886,7 +1097,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "3:63",
+                                          "nodeId": "1:168",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.1.badge.label",
@@ -904,14 +1115,31 @@
                                             "style": "Medium"
                                           },
                                           "fontSize": 12,
-                                          "children": []
+                                          "children": [],
+                                          "fillDetails": [
+                                            {
+                                              "color": "#166534",
+                                              "alpha": 1
+                                            }
+                                          ],
+                                          "fontWeight": 500,
+                                          "textColor": "#166534",
+                                          "lineHeight": 16
                                         }
-                                      ]
+                                      ],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#166534",
+                                          "alpha": 0.11999999731779099
+                                        }
+                                      ],
+                                      "cornerRadius": 4
                                     }
-                                  ]
+                                  ],
+                                  "cornerRadius": 0
                                 },
                                 {
-                                  "nodeId": "3:64",
+                                  "nodeId": "1:169",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.1.subtitle",
@@ -929,12 +1157,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "3:65",
+                              "nodeId": "1:170",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.1.meta",
@@ -952,7 +1190,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "3:66",
+                                  "nodeId": "1:171",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.1.metaText",
@@ -970,10 +1208,19 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 },
                                 {
-                                  "nodeId": "3:67",
+                                  "nodeId": "1:172",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.1.chevron",
@@ -990,14 +1237,36 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 16,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472"
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "3:68",
+                          "nodeId": "1:173",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.appointment.2",
@@ -1012,10 +1281,10 @@
                           "width": 326,
                           "height": 63,
                           "x": 0,
-                          "y": 126,
+                          "y": 134,
                           "children": [
                             {
-                              "nodeId": "3:69",
+                              "nodeId": "1:174",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.appointment.2.main",
@@ -1033,7 +1302,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "3:70",
+                                  "nodeId": "1:175",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.appointment.2.titleRow",
@@ -1051,7 +1320,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "3:71",
+                                      "nodeId": "1:176",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.appointment.2.title",
@@ -1069,10 +1338,19 @@
                                         "style": "SemiBold"
                                       },
                                       "fontSize": 15,
-                                      "children": []
+                                      "children": [],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#111827",
+                                          "alpha": 1
+                                        }
+                                      ],
+                                      "fontWeight": 600,
+                                      "textColor": "#111827",
+                                      "lineHeight": 22
                                     },
                                     {
-                                      "nodeId": "3:72",
+                                      "nodeId": "1:177",
                                       "type": "FRAME",
                                       "name": "Badge",
                                       "specId": "today.row.appointment.2.badge",
@@ -1093,7 +1371,7 @@
                                       ],
                                       "children": [
                                         {
-                                          "nodeId": "3:73",
+                                          "nodeId": "1:178",
                                           "type": "TEXT",
                                           "name": "Label",
                                           "specId": "today.row.appointment.2.badge.label",
@@ -1111,14 +1389,31 @@
                                             "style": "Medium"
                                           },
                                           "fontSize": 12,
-                                          "children": []
+                                          "children": [],
+                                          "fillDetails": [
+                                            {
+                                              "color": "#92400E",
+                                              "alpha": 1
+                                            }
+                                          ],
+                                          "fontWeight": 500,
+                                          "textColor": "#92400E",
+                                          "lineHeight": 16
                                         }
-                                      ]
+                                      ],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#92400E",
+                                          "alpha": 0.11999999731779099
+                                        }
+                                      ],
+                                      "cornerRadius": 4
                                     }
-                                  ]
+                                  ],
+                                  "cornerRadius": 0
                                 },
                                 {
-                                  "nodeId": "3:74",
+                                  "nodeId": "1:179",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.appointment.2.subtitle",
@@ -1136,12 +1431,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "3:75",
+                              "nodeId": "1:180",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.appointment.2.meta",
@@ -1159,7 +1464,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "3:76",
+                                  "nodeId": "1:181",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.appointment.2.metaText",
@@ -1177,10 +1482,19 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 },
                                 {
-                                  "nodeId": "3:77",
+                                  "nodeId": "1:182",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.appointment.2.chevron",
@@ -1197,23 +1511,53 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 16,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472"
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 12
                 },
                 {
-                  "nodeId": "3:78",
+                  "nodeId": "1:183",
                   "type": "FRAME",
                   "name": "Card",
                   "specId": "today.card.callbacks",
                   "layoutMode": "VERTICAL",
-                  "itemSpacing": 8,
+                  "itemSpacing": 0,
                   "padding": {
                     "top": 16,
                     "right": 16,
@@ -1229,7 +1573,7 @@
                   ],
                   "children": [
                     {
-                      "nodeId": "3:79",
+                      "nodeId": "1:184",
                       "type": "FRAME",
                       "name": "Head",
                       "specId": "today.card.callbacks.head",
@@ -1247,7 +1591,7 @@
                       "y": 16,
                       "children": [
                         {
-                          "nodeId": "3:80",
+                          "nodeId": "1:185",
                           "type": "TEXT",
                           "name": "Title",
                           "specId": "today.card.callbacks.title",
@@ -1265,30 +1609,40 @@
                             "style": "SemiBold"
                           },
                           "fontSize": 16,
-                          "children": []
+                          "children": [],
+                          "fillDetails": [
+                            {
+                              "color": "#111827",
+                              "alpha": 1
+                            }
+                          ],
+                          "fontWeight": 600,
+                          "textColor": "#111827",
+                          "lineHeight": 24
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     },
                     {
-                      "nodeId": "3:81",
+                      "nodeId": "1:186",
                       "type": "FRAME",
                       "name": "Body",
                       "specId": "today.card.callbacks.body",
                       "layoutMode": "VERTICAL",
                       "itemSpacing": 0,
                       "padding": {
-                        "top": 0,
+                        "top": 8,
                         "right": 0,
                         "bottom": 0,
                         "left": 0
                       },
                       "width": 326,
-                      "height": 126,
+                      "height": 134,
                       "x": 16,
-                      "y": 48,
+                      "y": 40,
                       "children": [
                         {
-                          "nodeId": "3:82",
+                          "nodeId": "1:187",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.callback.0",
@@ -1303,10 +1657,10 @@
                           "width": 326,
                           "height": 63,
                           "x": 0,
-                          "y": 0,
+                          "y": 8,
                           "children": [
                             {
-                              "nodeId": "3:83",
+                              "nodeId": "1:188",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.callback.0.main",
@@ -1324,7 +1678,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "3:84",
+                                  "nodeId": "1:189",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.callback.0.titleRow",
@@ -1342,7 +1696,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "3:85",
+                                      "nodeId": "1:190",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.callback.0.title",
@@ -1360,12 +1714,22 @@
                                         "style": "SemiBold"
                                       },
                                       "fontSize": 15,
-                                      "children": []
+                                      "children": [],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#111827",
+                                          "alpha": 1
+                                        }
+                                      ],
+                                      "fontWeight": 600,
+                                      "textColor": "#111827",
+                                      "lineHeight": 22
                                     }
-                                  ]
+                                  ],
+                                  "cornerRadius": 0
                                 },
                                 {
-                                  "nodeId": "3:86",
+                                  "nodeId": "1:191",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.callback.0.subtitle",
@@ -1383,12 +1747,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "3:87",
+                              "nodeId": "1:192",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.callback.0.meta",
@@ -1406,7 +1780,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "3:88",
+                                  "nodeId": "1:193",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.callback.0.metaText",
@@ -1424,10 +1798,19 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 },
                                 {
-                                  "nodeId": "3:89",
+                                  "nodeId": "1:194",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.callback.0.chevron",
@@ -1444,14 +1827,36 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 16,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472"
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         },
                         {
-                          "nodeId": "3:90",
+                          "nodeId": "1:195",
                           "type": "FRAME",
                           "name": "ListRow",
                           "specId": "today.row.callback.1",
@@ -1466,10 +1871,10 @@
                           "width": 326,
                           "height": 63,
                           "x": 0,
-                          "y": 63,
+                          "y": 71,
                           "children": [
                             {
-                              "nodeId": "3:91",
+                              "nodeId": "1:196",
                               "type": "FRAME",
                               "name": "Main",
                               "specId": "today.row.callback.1.main",
@@ -1487,7 +1892,7 @@
                               "y": 10,
                               "children": [
                                 {
-                                  "nodeId": "3:92",
+                                  "nodeId": "1:197",
                                   "type": "FRAME",
                                   "name": "TitleRow",
                                   "specId": "today.row.callback.1.titleRow",
@@ -1505,7 +1910,7 @@
                                   "y": 0,
                                   "children": [
                                     {
-                                      "nodeId": "3:93",
+                                      "nodeId": "1:198",
                                       "type": "TEXT",
                                       "name": "Title",
                                       "specId": "today.row.callback.1.title",
@@ -1523,12 +1928,22 @@
                                         "style": "SemiBold"
                                       },
                                       "fontSize": 15,
-                                      "children": []
+                                      "children": [],
+                                      "fillDetails": [
+                                        {
+                                          "color": "#111827",
+                                          "alpha": 1
+                                        }
+                                      ],
+                                      "fontWeight": 600,
+                                      "textColor": "#111827",
+                                      "lineHeight": 22
                                     }
-                                  ]
+                                  ],
+                                  "cornerRadius": 0
                                 },
                                 {
-                                  "nodeId": "3:94",
+                                  "nodeId": "1:199",
                                   "type": "TEXT",
                                   "name": "Subtitle",
                                   "specId": "today.row.callback.1.subtitle",
@@ -1546,12 +1961,22 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             },
                             {
-                              "nodeId": "3:95",
+                              "nodeId": "1:200",
                               "type": "FRAME",
                               "name": "Meta",
                               "specId": "today.row.callback.1.meta",
@@ -1569,7 +1994,7 @@
                               "y": 22,
                               "children": [
                                 {
-                                  "nodeId": "3:96",
+                                  "nodeId": "1:201",
                                   "type": "TEXT",
                                   "name": "Meta",
                                   "specId": "today.row.callback.1.metaText",
@@ -1587,10 +2012,19 @@
                                     "style": "Medium"
                                   },
                                   "fontSize": 13,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#4B5563",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 500,
+                                  "textColor": "#4B5563",
+                                  "lineHeight": 18
                                 },
                                 {
-                                  "nodeId": "3:97",
+                                  "nodeId": "1:202",
                                   "type": "GLYPH",
                                   "name": "Chevron",
                                   "specId": "today.row.callback.1.chevron",
@@ -1607,22 +2041,60 @@
                                     "style": "Regular"
                                   },
                                   "fontSize": 16,
-                                  "children": []
+                                  "children": [],
+                                  "fillDetails": [
+                                    {
+                                      "color": "#5B6472",
+                                      "alpha": 1
+                                    }
+                                  ],
+                                  "fontWeight": 400,
+                                  "textColor": "#5B6472"
                                 }
-                              ]
+                              ],
+                              "cornerRadius": 0
                             }
-                          ]
+                          ],
+                          "cornerRadius": 0,
+                          "borderTop": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          },
+                          "borderBottom": {
+                            "width": 1,
+                            "color": "#E5E7EB"
+                          },
+                          "borderLeft": {
+                            "width": 0,
+                            "color": "#E5E7EB"
+                          }
                         }
-                      ]
+                      ],
+                      "cornerRadius": 0
                     }
-                  ]
+                  ],
+                  "fillDetails": [
+                    {
+                      "color": "#FFFFFF",
+                      "alpha": 1
+                    }
+                  ],
+                  "cornerRadius": 12
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#F5F6F8",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0
         },
         {
-          "nodeId": "3:98",
+          "nodeId": "1:203",
           "type": "FRAME",
           "name": "TabBar",
           "specId": "today.root.bottom-nav.0",
@@ -1643,7 +2115,7 @@
           ],
           "children": [
             {
-              "nodeId": "3:99",
+              "nodeId": "1:204",
               "type": "FRAME",
               "name": "Tab:今日",
               "specId": "today.root.bottom-nav.0.tab.0",
@@ -1661,7 +2133,7 @@
               "y": 12.5,
               "children": [
                 {
-                  "nodeId": "3:100",
+                  "nodeId": "1:205",
                   "type": "GLYPH",
                   "name": "Icon",
                   "specId": "today.root.bottom-nav.0.tab.0.icon",
@@ -1678,10 +2150,18 @@
                     "style": "Regular"
                   },
                   "fontSize": 22,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 400,
+                  "textColor": "#111827"
                 },
                 {
-                  "nodeId": "3:101",
+                  "nodeId": "1:206",
                   "type": "TEXT",
                   "name": "Label",
                   "specId": "today.root.bottom-nav.0.tab.0.label",
@@ -1699,12 +2179,22 @@
                     "style": "Regular"
                   },
                   "fontSize": 12,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#111827",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 400,
+                  "textColor": "#111827",
+                  "lineHeight": 16
                 }
-              ]
+              ],
+              "cornerRadius": 0
             },
             {
-              "nodeId": "3:102",
+              "nodeId": "1:207",
               "type": "FRAME",
               "name": "Tab:预约列表",
               "specId": "today.root.bottom-nav.0.tab.1",
@@ -1722,7 +2212,7 @@
               "y": 12.5,
               "children": [
                 {
-                  "nodeId": "3:103",
+                  "nodeId": "1:208",
                   "type": "GLYPH",
                   "name": "Icon",
                   "specId": "today.root.bottom-nav.0.tab.1.icon",
@@ -1739,10 +2229,18 @@
                     "style": "Regular"
                   },
                   "fontSize": 22,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#5B6472",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 400,
+                  "textColor": "#5B6472"
                 },
                 {
-                  "nodeId": "3:104",
+                  "nodeId": "1:209",
                   "type": "TEXT",
                   "name": "Label",
                   "specId": "today.root.bottom-nav.0.tab.1.label",
@@ -1760,13 +2258,49 @@
                     "style": "Regular"
                   },
                   "fontSize": 12,
-                  "children": []
+                  "children": [],
+                  "fillDetails": [
+                    {
+                      "color": "#5B6472",
+                      "alpha": 1
+                    }
+                  ],
+                  "fontWeight": 400,
+                  "textColor": "#5B6472",
+                  "lineHeight": 16
                 }
-              ]
+              ],
+              "cornerRadius": 0
             }
-          ]
+          ],
+          "fillDetails": [
+            {
+              "color": "#FFFFFF",
+              "alpha": 1
+            }
+          ],
+          "cornerRadius": 0,
+          "borderTop": {
+            "width": 1,
+            "color": "#E5E7EB"
+          },
+          "borderBottom": {
+            "width": 0,
+            "color": "#E5E7EB"
+          },
+          "borderLeft": {
+            "width": 0,
+            "color": "#E5E7EB"
+          }
         }
-      ]
+      ],
+      "fillDetails": [
+        {
+          "color": "#F5F6F8",
+          "alpha": 1
+        }
+      ],
+      "cornerRadius": 0
     }
   ],
   "errors": []
